@@ -1,35 +1,49 @@
-[[redirects]]
-  from = "/:trainer"
-  to = "/index.html"
-  status = 200
-  conditions = {Role = ["trainer-profile"]}
-
-[[redirects]]
-  from = "/:trainer"
-  to = "/index.html"
-  status = 200
-
-[[edge_functions]]
-  function = "og-injector"
-  path = "/:trainer"
-
-[[edge_functions]]
-  function = "sitemap"
-  path = "/sitemap.xml"
-
 [build]
   publish = "."
-  command = "npm run build"
+  command = ""
 
-[[headers]]
-  for = "/dist/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+# Named pages
+[[redirects]]
+  from = "/dashboard"
+  to = "/dashboard.html"
+  status = 200
 
+[[redirects]]
+  from = "/edit"
+  to = "/edit.html"
+  status = 200
+
+[[redirects]]
+  from = "/join"
+  to = "/join.html"
+  status = 200
+
+[[redirects]]
+  from = "/pricing"
+  to = "/pricing.html"
+  status = 200
+
+[[redirects]]
+  from = "/landing"
+  to = "/landing.html"
+  status = 200
+
+# Catch-all: /:slug -> index.html (trainer profile pages)
+[[redirects]]
+  from = "/:trainer"
+  to = "/index.html"
+  status = 200
+
+# Cache headers
 [[headers]]
   for = "/*.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/styles.css"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
 
 [[headers]]
   for = "/*"
