@@ -1,387 +1,1190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrainedBy</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --brand:#FF5C00;--brand-dim:rgba(255,92,0,.10);--brand-border:rgba(255,92,0,.25);
-      --reps:#00C853;--reps-dim:rgba(0,200,83,.10);--wa:#25D366;
-      --bg:#0a0a0a;--s1:#111111;--s2:#1a1a1a;--s3:#222222;
-      --b0:rgba(255,255,255,.05);--b1:rgba(255,255,255,.08);--b2:rgba(255,255,255,.13);
-      --text:#f2f2f2;--t2:#888;--t3:#444;
-    }
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--text);font-family:"Inter",sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
-    .skeleton{background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px}
-    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-    #loading{display:flex;flex-direction:column;align-items:center;padding:60px 24px;gap:20px}
-    .sk-hero{width:100%;max-width:480px;height:260px;border-radius:20px}
-    .sk-av{width:80px;height:80px;border-radius:50%;margin-top:-40px}
-    .sk-ln{height:16px;width:200px}
-    .sk-ln.sm{width:140px;height:12px}
-    .sk-card{width:100%;max-width:480px;height:96px;border-radius:16px}
-    #err{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 24px;text-align:center;gap:16px}
-    .err-icon{font-size:48px}
-    .err-title{font-family:"Manrope",sans-serif;font-weight:800;font-size:24px}
-    .err-sub{color:var(--t2);font-size:15px;max-width:320px;line-height:1.6}
-    .err-link{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;background:var(--brand);color:#fff;border-radius:100px;font-size:14px;font-weight:700;text-decoration:none;margin-top:8px}
-    #profile{display:none}
-    .hero{position:relative;min-height:300px;overflow:hidden}
-    .hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0f0f0f 0%,#1a0a00 50%,#0a0a0a 100%)}
-    .hero-img{position:absolute;inset:0;background-size:cover;background-position:center top;opacity:.35}
-    .hero-ov{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,10,10,.2) 0%,rgba(10,10,10,.7) 60%,rgba(10,10,10,1) 100%)}
-    .hero-bar{position:relative;z-index:2;padding:48px 24px 0;max-width:600px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
-    .hero-logo{font-family:"Manrope",sans-serif;font-weight:900;font-size:16px;color:rgba(255,255,255,.5);text-decoration:none}
-    .hero-share{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:16px;transition:background .2s;outline:none}
-    .hero-share:hover{background:rgba(255,255,255,.18)}
-    .pcard{position:relative;z-index:2;max-width:600px;margin:0 auto;padding:0 16px;transform:translateY(-20px)}
-    .pcard-inner{background:var(--s1);border:1px solid var(--b2);border-radius:20px;padding:24px}
-    .ptop{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}
-    .av{width:72px;height:72px;border-radius:50%;background:var(--s2);border:2px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:"Manrope",sans-serif;font-weight:900;font-size:28px;color:var(--brand);overflow:hidden}
-    .av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-    .pinfo{flex:1;min-width:0}
-    .pname{font-family:"Manrope",sans-serif;font-weight:900;font-size:22px;letter-spacing:-.5px;line-height:1.1;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .ptitle{font-size:13px;color:var(--t2);margin-bottom:10px}
-    .rbadge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700}
-    .rbadge.v{background:var(--reps-dim);border:1px solid rgba(0,200,83,.25);color:var(--reps)}
-    .rbadge.p{background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.25);color:#FFAA00}
-    .rbadge.n{background:var(--b0);border:1px solid var(--b1);color:var(--t2)}
-    .rdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-    .rdot.v{background:var(--reps)}.rdot.p{background:#FFAA00}.rdot.n{background:var(--t3)}
-    .pbio{font-size:14px;color:var(--t2);line-height:1.65;margin-bottom:16px}
-    .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-    .ts{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600;background:var(--brand-dim);border:1px solid var(--brand-border);color:var(--brand)}
-    .tc{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600;background:var(--b0);border:1px solid var(--b1);color:var(--t2)}
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--b1);border-radius:14px;overflow:hidden;margin-bottom:16px}
-    .sc{padding:12px 8px;text-align:center;border-right:1px solid var(--b1);background:var(--s2)}
-    .sc:last-child{border-right:none}
-    .sv{font-family:"Manrope",sans-serif;font-weight:900;font-size:18px;letter-spacing:-.5px;line-height:1;margin-bottom:3px}
-    .sl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
-    .sa{color:var(--reps)}
-    .socials{display:flex;gap:8px;flex-wrap:wrap}
-    .soc{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:100px;background:var(--s2);border:1px solid var(--b1);color:var(--t2);text-decoration:none;font-size:12px;font-weight:600;transition:border-color .2s,color .2s}
-    .soc:hover{border-color:var(--b2);color:var(--text)}
-    .sw{max-width:600px;margin:0 auto;padding:0 16px 24px}
-    .slabel{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
-    .pkgs{display:flex;flex-direction:column;gap:10px}
-    .pkg{background:var(--s1);border:1px solid var(--b1);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:16px;transition:border-color .2s,transform .2s;cursor:pointer}
-    .pkg:hover{border-color:var(--b2);transform:translateY(-1px)}
-    .pkg.ft{border-color:var(--brand-border);background:linear-gradient(135deg,rgba(255,92,0,.05) 0%,var(--s1) 60%)}
-    .pki{width:44px;height:44px;border-radius:12px;background:var(--brand-dim);border:1px solid var(--brand-border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-    .pkn{font-family:"Manrope",sans-serif;font-weight:700;font-size:15px;margin-bottom:3px;display:flex;align-items:center;gap:8px}
-    .pkpop{padding:2px 8px;background:var(--brand);color:#fff;border-radius:100px;font-size:9px;font-weight:700}
-    .pkm{font-size:12px;color:var(--t2)}
-    .pkp{text-align:right;flex-shrink:0}
-    .pka{font-family:"Manrope",sans-serif;font-weight:900;font-size:18px;letter-spacing:-.5px;color:var(--brand)}
-    .pkper{font-size:10px;color:var(--t3)}
-    .pkarr{color:var(--t3);font-size:16px;flex-shrink:0}
-    .acard{background:var(--s1);border:1px solid var(--b1);border-radius:16px;overflow:hidden}
-    .ahead{padding:18px 20px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .2s}
-    .ahead:hover{background:var(--b0)}
-    .aico{width:40px;height:40px;border-radius:10px;background:var(--brand-dim);border:1px solid var(--brand-border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-    .atitle{font-family:"Manrope",sans-serif;font-weight:700;font-size:15px}
-    .asub{font-size:12px;color:var(--t2)}
-    .achev{margin-left:auto;color:var(--t3);font-size:18px;transition:transform .3s}
-    .achev.open{transform:rotate(180deg)}
-    .abody{display:none;padding:0 20px 20px}
-    .abody.open{display:block}
-    .aform{display:flex;flex-direction:column;gap:14px}
-    .arow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .af label{display:block;font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-    .af input,.af select{width:100%;padding:12px 14px;background:var(--s2);border:1px solid var(--b2);border-radius:10px;color:var(--text);font-size:14px;font-family:"Inter",sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
-    .af input:focus,.af select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(255,92,0,.12)}
-    .af select option{background:var(--s2)}
-    .arun{width:100%;padding:14px;background:var(--brand);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:"Inter",sans-serif;cursor:pointer;transition:background .2s,transform .2s}
-    .arun:hover{background:#e05200;transform:translateY(-1px)}
-    .ares{display:none;flex-direction:column;gap:10px}
-    .arc{background:var(--s2);border-radius:12px;padding:14px 16px}
-    .arl{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-    .arv{font-family:"Manrope",sans-serif;font-weight:900;font-size:28px;letter-spacing:-1px;color:var(--brand);line-height:1}
-    .ard{font-size:12px;color:var(--t2);margin-top:3px}
-    .abook{width:100%;padding:14px;background:var(--brand);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:"Inter",sans-serif;cursor:pointer;transition:background .2s}
-    .abook:hover{background:#e05200}
-    .ggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border-radius:16px;overflow:hidden}
-    .gimg{aspect-ratio:1;background:var(--s2);overflow:hidden;cursor:pointer}
-    .gimg img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
-    .gimg:hover img{transform:scale(1.05)}
-    .mov{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:200;display:none;align-items:flex-end;justify-content:center}
-    .mov.open{display:flex}
-    .modal{background:var(--s1);border:1px solid var(--b2);border-radius:24px 24px 0 0;padding:28px 24px 40px;width:100%;max-width:600px;animation:slideUp .3s cubic-bezier(.34,1.56,.64,1);position:relative}
-    @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
-    .mhandle{width:36px;height:4px;background:var(--b2);border-radius:2px;margin:0 auto 20px}
-    .mtitle{font-family:"Manrope",sans-serif;font-weight:800;font-size:20px;margin-bottom:4px}
-    .msub{font-size:13px;color:var(--t2);margin-bottom:20px}
-    .mpkg{background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:14px 16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
-    .mpkgn{font-family:"Manrope",sans-serif;font-weight:700;font-size:14px}
-    .mpkgp{font-family:"Manrope",sans-serif;font-weight:900;font-size:16px;color:var(--brand)}
-    .lform{display:flex;flex-direction:column;gap:12px}
-    .lf label{display:block;font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-    .lf input{width:100%;padding:14px 16px;background:var(--s2);border:1px solid var(--b2);border-radius:12px;color:var(--text);font-size:15px;font-family:"Inter",sans-serif;outline:none;transition:border-color .2s,box-shadow .2s}
-    .lf input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(255,92,0,.12)}
-    .lsub{width:100%;padding:16px;background:var(--brand);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:"Inter",sans-serif;cursor:pointer;transition:background .2s,transform .2s;margin-top:4px}
-    .lsub:hover{background:#e05200;transform:translateY(-1px)}
-    .lsucc{display:none;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:20px 0}
-    .lsi{font-size:48px}
-    .lst{font-family:"Manrope",sans-serif;font-weight:800;font-size:20px}
-    .lss{font-size:14px;color:var(--t2);line-height:1.6}
-    .mcl{position:absolute;top:20px;right:20px;width:32px;height:32px;border-radius:50%;background:var(--b1);border:none;color:var(--t2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
-    .mcl:hover{background:var(--b2)}
-    .wafab{position:fixed;bottom:24px;right:20px;z-index:100;display:none}
-    .wabtn{display:flex;align-items:center;gap:10px;padding:14px 20px;background:var(--wa);color:#fff;border:none;border-radius:100px;font-size:14px;font-weight:700;font-family:"Inter",sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(37,211,102,.3);transition:transform .2s,box-shadow .2s;text-decoration:none}
-    .wabtn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(37,211,102,.4)}
-    .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--s1);border:1px solid var(--b2);border-radius:100px;padding:10px 20px;font-size:13px;font-weight:600;z-index:300;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
-    .toast.show{transform:translateX(-50%) translateY(0)}
-    .pfooter{max-width:600px;margin:0 auto;padding:24px 16px 80px;text-align:center}
-    .fbrand{font-family:"Manrope",sans-serif;font-weight:900;font-size:13px;color:var(--t3);text-decoration:none}
-    .fbrand span{color:var(--brand)}
-    .hidden{display:none!important}
-    @media(min-width:600px){.wafab{right:calc(50% - 280px)}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>TrainedBy</title>
+<meta name="description" content="Verified personal trainer profile">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="TrainedBy">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --orange:#FF5C00;
+    --orange-dim:rgba(255,92,0,0.15);
+    --green:#22c55e;
+    --green-dim:rgba(34,197,94,0.15);
+    --white:#ffffff;
+    --white-60:rgba(255,255,255,0.6);
+    --white-30:rgba(255,255,255,0.3);
+    --white-10:rgba(255,255,255,0.1);
+    --white-06:rgba(255,255,255,0.06);
+    --black:#000000;
+    --glass:rgba(10,10,10,0.55);
+    --glass-border:rgba(255,255,255,0.12);
+    --radius:16px;
+    --radius-sm:10px;
+    --font:'Manrope',sans-serif;
+  }
+  html,body{height:100%;width:100%;overflow-x:hidden}
+  body{font-family:var(--font);background:#0a0a0a;color:var(--white);-webkit-font-smoothing:antialiased}
+
+  /* ── FULL BLEED BACKGROUND ── */
+  #bg{
+    position:fixed;inset:0;z-index:0;
+    background:#0a0a0a;
+    background-image:url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&q=85');
+    background-size:cover;background-position:center top;
+  }
+  #bg::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.35) 0%,
+      rgba(0,0,0,0.5) 40%,
+      rgba(0,0,0,0.82) 70%,
+      rgba(0,0,0,0.97) 100%
+    );
+  }
+
+  /* ── TOP BAR ── */
+  #topbar{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:env(safe-area-inset-top,16px) 20px 12px;
+    padding-top:max(env(safe-area-inset-top),16px);
+  }
+  .tb-logo{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-60)}
+  .tb-cta{
+    background:rgba(255,255,255,0.12);
+    border:1px solid var(--glass-border);
+    color:var(--white);font-size:12px;font-weight:600;
+    padding:7px 14px;border-radius:20px;
+    text-decoration:none;letter-spacing:0.04em;
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  }
+  .tb-share{
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(255,255,255,0.12);border:1px solid var(--glass-border);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  }
+
+  /* ── MAIN SCROLL CONTAINER ── */
+  #page{
+    position:relative;z-index:1;
+    min-height:100vh;
+    display:flex;flex-direction:column;
+    padding-top:max(env(safe-area-inset-top),16px);
+  }
+
+  /* ── HERO SECTION ── */
+  #hero{
+    flex:1;
+    display:flex;flex-direction:column;align-items:center;
+    padding:72px 24px 32px;
+    text-align:center;
+  }
+
+  /* Avatar */
+  .avatar-wrap{
+    position:relative;
+    width:108px;height:108px;
+    margin-bottom:18px;
+  }
+  .avatar-ring{
+    position:absolute;inset:-4px;
+    border-radius:50%;
+    background:conic-gradient(var(--orange) 0deg 270deg, transparent 270deg);
+    animation:spin 8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .avatar-inner{
+    position:absolute;inset:3px;
+    border-radius:50%;
+    background:#1a1a1a;
+    overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .avatar-inner img{width:100%;height:100%;object-fit:cover}
+  .avatar-initials{font-size:32px;font-weight:800;color:var(--orange)}
+  .avatar-inner.no-photo{
+    background:linear-gradient(135deg,#1a1a1a 0%,#2a1500 100%);
+    border:2px solid rgba(255,92,0,0.3);
+  }
+
+  /* Name row */
+  .name-row{
+    display:flex;align-items:center;gap:8px;
+    margin-bottom:6px;
+  }
+  .trainer-name{font-size:26px;font-weight:800;letter-spacing:-0.02em;color:var(--white)}
+  .verified-badge{
+    width:22px;height:22px;
+    background:var(--orange);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .verified-badge svg{width:12px;height:12px}
+
+  /* Title */
+  .trainer-title{font-size:14px;color:var(--white-60);font-weight:500;margin-bottom:12px;line-height:1.4}
+
+  /* REPs badge row */
+  .badge-row{
+    display:flex;align-items:center;gap:8px;
+    margin-bottom:20px;flex-wrap:wrap;justify-content:center;
+  }
+  .reps-num{font-size:12px;color:var(--white-60);font-weight:500;letter-spacing:0.04em}
+  .reps-badge{
+    display:flex;align-items:center;gap:5px;
+    background:var(--green-dim);
+    border:1px solid rgba(34,197,94,0.3);
+    border-radius:20px;padding:4px 10px;
+    font-size:12px;font-weight:600;color:var(--green);
+  }
+  .reps-badge svg{width:11px;height:11px}
+  .pending-badge{
+    background:rgba(251,191,36,0.15);
+    border:1px solid rgba(251,191,36,0.3);
+    color:#fbbf24;
+  }
+
+  /* Stats glass pill */
+  .stats-pill{
+    display:flex;align-items:center;
+    background:var(--glass);
+    border:1px solid var(--glass-border);
+    border-radius:14px;
+    padding:14px 0;
+    margin-bottom:16px;
+    width:100%;max-width:340px;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  }
+  .stat-item{
+    flex:1;text-align:center;
+    position:relative;
+  }
+  .stat-item+.stat-item::before{
+    content:'';position:absolute;left:0;top:20%;height:60%;
+    width:1px;background:var(--glass-border);
+  }
+  .stat-val{font-size:20px;font-weight:800;color:var(--white);line-height:1}
+  .stat-val.accept{color:var(--green);font-size:18px}
+  .stat-lbl{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--white-60);margin-top:3px}
+
+  /* Training modes */
+  .modes-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+  .mode-tag{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.04em;border:1px solid}
+  .mode-tag.in-person{background:rgba(255,92,0,0.1);border-color:rgba(255,92,0,0.3);color:var(--orange)}
+  .mode-tag.online{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:#818cf8}
+  .mode-tag.hybrid{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--green)}
+
+  /* Rating row */
+  .rating-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px}
+  .star-filled{color:var(--orange);font-size:14px}
+  .star-empty{color:rgba(255,255,255,0.2);font-size:14px}
+  .rating-score{font-size:14px;font-weight:800}
+  .rating-count{font-size:12px;color:var(--white-60)}
+
+  /* Video badge on avatar */
+  .avatar-video-btn{position:absolute;bottom:2px;right:2px;width:28px;height:28px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;border:2px solid #0a0a0a;cursor:pointer;z-index:2}
+
+  /* Reviews */
+  .reviews-summary{display:flex;align-items:center;gap:14px;padding:14px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid var(--glass-border);margin-bottom:12px}
+  .reviews-big{font-size:44px;font-weight:800;line-height:1}
+  .reviews-meta{flex:1}
+  .reviews-stars{display:flex;gap:2px;margin-bottom:4px}
+  .reviews-count{font-size:12px;color:var(--white-60)}
+  .review-card{background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:10px;padding:14px;margin-bottom:8px}
+  .review-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .review-av{width:34px;height:34px;border-radius:50%;background:var(--orange-dim);border:1px solid rgba(255,92,0,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--orange);flex-shrink:0}
+  .review-name{font-size:13px;font-weight:700}
+  .review-verified{font-size:10px;color:var(--green);font-weight:600;margin-top:2px}
+  .review-stars-sm{display:flex;gap:2px;margin-left:auto}
+  .review-text{font-size:13px;line-height:1.7;color:var(--white-60)}
+  .review-achievement{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:600;color:var(--green)}
+
+  /* Transformations */
+  .transforms-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .transform-card{border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border)}
+  .transform-imgs{display:grid;grid-template-columns:1fr 1fr;gap:1px}
+  .transform-img{aspect-ratio:1;object-fit:cover;width:100%;background:rgba(255,255,255,0.06)}
+  .transform-labels{display:flex;justify-content:space-between;padding:6px 8px 2px}
+  .t-before{font-size:9px;font-weight:700;color:var(--white-60);letter-spacing:0.06em}
+  .t-after{font-size:9px;font-weight:700;color:var(--green);letter-spacing:0.06em}
+  .transform-meta{padding:0 8px 8px;font-size:11px;color:var(--orange);font-weight:700}
+
+  /* Video modal */
+  #videoModal{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+  #videoModal.open{display:flex}
+  #videoModal video{max-width:100%;max-height:80vh;border-radius:var(--radius)}
+  .video-close{position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+  /* Gym tag */
+  .gym-tag{
+    display:inline-flex;align-items:center;gap:5px;
+    background:var(--white-06);border:1px solid var(--glass-border);
+    border-radius:20px;padding:5px 12px;
+    font-size:12px;color:var(--white-60);font-weight:500;
+    margin-bottom:24px;
+  }
+
+  /* ── CTA SECTION ── */
+  #ctas{
+    padding:0 20px 24px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .btn-wa-wrap{display:flex;flex-direction:column;gap:10px}
+  .btn-wa{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    background:#25D366;color:#fff;
+    font-size:16px;font-weight:700;
+    padding:17px 24px;border-radius:14px;
+    text-decoration:none;border:none;cursor:pointer;
+    letter-spacing:0.01em;
+    transition:opacity 0.15s;
+  }
+  .btn-wa:active{opacity:0.85}
+  .btn-wa svg{width:22px;height:22px}
+  .btn-book{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    background:var(--orange);color:#fff;
+    font-size:16px;font-weight:700;
+    padding:17px 24px;border-radius:14px;
+    text-decoration:none;border:none;cursor:pointer;
+    letter-spacing:0.01em;
+    transition:opacity 0.15s;
+  }
+  .btn-book:active{opacity:0.85}
+  .btn-book svg{width:18px;height:18px}
+
+  /* 2-col action grid */
+  .action-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  }
+  .btn-action{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid var(--glass-border);
+    border-radius:14px;padding:16px 12px;
+    color:var(--white);font-size:13px;font-weight:600;
+    cursor:pointer;text-decoration:none;
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    transition:background 0.15s;
+  }
+  .btn-action:active{background:rgba(255,255,255,0.14)}
+  .btn-action svg{width:20px;height:20px;color:var(--white-60)}
+
+  /* Save contact */
+  .btn-save{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    background:transparent;border:none;
+    color:var(--white-60);font-size:13px;font-weight:500;
+    padding:14px;cursor:pointer;text-decoration:none;
+    font-family:var(--font);
+  }
+  .btn-save svg{width:16px;height:16px}
+
+  /* ── BOTTOM SECTIONS ── */
+  #sections{
+    padding:0 20px;
+    display:flex;flex-direction:column;gap:12px;
+    margin-bottom:32px;
+  }
+
+  /* Section card */
+  .sec-card{
+    background:var(--glass);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  }
+  .sec-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 18px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .sec-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--white-60)}
+  .sec-arrow{transition:transform 0.25s;color:var(--white-60)}
+  .sec-arrow.open{transform:rotate(180deg)}
+  .sec-body{display:none;padding:0 18px 16px}
+  .sec-body.open{display:block}
+
+  /* Bio */
+  .bio-text{font-size:14px;line-height:1.7;color:var(--white-60)}
+
+  /* Tags */
+  .tag-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+  .tag{
+    font-size:12px;font-weight:600;padding:5px 11px;border-radius:20px;
+    background:var(--orange-dim);color:var(--orange);
+    border:1px solid rgba(255,92,0,0.2);
+  }
+  .cert-tag{
+    background:var(--white-06);color:var(--white-60);
+    border:1px solid var(--glass-border);
+  }
+
+  /* Packages */
+  .pkg-list{display:flex;flex-direction:column;gap:8px}
+  .pkg-card{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--white-06);border:1px solid var(--glass-border);
+    border-radius:var(--radius-sm);padding:14px 16px;
+    cursor:pointer;transition:background 0.15s;
+    text-decoration:none;
+  }
+  .pkg-card:active{background:var(--white-10)}
+  .pkg-left{display:flex;align-items:center;gap:12px}
+  .pkg-icon{
+    width:36px;height:36px;border-radius:9px;
+    background:var(--orange-dim);
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;flex-shrink:0;
+  }
+  .pkg-name{font-size:14px;font-weight:700;color:var(--white)}
+  .pkg-sessions{font-size:12px;color:var(--white-60);margin-top:1px}
+  .pkg-badge{
+    font-size:10px;font-weight:700;letter-spacing:0.05em;
+    background:var(--orange);color:#fff;
+    padding:2px 7px;border-radius:20px;margin-left:6px;
+    vertical-align:middle;
+  }
+  .pkg-right{text-align:right;flex-shrink:0}
+  .pkg-price{font-size:16px;font-weight:800;color:var(--orange)}
+  .pkg-unit{font-size:11px;color:var(--white-60)}
+
+  /* Assessment */
+  .assess-intro{font-size:13px;color:var(--white-60);margin-bottom:14px;line-height:1.6}
+  .assess-form{display:flex;flex-direction:column;gap:10px}
+  .assess-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .assess-field{display:flex;flex-direction:column;gap:4px}
+  .assess-field label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--white-60)}
+  .assess-field input,.assess-field select{
+    background:var(--white-06);border:1px solid var(--glass-border);
+    border-radius:9px;padding:10px 12px;
+    color:var(--white);font-size:14px;font-family:var(--font);
+    outline:none;
+  }
+  .assess-field input:focus,.assess-field select:focus{border-color:var(--orange)}
+  .assess-field select option{background:#1a1a1a}
+  .btn-assess{
+    background:var(--orange);color:#fff;
+    font-size:14px;font-weight:700;padding:13px;
+    border-radius:10px;border:none;cursor:pointer;
+    font-family:var(--font);margin-top:4px;
+  }
+  .assess-result{
+    background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
+    border-radius:10px;padding:14px;margin-top:8px;
+    font-size:13px;line-height:1.7;color:var(--white);
+    display:none;
+  }
+
+  /* Gallery */
+  .gallery-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
+  }
+  .gallery-img{
+    aspect-ratio:1;border-radius:8px;
+    background:var(--white-06);overflow:hidden;
+  }
+  .gallery-img img{width:100%;height:100%;object-fit:cover}
+
+  /* Powered by */
+  .powered{
+    text-align:center;padding:16px;
+    font-size:11px;color:var(--white-60);
+    letter-spacing:0.04em;
+  }
+  .powered a{color:var(--orange);text-decoration:none;font-weight:600}
+
+  /* Loading skeleton */
+  #loading{
+    position:fixed;inset:0;z-index:200;
+    background:#0a0a0a;
+    display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:16px;
+  }
+  .sk-logo{font-size:18px;font-weight:800;letter-spacing:0.1em;color:var(--white-60)}
+  .sk-spinner{
+    width:32px;height:32px;border-radius:50%;
+    border:2px solid var(--white-10);
+    border-top-color:var(--orange);
+    animation:spin 0.8s linear infinite;
+  }
+
+  /* Error / not found */
+  #err{
+    display:none;
+    position:fixed;inset:0;z-index:200;
+    background:#0a0a0a;
+    align-items:center;justify-content:center;
+    flex-direction:column;gap:12px;padding:40px;text-align:center;
+  }
+  .err-icon{font-size:48px;margin-bottom:8px}
+  .err-title{font-size:20px;font-weight:800}
+  .err-sub{font-size:14px;color:var(--white-60);line-height:1.6}
+
+  /* Pending */
+  #pending{
+    display:none;
+    position:fixed;inset:0;z-index:200;
+    background:#0a0a0a;
+    align-items:center;justify-content:center;
+    flex-direction:column;gap:12px;padding:40px;text-align:center;
+  }
+
+  /* Lead modal */
+  #leadModal{
+    display:none;position:fixed;inset:0;z-index:300;
+    background:rgba(0,0,0,0.7);
+    align-items:flex-end;justify-content:center;
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  }
+  #leadModal.open{display:flex}
+  .modal-sheet{
+    background:#111;border:1px solid var(--glass-border);
+    border-radius:24px 24px 0 0;
+    padding:28px 24px max(env(safe-area-inset-bottom),24px);
+    width:100%;max-width:480px;
+  }
+  .modal-handle{width:36px;height:4px;background:var(--white-30);border-radius:2px;margin:0 auto 20px}
+  .modal-title{font-size:18px;font-weight:800;margin-bottom:4px}
+  .modal-sub{font-size:13px;color:var(--white-60);margin-bottom:20px}
+  .modal-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+  .modal-field label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--white-60)}
+  .modal-field input{
+    background:var(--white-06);border:1px solid var(--glass-border);
+    border-radius:10px;padding:12px 14px;
+    color:var(--white);font-size:15px;font-family:var(--font);outline:none;
+  }
+  .modal-field input:focus{border-color:var(--orange)}
+  .btn-modal-submit{
+    width:100%;background:var(--orange);color:#fff;
+    font-size:15px;font-weight:700;padding:15px;
+    border-radius:12px;border:none;cursor:pointer;
+    font-family:var(--font);margin-top:4px;
+  }
+  .btn-modal-close{
+    position:absolute;top:16px;right:16px;
+    width:32px;height:32px;border-radius:50%;
+    background:var(--white-10);border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--white);
+  }
+</style>
 </head>
 <body>
 
+<!-- Loading -->
 <div id="loading">
-  <div class="skeleton sk-hero"></div>
-  <div class="skeleton sk-av"></div>
-  <div class="skeleton sk-ln"></div>
-  <div class="skeleton sk-ln sm"></div>
-  <div class="skeleton sk-card"></div>
-  <div class="skeleton sk-card"></div>
+  <div class="sk-logo">TRAINEDBY</div>
+  <div class="sk-spinner"></div>
 </div>
 
+<!-- Error -->
 <div id="err">
-  <div class="err-icon">&#x1F3CB;</div>
+  <div class="err-icon">🔍</div>
   <div class="err-title">Trainer not found</div>
-  <p class="err-sub">This profile does not exist or may have been removed. Check the link and try again.</p>
-  <a href="/landing.html" class="err-link">&#x2190; Back to TrainedBy</a>
+  <div class="err-sub">This profile doesn't exist or the link may be incorrect.</div>
+  <a href="/landing.html" style="margin-top:12px;color:var(--orange);font-weight:600;font-size:14px">Browse TrainedBy →</a>
 </div>
 
-<div id="profile">
-  <div class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-img" id="heroBg"></div>
-    <div class="hero-ov"></div>
-    <div class="hero-bar">
-      <a href="/landing.html" class="hero-logo">TrainedBy</a>
-      <button class="hero-share" onclick="shareProfile()" title="Share">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+<!-- Pending -->
+<div id="pending">
+  <div style="width:72px;height:72px;border-radius:50%;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:8px">⏳</div>
+  <div style="font-size:20px;font-weight:800">Verification in Progress</div>
+  <div style="font-size:14px;color:var(--white-60);line-height:1.6;max-width:280px">This trainer's REPs UAE credentials are being verified. Check back shortly.</div>
+</div>
+
+<!-- Background -->
+<div id="bg"></div>
+
+<!-- Top bar -->
+<div id="topbar">
+  <a href="/landing.html" class="tb-logo">TrainedBy</a>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="tb-share" onclick="shareProfile()" title="Share">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    </div>
+    <a href="/join.html" class="tb-cta">Get Your Page</a>
+  </div>
+</div>
+
+<!-- Main page -->
+<div id="page" style="display:none">
+
+  <!-- Hero -->
+  <div id="hero">
+    <!-- Avatar -->
+    <div class="avatar-wrap" style="position:relative">
+      <div class="avatar-ring"></div>
+      <div class="avatar-inner">
+        <img id="avatarImg" src="" alt="" style="display:none">
+        <div id="avatarInitials" class="avatar-initials"></div>
+      </div>
+     <div class="avatar-video-btn" id="videoBadge" style="display:none" onclick="openVideoModal()">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    </div>
+  </div>
+
+  <!-- Rating row -->
+  <div class="rating-row" id="ratingRow" style="display:none">
+    <div id="starsEl" style="display:flex;gap:2px"></div>
+    <span class="rating-score" id="ratingScore"></span>
+    <span class="rating-count" id="ratingCount"></span>
+  </div>
+
+  <!-- Name row -->    <div class="name-row">
+      <span id="trainerName" class="trainer-name">—</span>
+      <span id="verifiedIcon" class="verified-badge" style="display:none">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </span>
+    </div>
+
+    <!-- Title -->
+    <div id="trainerTitle" class="trainer-title">—</div>
+
+    <!-- Badge row -->
+    <div class="badge-row">
+      <span id="repsNum" class="reps-num" style="display:none"></span>
+      <span id="repsBadge" class="reps-badge" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        REPs UAE Verified
+      </span>
+      <span id="pendingBadge" class="reps-badge pending-badge" style="display:none">
+        ⏳ Verification Pending
+      </span>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-pill" id="statsPill">
+      <div class="stat-item">
+        <div class="stat-val" id="sYrs">—</div>
+        <div class="stat-lbl">Yrs Exp</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="sClients">—</div>
+        <div class="stat-lbl">Clients</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="sSessions">—</div>
+        <div class="stat-lbl">Sessions</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val accept" id="sAccept">✓</div>
+        <div class="stat-lbl">Accepting</div>
+      </div>
+    </div>
+
+    <!-- Training modes -->
+    <div class="modes-row" id="modesRow"></div>
+
+    <!-- Gym tag -->
+    <div id="gymTag" class="gym-tag" style="display:none">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      <span id="gymName"></span>
+    </div>
+  </div>
+
+  <!-- CTAs -->
+  <div id="ctas">
+    <div class="btn-wa-wrap">
+    <a id="waBtn" href="#" class="btn-wa" style="display:none">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp Me
+    </a>
+    </div>
+    <button id="bookBtn" class="btn-book" onclick="openLead()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Book a Session
+    </button>
+    <div class="action-grid">
+      <button class="btn-action" onclick="scrollToPackages()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Packages
+      </button>
+      <button class="btn-action" onclick="scrollToAssess()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Free Assessment
       </button>
     </div>
+    <button class="btn-save" onclick="saveContact()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Save My Contact
+    </button>
   </div>
 
-  <div class="pcard">
-    <div class="pcard-inner">
-      <div class="ptop">
-        <div class="av" id="avEl"></div>
-        <div class="pinfo">
-          <div class="pname" id="pname"></div>
-          <div class="ptitle" id="ptitle"></div>
-          <div class="rbadge" id="rbadge"><div class="rdot" id="rdot"></div><span id="rtext"></span></div>
-        </div>
+  <!-- Sections -->
+  <div id="sections">
+
+    <!-- Bio -->
+    <div class="sec-card" id="bioCard" style="display:none">
+      <div class="sec-header" onclick="toggleSec('bioBody',this)">
+        <span class="sec-title">About</span>
+        <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <p class="pbio" id="pbio"></p>
-      <div class="tags" id="stags"></div>
-      <div class="tags" id="ctags"></div>
-      <div class="stats" id="statsRow"></div>
-      <div class="socials" id="socials"></div>
+      <div id="bioBody" class="sec-body">
+        <p id="bioText" class="bio-text"></p>
+        <div id="specTags" class="tag-row" style="margin-top:12px"></div>
+        <div id="certTags" class="tag-row" style="margin-top:8px"></div>
+      </div>
     </div>
-  </div>
 
-  <div class="sw" id="pkgSec">
-    <div class="slabel">Training Packages</div>
-    <div class="pkgs" id="pkgList"></div>
-  </div>
-
-  <div class="sw">
-    <div class="slabel">Free Fitness Assessment</div>
-    <div class="acard">
-      <div class="ahead" onclick="toggleA()">
-        <div class="aico">&#x1F4CA;</div>
-        <div><div class="atitle">Get Your Free Assessment</div><div class="asub">BMI, sessions &amp; plan in 60 seconds</div></div>
-        <div class="achev" id="achev">&#9662;</div>
+    <!-- Packages -->
+    <div class="sec-card" id="pkgsCard" style="display:none">
+      <div class="sec-header" onclick="toggleSec('pkgsBody',this)">
+        <span class="sec-title">Training Packages</span>
+        <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <div class="abody" id="abody">
-        <div class="aform" id="aform">
-          <div class="arow">
-            <div class="af"><label>Age</label><input type="number" id="aAge" placeholder="28" min="16" max="80"></div>
-            <div class="af"><label>Gender</label><select id="aGender"><option value="">Select</option><option value="male">Male</option><option value="female">Female</option></select></div>
+      <div id="pkgsBody" class="sec-body open">
+        <div id="pkgList" class="pkg-list"></div>
+      </div>
+    </div>
+
+    <!-- Assessment -->
+    <div class="sec-card">
+      <div class="sec-header" onclick="toggleSec('assessBody',this)">
+        <span class="sec-title">Free Fitness Assessment</span>
+        <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="assessBody" class="sec-body">
+        <p class="assess-intro">Get your personalised fitness score, BMI, and a recommended training plan in 30 seconds.</p>
+        <div class="assess-form">
+          <div class="assess-row">
+            <div class="assess-field">
+              <label>Age</label>
+              <input type="number" id="aAge" placeholder="28" min="16" max="80">
+            </div>
+            <div class="assess-field">
+              <label>Gender</label>
+              <select id="aGender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
           </div>
-          <div class="arow">
-            <div class="af"><label>Weight (kg)</label><input type="number" id="aWeight" placeholder="75"></div>
-            <div class="af"><label>Height (cm)</label><input type="number" id="aHeight" placeholder="175"></div>
+          <div class="assess-row">
+            <div class="assess-field">
+              <label>Height (cm)</label>
+              <input type="number" id="aHeight" placeholder="175" min="140" max="220">
+            </div>
+            <div class="assess-field">
+              <label>Weight (kg)</label>
+              <input type="number" id="aWeight" placeholder="75" min="40" max="200">
+            </div>
           </div>
-          <div class="af"><label>Goal</label><select id="aGoal"><option value="">Select your goal</option><option value="fat_loss">Fat Loss</option><option value="muscle_gain">Muscle Gain</option><option value="endurance">Endurance</option><option value="general">General Fitness</option></select></div>
-          <button class="arun" onclick="runA()">Calculate My Plan &#x2192;</button>
-        </div>
-        <div class="ares" id="ares">
-          <div class="arc"><div class="arl">Your BMI</div><div class="arv" id="rBMI"></div><div class="ard" id="rBMId"></div></div>
-          <div class="arc"><div class="arl">Sessions / Week</div><div class="arv" id="rSess"></div><div class="ard" id="rSessd"></div></div>
-          <div class="arc"><div class="arl">Suggested Focus</div><div class="arv" id="rFocus" style="font-size:18px;letter-spacing:0"></div><div class="ard" id="rFocusd"></div></div>
-          <button class="abook" onclick="openModal(null,'Trial Session')">Book a Free Trial &#x2192;</button>
+          <div class="assess-field">
+            <label>Goal</label>
+            <select id="aGoal">
+              <option value="fat_loss">Fat Loss</option>
+              <option value="muscle_gain">Muscle Gain</option>
+              <option value="endurance">Endurance</option>
+              <option value="general">General Fitness</option>
+            </select>
+          </div>
+          <div class="assess-field">
+            <label>Activity Level</label>
+            <select id="aActivity">
+              <option value="sedentary">Sedentary (desk job)</option>
+              <option value="light">Light (1–2x/week)</option>
+              <option value="moderate" selected>Moderate (3–4x/week)</option>
+              <option value="active">Active (5+x/week)</option>
+            </select>
+          </div>
+          <button class="btn-assess" onclick="runAssessment()">Get My Free Assessment →</button>
+          <div id="assessResult" class="assess-result"></div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="sw hidden" id="galSec">
-    <div class="slabel">Gallery</div>
-    <div class="ggrid" id="galGrid"></div>
-  </div>
-
-  <div class="pfooter"><a href="/landing.html" class="fbrand">Powered by <span>TrainedBy</span></a></div>
-</div>
-
-<div class="wafab" id="waFab">
-  <a class="wabtn" id="waLink" href="#" target="_blank" rel="noopener">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-    WhatsApp Me
-  </a>
-</div>
-
-<div class="mov" id="mov" onclick="closeModalOv(event)">
-  <div class="modal">
-    <button class="mcl" onclick="closeModal()">&#x00D7;</button>
-    <div class="mhandle"></div>
-    <div id="mform">
-      <div class="mtitle" id="mtitle">Book a Session</div>
-      <p class="msub">Send your details and the trainer will contact you within 24 hours.</p>
-      <div class="mpkg" id="mpkg" style="display:none"><span class="mpkgn" id="mpkgn"></span><span class="mpkgp" id="mpkgp"></span></div>
-      <div class="lform">
-        <div class="lf"><label>Your Name</label><input type="text" id="lName" placeholder="Ahmed Al Rashid"></div>
-        <div class="lf"><label>WhatsApp Number</label><input type="tel" id="lPhone" placeholder="+971 50 123 4567"></div>
-        <div class="lf"><label>Your Goal (optional)</label><input type="text" id="lGoal" placeholder="e.g. Lose 10kg, build muscle..."></div>
-        <button class="lsub" onclick="submitLead()">Send Enquiry &#x2192;</button>
+    <!-- Transformations -->
+    <div class="sec-card" id="transformsCard" style="display:none">
+      <div class="sec-header" onclick="toggleSec('transformsBody',this)">
+        <span class="sec-title">Client Transformations</span>
+        <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="transformsBody" class="sec-body open">
+        <div id="transformsGrid" class="transforms-grid"></div>
       </div>
     </div>
-    <div class="lsucc" id="lsucc">
-      <div class="lsi">&#x2705;</div>
-      <div class="lst">Enquiry Sent!</div>
-      <p class="lss">The trainer will reach out on WhatsApp within 24 hours. Get ready to train.</p>
+
+    <!-- Reviews -->
+    <div class="sec-card" id="reviewsCard" style="display:none">
+      <div class="sec-header" onclick="toggleSec('reviewsBody',this)">
+        <span class="sec-title">Client Reviews</span>
+        <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="reviewsBody" class="sec-body open">
+        <div id="reviewsContent"></div>
+      </div>
     </div>
+
+    <!-- Gallery -->
+    <div class="sec-card" id="galleryCard" style="display:none">
+      <div class="sec-header" onclick="toggleSec('galleryBody',this)">
+        <span class="sec-title">Gallery</span>
+        <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="galleryBody" class="sec-body">
+        <div id="galleryGrid" class="gallery-grid"></div>
+      </div>
+    </div>
+
   </div>
+
+  <!-- Socials -->
+  <div id="socials" style="display:flex;gap:10px;padding:0 20px 20px;flex-wrap:wrap"></div>
+
+  <div class="powered">Powered by <a href="/landing.html">TrainedBy.ae</a> · <a href="/find.html" style="color:var(--orange)">Find a Trainer</a></div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- Video Modal -->
+<div id="videoModal">
+  <button class="video-close" onclick="closeVideoModal()">×</button>
+  <video id="introVideo" controls playsinline></video>
+</div>
+
+<!-- Lead Modal -->
+<div id="leadModal" onclick="if(event.target===this)closeLead()">
+  <div class="modal-sheet" style="position:relative">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Book a Session</div>
+    <div id="modalSub" class="modal-sub">Send your details and the trainer will reach out within 24 hours.</div>
+    <div class="modal-field">
+      <label>Your Name</label>
+      <input type="text" id="leadName" placeholder="Ahmed Al Rashidi">
+    </div>
+    <div class="modal-field">
+      <label>WhatsApp Number</label>
+      <input type="tel" id="leadPhone" placeholder="+971 50 000 0000">
+    </div>
+    <div class="modal-field">
+      <label>Message (optional)</label>
+      <input type="text" id="leadMsg" placeholder="I'm interested in the Monthly Pack">
+    </div>
+    <button class="btn-modal-submit" onclick="submitLead()">Send Request →</button>
+  </div>
+</div>
 
 <script>
-const SB="https://mezhtdbfyvkshpuplqqw.supabase.co";
-const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo";
-let TD=null,SP=null;
-const H={"Authorization":"Bearer "+AK,"apikey":AK};
+const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
 
-function slug(){
-  const p=location.pathname.replace(/\//g,"").trim();
-  if(p&&p!=="index.html")return p;
-  const q=new URLSearchParams(location.search);
-  return q.get("trainer")||q.get("slug")||"";
+let TRAINER = null;
+
+function getSlug() {
+  const path = location.pathname.replace(/^\//, '').trim();
+  if (path && path !== 'index.html') return path;
+  const q = new URLSearchParams(location.search);
+  return q.get('trainer') || q.get('slug') || '';
 }
 
-async function init(){
-  const s=slug();if(!s){showErr();return;}
-  try{
-    const r=await fetch(SB+"/functions/v1/get-trainer?slug="+encodeURIComponent(s),{headers:H});
-    if(!r.ok){showErr();return;}
-    const d=await r.json();
-    if(!d||!d.trainer){showErr();return;}
-    TD=d;render(d);track(d.trainer.id);
-  }catch(e){showErr();}
+async function loadTrainer() {
+  const slug = getSlug();
+  if (!slug) { showErr(); return; }
+  try {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/get-trainer?slug=${encodeURIComponent(slug)}`, {
+      headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY }
+    });
+    if (!r.ok) { showErr(); return; }
+    const data = await r.json();
+    if (!data || data.error) { showErr(); return; }
+    // API returns { trainer: {...}, packages: [...] }
+    const trainer = data.trainer || data;
+    trainer.packages = data.packages || data.session_packages || trainer.packages || [];
+    TRAINER = trainer;
+    render(trainer);
+  } catch(e) {
+    showErr();
+  }
 }
 
-function showErr(){
-  document.getElementById("loading").style.display="none";
-  document.getElementById("err").style.display="flex";
+function render(t) {
+  // Page title
+  document.title = `${t.name} — ${t.title || 'Personal Trainer'} | TrainedBy`;
+
+  // OG meta
+  const ogTitle = document.querySelector('meta[property="og:title"]') || Object.assign(document.createElement('meta'), {property:'og:title'});
+  ogTitle.content = document.title;
+  document.head.appendChild(ogTitle);
+
+  // Background — use trainer cover or avatar or default gym
+  const bgPhoto = t.cover_url || t.photo_url || t.avatar_url;
+  if (bgPhoto) {
+    document.getElementById('bg').style.backgroundImage = `url('${bgPhoto}')`;
+  }
+
+  // Avatar
+  const avatarSrc = t.avatar_url || t.photo_url || t.cover_url;
+  if (avatarSrc) {
+    const img = document.getElementById('avatarImg');
+    img.src = avatarSrc;
+    img.alt = t.name;
+    img.style.display = 'block';
+    document.getElementById('avatarInitials').style.display = 'none';
+  } else {
+    const initials = (t.name || '').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+    document.getElementById('avatarInitials').textContent = initials;
+  }
+
+  // Rating row
+  if (t.avg_rating && t.review_count > 0) {
+    document.getElementById('ratingRow').style.display = 'flex';
+    const score = parseFloat(t.avg_rating);
+    document.getElementById('ratingScore').textContent = score.toFixed(1);
+    document.getElementById('ratingCount').textContent = `(${t.review_count} reviews)`;
+    const starsEl = document.getElementById('starsEl');
+    for (let i = 1; i <= 5; i++) {
+      const s = document.createElement('span');
+      s.textContent = '★';
+      s.className = i <= Math.round(score) ? 'star-filled' : 'star-empty';
+      starsEl.appendChild(s);
+    }
+  }
+
+  // Video intro badge
+  if (t.video_intro_url) {
+    document.getElementById('videoBadge').style.display = 'flex';
+    document.getElementById('introVideo').src = t.video_intro_url;
+  }
+
+  // Training modes
+  const modes = t.training_modes || (t.offers_online && t.offers_in_person ? ['in-person','online'] : t.offers_online ? ['online'] : ['in-person']);
+  const modesRow = document.getElementById('modesRow');
+  const modeLabels = {'in-person':'In-Person','online':'Online','hybrid':'Hybrid'};
+  (Array.isArray(modes) ? modes : [modes]).forEach(m => {
+    const tag = document.createElement('span');
+    tag.className = `mode-tag ${m}`;
+    tag.textContent = modeLabels[m] || m;
+    modesRow.appendChild(tag);
+  });
+
+  // Name
+  document.getElementById('trainerName').textContent = t.name || t.full_name || '';
+
+  // Verified — check both reps_verified and verification_status
+  if (t.reps_verified || t.verification_status === 'verified') {
+    document.getElementById('verifiedIcon').style.display = 'flex';
+    document.getElementById('repsBadge').style.display = 'flex';
+    if (t.reps_number) {
+      const rn = document.getElementById('repsNum');
+      rn.textContent = `REPs #${t.reps_number}`;
+      rn.style.display = 'inline';
+    }
+  } else if (t.verification_status === 'pending') {
+    document.getElementById('pendingBadge').style.display = 'inline-flex';
+  }
+
+  // Title
+  const titleParts = [t.title, t.city || t.location].filter(Boolean);
+  document.getElementById('trainerTitle').textContent = titleParts.join(' · ') || 'Personal Trainer · Dubai';
+
+  // Stats
+  const yrs = t.years_experience;
+  document.getElementById('sYrs').textContent = yrs ? `${yrs}` : '--';
+  const cli = t.clients_trained;
+  document.getElementById('sClients').textContent = cli ? `${cli}+` : '--';
+  const sess = t.sessions_delivered;
+  document.getElementById('sSessions').textContent = sess ? (sess >= 1000 ? `${(sess/1000).toFixed(1)}k` : sess) : '--';
+  // Hide stats pill if all values are empty
+  if (!yrs && !cli && !sess) document.getElementById('statsPill').style.opacity = '0.4';
+  const acc = t.accepting_clients !== false;
+  document.getElementById('sAccept').textContent = acc ? '✓' : '✗';
+  document.getElementById('sAccept').style.color = acc ? 'var(--green)' : 'var(--white-60)';
+
+  // Gym / location tags
+  const gymLabel = t.gym_name || (t.locations && t.locations.length ? t.locations.map(l=>l.charAt(0).toUpperCase()+l.slice(1)).join(' & ') : null);
+  if (gymLabel) {
+    document.getElementById('gymName').textContent = gymLabel;
+    document.getElementById('gymTag').style.display = 'inline-flex';
+  }
+
+  // WhatsApp — always show. If no number, clicking opens the lead form instead
+  const waBtn = document.getElementById('waBtn');
+  if (t.whatsapp) {
+    const wn = t.whatsapp.replace(/\D/g, '');
+    waBtn.href = `https://wa.me/${wn}?text=Hi%20${encodeURIComponent(t.name)}%2C%20I%20found%20your%20profile%20on%20TrainedBy.ae`;
+    waBtn.style.display = 'flex';
+  } else {
+    // No WhatsApp — show button that opens lead form
+    waBtn.href = '#';
+    waBtn.onclick = (e) => { e.preventDefault(); openLead(); };
+    waBtn.style.display = 'flex';
+    waBtn.querySelector('svg').style.display = 'none';
+    waBtn.childNodes[waBtn.childNodes.length-1].textContent = ' Contact Me';
+  }
+
+  // Bio
+  if (t.bio) {
+    document.getElementById('bioText').textContent = t.bio;
+    document.getElementById('bioCard').style.display = 'block';
+    (t.specialties || []).forEach(s => {
+      const el = document.createElement('span');
+      el.className = 'tag'; el.textContent = s;
+      document.getElementById('specTags').appendChild(el);
+    });
+    (t.certifications || []).forEach(c => {
+      const el = document.createElement('span');
+      el.className = 'tag cert-tag'; el.textContent = c;
+      document.getElementById('certTags').appendChild(el);
+    });
+  }
+
+  // Packages
+  const pkgs = t.packages || t.session_packages || [];
+  if (pkgs.length) {
+    document.getElementById('pkgsCard').style.display = 'block';
+    const icons = [
+      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M6.5 6.5h11M6.5 17.5h11M4 12h16"/><circle cx="4" cy="6.5" r="1.5"/><circle cx="4" cy="17.5" r="1.5"/><circle cx="20" cy="6.5" r="1.5"/><circle cx="20" cy="17.5" r="1.5"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="5" r="3"/><path d="M6.5 8a2 2 0 00-1.905 1.46L2 17h20l-2.595-7.54A2 2 0 0017.5 8h-11z"/><path d="M8.5 17v4M15.5 17v4"/></svg>`
+    ];
+    pkgs.forEach((p, i) => {
+      const card = document.createElement('div');
+      card.className = 'pkg-card';
+      card.onclick = () => openLead(p.name);
+      card.innerHTML = `
+        <div class="pkg-left">
+          <div class="pkg-icon" style="display:flex;align-items:center;justify-content:center">${icons[i % icons.length]}</div>
+          <div>
+            <div class="pkg-name">${p.name || p.title || ''}${p.is_popular ? '<span class="pkg-badge">Popular</span>' : ''}</div>
+            <div class="pkg-sessions">${p.sessions_count || p.sessions || 1} session${(p.sessions_count||p.sessions||1)>1?'s':''}</div>
+          </div>
+        </div>
+        <div class="pkg-right">
+          <div class="pkg-price">AED ${(p.price||p.price_aed||0).toLocaleString()}</div>
+          <div class="pkg-unit">per pack</div>
+        </div>`;
+      document.getElementById('pkgList').appendChild(card);
+    });
+  }
+
+  // Gallery
+  const gallery = t.gallery_urls || t.gallery || [];
+  if (gallery.length) {
+    document.getElementById('galleryCard').style.display = 'block';
+    gallery.slice(0,9).forEach(url => {
+      const div = document.createElement('div');
+      div.className = 'gallery-img';
+      div.innerHTML = `<img src="${url}" alt="Gallery" loading="lazy">`;
+      document.getElementById('galleryGrid').appendChild(div);
+    });
+  }
+
+  // Socials
+  const sl = document.getElementById('socials');
+  if (t.instagram) {
+    const a = document.createElement('a');
+    a.className = 'tag cert-tag';
+    a.href = `https://instagram.com/${t.instagram.replace('@','')}`;
+    a.target = '_blank'; a.rel = 'noopener';
+    a.style.textDecoration = 'none';
+    a.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>${t.instagram}`;
+    sl.appendChild(a);
+    sl.style.display = 'flex';
+  }
+
+  // Add no-photo class to avatar if no image
+  if (!(t.avatar_url || t.photo_url || t.cover_url)) {
+    document.querySelector('.avatar-inner').classList.add('no-photo');
+  }
+  // Show page
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('page').style.display = 'flex';
+
+  // Load reviews and transformations
+  if (t.id) {
+    loadReviews(t.id);
+    loadTransformations(t.id);
+  }
+
+  // Track view
+  trackView(t.id);
 }
 
-function render(d){
-  const t=d.trainer,pkgs=d.packages||[];
-  document.title=t.name+" \u2014 "+(t.title||"Personal Trainer")+" | TrainedBy";
-  if(t.cover_url)document.getElementById("heroBg").style.backgroundImage="url('"+t.cover_url+"')";
-  const av=document.getElementById("avEl");
-  if(t.avatar_url)av.innerHTML="<img src='"+t.avatar_url+"' alt='"+t.name+"'>";
-  else av.textContent=(t.name||"T")[0].toUpperCase();
-  document.getElementById("pname").textContent=t.name||"";
-  document.getElementById("ptitle").textContent=(t.title||"Personal Trainer")+(t.location?" \u00B7 "+t.location:"");
-  const rb=document.getElementById("rbadge"),rd=document.getElementById("rdot"),rt=document.getElementById("rtext");
-  if(t.reps_verified){rb.className="rbadge v";rd.className="rdot v";rt.textContent="REPs UAE Verified";}
-  else if(t.reps_number){rb.className="rbadge p";rd.className="rdot p";rt.textContent="Verification Pending";}
-  else{rb.className="rbadge n";rd.className="rdot n";rt.textContent="Not REPs Registered";}
-  const bio=document.getElementById("pbio");
-  if(t.bio)bio.textContent=t.bio;else bio.style.display="none";
-  const sc=document.getElementById("stags");
-  (t.specialties||[]).forEach(s=>{const e=document.createElement("span");e.className="ts";e.textContent=s;sc.appendChild(e);});
-  const cc=document.getElementById("ctags");
-  (t.certifications||[]).forEach(c=>{const e=document.createElement("span");e.className="tc";e.textContent=c;cc.appendChild(e);});
-  const sr=document.getElementById("statsRow");
-  [{v:t.years_experience?t.years_experience+"":"--",l:"Yrs Exp"},{v:t.clients_trained?t.clients_trained+"+":"--",l:"Clients"},{v:t.sessions_delivered?Math.round(t.sessions_delivered/100)/10+"k":"--",l:"Sessions"},{v:t.accepting_clients!==false?"\u2713":"\u2717",l:"Accepting",c:t.accepting_clients!==false?"sa":""}].forEach(s=>{const e=document.createElement("div");e.className="sc";e.innerHTML="<div class='sv "+(s.c||")+"'>"+s.v+"</div><div class='sl'>"+s.l+"</div>";sr.appendChild(e);});
-  const sl=document.getElementById("socials");
-  if(t.instagram){const a=document.createElement("a");a.className="soc";a.href="https://instagram.com/"+t.instagram.replace("@","");a.target="_blank";a.rel="noopener";a.innerHTML="<svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='2' width='20' height='20' rx='5'/><path d='M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z'/><line x1='17.5' y1='6.5' x2='17.51' y2='6.5'/></svg> "+t.instagram;sl.appendChild(a);}
-  if(t.whatsapp){const wn=t.whatsapp.replace(/\D/g,"");document.getElementById("waLink").href="https://wa.me/"+wn+"?text=Hi%20"+encodeURIComponent(t.name)+"%2C%20I%20found%20your%20profile%20on%20TrainedBy.ae";document.getElementById("waFab").style.display="block";}
-  const pl=document.getElementById("pkgList");
-  if(pkgs.length>0){const icons=["&#x1F3CB;","&#x26A1;","&#x1F3AF;","&#x1F525;","&#x1F4AA;","&#x1F3C3;"];pkgs.forEach((p,i)=>{const c=document.createElement("div");c.className="pkg"+(i===1?" ft":"");c.innerHTML="<div class='pki'>"+icons[i%icons.length]+"</div><div style='flex:1;min-width:0'><div class='pkn'>"+(p.name||"Package")+(i===1?"<span class='pkpop'>Popular</span>":"")+"</div><div class='pkm'>"+(p.sessions?p.sessions+" sessions":"")+(p.duration_min?" \u00B7 "+p.duration_min+"min":"")+"</div></div><div class='pkp'><div class='pka'>AED "+(p.price||0).toLocaleString()+"</div><div class='pkper'>"+(p.sessions?"per pack":"per month")+"</div></div><div class='pkarr'>\u203A</div>";c.onclick=()=>openModal(p);pl.appendChild(c);});}
-  else document.getElementById("pkgSec").style.display="none";
-  const gal=t.gallery_urls||t.gallery||[];
-  if(gal.length>0){const gs=document.getElementById("galSec"),gg=document.getElementById("galGrid");gs.classList.remove("hidden");gal.slice(0,9).forEach(u=>{const d=document.createElement("div");d.className="gimg";d.innerHTML="<img src='"+u+"' alt='Gallery' loading='lazy'>";gg.appendChild(d);});}
-  document.getElementById("loading").style.display="none";
-  document.getElementById("profile").style.display="block";
+async function loadReviews(trainerId) {
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/reviews?trainer_id=eq.${trainerId}&verified=eq.true&order=created_at.desc&limit=8`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    const reviews = await r.json();
+    if (!Array.isArray(reviews) || !reviews.length) return;
+    document.getElementById('reviewsCard').style.display = 'block';
+    const avg = reviews.reduce((a,b) => a+b.rating, 0) / reviews.length;
+    let starsHtml = '';
+    for (let i=1;i<=5;i++) starsHtml += `<span style="color:${i<=Math.round(avg)?'var(--orange)':'rgba(255,255,255,0.2)'};font-size:14px">★</span>`;
+    let html = `<div class="reviews-summary"><div class="reviews-big">${avg.toFixed(1)}</div><div class="reviews-meta"><div class="reviews-stars">${starsHtml}</div><div class="reviews-count">${reviews.length} verified review${reviews.length>1?'s':''}</div></div></div>`;
+    reviews.forEach(rv => {
+      let rvStars = '';
+      for (let i=1;i<=5;i++) rvStars += `<span style="color:${i<=rv.rating?'var(--orange)':'rgba(255,255,255,0.2)'};font-size:12px">★</span>`;
+      html += `<div class="review-card"><div class="review-header"><div class="review-av">${(rv.client_name||'?').substring(0,2).toUpperCase()}</div><div><div class="review-name">${rv.client_name||'Client'}</div><div class="review-verified">✓ Verified</div></div><div class="review-stars-sm">${rvStars}</div></div><div class="review-text">${rv.review_text||''}</div>${rv.goal_achieved?`<div class="review-achievement">🎯 ${rv.goal_achieved}</div>`:''}</div>`;
+    });
+    document.getElementById('reviewsContent').innerHTML = html;
+  } catch(e) {}
 }
 
-function toggleA(){document.getElementById("abody").classList.toggle("open");document.getElementById("achev").classList.toggle("open");}
-
-function runA(){
-  const age=+document.getElementById("aAge").value,w=+document.getElementById("aWeight").value,h=+document.getElementById("aHeight").value,g=document.getElementById("aGender").value,goal=document.getElementById("aGoal").value;
-  if(!age||!w||!h||!g||!goal){toast("Please fill in all fields");return;}
-  const bmi=w/Math.pow(h/100,2);
-  let bd="";if(bmi<18.5)bd="Underweight \u2014 focus on muscle building";else if(bmi<25)bd="Healthy weight \u2014 great foundation";else if(bmi<30)bd="Overweight \u2014 fat loss recommended";else bd="Obese \u2014 structured programme essential";
-  const sm={fat_loss:"4\u20135x",muscle_gain:"4x",endurance:"5x",general:"3x"};
-  const sd={fat_loss:"Mix of HIIT and strength",muscle_gain:"Progressive overload",endurance:"Cardio + functional",general:"Balanced full-body"};
-  const fm={fat_loss:"Fat Loss",muscle_gain:"Hypertrophy",endurance:"Cardio",general:"General Fitness"};
-  const fd={fat_loss:"Caloric deficit + resistance",muscle_gain:"Compound lifts + protein",endurance:"Zone 2 + VO2 max work",general:"Mobility, strength & cardio"};
-  document.getElementById("rBMI").textContent=bmi.toFixed(1);document.getElementById("rBMId").textContent=bd;
-  document.getElementById("rSess").textContent=sm[goal]||"3\u20134x";document.getElementById("rSessd").textContent=sd[goal]||"";
-  document.getElementById("rFocus").textContent=fm[goal]||"General";document.getElementById("rFocusd").textContent=fd[goal]||"";
-  document.getElementById("aform").style.display="none";document.getElementById("ares").style.display="flex";
+async function loadTransformations(trainerId) {
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/transformations?trainer_id=eq.${trainerId}&client_consent=eq.true&order=display_order.asc&limit=6`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    const transforms = await r.json();
+    if (!Array.isArray(transforms) || !transforms.length) return;
+    document.getElementById('transformsCard').style.display = 'block';
+    const grid = document.getElementById('transformsGrid');
+    transforms.forEach(tr => {
+      const card = document.createElement('div');
+      card.className = 'transform-card';
+      card.innerHTML = `<div class="transform-imgs"><img src="${tr.before_url}" class="transform-img" loading="lazy"><img src="${tr.after_url}" class="transform-img" loading="lazy"></div><div class="transform-labels"><span class="t-before">BEFORE</span><span class="t-after">AFTER</span></div>${tr.duration_weeks?`<div class="transform-meta">${tr.duration_weeks}w · ${(tr.goal_type||'').replace('-',' ')}</div>`:''}` ;
+      grid.appendChild(card);
+    });
+  } catch(e) {}
 }
 
-function openModal(pkg,name){
-  SP=pkg;
-  const mp=document.getElementById("mpkg");
-  if(pkg){mp.style.display="flex";document.getElementById("mpkgn").textContent=pkg.name;document.getElementById("mpkgp").textContent="AED "+(pkg.price||0).toLocaleString();document.getElementById("mtitle").textContent="Enquire about "+pkg.name;}
-  else{mp.style.display="none";document.getElementById("mtitle").textContent=name||"Book a Session";}
-  document.getElementById("mform").style.display="block";document.getElementById("lsucc").style.display="none";
-  document.getElementById("mov").classList.add("open");document.body.style.overflow="hidden";
+function openVideoModal() {
+  document.getElementById('videoModal').classList.add('open');
+  document.getElementById('introVideo').play();
 }
-function closeModal(){document.getElementById("mov").classList.remove("open");document.body.style.overflow="";}
-function closeModalOv(e){if(e.target===document.getElementById("mov"))closeModal();}
-
-async function submitLead(){
-  const n=document.getElementById("lName").value.trim(),p=document.getElementById("lPhone").value.trim();
-  if(!n||!p){toast("Please enter your name and WhatsApp number");return;}
-  const btn=document.querySelector(".lsub");btn.textContent="Sending...";btn.disabled=true;
-  try{await fetch(SB+"/functions/v1/submit-lead",{method:"POST",headers:{...H,"Content-Type":"application/json"},body:JSON.stringify({trainer_id:TD?.trainer?.id,name:n,phone:p,goal:document.getElementById("lGoal").value,package_id:SP?.id})});}catch(e){}
-  document.getElementById("mform").style.display="none";document.getElementById("lsucc").style.display="flex";
-  btn.textContent="Send Enquiry \u2192";btn.disabled=false;
+function closeVideoModal() {
+  document.getElementById('videoModal').classList.remove('open');
+  document.getElementById('introVideo').pause();
 }
 
-async function shareProfile(){
-  const url=location.href,name=TD?.trainer?.name||"this trainer";
-  if(navigator.share){try{await navigator.share({title:name+" on TrainedBy",url});return;}catch(e){}}
-  await navigator.clipboard.writeText(url).catch(()=>{});toast("Link copied to clipboard");
+function showErr() {
+  document.getElementById('loading').style.display = 'none';
+  const e = document.getElementById('err');
+  e.style.display = 'flex';
 }
 
-function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2800);}
-
-async function track(id){
-  if(!id)return;
-  try{await fetch(SB+"/functions/v1/track-event",{method:"POST",headers:{...H,"Content-Type":"application/json"},body:JSON.stringify({trainer_id:id,event:"profile_view"})});}catch(e){}
+function toggleSec(id, header) {
+  const body = document.getElementById(id);
+  const arrow = header.querySelector('.sec-arrow');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.classList.toggle('open', !isOpen);
 }
 
-init();
+function scrollToPackages() {
+  document.getElementById('pkgsCard')?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function scrollToAssess() {
+  document.getElementById('assessBody').style.display = 'block';
+  document.getElementById('assessBody').classList.add('open');
+  document.querySelector('#assessBody').closest('.sec-card').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function openLead(pkgName) {
+  if (pkgName) document.getElementById('leadMsg').value = `I'm interested in the ${pkgName}`;
+  document.getElementById('leadModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLead() {
+  document.getElementById('leadModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function submitLead() {
+  const name = document.getElementById('leadName').value.trim();
+  const phone = document.getElementById('leadPhone').value.trim();
+  const msg = document.getElementById('leadMsg').value.trim();
+  if (!name || !phone) { alert('Please enter your name and WhatsApp number.'); return; }
+  const btn = document.querySelector('.btn-modal-submit');
+  btn.textContent = 'Sending…'; btn.disabled = true;
+  try {
+    await fetch(`${SUPABASE_URL}/functions/v1/submit-lead`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trainer_id: TRAINER?.id, name, phone, message: msg, source: 'profile' })
+    });
+    document.getElementById('modalSub').textContent = '✅ Request sent! The trainer will contact you shortly.';
+    btn.textContent = 'Done'; btn.style.background = 'var(--green)';
+    setTimeout(closeLead, 2000);
+  } catch(e) {
+    btn.textContent = 'Send Request →'; btn.disabled = false;
+    alert('Something went wrong. Please try WhatsApp instead.');
+  }
+}
+
+function runAssessment() {
+  const age = parseInt(document.getElementById('aAge').value);
+  const gender = document.getElementById('aGender').value;
+  const height = parseFloat(document.getElementById('aHeight').value);
+  const weight = parseFloat(document.getElementById('aWeight').value);
+  const goal = document.getElementById('aGoal').value;
+  const activity = document.getElementById('aActivity').value;
+  if (!age || !height || !weight) { alert('Please fill in all fields.'); return; }
+
+  const bmi = weight / ((height/100) ** 2);
+  const bmiCat = bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Healthy Weight' : bmi < 30 ? 'Overweight' : 'Obese';
+  const actMult = {sedentary:1.2, light:1.375, moderate:1.55, active:1.725}[activity] || 1.55;
+  const bmr = gender === 'male' ? 10*weight + 6.25*height - 5*age + 5 : 10*weight + 6.25*height - 5*age - 161;
+  const tdee = Math.round(bmr * actMult);
+  const goalMap = {fat_loss:'Fat Loss — aim for a 300–500 kcal daily deficit', muscle_gain:'Muscle Gain — aim for a 200–300 kcal daily surplus', endurance:'Endurance — focus on zone 2 cardio + mobility', general:'General Fitness — balanced strength + cardio split'};
+  const sessMap = {fat_loss:'4–5x/week (3 strength + 2 cardio)', muscle_gain:'4x/week progressive overload', endurance:'5x/week (3 cardio + 2 strength)', general:'3–4x/week full-body'};
+
+  const result = document.getElementById('assessResult');
+  result.style.display = 'block';
+  result.innerHTML = `
+    <div style="font-weight:800;font-size:15px;margin-bottom:10px">Your Assessment Results</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:20px;font-weight:800;color:var(--orange)">${bmi.toFixed(1)}</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--white-60);margin-top:2px">BMI · ${bmiCat}</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:20px;font-weight:800;color:var(--orange)">${tdee.toLocaleString()}</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--white-60);margin-top:2px">Daily Calories</div>
+      </div>
+    </div>
+    <div style="font-size:13px;line-height:1.7;color:var(--white-60)">
+      <strong style="color:var(--white)">Goal:</strong> ${goalMap[goal]}<br>
+      <strong style="color:var(--white)">Recommended:</strong> ${sessMap[goal]}<br><br>
+      <span style="color:var(--orange);font-weight:600">Book a session with ${TRAINER?.name?.split(' ')[0] || 'this trainer'} to get a fully personalised plan →</span>
+    </div>`;
+  result.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function shareProfile() {
+  if (navigator.share) {
+    navigator.share({ title: document.title, url: location.href });
+  } else {
+    navigator.clipboard.writeText(location.href).then(() => alert('Link copied!'));
+  }
+}
+
+function saveContact() {
+  if (!TRAINER) return;
+  const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${TRAINER.name}\nTITLE:${TRAINER.title || 'Personal Trainer'}\nTEL:${TRAINER.whatsapp || ''}\nURL:${location.href}\nNOTE:Verified Personal Trainer on TrainedBy.ae\nEND:VCARD`;
+  const blob = new Blob([vcard], {type:'text/vcard'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${TRAINER.name.replace(/\s+/g,'-')}.vcf`;
+  a.click();
+}
+
+async function trackView(trainerId) {
+  if (!trainerId) return;
+  try {
+    await fetch(`${SUPABASE_URL}/functions/v1/get-trainer`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trainer_id: trainerId, event: 'profile_view' })
+    });
+  } catch(e) {}
+}
+
+loadTrainer();
 </script>
 </body>
 </html>

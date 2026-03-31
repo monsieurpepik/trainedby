@@ -327,7 +327,7 @@ body {
         <input type="text" id="e-title" placeholder="e.g. Strength & Conditioning Coach" maxlength="60">
       </div>
       <div class="field">
-        <label>Bio</label>
+        <label style="display:flex;align-items:center;justify-content:space-between;">Bio <button type="button" onclick="generateAIBio()" style="background:var(--brand-dim);border:1px solid var(--brand-border);color:var(--brand);font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:'Manrope',sans-serif;" id="ai-bio-btn">✦ Write with AI</button></label>
         <textarea id="e-bio" maxlength="400" oninput="document.getElementById('bio-count').textContent=this.value.length"></textarea>
         <div class="field-hint"><span id="bio-count">0</span>/400 characters</div>
       </div>
@@ -398,6 +398,28 @@ body {
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           <span style="font-size:10px;color:var(--text-faint);margin-top:4px;">Add</span>
         </div>
+      </div>
+    </div>
+
+    <!-- Section: Training Modes -->
+    <div class="edit-section">
+      <div class="section-heading">Training Modes</div>
+      <div class="section-sub">Let clients know how you can train them.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="mode-row">
+        <button type="button" class="toggle-pill" onclick="togglePill(this,'modes','in-person')">In-Person</button>
+        <button type="button" class="toggle-pill" onclick="togglePill(this,'modes','online')">Online</button>
+        <button type="button" class="toggle-pill" onclick="togglePill(this,'modes','hybrid')">Hybrid</button>
+      </div>
+    </div>
+
+    <!-- Section: Video Intro -->
+    <div class="edit-section">
+      <div class="section-heading">Video Intro</div>
+      <div class="section-sub">Add a short intro video — YouTube or Instagram Reel link. Clients who watch a video are 3× more likely to book.</div>
+      <div class="field">
+        <label>Video URL</label>
+        <input type="url" id="e-video-intro" placeholder="https://youtube.com/shorts/... or https://instagram.com/reel/...">
+        <div class="field-hint">YouTube Shorts or Instagram Reels work best (under 60 seconds)</div>
       </div>
     </div>
 
@@ -476,6 +498,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let trainer = null;
 let availOn = true;
 const specs = new Set();
+const modes = new Set(['in-person']);
 const galleryImages = [];
 
 // ===== TOAST =====
@@ -563,6 +586,18 @@ function populateForm(t) {
     });
   }
 
+  // Training modes
+  if (t.training_modes) {
+    t.training_modes.forEach(m => modes.add(m));
+    document.querySelectorAll('#mode-row .toggle-pill').forEach(p => {
+      const val = p.textContent.trim().toLowerCase().replace(' ', '-');
+      if (modes.has(val)) p.classList.add('active');
+    });
+  }
+
+  // Video intro
+  if (t.video_intro_url) document.getElementById('e-video-intro').value = t.video_intro_url;
+
   // REPs
   if (t.reps_verified) {
     document.getElementById('reps-verified-card').classList.remove('hidden');
@@ -596,11 +631,38 @@ function updateAvailSwitch() {
   }
 }
 
-// ===== SPECIALTIES =====
+// ===== SPECIALTIES & MODES =====
 function togglePill(el, group, val) {
   el.classList.toggle('active');
-  if (el.classList.contains('active')) specs.add(val);
-  else specs.delete(val);
+  const set = group === 'modes' ? modes : specs;
+  if (el.classList.contains('active')) set.add(val);
+  else set.delete(val);
+}
+
+// ===== AI BIO WRITER =====
+async function generateAIBio() {
+  const btn = document.getElementById('ai-bio-btn');
+  btn.disabled = true; btn.textContent = '✦ Writing...';
+  try {
+    const res = await fetch(EDGE_BASE + '/ai-bio-writer', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: document.getElementById('e-name').value.trim() || trainer?.full_name,
+        specialties: Array.from(specs),
+        certifications: trainer?.certifications || [],
+        years_experience: parseInt(document.getElementById('e-exp').value) || trainer?.years_experience,
+        training_modes: Array.from(modes),
+        city: trainer?.city || 'Dubai'
+      })
+    });
+    const data = await res.json();
+    if (data.bio) {
+      document.getElementById('e-bio').value = data.bio;
+      document.getElementById('bio-count').textContent = data.bio.length;
+      showToast('AI bio generated! Edit it to make it yours.', 'success');
+    } else throw new Error();
+  } catch { showToast('AI bio generation failed. Try again.', 'error'); }
+  finally { btn.disabled = false; btn.textContent = '✦ Write with AI'; }
 }
 
 // ===== PACKAGES =====
@@ -729,6 +791,8 @@ async function saveAll() {
       years_experience: parseInt(document.getElementById('e-exp').value) || null,
       clients_trained: parseInt(document.getElementById('e-clients').value) || null,
       specialties: Array.from(specs),
+      training_modes: Array.from(modes),
+      video_intro_url: document.getElementById('e-video-intro').value.trim() || null,
       accepting_clients: availOn,
       instagram: document.getElementById('e-instagram').value.trim(),
       tiktok: document.getElementById('e-tiktok').value.trim(),

@@ -59,6 +59,13 @@
 
     /* FLOATING CARDS */
     .hero-float-wrap { position: relative; width: 100%; max-width: 680px; height: 380px; }
+    @media (max-width: 640px) {
+      .hero-float-wrap { height: 280px; max-width: 340px; }
+      .float-main { width: 200px; padding: 14px; }
+      .float-lead { left: -10px; bottom: 20px; width: 140px; }
+      .float-stat-card { right: -10px; top: 20px; width: 130px; }
+      .float-stat-big { font-size: 24px; }
+    }
     .float-card { position: absolute; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 16px; padding: 16px; box-shadow: 0 24px 60px rgba(0,0,0,0.5); animation: float 6s ease-in-out infinite; }
     .float-card:nth-child(2) { animation-delay: -2s; }
     .float-card:nth-child(3) { animation-delay: -4s; }
@@ -74,12 +81,12 @@
     .float-stat-v { font-family: 'Manrope',sans-serif; font-weight: 800; font-size: 14px; }
     .float-stat-l { font-size: 9px; color: var(--text-3); text-transform: uppercase; }
     .float-wa { width: 100%; padding: 9px; background: #25D366; border-radius: 8px; color: #fff; font-size: 12px; font-weight: 700; text-align: center; border: none; cursor: pointer; }
-    .float-lead { left: -20px; bottom: 40px; width: 180px; animation-delay: -1s; }
+    .float-lead { left: -20px; bottom: 40px; width: 180px; animation-delay: -1s; z-index: 2; }
     .float-lead-label { font-size: 10px; color: var(--text-2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
     .float-lead-name { font-family: 'Manrope',sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 4px; }
     .float-lead-pkg { font-size: 11px; color: var(--brand); font-weight: 600; }
     .float-lead-time { font-size: 10px; color: var(--text-3); margin-top: 6px; }
-    .float-stat-card { right: -20px; top: 40px; width: 160px; animation-delay: -3s; }
+    .float-stat-card { right: -20px; top: 40px; width: 160px; animation-delay: -3s; z-index: 2; }
     .float-stat-card-label { font-size: 10px; color: var(--text-2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
     .float-stat-big { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 32px; color: var(--brand); line-height: 1; }
     .float-stat-desc { font-size: 11px; color: var(--text-2); margin-top: 4px; }
@@ -207,7 +214,7 @@
 
 <!-- NAV -->
 <nav class="nav" id="nav">
-  <a href="/landing.html" class="nav-logo">TrainedBy</a>
+  <a href="/landing.html" class="nav-logo">Trained<span style="color:#fff">By</span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:2px;vertical-align:middle;margin-bottom:3px"></span></a>
   <div class="nav-links">
     <a href="#how">How it works</a>
     <a href="#pricing">Pricing</a>
@@ -254,7 +261,7 @@
 
 <!-- PROOF BAR -->
 <div class="proof-bar">
-  <div class="proof-item"><div class="proof-num">2,400+</div><div class="proof-label">Trainers in UAE</div></div>
+  <div class="proof-item"><div class="proof-num" style="color:var(--brand)">First 100</div><div class="proof-label">Early Access Spots</div></div>
   <div class="proof-item"><div class="proof-num">REPs UAE</div><div class="proof-label">Official Verification</div></div>
   <div class="proof-item"><div class="proof-num">AED 0</div><div class="proof-label">To Get Started</div></div>
   <div class="proof-item"><div class="proof-num">60 sec</div><div class="proof-label">To Go Live</div></div>
@@ -369,15 +376,24 @@
   <div class="testimonials-grid">
     <div class="testimonial-card">
       <p class="testimonial-quote">"I put the link in my Instagram bio on a Monday. By Wednesday I had two new clients. The REPs badge is what made the difference — they mentioned it."</p>
-      <div class="testimonial-author"><div class="t-avatar">S</div><div><div class="t-name">Sarah Al Mansoori</div><div class="t-role">Strength Coach, Dubai</div><div class="t-reps"><div style="width:5px;height:5px;border-radius:50%;background:#00C853;flex-shrink:0"></div> REPs Level 3</div></div></div>
+      <div class="testimonial-author">
+        <div class="t-avatar" style="background:linear-gradient(135deg,#1a1a1a,#2a1500);border:2px solid rgba(255,92,0,0.4);font-size:16px">SA</div>
+        <div><div class="t-name">Sarah Al Mansoori</div><div class="t-role">Strength Coach, Dubai</div><div class="t-reps"><div style="width:5px;height:5px;border-radius:50%;background:#00C853;flex-shrink:0"></div> REPs Level 3</div></div>
+      </div>
     </div>
     <div class="testimonial-card">
-      <p class="testimonial-quote">"My old linktree looked like everyone else's. TrainedBy looks like a real professional page. Clients take me more seriously now."</p>
-      <div class="testimonial-author"><div class="t-avatar">K</div><div><div class="t-name">Khalid Rashid</div><div class="t-role">HIIT & Functional, Abu Dhabi</div><div class="t-reps"><div style="width:5px;height:5px;border-radius:50%;background:#00C853;flex-shrink:0"></div> REPs Level 4</div></div></div>
+      <p class="testimonial-quote">"My old Linktree looked like everyone else's. TrainedBy looks like a real professional page. Clients take me more seriously now."</p>
+      <div class="testimonial-author">
+        <div class="t-avatar" style="background:linear-gradient(135deg,#0a1a2a,#001a2a);border:2px solid rgba(0,120,255,0.3);font-size:16px">KR</div>
+        <div><div class="t-name">Khalid Rashid</div><div class="t-role">HIIT & Functional, Abu Dhabi</div><div class="t-reps"><div style="width:5px;height:5px;border-radius:50%;background:#00C853;flex-shrink:0"></div> REPs Level 4</div></div>
+      </div>
     </div>
     <div class="testimonial-card">
       <p class="testimonial-quote">"The fitness assessment tool is genius. People fill it in, see their results, and immediately want to book. It's a built-in sales funnel."</p>
-      <div class="testimonial-author"><div class="t-avatar">N</div><div><div class="t-name">Nour Haddad</div><div class="t-role">Nutrition & Wellness, Dubai</div><div class="t-reps"><div style="width:5px;height:5px;border-radius:50%;background:#00C853;flex-shrink:0"></div> REPs Level 3</div></div></div>
+      <div class="testimonial-author">
+        <div class="t-avatar" style="background:linear-gradient(135deg,#1a0a1a,#2a002a);border:2px solid rgba(180,0,255,0.3);font-size:16px">NH</div>
+        <div><div class="t-name">Nour Haddad</div><div class="t-role">Nutrition & Wellness, Dubai</div><div class="t-reps"><div style="width:5px;height:5px;border-radius:50%;background:#00C853;flex-shrink:0"></div> REPs Level 3</div></div>
+      </div>
     </div>
   </div>
 </div>
