@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dashboard — TrainedBy</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF5C00'/%3E%3Ctext x='16' y='23' font-family='Manrope,Arial,sans-serif' font-size='14' font-weight='800' text-anchor='middle' fill='white'%3ETB%3C/text%3E%3C/svg%3E">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap&subset=latin" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap&subset=latin" rel="stylesheet"></noscript>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --brand: #FF5C00; --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
+  --reps: #00C853; --reps-dim: rgba(0,200,83,0.08); --reps-border: rgba(0,200,83,0.2);
+  --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c; --surface-4: #242424;
+  --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.14);
+  --text: #fff; --text-muted: rgba(255,255,255,0.5); --text-faint: rgba(255,255,255,0.25);
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--surface); color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; min-height: 100vh;
+}
+.dash-wrap {
+  max-width: 480px; margin: 0 auto;
+  padding: 0 20px max(80px, env(safe-area-inset-bottom));
+}
+
+/* Header */
+.dash-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: 20px;
+  border-bottom: 1px solid var(--border); margin: 0 -20px; padding-left: 20px; padding-right: 20px;
+}
+.dash-logo {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 16px;
+  text-decoration: none; color: var(--text);
+}
+.header-nav { display: flex; gap: 8px; }
+.header-nav a {
+  padding: 8px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 700; text-decoration: none;
+  transition: all 0.2s;
+}
+.header-nav .nav-edit {
+  background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted);
+}
+.header-nav .nav-edit:hover { border-color: var(--border-hover); color: var(--text); }
+.header-nav .nav-view {
+  background: var(--brand); color: #fff;
+}
+.header-nav .nav-view:hover { background: #e05200; }
+
+/* Trainer greeting */
+.trainer-greeting {
+  padding: 24px 0 20px;
+  border-bottom: 1px solid var(--border);
+}
+.greeting-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.greeting-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  object-fit: cover; background: var(--surface-3);
+  border: 2px solid var(--brand);
+}
+.greeting-name {
+  font-family: 'Manrope', sans-serif; font-size: 18px; font-weight: 800;
+}
+.greeting-sub { font-size: 12px; color: var(--text-muted); }
+
+/* Profile URL copy bar */
+.url-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 14px;
+}
+.url-bar-text {
+  flex: 1; font-size: 13px; font-weight: 600; color: var(--brand);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.url-copy-btn {
+  padding: 6px 12px; border-radius: 8px;
+  background: var(--brand-dim); border: 1px solid var(--brand-border);
+  color: var(--brand); font-size: 11px; font-weight: 700;
+  cursor: pointer; flex-shrink: 0;
+}
+
+/* Stats grid */
+.stats-section { padding: 24px 0; border-bottom: 1px solid var(--border); }
+.stats-section-title {
+  font-size: 11px; font-weight: 700; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;
+}
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.stat-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px;
+}
+.stat-card.brand-card {
+  background: var(--brand-dim); border-color: var(--brand-border);
+}
+.stat-card-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--surface-3); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px; color: var(--text-muted);
+}
+.stat-card.brand-card .stat-card-icon {
+  background: var(--brand-dim); border-color: var(--brand-border); color: var(--brand);
+}
+.stat-card-value {
+  font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 800;
+  letter-spacing: -0.5px; margin-bottom: 2px;
+}
+.stat-card-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+.stat-card-change {
+  font-size: 11px; font-weight: 600; margin-top: 4px;
+}
+.stat-card-change.up { color: var(--reps); }
+.stat-card-change.down { color: #ff5555; }
+
+/* Chart placeholder */
+.chart-section { padding: 24px 0; border-bottom: 1px solid var(--border); }
+.chart-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.chart-title {
+  font-size: 11px; font-weight: 700; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.chart-period-select {
+  padding: 6px 10px; border-radius: 8px;
+  background: var(--surface-3); border: 1px solid var(--border);
+  color: var(--text-muted); font-size: 11px; font-weight: 600;
+  cursor: pointer; outline: none;
+}
+.chart-area {
+  width: 100%; height: 120px; position: relative;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+}
+.chart-bars {
+  display: flex; align-items: flex-end; gap: 4px;
+  padding: 12px 12px 0; height: 100%;
+}
+.chart-bar {
+  flex: 1; border-radius: 4px 4px 0 0;
+  background: var(--brand-dim); border: 1px solid var(--brand-border);
+  transition: background 0.2s; cursor: pointer; min-height: 4px;
+}
+.chart-bar:hover { background: rgba(255,92,0,0.25); }
+.chart-bar.today { background: var(--brand); border-color: var(--brand); }
+.chart-labels {
+  display: flex; gap: 4px; padding: 4px 12px 0;
+}
+.chart-label {
+  flex: 1; text-align: center; font-size: 9px; color: var(--text-faint);
+  font-weight: 600;
+}
+
+/* Leads section */
+.leads-section { padding: 24px 0; border-bottom: 1px solid var(--border); }
+.leads-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.leads-title {
+  font-size: 11px; font-weight: 700; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.leads-count {
+  background: var(--brand); color: #fff;
+  font-size: 10px; font-weight: 700; padding: 2px 8px;
+  border-radius: 10px;
+}
+.lead-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 12px;
+  margin-bottom: 8px;
+}
+.lead-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--surface-3); display: flex; align-items: center;
+  justify-content: center; font-family: 'Manrope', sans-serif;
+  font-size: 14px; font-weight: 800; color: var(--text-muted);
+  flex-shrink: 0;
+}
+.lead-name { font-size: 13px; font-weight: 700; margin-bottom: 1px; }
+.lead-meta { font-size: 11px; color: var(--text-muted); }
+.lead-actions { display: flex; gap: 6px; margin-left: auto; }
+.lead-wa-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(37,211,102,0.08); border: 1px solid rgba(37,211,102,0.15);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; text-decoration: none; color: #25D366;
+  transition: background 0.2s;
+}
+.lead-wa-btn:hover { background: rgba(37,211,102,0.15); }
+.lead-type-tag {
+  padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.lead-type-tag.assessment {
+  background: var(--brand-dim); border: 1px solid var(--brand-border); color: var(--brand);
+}
+.lead-type-tag.booking {
+  background: var(--reps-dim); border: 1px solid var(--reps-border); color: var(--reps);
+}
+.lead-type-tag.package {
+  background: rgba(100,100,255,0.08); border: 1px solid rgba(100,100,255,0.2); color: #8888ff;
+}
+
+/* Onboarding checklist */
+.checklist-section { padding: 24px 0; border-bottom: 1px solid var(--border); }
+.checklist-title {
+  font-size: 11px; font-weight: 700; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;
+}
+.checklist-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: 12px;
+  margin-bottom: 6px; transition: background 0.2s;
+}
+.checklist-item.done { opacity: 0.5; }
+.check-circle {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid var(--border); display: flex; align-items: center; justify-content: center;
+}
+.check-circle.done {
+  background: var(--reps); border-color: var(--reps);
+}
+.checklist-text { font-size: 13px; font-weight: 600; }
+.checklist-sub { font-size: 11px; color: var(--text-muted); }
+.checklist-action {
+  margin-left: auto; padding: 6px 12px; border-radius: 8px;
+  background: var(--brand-dim); border: 1px solid var(--brand-border);
+  color: var(--brand); font-size: 11px; font-weight: 700;
+  text-decoration: none; cursor: pointer; flex-shrink: 0;
+}
+
+/* Upgrade banner */
+.upgrade-banner {
+  background: linear-gradient(135deg, rgba(255,92,0,0.12) 0%, rgba(255,92,0,0.05) 100%);
+  border: 1px solid var(--brand-border); border-radius: 16px;
+  padding: 20px; margin: 24px 0;
+}
+.upgrade-title {
+  font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 800;
+  margin-bottom: 6px;
+}
+.upgrade-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
+.upgrade-features {
+  display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;
+}
+.upgrade-feature {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text-muted);
+}
+.upgrade-feature svg { flex-shrink: 0; }
+.upgrade-btn {
+  width: 100%; padding: 14px; border-radius: 12px;
+  background: var(--brand); color: #fff; border: none;
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+}
+.upgrade-btn:hover { background: #e05200; }
+
+/* Referral section */
+.referral-section { padding: 24px 0; }
+.referral-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px;
+}
+.referral-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.referral-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.6; }
+.referral-url {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface-3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px;
+}
+.referral-url-text {
+  flex: 1; font-size: 12px; font-weight: 600; color: var(--text-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 32px 0;
+}
+.empty-state-icon { margin-bottom: 12px; }
+.empty-state-text { font-size: 13px; color: var(--text-muted); }
+
+/* Bottom nav */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(10,10,10,0.95); backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  display: flex; padding: 12px 0 max(12px, env(safe-area-inset-bottom));
+  z-index: 20;
+}
+.bottom-nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 3px; cursor: pointer; text-decoration: none;
+  color: var(--text-faint); transition: color 0.2s;
+}
+.bottom-nav-item.active { color: var(--brand); }
+.bottom-nav-item span { font-size: 10px; font-weight: 600; }
+
+/* Spinner */
+.spinner {
+  display: inline-block; width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: max(80px, calc(env(safe-area-inset-bottom) + 70px));
+  left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--surface-3); border: 1px solid var(--border);
+  color: var(--text); padding: 12px 20px; border-radius: 24px;
+  font-size: 13px; font-weight: 600; z-index: 100;
+  transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+  white-space: nowrap; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { background: var(--reps-dim); border-color: var(--reps-border); color: var(--reps); }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="dash-wrap">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <a href="/" class="dash-logo">
+      <svg width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
+      Dashboard
+    </a>
+    <div class="header-nav">
+      <a href="/edit" class="nav-edit">Edit</a>
+      <a id="view-link" href="#" class="nav-view">View Profile</a>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="dash-loading" style="text-align:center;padding:60px 0;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--brand);animation:pulse 1.2s ease-in-out infinite;"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--brand);animation:pulse 1.2s ease-in-out infinite;animation-delay:0.2s;"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--brand);animation:pulse 1.2s ease-in-out infinite;animation-delay:0.4s;"></div>
+    </div>
+    <style>@keyframes pulse{0%,80%,100%{transform:scale(0.6);opacity:0.3}40%{transform:scale(1);opacity:1}}</style>
+  </div>
+
+  <!-- Auth gate -->
+  <div id="dash-auth" class="hidden" style="text-align:center;padding:60px 0;">
+    <h2 style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Sign in to view your dashboard</h2>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:24px;">Access your leads, analytics, and profile settings.</p>
+    <a href="/edit" style="display:inline-block;padding:14px 28px;border-radius:12px;background:var(--brand);color:#fff;text-decoration:none;font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;">Sign In →</a>
+  </div>
+
+  <!-- Dashboard content -->
+  <div id="dash-content" class="hidden">
+
+    <!-- Greeting -->
+    <div class="trainer-greeting">
+      <div class="greeting-row">
+        <img id="dash-avatar" class="greeting-avatar" src="" alt="Avatar">
+        <div>
+          <div class="greeting-name" id="dash-name">Loading...</div>
+          <div class="greeting-sub" id="dash-sub">TrainedBy.ae</div>
+        </div>
+      </div>
+      <div class="url-bar">
+        <span class="url-bar-text" id="dash-url">trainedby.ae/...</span>
+        <button class="url-copy-btn" onclick="copyUrl()">Copy Link</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-section">
+      <div class="stats-section-title">This Week</div>
+      <div class="stats-grid">
+        <div class="stat-card brand-card">
+          <div class="stat-card-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div class="stat-card-value" id="stat-leads">—</div>
+          <div class="stat-card-label">New Leads</div>
+          <div class="stat-card-change up" id="stat-leads-change"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div class="stat-card-value" id="stat-views">—</div>
+          <div class="stat-card-label">Profile Views</div>
+          <div class="stat-card-change up" id="stat-views-change"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div class="stat-card-value" id="stat-wa-taps">—</div>
+          <div class="stat-card-label">WhatsApp Taps</div>
+          <div class="stat-card-change up" id="stat-wa-change"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="stat-card-value" id="stat-assess">—</div>
+          <div class="stat-card-label">Assessments</div>
+          <div class="stat-card-change up" id="stat-assess-change"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Views chart -->
+    <div class="chart-section">
+      <div class="chart-header">
+        <span class="chart-title">Profile Views</span>
+        <select class="chart-period-select" onchange="loadChart(this.value)">
+          <option value="7">Last 7 days</option>
+          <option value="14">Last 14 days</option>
+          <option value="30">Last 30 days</option>
+        </select>
+      </div>
+      <div class="chart-area">
+        <div class="chart-bars" id="chart-bars"></div>
+      </div>
+      <div class="chart-labels" id="chart-labels"></div>
+    </div>
+
+    <!-- Leads -->
+    <div class="leads-section">
+      <div class="leads-header">
+        <span class="leads-title">Recent Leads</span>
+        <span class="leads-count" id="leads-total-badge">0</span>
+      </div>
+      <div id="leads-list">
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div class="empty-state-text">No leads yet — share your profile link to get started.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onboarding Checklist -->
+    <div class="checklist-section" id="checklist-section">
+      <div class="checklist-title">Getting Started</div>
+      <div id="checklist-list"></div>
+    </div>
+
+    <!-- Upgrade Banner -->
+    <div class="upgrade-banner" id="upgrade-banner">
+      <div class="upgrade-title">Unlock Pro Features</div>
+      <div class="upgrade-sub">Get more leads, more visibility, and powerful tools to grow your training business.</div>
+      <div class="upgrade-features">
+        <div class="upgrade-feature">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Unlimited session packages (Free: 3)
+        </div>
+        <div class="upgrade-feature">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Priority placement in search results
+        </div>
+        <div class="upgrade-feature">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Lead notifications via WhatsApp
+        </div>
+        <div class="upgrade-feature">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Transformation gallery (9 photos)
+        </div>
+        <div class="upgrade-feature">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Advanced analytics &amp; weekly reports
+        </div>
+      </div>
+      <button class="upgrade-btn" onclick="startUpgrade()">Upgrade to Pro — AED 99/mo</button>
+    </div>
+
+    <!-- Referral -->
+    <div class="referral-section">
+      <div class="referral-card">
+        <div class="referral-title">Refer a Trainer — Earn Free Months</div>
+        <div class="referral-sub">Share your referral link. When a trainer signs up and upgrades, you both get 1 month free.</div>
+        <div class="referral-url">
+          <span class="referral-url-text" id="referral-url-text">trainedby.ae/join?ref=...</span>
+          <button class="url-copy-btn" onclick="copyReferral()">Copy</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dash-content -->
+
+</div><!-- /dash-wrap -->
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="/dashboard" class="bottom-nav-item active">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    <span>Dashboard</span>
+  </a>
+  <a href="/edit" class="bottom-nav-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    <span>Edit</span>
+  </a>
+  <a id="nav-view-profile" href="#" class="bottom-nav-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    <span>Profile</span>
+  </a>
+  <a href="/pricing" class="bottom-nav-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    <span>Upgrade</span>
+  </a>
+</nav>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+<script>
+const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
+const EDGE_BASE = SUPABASE_URL + '/functions/v1';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let trainer = null;
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast' + (type ? ' ' + type : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+async function init() {
+  const token = localStorage.getItem('tb_edit_token');
+  document.getElementById('dash-loading').style.display = 'none';
+  if (!token) { document.getElementById('dash-auth').classList.remove('hidden'); return; }
+
+  try {
+    const res = await fetch(EDGE_BASE + '/verify-magic-link', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.trainer) throw new Error();
+    trainer = data.trainer;
+    populateDash(trainer);
+    loadStats();
+    loadLeads();
+    loadChart(7);
+    buildChecklist(trainer);
+    document.getElementById('dash-content').classList.remove('hidden');
+  } catch {
+    localStorage.removeItem('tb_edit_token');
+    document.getElementById('dash-auth').classList.remove('hidden');
+  }
+}
+
+function populateDash(t) {
+  document.getElementById('dash-avatar').src = t.avatar_url || '';
+  document.getElementById('dash-name').textContent = 'Hey, ' + (t.name?.split(' ')[0] || 'Trainer') + ' 👋';
+  document.getElementById('dash-sub').textContent = t.reps_verified ? 'REPs Verified Trainer' : 'Verification Pending';
+  const url = 'trainedby.ae/' + t.slug;
+  document.getElementById('dash-url').textContent = url;
+  document.getElementById('view-link').href = '/' + t.slug;
+  document.getElementById('nav-view-profile').href = '/' + t.slug;
+  document.getElementById('referral-url-text').textContent = 'trainedby.ae/join?ref=' + t.slug;
+  if (t.plan === 'pro' || t.plan === 'premium') {
+    document.getElementById('upgrade-banner').style.display = 'none';
+  }
+}
+
+async function loadStats() {
+  try {
+    const res = await fetch(EDGE_BASE + '/weekly-stats', {
+      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('tb_edit_token') }
+    });
+    const data = await res.json();
+    document.getElementById('stat-leads').textContent = data.leads_this_week ?? '0';
+    document.getElementById('stat-views').textContent = data.views_this_week ?? '0';
+    document.getElementById('stat-wa-taps').textContent = data.wa_taps_this_week ?? '0';
+    document.getElementById('stat-assess').textContent = data.assessments_this_week ?? '0';
+    if (data.leads_change) {
+      const el = document.getElementById('stat-leads-change');
+      el.textContent = (data.leads_change > 0 ? '↑' : '↓') + ' ' + Math.abs(data.leads_change) + ' vs last week';
+      el.className = 'stat-card-change ' + (data.leads_change > 0 ? 'up' : 'down');
+    }
+  } catch { /* silently fail */ }
+}
+
+async function loadLeads() {
+  try {
+    const { data, error } = await sb.from('leads')
+      .select('*').eq('trainer_id', trainer.id)
+      .order('created_at', { ascending: false }).limit(10);
+    if (error || !data?.length) return;
+    document.getElementById('leads-total-badge').textContent = data.length;
+    const list = document.getElementById('leads-list');
+    list.innerHTML = '';
+    data.forEach(lead => {
+      const initials = (lead.name || '?').split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+      const timeAgo = formatTimeAgo(lead.created_at);
+      const typeTag = lead.type === 'assessment' ? 'assessment' : lead.type === 'package' ? 'package' : 'booking';
+      const typeLabel = lead.type === 'assessment' ? 'Assessment' : lead.type === 'package' ? 'Package' : 'Booking';
+      const waMsg = encodeURIComponent(`Hi ${lead.name}, I'm ${trainer.name} from TrainedBy.ae. I saw your enquiry and would love to help you reach your fitness goals!`);
+      const waUrl = `https://wa.me/${(lead.phone || '').replace(/\D/g,'')}?text=${waMsg}`;
+      list.innerHTML += `
+        <div class="lead-item">
+          <div class="lead-avatar">${initials}</div>
+          <div>
+            <div class="lead-name">${lead.name || 'Unknown'}</div>
+            <div class="lead-meta">${timeAgo} · ${lead.goal ? lead.goal.replace('_',' ') : 'No goal specified'}</div>
+          </div>
+          <div class="lead-actions">
+            <span class="lead-type-tag ${typeTag}">${typeLabel}</span>
+            ${lead.phone ? `<a href="${waUrl}" class="lead-wa-btn" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>` : ''}
+          </div>
+        </div>`;
+    });
+  } catch { /* silently fail */ }
+}
+
+function loadChart(days) {
+  const bars = document.getElementById('chart-bars');
+  const labels = document.getElementById('chart-labels');
+  bars.innerHTML = ''; labels.innerHTML = '';
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const today = new Date();
+  const data = Array.from({length: days}, () => Math.floor(Math.random() * 40 + 5));
+  const max = Math.max(...data);
+  data.forEach((val, i) => {
+    const d = new Date(today); d.setDate(today.getDate() - (days - 1 - i));
+    const isToday = i === days - 1;
+    const pct = Math.max(8, Math.round((val / max) * 88));
+    bars.innerHTML += `<div class="chart-bar ${isToday ? 'today' : ''}" style="height:${pct}%" title="${val} views"></div>`;
+    if (days <= 7) labels.innerHTML += `<div class="chart-label">${dayNames[d.getDay()]}</div>`;
+    else if (i % 3 === 0) labels.innerHTML += `<div class="chart-label" style="flex:3;">${d.getDate()}/${d.getMonth()+1}</div>`;
+  });
+}
+
+function buildChecklist(t) {
+  const items = [
+    { label: 'Profile photo added', sub: 'A photo increases leads by 5×', done: !!t.avatar_url, action: '/edit', actionLabel: 'Add' },
+    { label: 'Bio written', sub: 'Tell clients what makes you different', done: !!(t.bio && t.bio.length > 30), action: '/edit', actionLabel: 'Write' },
+    { label: 'REPs UAE verified', sub: 'Get the verified badge on your profile', done: !!t.reps_verified, action: '/edit', actionLabel: 'Verify' },
+    { label: 'Session packages added', sub: 'Show clients your rates', done: !!(t.packages && t.packages.length > 0), action: '/edit', actionLabel: 'Add' },
+    { label: 'Instagram connected', sub: 'Link your social media', done: !!t.instagram, action: '/edit', actionLabel: 'Connect' },
+    { label: 'Profile shared', sub: 'Share your link on Instagram bio', done: false, action: null, actionLabel: null }
+  ];
+  const list = document.getElementById('checklist-list');
+  const allDone = items.every(i => i.done);
+  if (allDone) { document.getElementById('checklist-section').style.display = 'none'; return; }
+  items.forEach(item => {
+    list.innerHTML += `
+      <div class="checklist-item ${item.done ? 'done' : ''}">
+        <div class="check-circle ${item.done ? 'done' : ''}">
+          ${item.done ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>' : ''}
+        </div>
+        <div>
+          <div class="checklist-text">${item.label}</div>
+          <div class="checklist-sub">${item.sub}</div>
+        </div>
+        ${!item.done && item.action ? `<a href="${item.action}" class="checklist-action">${item.actionLabel}</a>` : ''}
+      </div>`;
+  });
+}
+
+function copyUrl() {
+  navigator.clipboard.writeText('https://trainedby.ae/' + trainer.slug).then(() => showToast('Link copied!', 'success'));
+}
+function copyReferral() {
+  navigator.clipboard.writeText('https://trainedby.ae/join?ref=' + trainer.slug).then(() => showToast('Referral link copied!', 'success'));
+}
+
+async function startUpgrade() {
+  try {
+    const res = await fetch(EDGE_BASE + '/create-checkout', {
+      method: 'POST', headers: { 'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('tb_edit_token') },
+      body: JSON.stringify({ trainer_id: trainer.id, plan: 'pro', success_url: location.origin + '/dashboard?upgraded=1', cancel_url: location.origin + '/dashboard' })
+    });
+    const data = await res.json();
+    if (data.url) location.href = data.url;
+    else showToast('Could not start checkout. Please try again.', 'error');
+  } catch { showToast('Could not start checkout.', 'error'); }
+}
+
+function formatTimeAgo(dateStr) {
+  const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+// Check for upgrade success
+if (new URLSearchParams(location.search).get('upgraded') === '1') {
+  showToast('Welcome to Pro! 🔥', 'success');
+  history.replaceState({}, '', '/dashboard');
+}
+
+init();
+</script>
+</body>
+</html>

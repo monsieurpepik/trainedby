@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>TrainedBy — UAE Personal Trainer Profiles</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF5C00'/%3E%3Ctext x='16' y='23' font-family='Manrope,Arial,sans-serif' font-size='14' font-weight='800' text-anchor='middle' fill='white'%3ETB%3C/text%3E%3C/svg%3E">
+<!-- Preconnect -->
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://https://mezhtdbfyvkshpuplqqw.supabase.co.supabase.co" crossorigin>
+<!-- Fonts -->
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap&subset=latin" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap&subset=latin" rel="stylesheet"></noscript>
+<!-- Supabase -->
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" as="script" crossorigin="anonymous">
+<!-- Styles -->
+<link rel="stylesheet" href="/dist/styles.min.css">
+<link rel="manifest" href="/manifest.json">
+<link rel="canonical" id="canonical-url" href="https://trainedby.ae/">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="UAE personal trainer profile — REPs verified, session packages, and direct WhatsApp contact.">
+<!-- Open Graph -->
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="TrainedBy">
+<meta property="og:title" id="og-title" content="TrainedBy — UAE Personal Trainer">
+<meta property="og:description" id="og-desc" content="UAE personal trainer profile — REPs verified, session packages, and direct WhatsApp contact.">
+<meta property="og:image" id="og-image" content="https://trainedby.ae/og-default.jpg">
+<meta property="og:url" id="og-url" content="https://trainedby.ae/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" id="twitter-title" content="TrainedBy — Find UAE Personal Trainers">
+<meta name="twitter:description" id="twitter-description" content="Connect with REPs-verified UAE personal trainers. Browse profiles, session packages, and contact trainers directly.">
+<!-- Schema -->
+<script type="application/ld+json" id="schema-trainer">{"@context":"https://schema.org","@type":"WebSite","name":"TrainedBy","url":"https://trainedby.ae/"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"TrainedBy","url":"https://trainedby.ae","description":"Verified profiles for REPs-registered personal trainers in the UAE.","areaServed":{"@type":"Country","name":"United Arab Emirates"}}</script>
+</head>
+<body>
+<noscript>
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0a0a0a;color:#fff;font-family:'Inter',sans-serif;text-align:center;padding:24px;">
+    <div>
+      <h1 style="font-size:20px;margin-bottom:8px;">JavaScript Required</h1>
+      <p style="color:rgba(255,255,255,0.5);font-size:14px;">Please enable JavaScript to view this trainer profile on TrainedBy.</p>
+    </div>
+  </div>
+</noscript>
+
+<!-- LOADING -->
+<div id="loading" class="loading" role="status" aria-label="Loading">
+  <div class="loading-dot"></div>
+  <div class="loading-dot"></div>
+  <div class="loading-dot"></div>
+</div>
+
+<!-- SKELETON -->
+<div id="skeleton" class="hidden">
+  <div class="skeleton-group">
+    <div class="skeleton skeleton-avatar"></div>
+    <div class="skeleton skeleton-name"></div>
+    <div class="skeleton skeleton-bio"></div>
+    <div class="skeleton skeleton-bio short"></div>
+    <div style="width:100%;max-width:340px;margin-top:24px;">
+      <div class="skeleton skeleton-btn"></div>
+      <div class="skeleton skeleton-btn"></div>
+      <div class="skeleton skeleton-btn"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ERROR: TRAINER NOT FOUND -->
+<div id="error" class="error-page hidden">
+  <div class="error-icon">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  </div>
+  <h1>Trainer Not Found</h1>
+  <p>This profile doesn't exist or the link may have changed.</p>
+  <div class="error-actions">
+    <input class="error-search" type="text" id="trainer-search" placeholder="Search trainer name..." onkeydown="if(event.key==='Enter')searchTrainer()">
+    <div id="search-results" style="display:none;width:100%;margin-bottom:12px;"></div>
+    <a href="/join" class="btn btn-brand" style="font-size:15px;padding:16px;text-decoration:none;">
+      <span class="btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></span>
+      I'm a Trainer — Get Verified
+    </a>
+    <a href="/" class="btn btn-ghost" style="text-decoration:none;">Browse All Trainers</a>
+  </div>
+</div>
+
+<!-- PENDING VERIFICATION -->
+<div id="pending" class="error-page hidden">
+  <div class="error-icon" style="border-color:rgba(255,193,7,0.3);">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,193,7,0.7)" stroke-width="1.5"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/><polyline points="12 8 12 13"/><circle cx="12" cy="16" r="0.5" fill="rgba(255,193,7,0.7)"/></svg>
+  </div>
+  <h1>Verification in Progress</h1>
+  <p><span id="pending-trainer-name"></span>'s profile is being verified by our team. REPs UAE registration typically takes 24–48 hours.</p>
+  <div class="error-actions">
+    <a id="pending-edit-link" href="/edit" class="btn btn-brand" style="font-size:15px;padding:16px;text-decoration:none;display:none;">
+      <span class="btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></span>
+      Edit My Profile
+    </a>
+    <a href="/dashboard" class="btn btn-ghost" style="text-decoration:none;font-size:15px;padding:16px;">Go to Dashboard</a>
+  </div>
+</div>
+
+<!-- ===== TRAINER PROFILE PAGE ===== -->
+<div id="trainer-page" class="hidden">
+  <div id="bg" class="bg bg-fallback"></div>
+  <div class="page">
+
+    <!-- Top Nav -->
+    <div class="top-nav">
+      <div style="display:flex;gap:8px;">
+        <a id="nav-logo" href="/" style="text-decoration:none;display:flex;align-items:center;gap:6px;">
+          <svg width="22" height="22" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
+        </a>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <a id="nav-edit-btn" href="/edit" class="nav-btn hidden" aria-label="Edit profile" style="text-decoration:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </a>
+        <button id="nav-share-btn" class="nav-btn" onclick="nativeShare()" aria-label="Share profile">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        </button>
+        <a href="/join" class="nav-claim" id="nav-claim-btn">Get Your Page</a>
+      </div>
+    </div>
+
+    <!-- Verification Pending Banner -->
+    <div id="verification-pending-banner" class="verify-banner hidden" style="margin-top:16px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,193,7,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <strong>Verification Pending</strong> — Your REPs UAE registration is being confirmed. This usually takes 24 hours.
+    </div>
+
+    <!-- Profile Header -->
+    <div class="profile" style="margin-top:28px;">
+
+      <!-- Avatar + REPs Badge -->
+      <div class="avatar-wrap" id="avatar-container">
+        <img id="trainer-avatar" class="avatar" src="" alt="Trainer" loading="eager">
+        <div class="avatar-ring"></div>
+        <div class="reps-badge" id="reps-badge" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#00C853"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+        </div>
+      </div>
+
+      <!-- Name + Title -->
+      <h1 class="trainer-name" id="trainer-name"></h1>
+      <p class="trainer-title" id="trainer-title"></p>
+
+      <!-- Specialties -->
+      <div class="specialties" id="specialties-row"></div>
+
+      <!-- Stats -->
+      <div class="stats-row" id="stats-row">
+        <div class="stat-item">
+          <div class="stat-value" id="stat-exp">—</div>
+          <div class="stat-label">Yrs Exp</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-clients">—</div>
+          <div class="stat-label">Clients</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-sessions">—</div>
+          <div class="stat-label">Sessions</div>
+        </div>
+      </div>
+
+      <!-- Availability -->
+      <div id="availability-badge" class="availability open" style="margin-bottom:16px;">
+        <span class="availability-dot"></span>
+        <span id="availability-text">Accepting New Clients</span>
+      </div>
+
+      <!-- Bio -->
+      <p class="bio" id="trainer-bio"></p>
+
+      <!-- Social Links -->
+      <div class="social-row" id="social-row"></div>
+
+      <!-- CTA Buttons -->
+      <div class="cta-stack" id="cta-stack">
+        <a id="wa-btn" href="#" class="btn btn-wa" target="_blank" rel="noopener">
+          <span class="btn-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </span>
+          WhatsApp Me
+        </a>
+        <button id="assessment-btn" class="btn btn-brand" onclick="openAssessment()">
+          <span class="btn-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </span>
+          Free Fitness Assessment
+        </button>
+        <button id="book-btn" class="btn btn-ghost" onclick="openLeadModal('book')">
+          <span class="btn-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </span>
+          Book a Trial Session
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== SESSION PACKAGES ===== -->
+    <div class="section" id="sessions-section" style="display:none;">
+      <div class="section-header">
+        <span class="section-title">Session Packages</span>
+      </div>
+      <div class="sessions-grid" id="sessions-grid"></div>
+    </div>
+
+    <!-- ===== CERTIFICATIONS ===== -->
+    <div class="section" id="certs-section" style="display:none;">
+      <div class="section-header">
+        <span class="section-title">Certifications</span>
+      </div>
+      <div class="certs-list" id="certs-list"></div>
+    </div>
+
+    <!-- ===== TRANSFORMATION GALLERY ===== -->
+    <div class="section" id="gallery-section" style="display:none;">
+      <div class="section-header">
+        <span class="section-title">Transformations</span>
+        <button class="section-link" onclick="openGallery()">View All</button>
+      </div>
+      <div class="gallery-grid" id="gallery-grid"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="profile-footer">
+      <a href="https://trainedby.ae">TrainedBy.ae</a> &nbsp;·&nbsp; REPs Verified Trainers in the UAE
+    </div>
+
+  </div><!-- /page -->
+</div><!-- /trainer-page -->
+
+<!-- ===== FITNESS ASSESSMENT MODAL ===== -->
+<div id="assessment-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Fitness Assessment">
+  <div class="modal-sheet" id="assessment-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Free Fitness Assessment</span>
+      <button class="modal-close" onclick="closeAssessment()" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Steps indicator -->
+      <div class="modal-steps">
+        <div class="modal-step-dot active" id="assess-dot-1"><span>1</span></div>
+        <div class="modal-step-line"></div>
+        <div class="modal-step-dot" id="assess-dot-2"><span>2</span></div>
+        <div class="modal-step-line"></div>
+        <div class="modal-step-dot" id="assess-dot-3"><span>3</span></div>
+      </div>
+
+      <!-- Step 1: Body Stats -->
+      <div id="assess-step-1">
+        <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:20px;line-height:1.5;">Answer 3 quick questions to get your personalised fitness score. Takes 30 seconds.</p>
+
+        <div class="modal-field">
+          <label>Age <span class="modal-req">*</span></label>
+          <input type="number" id="assess-age" placeholder="e.g. 28" inputmode="numeric" min="16" max="80">
+        </div>
+
+        <div class="modal-field">
+          <label>Gender <span class="modal-req">*</span></label>
+          <div style="display:flex;gap:8px;">
+            <button class="toggle-btn active" onclick="setAssessField(this,'gender','male')">Male</button>
+            <button class="toggle-btn" onclick="setAssessField(this,'gender','female')">Female</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+          <div class="modal-field" style="flex:1;">
+            <label>Weight (kg) <span class="modal-req">*</span></label>
+            <input type="number" id="assess-weight" placeholder="75" inputmode="numeric" oninput="calcBMI()">
+          </div>
+          <div class="modal-field" style="flex:1;">
+            <label>Height (cm) <span class="modal-req">*</span></label>
+            <input type="number" id="assess-height" placeholder="175" inputmode="numeric" oninput="calcBMI()">
+          </div>
+        </div>
+
+        <!-- BMI result -->
+        <div id="bmi-result" style="display:none;background:var(--brand-dim);border:1px solid var(--brand-border);border-radius:var(--radius);padding:16px;margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px;">Your BMI</div>
+              <div id="bmi-value" style="font-family:'Manrope',sans-serif;font-size:26px;font-weight:800;color:#fff;"></div>
+            </div>
+            <div id="bmi-category" style="font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;"></div>
+          </div>
+        </div>
+
+        <button class="modal-btn" onclick="assessGoStep(2)">Next: Your Goals →</button>
+      </div>
+
+      <!-- Step 2: Goals + Activity -->
+      <div id="assess-step-2" style="display:none;">
+        <div class="modal-field">
+          <label>Primary Goal <span class="modal-req">*</span></label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="toggle-btn" onclick="setAssessField(this,'goal','fat_loss')">Fat Loss</button>
+            <button class="toggle-btn" onclick="setAssessField(this,'goal','muscle_gain')">Muscle Gain</button>
+            <button class="toggle-btn" onclick="setAssessField(this,'goal','endurance')">Endurance</button>
+            <button class="toggle-btn" onclick="setAssessField(this,'goal','general_fitness')">General Fitness</button>
+            <button class="toggle-btn" onclick="setAssessField(this,'goal','sport_specific')">Sport Specific</button>
+          </div>
+        </div>
+
+        <div class="modal-field">
+          <label>Current Activity Level <span class="modal-req">*</span></label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="toggle-btn" onclick="setAssessField(this,'activity','sedentary')">Sedentary</button>
+            <button class="toggle-btn" onclick="setAssessField(this,'activity','light')">Light (1-2x/wk)</button>
+            <button class="toggle-btn active" onclick="setAssessField(this,'activity','moderate')">Moderate (3-4x/wk)</button>
+            <button class="toggle-btn" onclick="setAssessField(this,'activity','active')">Active (5+/wk)</button>
+          </div>
+        </div>
+
+        <div class="modal-field">
+          <label>Training Location Preference</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="toggle-btn active" onclick="setAssessField(this,'location','gym')">Gym</button>
+            <button class="toggle-btn" onclick="setAssessField(this,'location','home')">Home</button>
+            <button class="toggle-btn" onclick="setAssessField(this,'location','outdoor')">Outdoor</button>
+            <button class="toggle-btn" onclick="setAssessField(this,'location','flexible')">Flexible</button>
+          </div>
+        </div>
+
+        <!-- TDEE Result -->
+        <div id="tdee-result" style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Your Daily Calorie Target</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">Maintenance</div>
+              <div id="tdee-maintain" style="font-family:'Manrope',sans-serif;font-size:18px;font-weight:800;color:#fff;">—</div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">Goal Target</div>
+              <div id="tdee-goal" style="font-family:'Manrope',sans-serif;font-size:18px;font-weight:800;color:var(--brand);">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button class="modal-btn" onclick="assessGoStep(1)" style="flex:0 0 auto;background:transparent;border:1px solid var(--border);color:rgba(255,255,255,0.5);padding:14px 18px;">←</button>
+          <button class="modal-btn" onclick="assessGoStep(3)" style="flex:1;">Get My Plan →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Contact + Submit -->
+      <div id="assess-step-3" style="display:none;">
+        <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:20px;line-height:1.5;">Your results go to the trainer. They'll reach out with a personalised plan — free, no obligation.</p>
+
+        <div class="modal-field">
+          <label>Full Name <span class="modal-req">*</span></label>
+          <input type="text" id="assess-name" placeholder="Your full name" autocomplete="name">
+        </div>
+        <div class="modal-field">
+          <label>Phone / WhatsApp <span class="modal-req">*</span></label>
+          <div style="display:flex;align-items:center;background:var(--surface-3);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">
+            <span style="padding:12px 0 12px 14px;font-size:14px;color:rgba(255,255,255,0.3);font-weight:500;white-space:nowrap;">+971</span>
+            <input type="tel" id="assess-phone" placeholder="50 123 4567" inputmode="tel" autocomplete="tel" style="border:none;background:transparent;padding:12px 14px 12px 8px;font-size:14px;flex:1;min-width:0;color:#fff;outline:none;">
+          </div>
+        </div>
+
+        <div id="assess-error" style="display:none;font-size:12px;color:#ff5555;font-weight:500;margin-bottom:10px;"></div>
+
+        <div style="display:flex;gap:8px;">
+          <button class="modal-btn" onclick="assessGoStep(2)" style="flex:0 0 auto;background:transparent;border:1px solid var(--border);color:rgba(255,255,255,0.5);padding:14px 18px;">←</button>
+          <button class="modal-btn" id="assess-submit-btn" onclick="submitAssessment()" style="flex:1;">Send My Results</button>
+        </div>
+
+        <div style="margin-top:14px;padding:12px 14px;border-radius:var(--radius-sm);background:var(--wa-dim);border:1px solid rgba(37,211,102,0.12);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#25D366"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+            <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);">Free for you — no fees, no commitment</span>
+          </div>
+          <span style="font-size:10px;color:rgba(255,255,255,0.3);">Your trainer will contact you on WhatsApp within 24 hours.</span>
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+  </div><!-- /modal-sheet -->
+</div><!-- /assessment-overlay -->
+
+<!-- ===== LEAD / BOOKING MODAL ===== -->
+<div id="lead-overlay" class="lead-modal-overlay" role="dialog" aria-modal="true">
+  <div class="lead-modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title" id="lead-modal-title">Book a Trial Session</span>
+      <button class="modal-close" onclick="closeLeadModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" style="padding:20px;">
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:20px;line-height:1.5;" id="lead-modal-desc">Leave your details and the trainer will get back to you on WhatsApp.</p>
+
+      <div class="modal-field">
+        <label>Full Name <span class="modal-req">*</span></label>
+        <input type="text" id="lead-name" placeholder="Your full name" autocomplete="name">
+      </div>
+      <div class="modal-field">
+        <label>Phone / WhatsApp <span class="modal-req">*</span></label>
+        <div style="display:flex;align-items:center;background:var(--surface-3);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">
+          <span style="padding:12px 0 12px 14px;font-size:14px;color:rgba(255,255,255,0.3);font-weight:500;white-space:nowrap;">+971</span>
+          <input type="tel" id="lead-phone" placeholder="50 123 4567" inputmode="tel" autocomplete="tel" style="border:none;background:transparent;padding:12px 14px 12px 8px;font-size:14px;flex:1;min-width:0;color:#fff;outline:none;">
+        </div>
+      </div>
+      <div class="modal-field">
+        <label>What are you looking for?</label>
+        <select id="lead-goal" style="color:rgba(255,255,255,0.7);">
+          <option value="">Select a goal (optional)</option>
+          <option value="fat_loss">Fat Loss</option>
+          <option value="muscle_gain">Muscle Gain</option>
+          <option value="endurance">Endurance / Cardio</option>
+          <option value="general_fitness">General Fitness</option>
+          <option value="sport_specific">Sport Specific</option>
+          <option value="rehabilitation">Rehabilitation</option>
+        </select>
+      </div>
+
+      <div id="lead-error" style="display:none;font-size:12px;color:#ff5555;font-weight:500;margin-bottom:10px;"></div>
+      <button class="modal-btn" id="lead-submit-btn" onclick="submitLead()">Send Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GALLERY LIGHTBOX ===== -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  <img id="lightbox-img" src="" alt="Transformation">
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+<script type="module" src="/dist/init.bundle.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+*.env.local
+scripts/stripe_ids.json
+scripts/setup_supabase.py
+scripts/run_sql_api.py
+scripts/run_schema.py
+supabase/.temp/
+.DS_Store
+*.log

@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Get Your Verified Trainer Page — TrainedBy</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF5C00'/%3E%3Ctext x='16' y='23' font-family='Manrope,Arial,sans-serif' font-size='14' font-weight='800' text-anchor='middle' fill='white'%3ETB%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Create your verified personal trainer profile on TrainedBy. REPs UAE verified. Free to set up in 5 minutes.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap&subset=latin" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap&subset=latin" rel="stylesheet"></noscript>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --brand: #FF5C00; --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
+  --reps: #00C853; --reps-dim: rgba(0,200,83,0.08); --reps-border: rgba(0,200,83,0.2);
+  --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c;
+  --border: rgba(255,255,255,0.08); --text: #fff;
+  --text-muted: rgba(255,255,255,0.5); --text-faint: rgba(255,255,255,0.25);
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--surface); color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden; min-height: 100vh;
+}
+
+/* Layout */
+.join-wrap {
+  max-width: 480px; margin: 0 auto;
+  padding: 0 20px max(40px, env(safe-area-inset-bottom));
+  min-height: 100vh;
+}
+.join-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: 20px;
+}
+.join-logo {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 16px;
+  text-decoration: none; color: var(--text);
+}
+.join-login-link {
+  font-size: 13px; color: var(--text-muted); text-decoration: none;
+}
+.join-login-link span { color: var(--brand); font-weight: 600; }
+
+/* Progress bar */
+.progress-bar {
+  height: 3px; background: var(--surface-3); border-radius: 2px;
+  margin-bottom: 32px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--brand); border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* Step titles */
+.step-label {
+  font-size: 11px; font-weight: 600; color: var(--brand);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+}
+.step-title {
+  font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 800;
+  letter-spacing: -0.5px; margin-bottom: 6px; line-height: 1.2;
+}
+.step-subtitle {
+  font-size: 14px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.6;
+}
+
+/* Form fields */
+.field { margin-bottom: 18px; }
+.field label {
+  display: block; font-size: 11px; font-weight: 600;
+  color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.06em; margin-bottom: 8px;
+}
+.field input, .field select, .field textarea {
+  width: 100%; padding: 14px 16px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 15px; outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--brand); background: var(--surface-3);
+}
+.field input::placeholder { color: var(--text-faint); }
+.field textarea { resize: vertical; min-height: 100px; }
+.field-hint { font-size: 11px; color: var(--text-faint); margin-top: 5px; }
+.field-req { color: var(--brand); }
+.field-error { font-size: 12px; color: #ff5555; margin-top: 5px; font-weight: 500; }
+
+/* Slug field */
+.slug-field {
+  display: flex; align-items: center;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden; transition: border-color 0.2s;
+}
+.slug-field:focus-within { border-color: var(--brand); }
+.slug-prefix {
+  padding: 14px 0 14px 16px; font-size: 15px;
+  color: var(--text-faint); white-space: nowrap; flex-shrink: 0;
+}
+.slug-field input {
+  border: none; background: transparent; padding: 14px 16px 14px 4px;
+  font-size: 15px; font-weight: 600; flex: 1; min-width: 0;
+  color: var(--text); outline: none;
+}
+.slug-status { padding-right: 14px; flex-shrink: 0; }
+
+/* Toggle pills */
+.toggle-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.toggle-pill {
+  padding: 8px 14px; border-radius: 20px;
+  background: var(--surface-3); border: 1px solid var(--border);
+  color: var(--text-muted); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; user-select: none;
+}
+.toggle-pill.active {
+  background: var(--brand-dim); border-color: var(--brand-border); color: var(--brand);
+}
+.toggle-pill.reps-active {
+  background: var(--reps-dim); border-color: var(--reps-border); color: var(--reps);
+}
+
+/* Photo upload */
+.photo-upload {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 100%; height: 160px; border: 2px dashed var(--border);
+  border-radius: 16px; cursor: pointer; transition: all 0.2s;
+  background: var(--surface-2); position: relative; overflow: hidden;
+}
+.photo-upload:hover { border-color: var(--brand); background: var(--brand-dim); }
+.photo-upload input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.photo-upload-icon { color: var(--text-faint); margin-bottom: 8px; }
+.photo-upload-text { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+.photo-upload-sub { font-size: 11px; color: var(--text-faint); margin-top: 2px; }
+.photo-preview {
+  width: 100%; height: 100%; object-fit: cover;
+  position: absolute; inset: 0; border-radius: 14px;
+}
+
+/* Avatar upload (circular) */
+.avatar-upload-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  margin-bottom: 8px;
+}
+.avatar-upload-circle {
+  width: 100px; height: 100px; border-radius: 50%;
+  border: 2px dashed var(--border); background: var(--surface-2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative; overflow: hidden; transition: all 0.2s;
+}
+.avatar-upload-circle:hover { border-color: var(--brand); }
+.avatar-upload-circle input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+.avatar-upload-circle img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+  position: absolute; inset: 0;
+}
+
+/* OTP input */
+.otp-row { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+.otp-input {
+  width: 52px; height: 60px; border-radius: 12px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  color: var(--text); font-family: 'Manrope', sans-serif;
+  font-size: 24px; font-weight: 800; text-align: center; outline: none;
+  transition: border-color 0.2s;
+}
+.otp-input:focus { border-color: var(--brand); }
+
+/* REPs verification card */
+.reps-card {
+  background: var(--reps-dim); border: 1px solid var(--reps-border);
+  border-radius: 14px; padding: 16px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.reps-card-icon {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(0,200,83,0.12); border: 1px solid var(--reps-border);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.reps-card-title { font-size: 13px; font-weight: 700; color: var(--reps); }
+.reps-card-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* Success screen */
+.success-screen {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 40px 0;
+}
+.success-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--brand-dim); border: 1px solid var(--brand-border);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+}
+.success-title {
+  font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 800;
+  letter-spacing: -0.5px; margin-bottom: 10px;
+}
+.success-sub { font-size: 14px; color: var(--text-muted); max-width: 300px; line-height: 1.6; margin-bottom: 28px; }
+
+/* Profile URL card */
+.url-card {
+  width: 100%; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.url-card-text {
+  flex: 1; font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 700;
+  color: var(--brand); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.url-copy-btn {
+  padding: 8px 14px; border-radius: 8px;
+  background: var(--brand-dim); border: 1px solid var(--brand-border);
+  color: var(--brand); font-size: 12px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+}
+
+/* Primary button */
+.btn-primary {
+  width: 100%; padding: 16px; border-radius: 14px;
+  background: var(--brand); color: #fff; border: none;
+  font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; margin-top: 4px;
+}
+.btn-primary:hover { background: #e05200; transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-secondary {
+  width: 100%; padding: 14px; border-radius: 14px;
+  background: transparent; color: var(--text-muted);
+  border: 1px solid var(--border);
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; margin-top: 10px;
+}
+.btn-secondary:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+/* Trust row */
+.trust-row {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  margin-top: 20px; flex-wrap: wrap;
+}
+.trust-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--text-faint); font-weight: 500;
+}
+
+/* Spinner */
+.spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="join-wrap">
+
+  <!-- Header -->
+  <div class="join-header">
+    <a href="/" class="join-logo">
+      <svg width="28" height="28" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
+      TrainedBy
+    </a>
+    <a href="/edit" class="join-login-link">Already a member? <span>Sign in</span></a>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width:20%"></div>
+  </div>
+
+  <!-- ===== STEP 1: Basic Info ===== -->
+  <div id="step-1">
+    <div class="step-label">Step 1 of 5</div>
+    <h1 class="step-title">Let's build your trainer page</h1>
+    <p class="step-subtitle">Your verified profile goes live in minutes. Free forever.</p>
+
+    <div class="field">
+      <label>Full Name <span class="field-req">*</span></label>
+      <input type="text" id="s1-name" placeholder="e.g. Sarah Al Mansoori" autocomplete="name">
+    </div>
+
+    <div class="field">
+      <label>Your URL <span class="field-req">*</span></label>
+      <div class="slug-field">
+        <span class="slug-prefix">trainedby.ae/</span>
+        <input type="text" id="s1-slug" placeholder="sarah" autocomplete="off" oninput="checkSlug(this.value)">
+        <span class="slug-status" id="slug-status"></span>
+      </div>
+      <div class="field-hint">Only letters, numbers, and hyphens. e.g. trainedby.ae/sarah</div>
+      <div class="field-error hidden" id="slug-error"></div>
+    </div>
+
+    <div class="field">
+      <label>Email <span class="field-req">*</span></label>
+      <input type="email" id="s1-email" placeholder="you@email.com" autocomplete="email">
+      <div class="field-hint">Used for your magic-link login — no password needed</div>
+    </div>
+
+    <div class="field">
+      <label>WhatsApp Number <span class="field-req">*</span></label>
+      <div style="display:flex;align-items:center;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s;" id="wa-field-wrap">
+        <span style="padding:14px 0 14px 16px;font-size:15px;color:var(--text-faint);white-space:nowrap;">+971</span>
+        <input type="tel" id="s1-phone" placeholder="50 123 4567" inputmode="tel" autocomplete="tel"
+          style="border:none;background:transparent;padding:14px 16px 14px 8px;font-size:15px;flex:1;min-width:0;color:var(--text);outline:none;"
+          onfocus="document.getElementById('wa-field-wrap').style.borderColor='var(--brand)'"
+          onblur="document.getElementById('wa-field-wrap').style.borderColor='var(--border)'">
+      </div>
+    </div>
+
+    <div class="field-error hidden" id="s1-error"></div>
+    <button class="btn-primary" onclick="step1Next()">Continue →</button>
+
+    <div class="trust-row">
+      <div class="trust-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#00C853"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+        REPs UAE Verified
+      </div>
+      <div class="trust-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Free Forever
+      </div>
+      <div class="trust-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        5 Min Setup
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STEP 2: REPs Verification ===== -->
+  <div id="step-2" class="hidden">
+    <div class="step-label">Step 2 of 5</div>
+    <h1 class="step-title">Verify your REPs registration</h1>
+    <p class="step-subtitle">Your REPs UAE number gives you the verified badge — the trust signal that sets you apart.</p>
+
+    <div class="reps-card">
+      <div class="reps-card-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#00C853"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+      </div>
+      <div>
+        <div class="reps-card-title">REPs UAE Verified Badge</div>
+        <div class="reps-card-sub">Clients trust verified trainers 3× more. Verification is free and takes 24h.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>REPs UAE Registration Number <span class="field-req">*</span></label>
+      <input type="text" id="s2-reps" placeholder="e.g. REP-12345" autocomplete="off" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.05em;">
+      <div class="field-hint">Find your number at repsuae.com/searcht</div>
+    </div>
+
+    <div class="field">
+      <label>REPs Registration Level</label>
+      <div class="toggle-row">
+        <div class="toggle-pill" onclick="selectRepsLevel(this,'level_2')">Level 2</div>
+        <div class="toggle-pill active" onclick="selectRepsLevel(this,'level_3')">Level 3</div>
+        <div class="toggle-pill" onclick="selectRepsLevel(this,'level_4')">Level 4</div>
+        <div class="toggle-pill" onclick="selectRepsLevel(this,'master')">Master Trainer</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Additional Certifications</label>
+      <div class="toggle-row" id="cert-toggle-row">
+        <div class="toggle-pill" onclick="toggleCert(this,'IFPA')">IFPA</div>
+        <div class="toggle-pill" onclick="toggleCert(this,'NASM')">NASM</div>
+        <div class="toggle-pill" onclick="toggleCert(this,'ACE')">ACE</div>
+        <div class="toggle-pill" onclick="toggleCert(this,'ISSA')">ISSA</div>
+        <div class="toggle-pill" onclick="toggleCert(this,'CrossFit L1')">CrossFit L1</div>
+        <div class="toggle-pill" onclick="toggleCert(this,'CrossFit L2')">CrossFit L2</div>
+        <div class="toggle-pill" onclick="toggleCert(this,'Yoga RYT')">Yoga RYT</div>
+        <div class="toggle-pill" onclick="toggleCert(this,'Nutrition')">Nutrition Coach</div>
+      </div>
+    </div>
+
+    <div class="field-error hidden" id="s2-error"></div>
+    <button class="btn-primary" onclick="step2Next()">Continue →</button>
+    <button class="btn-secondary" onclick="skipReps()">Skip for now — verify later</button>
+  </div>
+
+  <!-- ===== STEP 3: Profile Details ===== -->
+  <div id="step-3" class="hidden">
+    <div class="step-label">Step 3 of 5</div>
+    <h1 class="step-title">Tell clients about yourself</h1>
+    <p class="step-subtitle">This is what potential clients see on your profile. Be specific — it converts.</p>
+
+    <!-- Avatar upload -->
+    <div class="field">
+      <label>Profile Photo <span class="field-req">*</span></label>
+      <div class="avatar-upload-wrap">
+        <div class="avatar-upload-circle" id="avatar-circle">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="file" id="avatar-file" accept="image/*" onchange="previewAvatar(this)">
+          <img id="avatar-preview" src="" alt="" style="display:none;">
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:13px;font-weight:600;color:var(--text-muted);">Upload a professional photo</div>
+          <div style="font-size:11px;color:var(--text-faint);margin-top:2px;">JPG or PNG, at least 400×400px</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Your Title / Role <span class="field-req">*</span></label>
+      <input type="text" id="s3-title" placeholder="e.g. Strength & Conditioning Coach" maxlength="60">
+      <div class="field-hint">Shown below your name on your profile</div>
+    </div>
+
+    <div class="field">
+      <label>Bio <span class="field-req">*</span></label>
+      <textarea id="s3-bio" placeholder="Tell clients what makes you different. Your training philosophy, results you've achieved, who you work best with..." maxlength="400"></textarea>
+      <div class="field-hint"><span id="bio-count">0</span>/400 characters</div>
+    </div>
+
+    <div class="field">
+      <label>Specialties <span class="field-req">*</span></label>
+      <div class="toggle-row" id="spec-toggle-row">
+        <div class="toggle-pill" onclick="toggleSpec(this,'Strength')">Strength</div>
+        <div class="toggle-pill" onclick="toggleSpec(this,'Fat Loss')">Fat Loss</div>
+        <div class="toggle-pill" onclick="toggleSpec(this,'Muscle Gain')">Muscle Gain</div>
+        <div class="toggle-pill" onclick="toggleSpec(this,'HIIT')">HIIT</div>
+        <div class="toggle-pill" onclick="toggleSpec(this,'Cardio')">Cardio</div>
+        <div class="toggle-pill" onclick="toggleSpec(this,'Yoga')">Yoga</div>
+        <div class="toggle-pill" onclick="toggleSpec(this,'Pilates')">Pilates</div>
+        <div class="toggle-pill" onclick="toggleSpec(this,'CrossFit')">CrossFit</div>
+        <div class="toggle-pill" onclick="toggleSpec(this,'Boxing')">Boxing</div>
+        <div class="toggle-pill" onclick="toggleSpec(this,'Nutrition')">Nutrition</div>
+        <div class="toggle-pill" onclick="toggleSpec(this,'Rehabilitation')">Rehabilitation</div>
+        <div class="toggle-pill" onclick="toggleSpec(this,'Sport Specific')">Sport Specific</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;">
+      <div class="field" style="flex:1;">
+        <label>Years of Experience</label>
+        <input type="number" id="s3-exp" placeholder="5" min="0" max="50" inputmode="numeric">
+      </div>
+      <div class="field" style="flex:1;">
+        <label>Clients Trained</label>
+        <input type="number" id="s3-clients" placeholder="120" min="0" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Training Location</label>
+      <div class="toggle-row">
+        <div class="toggle-pill active" onclick="toggleLocation(this,'gym')">Gym</div>
+        <div class="toggle-pill" onclick="toggleLocation(this,'home')">Home Visits</div>
+        <div class="toggle-pill" onclick="toggleLocation(this,'outdoor')">Outdoor</div>
+        <div class="toggle-pill" onclick="toggleLocation(this,'online')">Online</div>
+      </div>
+    </div>
+
+    <div class="field-error hidden" id="s3-error"></div>
+    <button class="btn-primary" onclick="step3Next()">Continue →</button>
+  </div>
+
+  <!-- ===== STEP 4: Social Links + Session Packages ===== -->
+  <div id="step-4" class="hidden">
+    <div class="step-label">Step 4 of 5</div>
+    <h1 class="step-title">Add your links & packages</h1>
+    <p class="step-subtitle">Connect your social media and add your session packages so clients can see your rates.</p>
+
+    <div class="field">
+      <label>Instagram Handle</label>
+      <div style="display:flex;align-items:center;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <span style="padding:14px 0 14px 16px;font-size:15px;color:var(--text-faint);">@</span>
+        <input type="text" id="s4-instagram" placeholder="yourhandle" style="border:none;background:transparent;padding:14px 16px 14px 6px;font-size:15px;flex:1;min-width:0;color:var(--text);outline:none;">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>TikTok Handle</label>
+      <div style="display:flex;align-items:center;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <span style="padding:14px 0 14px 16px;font-size:15px;color:var(--text-faint);">@</span>
+        <input type="text" id="s4-tiktok" placeholder="yourhandle" style="border:none;background:transparent;padding:14px 16px 14px 6px;font-size:15px;flex:1;min-width:0;color:var(--text);outline:none;">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>YouTube Channel URL</label>
+      <input type="url" id="s4-youtube" placeholder="https://youtube.com/@yourchannel">
+    </div>
+
+    <!-- Session Packages -->
+    <div style="margin-top:8px;margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Session Packages</div>
+
+      <div id="packages-list">
+        <!-- Package 1 -->
+        <div class="package-row" style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;">
+          <div style="display:flex;gap:10px;margin-bottom:10px;">
+            <div style="flex:2;">
+              <div style="font-size:10px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Package Name</div>
+              <input type="text" placeholder="e.g. Single Session" style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;">
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:10px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Price (AED)</div>
+              <input type="number" placeholder="350" inputmode="numeric" style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;font-family:'Manrope',sans-serif;font-weight:700;">
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;">
+              <div style="font-size:10px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Duration</div>
+              <select style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;">
+                <option value="30min">30 min</option>
+                <option value="45min">45 min</option>
+                <option value="60min" selected>60 min</option>
+                <option value="90min">90 min</option>
+              </select>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:10px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Sessions</div>
+              <select style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;">
+                <option value="1" selected>1 session</option>
+                <option value="4">4 sessions</option>
+                <option value="8">8 sessions</option>
+                <option value="12">12 sessions</option>
+                <option value="20">20 sessions</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="addPackage()" style="width:100%;padding:12px;border-radius:10px;background:transparent;border:1px dashed var(--border);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
+        + Add Another Package
+      </button>
+    </div>
+
+    <div class="field-error hidden" id="s4-error"></div>
+    <button class="btn-primary" style="margin-top:16px;" onclick="step4Next()">Continue →</button>
+  </div>
+
+  <!-- ===== STEP 5: Email OTP Verification ===== -->
+  <div id="step-5" class="hidden">
+    <div class="step-label">Step 5 of 5</div>
+    <h1 class="step-title">Verify your email</h1>
+    <p class="step-subtitle">We sent a 6-digit code to <strong id="otp-email-display" style="color:var(--brand);"></strong></p>
+
+    <div class="otp-row">
+      <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="otp-0" oninput="otpInput(this,0)">
+      <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="otp-1" oninput="otpInput(this,1)">
+      <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="otp-2" oninput="otpInput(this,2)">
+      <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="otp-3" oninput="otpInput(this,3)">
+      <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="otp-4" oninput="otpInput(this,4)">
+      <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="otp-5" oninput="otpInput(this,5)">
+    </div>
+
+    <div class="field-error hidden" id="otp-error" style="text-align:center;margin-bottom:12px;"></div>
+
+    <button class="btn-primary" id="otp-verify-btn" onclick="verifyOTP()">Verify & Go Live</button>
+    <button class="btn-secondary" onclick="resendOTP()" id="resend-btn">Resend Code</button>
+
+    <p style="text-align:center;font-size:11px;color:var(--text-faint);margin-top:16px;">Check your spam folder if you don't see it within 1 minute.</p>
+  </div>
+
+  <!-- ===== SUCCESS ===== -->
+  <div id="step-success" class="hidden">
+    <div class="success-screen">
+      <div class="success-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="var(--brand)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      </div>
+      <h1 class="success-title">You're live! 🔥</h1>
+      <p class="success-sub">Your profile is being verified by our team. REPs confirmation takes 24–48 hours. Share your link now — clients can already view your page.</p>
+
+      <div class="url-card">
+        <span class="url-card-text" id="success-url">trainedby.ae/you</span>
+        <button class="url-copy-btn" onclick="copyProfileUrl()">Copy</button>
+      </div>
+
+      <a id="view-profile-btn" href="#" class="btn-primary" style="display:block;text-align:center;text-decoration:none;margin-bottom:12px;">View My Profile →</a>
+      <a href="/dashboard" class="btn-secondary" style="display:block;text-align:center;text-decoration:none;">Go to Dashboard</a>
+
+      <div style="margin-top:28px;padding:16px;background:var(--reps-dim);border:1px solid var(--reps-border);border-radius:14px;text-align:left;">
+        <div style="font-size:12px;font-weight:700;color:var(--reps);margin-bottom:8px;">What happens next:</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.8;">
+          ✓ Share your link on Instagram bio<br>
+          ✓ Our team verifies your REPs number (24h)<br>
+          ✓ You get the verified badge on your profile<br>
+          ✓ Leads come in via WhatsApp &amp; assessment form
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /join-wrap -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+<script>
+// ===== CONFIG =====
+const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
+const EDGE_BASE = SUPABASE_URL + '/functions/v1';
+const IS_TEST = !/trainedby\.(ae|com)$/.test(location.hostname);
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ===== STATE =====
+const state = {
+  name: '', slug: '', email: '', phone: '',
+  reps_number: '', reps_level: 'level_3', certs: [],
+  avatar_file: null, title: '', bio: '', specialties: [],
+  exp: null, clients: null, locations: ['gym'],
+  instagram: '', tiktok: '', youtube: '',
+  packages: [], trainer_id: null
+};
+
+// ===== PROGRESS =====
+function setProgress(pct) {
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function showStep(n) {
+  [1,2,3,4,5,'success'].forEach(s => {
+    const el = document.getElementById('step-' + s);
+    if (el) el.classList.add('hidden');
+  });
+  document.getElementById('step-' + n).classList.remove('hidden');
+  window.scrollTo(0, 0);
+}
+
+// ===== STEP 1 =====
+let slugCheckTimer = null;
+function checkSlug(val) {
+  const clean = val.toLowerCase().replace(/[^a-z0-9-]/g, '');
+  document.getElementById('s1-slug').value = clean;
+  const status = document.getElementById('slug-status');
+  if (!clean || clean.length < 2) { status.innerHTML = ''; return; }
+  clearTimeout(slugCheckTimer);
+  status.innerHTML = '<span style="color:rgba(255,255,255,0.3);font-size:12px;">...</span>';
+  slugCheckTimer = setTimeout(async () => {
+    const { data } = await sb.from('trainers').select('id').eq('slug', clean).maybeSingle();
+    if (data) {
+      status.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="#ff5555"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>';
+      document.getElementById('slug-error').textContent = 'This URL is taken. Try another.';
+      document.getElementById('slug-error').classList.remove('hidden');
+    } else {
+      status.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>';
+      document.getElementById('slug-error').classList.add('hidden');
+    }
+  }, 500);
+}
+
+function step1Next() {
+  const name = document.getElementById('s1-name').value.trim();
+  const slug = document.getElementById('s1-slug').value.trim();
+  const email = document.getElementById('s1-email').value.trim();
+  const phone = document.getElementById('s1-phone').value.trim();
+  const err = document.getElementById('s1-error');
+  if (!name || !slug || !email || !phone) {
+    err.textContent = 'Please fill in all required fields.'; err.classList.remove('hidden'); return;
+  }
+  if (!/^[a-z0-9-]{2,30}$/.test(slug)) {
+    err.textContent = 'URL must be 2–30 characters, letters/numbers/hyphens only.'; err.classList.remove('hidden'); return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    err.textContent = 'Please enter a valid email address.'; err.classList.remove('hidden'); return;
+  }
+  err.classList.add('hidden');
+  Object.assign(state, { name, slug, email, phone });
+  setProgress(40); showStep(2);
+}
+
+// ===== STEP 2 =====
+function selectRepsLevel(el, val) {
+  document.querySelectorAll('#step-2 .toggle-pill:not([onclick*="toggleCert"])').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  state.reps_level = val;
+}
+function toggleCert(el, cert) {
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) { if (!state.certs.includes(cert)) state.certs.push(cert); }
+  else { state.certs = state.certs.filter(c => c !== cert); }
+}
+function step2Next() {
+  const reps = document.getElementById('s2-reps').value.trim();
+  const err = document.getElementById('s2-error');
+  if (!reps) { err.textContent = 'Please enter your REPs UAE number.'; err.classList.remove('hidden'); return; }
+  err.classList.add('hidden');
+  state.reps_number = reps;
+  setProgress(60); showStep(3);
+}
+function skipReps() { state.reps_number = ''; setProgress(60); showStep(3); }
+
+// ===== STEP 3 =====
+document.addEventListener('DOMContentLoaded', () => {
+  const bioEl = document.getElementById('s3-bio');
+  if (bioEl) bioEl.addEventListener('input', () => {
+    document.getElementById('bio-count').textContent = bioEl.value.length;
+  });
+});
+function previewAvatar(input) {
+  if (!input.files[0]) return;
+  state.avatar_file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('avatar-preview');
+    img.src = e.target.result; img.style.display = 'block';
+    document.querySelector('#avatar-circle svg').style.display = 'none';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function toggleSpec(el, spec) {
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) { if (!state.specialties.includes(spec)) state.specialties.push(spec); }
+  else { state.specialties = state.specialties.filter(s => s !== spec); }
+}
+function toggleLocation(el, loc) {
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) { if (!state.locations.includes(loc)) state.locations.push(loc); }
+  else { state.locations = state.locations.filter(l => l !== loc); }
+}
+function step3Next() {
+  const title = document.getElementById('s3-title').value.trim();
+  const bio = document.getElementById('s3-bio').value.trim();
+  const err = document.getElementById('s3-error');
+  if (!title || !bio) { err.textContent = 'Please fill in your title and bio.'; err.classList.remove('hidden'); return; }
+  if (state.specialties.length === 0) { err.textContent = 'Please select at least one specialty.'; err.classList.remove('hidden'); return; }
+  err.classList.add('hidden');
+  Object.assign(state, {
+    title, bio,
+    exp: parseInt(document.getElementById('s3-exp').value) || null,
+    clients: parseInt(document.getElementById('s3-clients').value) || null
+  });
+  setProgress(80); showStep(4);
+}
+
+// ===== STEP 4 =====
+function addPackage() {
+  const list = document.getElementById('packages-list');
+  const div = document.createElement('div');
+  div.className = 'package-row';
+  div.style.cssText = 'background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;';
+  div.innerHTML = `
+    <div style="display:flex;gap:10px;margin-bottom:10px;">
+      <div style="flex:2;"><div style="font-size:10px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Package Name</div>
+      <input type="text" placeholder="e.g. Monthly Pack" style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;"></div>
+      <div style="flex:1;"><div style="font-size:10px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Price (AED)</div>
+      <input type="number" placeholder="2500" inputmode="numeric" style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;font-family:'Manrope',sans-serif;font-weight:700;"></div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <div style="flex:1;"><div style="font-size:10px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Duration</div>
+      <select style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;">
+        <option value="30min">30 min</option><option value="45min">45 min</option><option value="60min" selected>60 min</option><option value="90min">90 min</option>
+      </select></div>
+      <div style="flex:1;"><div style="font-size:10px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Sessions</div>
+      <select style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;">
+        <option value="1">1 session</option><option value="4">4 sessions</option><option value="8">8 sessions</option><option value="12" selected>12 sessions</option><option value="20">20 sessions</option>
+      </select></div>
+    </div>`;
+  list.appendChild(div);
+}
+
+function collectPackages() {
+  const rows = document.querySelectorAll('.package-row');
+  const pkgs = [];
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const selects = row.querySelectorAll('select');
+    const name = inputs[0]?.value.trim();
+    const price = parseFloat(inputs[1]?.value);
+    const duration = selects[0]?.value;
+    const sessions = parseInt(selects[1]?.value);
+    if (name && price) pkgs.push({ name, price, duration, sessions });
+  });
+  return pkgs;
+}
+
+async function step4Next() {
+  state.instagram = document.getElementById('s4-instagram').value.trim();
+  state.tiktok = document.getElementById('s4-tiktok').value.trim();
+  state.youtube = document.getElementById('s4-youtube').value.trim();
+  state.packages = collectPackages();
+  // Send OTP
+  const btn = document.querySelector('#step-4 .btn-primary');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    const res = await fetch(EDGE_BASE + '/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: state.email, name: state.name, mode: IS_TEST ? 'test' : 'production' })
+    });
+    if (!res.ok) throw new Error('Failed to send code');
+    document.getElementById('otp-email-display').textContent = state.email;
+    setProgress(95); showStep(5);
+  } catch (e) {
+    document.getElementById('s4-error').textContent = 'Could not send verification code. Please try again.';
+    document.getElementById('s4-error').classList.remove('hidden');
+  } finally { btn.disabled = false; btn.textContent = 'Continue →'; }
+}
+
+// ===== STEP 5: OTP =====
+function otpInput(el, idx) {
+  el.value = el.value.replace(/\D/g, '').slice(-1);
+  if (el.value && idx < 5) document.getElementById('otp-' + (idx + 1)).focus();
+  if (getOTPValue().length === 6) verifyOTP();
+}
+function getOTPValue() {
+  return [0,1,2,3,4,5].map(i => document.getElementById('otp-' + i).value).join('');
+}
+
+async function verifyOTP() {
+  const otp = getOTPValue();
+  const err = document.getElementById('otp-error');
+  if (otp.length !== 6) { err.textContent = 'Please enter the 6-digit code.'; err.classList.remove('hidden'); return; }
+  if (IS_TEST && otp === '000000') { await createTrainer(); return; }
+  const btn = document.getElementById('otp-verify-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    const res = await fetch(EDGE_BASE + '/verify-magic-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: state.email, otp })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.valid) throw new Error(data.error || 'Invalid code');
+    err.classList.add('hidden');
+    await createTrainer();
+  } catch (e) {
+    err.textContent = e.message || 'Invalid or expired code. Please try again.';
+    err.classList.remove('hidden');
+  } finally { btn.disabled = false; btn.textContent = 'Verify & Go Live'; }
+}
+
+async function resendOTP() {
+  const btn = document.getElementById('resend-btn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+  await fetch(EDGE_BASE + '/send-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: state.email, name: state.name, mode: IS_TEST ? 'test' : 'production' })
+  });
+  btn.textContent = 'Sent!';
+  setTimeout(() => { btn.disabled = false; btn.textContent = 'Resend Code'; }, 30000);
+}
+
+// ===== CREATE TRAINER =====
+async function createTrainer() {
+  const btn = document.getElementById('otp-verify-btn');
+  btn.disabled = true; btn.innerHTML = 'Creating your profile... <span class="spinner"></span>';
+  try {
+    // Upload avatar if present
+    let avatar_url = null;
+    if (state.avatar_file) {
+      const reader = new FileReader();
+      avatar_url = await new Promise(resolve => {
+        reader.onload = e => resolve(e.target.result);
+        reader.readAsDataURL(state.avatar_file);
+      });
+    }
+    const payload = {
+      name: state.name, slug: state.slug, email: state.email,
+      phone: '+971' + state.phone.replace(/\s/g, ''),
+      reps_number: state.reps_number, reps_level: state.reps_level,
+      certifications: state.certs, title: state.title, bio: state.bio,
+      specialties: state.specialties, years_experience: state.exp,
+      clients_trained: state.clients, locations: state.locations,
+      instagram: state.instagram, tiktok: state.tiktok, youtube: state.youtube,
+      packages: state.packages, avatar_base64: avatar_url,
+      ref: new URLSearchParams(location.search).get('ref') || null
+    };
+    const res = await fetch(EDGE_BASE + '/update-trainer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create', ...payload })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to create profile');
+    state.trainer_id = data.id;
+    // Store edit token
+    if (data.edit_token) localStorage.setItem('tb_edit_token', data.edit_token);
+    // Show success
+    const profileUrl = 'trainedby.ae/' + state.slug;
+    document.getElementById('success-url').textContent = profileUrl;
+    document.getElementById('view-profile-btn').href = '/' + state.slug;
+    setProgress(100); showStep('success');
+  } catch (e) {
+    document.getElementById('otp-error').textContent = e.message || 'Something went wrong. Please try again.';
+    document.getElementById('otp-error').classList.remove('hidden');
+  } finally { btn.disabled = false; btn.textContent = 'Verify & Go Live'; }
+}
+
+function copyProfileUrl() {
+  const url = 'https://trainedby.ae/' + state.slug;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.querySelector('.url-copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+</script>
+</body>
+</html>
