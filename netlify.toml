@@ -1,63 +1,81 @@
 [build]
-  publish = "."
-  command = ""
+  publish = "dist"
+  command = "pnpm astro build"
 
-# Named pages
-[[redirects]]
-  from = "/dashboard"
-  to = "/dashboard.html"
-  status = 200
+# ── Named pages (Astro generates clean URLs automatically) ──────────────────
+# Astro outputs /join/index.html, /pricing/index.html etc.
+# These redirects handle legacy .html URLs for backward compatibility
 
 [[redirects]]
-  from = "/edit"
-  to = "/edit.html"
-  status = 200
+  from = "/dashboard.html"
+  to = "/dashboard"
+  status = 301
 
 [[redirects]]
-  from = "/join"
-  to = "/join.html"
-  status = 200
+  from = "/edit.html"
+  to = "/edit"
+  status = 301
 
 [[redirects]]
-  from = "/pricing"
-  to = "/pricing.html"
-  status = 200
+  from = "/join.html"
+  to = "/join"
+  status = 301
 
 [[redirects]]
-  from = "/landing"
-  to = "/landing.html"
-  status = 200
+  from = "/pricing.html"
+  to = "/pricing"
+  status = 301
 
 [[redirects]]
-  from = "/blog"
-  to = "/blog.html"
-  status = 200
+  from = "/landing.html"
+  to = "/landing"
+  status = 301
 
 [[redirects]]
-  from = "/plan-builder"
-  to = "/plan-builder.html"
-  status = 200
+  from = "/blog.html"
+  to = "/blog"
+  status = 301
 
-# Catch-all: /:slug -> index.html (trainer profile pages)
+[[redirects]]
+  from = "/plan-builder.html"
+  to = "/plan-builder"
+  status = 301
+
+# ── Catch-all: /:slug -> /profile (trainer profile pages) ───────────────────
+# Must come AFTER all named page redirects
 [[redirects]]
   from = "/:trainer"
-  to = "/index.html"
+  to = "/profile"
+  status = 200
+  conditions = {Role = ["trainer"]}
+
+# Fallback catch-all for all unknown paths → profile page (reads slug from URL)
+[[redirects]]
+  from = "/:trainer"
+  to = "/profile"
   status = 200
 
-# Cache headers
-[[headers]]
-  for = "/*.html"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/styles.css"
-  [headers.values]
-    Cache-Control = "public, max-age=86400"
-
+# ── Security headers ─────────────────────────────────────────────────────────
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.perplexity.ai; frame-ancestors 'none';"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

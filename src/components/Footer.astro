@@ -1,0 +1,27 @@
+---
+interface Props {
+  variant?: 'landing' | 'minimal';
+}
+const { variant = 'landing' } = Astro.props;
+---
+
+{variant === 'landing' ? (
+  <footer>
+    <a href="/landing" class="footer-logo">
+      Trained<span style="color:#fff">By</span>
+    </a>
+    <div class="footer-links">
+      <a href="/landing">Home</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/blog">Blog</a>
+      <a href="/find">Find a Trainer</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+    </div>
+    <p class="footer-copy">© {new Date().getFullYear()} TrainedBy.ae — Built for UAE Fitness Professionals</p>
+  </footer>
+) : (
+  <footer style="border-top:1px solid var(--border);padding:20px 24px;text-align:center;">
+    <p style="color:var(--text-3);font-size:12px;">© {new Date().getFullYear()} TrainedBy.ae</p>
+  </footer>
+)}

@@ -1,0 +1,85 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  canonical?: string;
+  noIndex?: boolean;
+}
+
+const {
+  title,
+  description = 'TrainedBy — The UAE Trainer\'s Operating System. Build your fitness business with digital products, affiliate income, and a Grand Slam Offer builder.',
+  ogImage = 'https://trainedby-ae.netlify.app/og-image.jpg',
+  canonical,
+  noIndex = false,
+} = Astro.props;
+
+const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    {noIndex && <meta name="robots" content="noindex,nofollow" />}
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Global design tokens -->
+    <style is:global>
+      :root {
+        --brand: #FF5C00;
+        --brand-dim: rgba(255,92,0,0.12);
+        --bg: #0a0a0a;
+        --surface: #111111;
+        --surface-2: #161616;
+        --surface-3: #1c1c1c;
+        --border: rgba(255,255,255,0.07);
+        --border-hover: rgba(255,255,255,0.14);
+        --text: #f0f0f0;
+        --text-2: #a0a0a0;
+        --text-3: #606060;
+        --text-muted: #808080;
+        --green: #00C853;
+        --red: #ff5555;
+        --radius: 12px;
+      }
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+      body {
+        font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100dvh;
+      }
+      img { max-width: 100%; height: auto; }
+      a { color: inherit; }
+      button { cursor: pointer; font-family: inherit; }
+      input, select, textarea { font-family: inherit; }
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
