@@ -1,6 +1,6 @@
 {
   "name": "trainedby-app",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "private": true,
   "scripts": {
     "build:css": "tailwindcss -i landing-input.css -o landing-output.css --minify",
@@ -10,18 +10,25 @@
     "dev": "astro dev",
     "preview": "astro preview",
     "clean": "rm -rf dist/*.js dist/chunks dist/*.css",
-    "test": "jest --testPathPattern=tests/ --testEnvironment=node --forceExit",
-    "test:watch": "jest --testPathPattern=tests/ --testEnvironment=node --watch",
-    "test:ci": "jest --testPathPattern=tests/ --testEnvironment=node --forceExit --ci --coverage"
+    "test": "jest --testPathPatterns=tests/ --testEnvironment=node --forceExit",
+    "test:watch": "jest --testPathPatterns=tests/ --testEnvironment=node --watch",
+    "test:ci": "jest --testPathPatterns=tests/ --testEnvironment=node --forceExit --ci --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:all": "pnpm test && pnpm test:e2e"
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/tests/**/*.test.js"],
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
     "testTimeout": 15000,
     "verbose": true
   },
   "devDependencies": {
     "@jest/globals": "^30.3.0",
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.13",
     "esbuild": "^0.20.2",

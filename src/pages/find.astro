@@ -1,0 +1,473 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Find a Verified Personal Trainer in UAE | TrainedBy.ae"
+  description="Browse REPs UAE verified personal trainers in Dubai, Abu Dhabi and across the UAE. Filter by speciality, location and training mode."
+>
+  <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#FF5C00;--orange-dim:rgba(255,92,0,0.12);
+  --green:#22c55e;--green-dim:rgba(34,197,94,0.12);
+  --white:#fff;--white-60:rgba(255,255,255,0.6);--white-30:rgba(255,255,255,0.3);--white-10:rgba(255,255,255,0.1);--white-06:rgba(255,255,255,0.06);
+  --surface:#0a0a0a;--surface2:#111;--surface3:#1a1a1a;
+  --glass:rgba(255,255,255,0.06);--glass-border:rgba(255,255,255,0.1);
+  --radius:14px;--font:'Manrope',sans-serif;
+}
+html,body{min-height:100vh;background:var(--surface);color:var(--white);font-family:var(--font);-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;
+  background:rgba(10,10,10,0.9);
+  border-bottom:1px solid var(--glass-border);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.nav-logo{font-size:15px;font-weight:800;letter-spacing:-0.01em;text-decoration:none;color:var(--white)}
+.nav-logo span{color:var(--orange)}
+.nav-cta{
+  background:var(--orange);color:#fff;font-size:13px;font-weight:700;
+  padding:8px 16px;border-radius:20px;text-decoration:none;letter-spacing:0.01em;
+}
+
+/* HERO */
+.hero{
+  padding:48px 20px 32px;
+  text-align:center;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,92,0,0.08) 0%, transparent 70%);
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
+  border-radius:20px;padding:4px 12px;
+  font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--orange);
+  margin-bottom:16px;
+}
+.hero h1{font-size:clamp(26px,6vw,40px);font-weight:800;letter-spacing:-0.03em;line-height:1.15;margin-bottom:10px}
+.hero p{font-size:15px;color:var(--white-60);max-width:480px;margin:0 auto 28px}
+
+/* SEARCH BAR */
+.search-wrap{
+  position:relative;max-width:520px;margin:0 auto 20px;
+}
+.search-wrap svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--white-30);pointer-events:none}
+#searchInput{
+  width:100%;padding:14px 16px 14px 46px;
+  background:var(--surface3);border:1px solid var(--glass-border);
+  border-radius:12px;color:var(--white);font-family:var(--font);font-size:15px;
+  outline:none;transition:border-color 0.2s;
+}
+#searchInput:focus{border-color:var(--orange)}
+#searchInput::placeholder{color:var(--white-30)}
+
+/* FILTERS */
+.filters{
+  display:flex;gap:8px;overflow-x:auto;padding:0 20px 4px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  max-width:900px;margin:0 auto 28px;
+}
+.filters::-webkit-scrollbar{display:none}
+.filter-btn{
+  flex-shrink:0;padding:7px 14px;border-radius:20px;
+  border:1px solid var(--glass-border);background:var(--glass);
+  color:var(--white-60);font-size:12px;font-weight:600;cursor:pointer;
+  transition:all 0.15s;white-space:nowrap;font-family:var(--font);
+}
+.filter-btn:hover{border-color:var(--orange);color:var(--orange)}
+.filter-btn.active{background:var(--orange-dim);border-color:rgba(255,92,0,0.4);color:var(--orange)}
+
+/* MAIN LAYOUT */
+.main{max-width:900px;margin:0 auto;padding:0 16px 60px}
+
+/* RESULTS HEADER */
+.results-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.results-count{font-size:13px;color:var(--white-60);font-weight:500}
+.sort-select{
+  background:var(--surface3);border:1px solid var(--glass-border);
+  color:var(--white);font-family:var(--font);font-size:12px;font-weight:600;
+  padding:6px 10px;border-radius:8px;outline:none;cursor:pointer;
+}
+
+/* TRAINER GRID */
+#trainerGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:14px;
+}
+
+/* TRAINER CARD */
+.trainer-card{
+  background:var(--surface2);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  cursor:pointer;
+  transition:border-color 0.2s,transform 0.15s;
+  text-decoration:none;
+  display:block;
+}
+.trainer-card:hover{border-color:rgba(255,92,0,0.3);transform:translateY(-2px)}
+
+.card-cover{
+  height:100px;
+  background:#1a1a1a;
+  background-image:url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=600&q=70');
+  background-size:cover;background-position:center;
+  position:relative;
+}
+.card-cover-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.1),rgba(10,10,10,0.7))}
+.card-mode-tags{position:absolute;top:8px;right:8px;display:flex;gap:4px}
+.card-mode{font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px;letter-spacing:0.04em}
+.card-mode.in-person{background:rgba(255,92,0,0.85);color:#fff}
+.card-mode.online{background:rgba(99,102,241,0.85);color:#fff}
+.card-mode.hybrid{background:rgba(34,197,94,0.85);color:#fff}
+
+.card-body{padding:14px}
+.card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.card-avatar{
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,#1a1a1a,#2a1500);
+  border:2px solid var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;color:var(--orange);
+  flex-shrink:0;overflow:hidden;margin-top:-32px;
+  position:relative;z-index:1;
+}
+.card-avatar img{width:100%;height:100%;object-fit:cover}
+.card-info{flex:1;min-width:0;padding-top:4px}
+.card-name{font-size:15px;font-weight:800;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-verified{width:14px;height:14px;background:var(--orange);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-verified svg{width:8px;height:8px}
+.card-title{font-size:12px;color:var(--white-60);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.card-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;background:var(--orange-dim);color:var(--orange);border:1px solid rgba(255,92,0,0.15)}
+
+.card-stats{display:flex;gap:0;border-top:1px solid var(--glass-border);padding-top:10px}
+.card-stat{flex:1;text-align:center}
+.card-stat+.card-stat{border-left:1px solid var(--glass-border)}
+.cs-val{font-size:14px;font-weight:800}
+.cs-lbl{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--white-60);margin-top:1px}
+
+.card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;
+  border-top:1px solid var(--glass-border);
+  background:rgba(255,255,255,0.02);
+}
+.card-price{font-size:13px;font-weight:700;color:var(--orange)}
+.card-price span{font-size:10px;color:var(--white-60);font-weight:500}
+.card-wa{
+  display:flex;align-items:center;gap:5px;
+  background:#25D366;color:#fff;
+  font-size:11px;font-weight:700;
+  padding:6px 12px;border-radius:20px;
+  text-decoration:none;
+}
+.card-wa svg{width:13px;height:13px}
+
+/* RATING STARS */
+.card-rating{display:flex;align-items:center;gap:4px;margin-bottom:8px}
+.card-stars{display:flex;gap:1px}
+.cs{font-size:11px}
+.cs.f{color:var(--orange)}.cs.e{color:rgba(255,255,255,0.15)}
+.card-rating-score{font-size:12px;font-weight:700}
+.card-rating-count{font-size:11px;color:var(--white-60)}
+
+/* EMPTY STATE */
+.empty-state{
+  text-align:center;padding:60px 20px;
+  grid-column:1/-1;
+}
+.empty-icon{font-size:48px;margin-bottom:16px}
+.empty-title{font-size:18px;font-weight:700;margin-bottom:8px}
+.empty-sub{font-size:14px;color:var(--white-60)}
+
+/* SKELETON */
+.skeleton-card{
+  background:var(--surface2);border:1px solid var(--glass-border);
+  border-radius:var(--radius);overflow:hidden;
+}
+.skel{background:linear-gradient(90deg,var(--surface3) 25%,rgba(255,255,255,0.04) 50%,var(--surface3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel-cover{height:100px;border-radius:0}
+.skel-body{padding:14px}
+.skel-line{height:12px;margin-bottom:8px}
+.skel-line.w60{width:60%}.skel-line.w80{width:80%}.skel-line.w40{width:40%}
+
+/* LOAD MORE */
+.load-more-wrap{text-align:center;margin-top:28px}
+.btn-load-more{
+  background:var(--surface3);border:1px solid var(--glass-border);
+  color:var(--white);font-family:var(--font);font-size:14px;font-weight:600;
+  padding:12px 28px;border-radius:20px;cursor:pointer;
+  transition:border-color 0.2s;
+}
+.btn-load-more:hover{border-color:var(--orange);color:var(--orange)}
+  </style>
+
+<nav>
+  <a href="/landing.html" class="nav-logo">Trained<span>By</span>.</a>
+  <a href="/join.html" class="nav-cta">Get Your Page →</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">
+    <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
+    REPs UAE Verified Trainers
+  </div>
+  <h1>Find Your Perfect<br>Personal Trainer</h1>
+  <p>Browse verified trainers across Dubai and the UAE. Filter by specialty, location, price and training style.</p>
+</div>
+
+<div class="search-wrap">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input type="text" id="searchInput" placeholder="Search by name, specialty or gym…" oninput="filterTrainers()">
+</div>
+
+<div class="filters" id="filters">
+  <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All Trainers</button>
+  <button class="filter-btn" data-filter="in-person" onclick="setFilter('in-person',this)">In-Person</button>
+  <button class="filter-btn" data-filter="online" onclick="setFilter('online',this)">Online</button>
+  <button class="filter-btn" data-filter="hybrid" onclick="setFilter('hybrid',this)">Hybrid</button>
+  <button class="filter-btn" data-filter="strength" onclick="setFilter('strength',this)">Strength</button>
+  <button class="filter-btn" data-filter="fat-loss" onclick="setFilter('fat-loss',this)">Fat Loss</button>
+  <button class="filter-btn" data-filter="hiit" onclick="setFilter('hiit',this)">HIIT</button>
+  <button class="filter-btn" data-filter="pilates" onclick="setFilter('pilates',this)">Pilates</button>
+  <button class="filter-btn" data-filter="boxing" onclick="setFilter('boxing',this)">Boxing</button>
+  <button class="filter-btn" data-filter="yoga" onclick="setFilter('yoga',this)">Yoga</button>
+  <button class="filter-btn" data-filter="nutrition" onclick="setFilter('nutrition',this)">Nutrition</button>
+  <button class="filter-btn" data-filter="female-only" onclick="setFilter('female-only',this)">Female Trainers</button>
+</div>
+
+<div class="main">
+  <div class="results-header">
+    <div class="results-count" id="resultsCount">Loading trainers…</div>
+    <select class="sort-select" id="sortSelect" onchange="sortTrainers()">
+      <option value="featured">Featured</option>
+      <option value="rating">Top Rated</option>
+      <option value="experience">Most Experienced</option>
+      <option value="price_low">Price: Low to High</option>
+      <option value="price_high">Price: High to Low</option>
+    </select>
+  </div>
+
+  <div id="trainerGrid">
+    <!-- Skeletons while loading -->
+    ${Array(6).fill(0).map(() => `
+    <div class="skeleton-card">
+      <div class="skel skel-cover"></div>
+      <div class="skel-body">
+        <div class="skel skel-line w80"></div>
+        <div class="skel skel-line w60"></div>
+        <div class="skel skel-line w40" style="margin-top:12px"></div>
+      </div>
+    </div>`).join('')}
+  </div>
+
+  <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
+    <button class="btn-load-more" onclick="loadMore()">Load More Trainers</button>
+  </div>
+</div>
+
+<script is:inline>
+const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
+
+let allTrainers = [];
+let filtered = [];
+let activeFilter = 'all';
+let page = 0;
+const PAGE_SIZE = 12;
+
+async function loadTrainers() {
+  try {
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/trainers?verification_status=eq.verified&order=created_at.desc&limit=200`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+    const trainers = await r.json();
+
+    // Also fetch packages for pricing
+    const ids = trainers.map(t => t.id);
+    let packages = [];
+    if (ids.length) {
+      const pr = await fetch(
+        `${SUPABASE_URL}/rest/v1/session_packages?trainer_id=in.(${ids.join(',')})&order=price.asc`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+      );
+      packages = await pr.json();
+    }
+
+    // Attach min price to each trainer
+    allTrainers = trainers.map(t => {
+      const tPkgs = packages.filter(p => p.trainer_id === t.id);
+      const minPrice = tPkgs.length ? Math.min(...tPkgs.map(p => p.price || 0)) : null;
+      return { ...t, min_price: minPrice, packages: tPkgs };
+    });
+
+    // If no verified trainers, show demo data
+    if (!allTrainers.length) {
+      allTrainers = getDemoTrainers();
+    }
+
+    filtered = [...allTrainers];
+    renderGrid();
+  } catch(e) {
+    allTrainers = getDemoTrainers();
+    filtered = [...allTrainers];
+    renderGrid();
+  }
+}
+
+function getDemoTrainers() {
+  return [
+    { id:'demo1', full_name:'Sarah Al Mansoori', slug:'sarah', title:'Strength & Conditioning Coach', city:'Dubai', specialties:['Strength','Fat Loss','HIIT'], certifications:['REPs Level 3','NASM CPT'], years_experience:8, clients_trained:240, avg_rating:4.9, review_count:34, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:150, whatsapp:'+971501234567' },
+    { id:'demo2', full_name:'Ahmed Hassan', slug:'ahmed', title:'Functional Fitness & Boxing Coach', city:'Dubai', specialties:['Boxing','Functional','HIIT'], certifications:['REPs Level 3','Boxing Coach'], years_experience:6, clients_trained:180, avg_rating:4.8, review_count:22, reps_verified:true, accepting_clients:true, training_modes:['in-person'], min_price:200, whatsapp:'+971502345678' },
+    { id:'demo3', full_name:'Layla Rashidi', slug:'layla', title:'Pilates & Yoga Specialist', city:'Abu Dhabi', specialties:['Pilates','Yoga','Flexibility'], certifications:['STOTT Pilates','RYT 200'], years_experience:5, clients_trained:120, avg_rating:5.0, review_count:18, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:180, whatsapp:'+971503456789' },
+    { id:'demo4', full_name:'Marcus Williams', slug:'marcus', title:'Bodybuilding & Nutrition Coach', city:'Dubai', specialties:['Muscle Gain','Nutrition','Bodybuilding'], certifications:['NASM CPT','Precision Nutrition'], years_experience:10, clients_trained:320, avg_rating:4.7, review_count:45, reps_verified:true, accepting_clients:false, training_modes:['in-person','online'], min_price:250, whatsapp:'+971504567890' },
+    { id:'demo5', full_name:'Fatima Al Zaabi', slug:'fatima', title:'Women\'s Fitness Specialist', city:'Dubai', specialties:['Fat Loss','Toning','Pre/Postnatal'], certifications:['REPs Level 3','Pre/Postnatal'], years_experience:4, clients_trained:95, avg_rating:4.9, review_count:28, reps_verified:true, accepting_clients:true, training_modes:['in-person'], min_price:150, whatsapp:'+971505678901', gender:'female' },
+    { id:'demo6', full_name:'Ryan O\'Brien', slug:'ryan', title:'Running & Endurance Coach', city:'Dubai', specialties:['Running','Endurance','Triathlon'], certifications:['UESCA Running Coach','REPs Level 3'], years_experience:7, clients_trained:200, avg_rating:4.8, review_count:31, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:120, whatsapp:'+971506789012' },
+  ];
+}
+
+function setFilter(filter, btn) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterTrainers();
+}
+
+function filterTrainers() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+
+  filtered = allTrainers.filter(t => {
+    // Text search
+    if (q) {
+      const searchable = [
+        t.full_name || t.name, t.title, t.city,
+        ...(t.specialties || []), ...(t.certifications || []), t.gym_name
+      ].filter(Boolean).join(' ').toLowerCase();
+      if (!searchable.includes(q)) return false;
+    }
+
+    // Filter
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'in-person') return (t.training_modes || []).includes('in-person');
+    if (activeFilter === 'online') return (t.training_modes || []).includes('online');
+    if (activeFilter === 'hybrid') return (t.training_modes || []).includes('hybrid') || ((t.training_modes||[]).includes('in-person') && (t.training_modes||[]).includes('online'));
+    if (activeFilter === 'female-only') return t.gender === 'female';
+    // Specialty filters
+    const specs = (t.specialties || []).map(s => s.toLowerCase());
+    return specs.some(s => s.includes(activeFilter));
+  });
+
+  page = 0;
+  renderGrid();
+}
+
+function sortTrainers() {
+  const sort = document.getElementById('sortSelect').value;
+  filtered.sort((a, b) => {
+    if (sort === 'rating') return (b.avg_rating || 0) - (a.avg_rating || 0);
+    if (sort === 'experience') return (b.years_experience || 0) - (a.years_experience || 0);
+    if (sort === 'price_low') return (a.min_price || 9999) - (b.min_price || 9999);
+    if (sort === 'price_high') return (b.min_price || 0) - (a.min_price || 0);
+    return 0;
+  });
+  page = 0;
+  renderGrid();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('trainerGrid');
+  const start = 0;
+  const end = (page + 1) * PAGE_SIZE;
+  const toShow = filtered.slice(start, end);
+
+  document.getElementById('resultsCount').textContent =
+    filtered.length === 0 ? 'No trainers found' :
+    `${filtered.length} verified trainer${filtered.length !== 1 ? 's' : ''}`;
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No trainers found</div><div class="empty-sub">Try adjusting your search or filters</div></div>`;
+    document.getElementById('loadMoreWrap').style.display = 'none';
+    return;
+  }
+
+  grid.innerHTML = toShow.map(t => trainerCardHTML(t)).join('');
+  document.getElementById('loadMoreWrap').style.display = filtered.length > end ? 'block' : 'none';
+}
+
+function loadMore() {
+  page++;
+  renderGrid();
+}
+
+function trainerCardHTML(t) {
+  const name = t.full_name || t.name || 'Trainer';
+  const initials = name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+  const slug = t.slug || t.id;
+  const modes = t.training_modes || ['in-person'];
+  const specs = (t.specialties || []).slice(0,3);
+  const rating = t.avg_rating ? parseFloat(t.avg_rating) : null;
+  const wa = t.whatsapp ? t.whatsapp.replace(/\D/g,'') : null;
+
+  const modeTagsHtml = modes.slice(0,2).map(m => {
+    const labels = {'in-person':'In-Person','online':'Online','hybrid':'Hybrid'};
+    return `<span class="card-mode ${m}">${labels[m]||m}</span>`;
+  }).join('');
+
+  const starsHtml = rating ? (() => {
+    let s = '';
+    for (let i=1;i<=5;i++) s += `<span class="cs ${i<=Math.round(rating)?'f':'e'}">★</span>`;
+    return `<div class="card-rating"><div class="card-stars">${s}</div><span class="card-rating-score">${rating.toFixed(1)}</span><span class="card-rating-count">(${t.review_count||0})</span></div>`;
+  })() : '';
+
+  const statsHtml = [
+    t.years_experience ? `<div class="card-stat"><div class="cs-val">${t.years_experience}</div><div class="cs-lbl">Yrs</div></div>` : '',
+    t.clients_trained ? `<div class="card-stat"><div class="cs-val">${t.clients_trained}+</div><div class="cs-lbl">Clients</div></div>` : '',
+    `<div class="card-stat"><div class="cs-val" style="color:${t.accepting_clients!==false?'var(--green)':'var(--white-30)'}">${t.accepting_clients!==false?'✓':'✗'}</div><div class="cs-lbl">Open</div></div>`
+  ].filter(Boolean).join('');
+
+  return `
+  <a href="/${slug}" class="trainer-card">
+    <div class="card-cover" style="${t.cover_url?`background-image:url('${t.cover_url}')`:''}">
+      <div class="card-cover-overlay"></div>
+      <div class="card-mode-tags">${modeTagsHtml}</div>
+    </div>
+    <div class="card-body">
+      <div class="card-top">
+        <div class="card-avatar">
+          ${t.avatar_url ? `<img src="${t.avatar_url}" alt="${name}">` : initials}
+        </div>
+        <div class="card-info">
+          <div class="card-name">
+            ${name}
+            ${t.reps_verified ? `<span class="card-verified"><svg viewBox="0 0 24 24" fill="white"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>` : ''}
+          </div>
+          <div class="card-title">${t.title || 'Personal Trainer'} · ${t.city || 'UAE'}</div>
+        </div>
+      </div>
+      ${starsHtml}
+      <div class="card-tags">${specs.map(s => `<span class="card-tag">${s}</span>`).join('')}</div>
+      <div class="card-stats">${statsHtml}</div>
+    </div>
+    <div class="card-footer">
+      <div class="card-price">${t.min_price ? `AED ${t.min_price.toLocaleString()} <span>/ session</span>` : '<span>Contact for price</span>'}</div>
+      ${wa ? `<a href="https://wa.me/${wa}" class="card-wa" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp</a>` : ''}
+    </div>
+  </a>`;
+}
+
+loadTrainers();
+</script>
+
+</Base>

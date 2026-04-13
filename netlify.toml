@@ -2,10 +2,10 @@
   publish = "dist"
   command = "pnpm astro build"
 
-# ── Named pages (Astro generates clean URLs automatically) ──────────────────
-# Astro outputs /join/index.html, /pricing/index.html etc.
-# These redirects handle legacy .html URLs for backward compatibility
+[build.environment]
+  NODE_VERSION = "22"
 
+# ── Legacy .html URL redirects (301 permanent) ──────────────────────────────
 [[redirects]]
   from = "/dashboard.html"
   to = "/dashboard"
@@ -41,18 +41,65 @@
   to = "/plan-builder"
   status = 301
 
-# ── Catch-all: /:slug -> /profile (trainer profile pages) ───────────────────
-# Must come AFTER all named page redirects
 [[redirects]]
-  from = "/:trainer"
-  to = "/profile"
-  status = 200
-  conditions = {Role = ["trainer"]}
+  from = "/find.html"
+  to = "/find"
+  status = 301
 
-# Fallback catch-all for all unknown paths → profile page (reads slug from URL)
+# ── Named page exclusions (must come before catch-all) ──────────────────────
+# These are handled by Astro's static output — no redirect needed.
+# The catch-all below must NOT intercept these paths.
+
+[[redirects]]
+  from = "/landing"
+  to = "/landing/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/join"
+  to = "/join/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/pricing"
+  to = "/pricing/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/dashboard/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/edit"
+  to = "/edit/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog"
+  to = "/blog/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/plan-builder"
+  to = "/plan-builder/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/find"
+  to = "/find/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/profile"
+  to = "/profile/index.html"
+  status = 200
+
+# ── Catch-all: /:slug → profile page (reads slug from URL at runtime) ───────
+# MUST come last — after all named page redirects
 [[redirects]]
   from = "/:trainer"
-  to = "/profile"
+  to = "/profile/index.html"
   status = 200
 
 # ── Security headers ─────────────────────────────────────────────────────────
@@ -61,14 +108,22 @@
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.perplexity.ai; frame-ancestors 'none';"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.perplexity.ai https://api.openai.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
 
+# ── Cache headers ─────────────────────────────────────────────────────────────
 [[headers]]
   for = "/*.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
   for = "/assets/*"
@@ -76,6 +131,12 @@
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/_astro/*"
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Type = "image/svg+xml"
+
+[[headers]]
+  for = "/*.woff2"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
