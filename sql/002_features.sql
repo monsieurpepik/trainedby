@@ -24,6 +24,13 @@ CREATE TABLE IF NOT EXISTS transformations (
 
 CREATE INDEX IF NOT EXISTS idx_transformations_trainer ON transformations(trainer_id);
 
+-- RLS: transformations are publicly readable; only service role can write
+ALTER TABLE transformations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read transformations with consent"
+  ON transformations FOR SELECT
+  USING (client_consent = TRUE);
+-- No INSERT/UPDATE/DELETE policy for anon — all writes go through edge functions using service role key
+
 -- 3. SESSION BOOKINGS — direct booking from profile
 CREATE TABLE IF NOT EXISTS bookings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -45,6 +52,10 @@ CREATE TABLE IF NOT EXISTS bookings (
 CREATE INDEX IF NOT EXISTS idx_bookings_trainer ON bookings(trainer_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
 
+-- RLS: bookings are private — no public read or write; all access via service role edge functions
+ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
+-- No policies = zero anon access. Service role key bypasses RLS entirely.
+
 -- 4. VERIFIED CLIENT REVIEWS
 CREATE TABLE IF NOT EXISTS reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -62,6 +73,13 @@ CREATE TABLE IF NOT EXISTS reviews (
 
 CREATE INDEX IF NOT EXISTS idx_reviews_trainer ON reviews(trainer_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_rating ON reviews(rating);
+
+-- RLS: only verified reviews are publicly readable; no public writes
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read verified reviews"
+  ON reviews FOR SELECT
+  USING (verified = TRUE);
+-- No INSERT/UPDATE/DELETE policy for anon — all writes via service role edge functions
 
 -- Aggregate rating on trainers table
 ALTER TABLE trainers
@@ -104,6 +122,10 @@ CREATE TABLE IF NOT EXISTS checkins (
 CREATE INDEX IF NOT EXISTS idx_checkins_trainer ON checkins(trainer_id);
 CREATE INDEX IF NOT EXISTS idx_checkins_client ON checkins(client_email);
 
+-- RLS: check-ins are private — no public access; all access via service role edge functions
+ALTER TABLE checkins ENABLE ROW LEVEL SECURITY;
+-- No policies = zero anon access.
+
 -- 6. WHATSAPP BROADCAST LISTS — trainer sends to all leads
 CREATE TABLE IF NOT EXISTS broadcasts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -114,6 +136,10 @@ CREATE TABLE IF NOT EXISTS broadcasts (
 );
 
 CREATE INDEX IF NOT EXISTS idx_broadcasts_trainer ON broadcasts(trainer_id);
+
+-- RLS: broadcasts are private — no public access
+ALTER TABLE broadcasts ENABLE ROW LEVEL SECURITY;
+-- No policies = zero anon access.
 
 -- 7. TRAINER AVAILABILITY — for booking calendar
 CREATE TABLE IF NOT EXISTS availability (
@@ -128,7 +154,38 @@ CREATE TABLE IF NOT EXISTS availability (
 
 CREATE INDEX IF NOT EXISTS idx_availability_trainer ON availability(trainer_id);
 
--- 8. SEED SAMPLE DATA — specialties and reviews for sarah
+-- RLS: availability is publicly readable (clients need to see when trainer is free)
+ALTER TABLE availability ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read trainer availability"
+  ON availability FOR SELECT
+  USING (is_available = TRUE);
+-- No public write access
+
+-- 8. RATE LIMITING TABLE — for edge function rate limiting
+CREATE TABLE IF NOT EXISTS rate_limits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key TEXT NOT NULL,            -- e.g. "submit-lead:ip:1.2.3.4" or "magic-link:email:x@y.com"
+  count INTEGER DEFAULT 1,
+  window_start TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_rate_limits_key ON rate_limits(key);
+CREATE INDEX IF NOT EXISTS idx_rate_limits_window ON rate_limits(window_start);
+
+-- RLS: rate_limits table is internal only — no public access
+ALTER TABLE rate_limits ENABLE ROW LEVEL SECURITY;
+-- No policies = zero anon access. Service role manages this table.
+
+-- Auto-cleanup old rate limit windows (older than 1 hour)
+CREATE OR REPLACE FUNCTION cleanup_rate_limits()
+RETURNS void AS $$
+BEGIN
+  DELETE FROM rate_limits WHERE window_start < NOW() - INTERVAL '1 hour';
+END;
+$$ LANGUAGE plpgsql;
+
+-- 9. SEED SAMPLE DATA — specialties and reviews for sarah
 UPDATE trainers SET
   specialties = ARRAY['Strength Training', 'Fat Loss', 'Muscle Gain', 'HIIT', 'Functional Training'],
   training_modes = ARRAY['in-person', 'online', 'hybrid'],

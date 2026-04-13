@@ -681,14 +681,29 @@ function showToast(msg, type = '') {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+// ===== AUTH HELPERS =====
+function getAuthToken() {
+  const cookies = document.cookie.split(';').map(c => c.trim());
+  for (const c of cookies) {
+    if (c.startsWith('tb_session=')) return c.slice('tb_session='.length);
+  }
+  return localStorage.getItem('tb_edit_token');
+}
+function clearAuthToken() {
+  localStorage.removeItem('tb_edit_token');
+  document.cookie = 'tb_session=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; SameSite=Strict';
+}
+
 async function init() {
-  const token = localStorage.getItem('tb_edit_token');
+  const token = getAuthToken();
   document.getElementById('dash-loading').style.display = 'none';
   if (!token) { document.getElementById('dash-auth').classList.remove('hidden'); return; }
 
   try {
     const res = await fetch(EDGE_BASE + '/verify-magic-link', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ token })
     });
     const data = await res.json();
@@ -701,7 +716,7 @@ async function init() {
     buildChecklist(trainer);
     document.getElementById('dash-content').classList.remove('hidden');
   } catch {
-    localStorage.removeItem('tb_edit_token');
+    clearAuthToken();
     document.getElementById('dash-auth').classList.remove('hidden');
   }
 }
@@ -753,7 +768,7 @@ function populateDash(t) {
 async function loadStats() {
   try {
     const res = await fetch(EDGE_BASE + '/weekly-stats', {
-      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('tb_edit_token') }
+      headers: { 'Authorization': 'Bearer ' + getAuthToken() }
     });
     const data = await res.json();
     document.getElementById('stat-leads').textContent = data.leads_this_week ?? '0';
@@ -885,7 +900,7 @@ async function startUpgrade() {
   try {
     const res = await fetch(EDGE_BASE + '/create-checkout', {
       method: 'POST', headers: { 'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem('tb_edit_token') },
+        'Authorization': 'Bearer ' + getAuthToken() },
       body: JSON.stringify({ trainer_id: trainer.id, plan: 'pro', success_url: location.origin + '/dashboard?upgraded=1', cancel_url: location.origin + '/dashboard' })
     });
     const data = await res.json();

@@ -6,13 +6,72 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Slugify a name
+// ─── Input Sanitization ───────────────────────────────────────────────────────
+// Strip HTML tags and control characters from user-supplied strings.
+// Prevents stored XSS when trainer names/bios are rendered in the dashboard.
+function sanitize(value: string | undefined | null): string {
+  if (!value) return "";
+  return value
+    .replace(/<[^>]*>/g, "")          // strip HTML tags
+    .replace(/[^\x20-\x7E\u00A0-\uFFFF]/g, "") // strip control characters
+    .trim()
+    .slice(0, 500);                    // hard cap at 500 chars
+}
+
+function sanitizeEmail(email: string): string {
+  return email.toLowerCase().trim().slice(0, 254);
+}
+
+// ─── Slugify ──────────────────────────────────────────────────────────────────
 function slugify(name: string): string {
   return name.toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
-    .trim();
+    .trim()
+    .slice(0, 40); // slugs capped at 40 chars
+}
+
+// ─── Rate Limiting ────────────────────────────────────────────────────────────
+// Limits registration attempts to 5 per email per 15 minutes.
+// Uses the rate_limits table added in 002_features.sql.
+async function checkRateLimit(
+  sb: ReturnType<typeof createClient>,
+  key: string,
+  maxCount: number,
+  windowMinutes: number
+): Promise<boolean> {
+  const windowStart = new Date(Date.now() - windowMinutes * 60 * 1000).toISOString();
+
+  // Clean up expired windows for this key
+  await sb.from("rate_limits")
+    .delete()
+    .eq("key", key)
+    .lt("window_start", windowStart);
+
+  // Check current count
+  const { data: existing } = await sb.from("rate_limits")
+    .select("id, count")
+    .eq("key", key)
+    .gte("window_start", windowStart)
+    .single();
+
+  if (!existing) {
+    // First request in this window — create entry
+    await sb.from("rate_limits").insert({ key, count: 1 });
+    return true; // allowed
+  }
+
+  if (existing.count >= maxCount) {
+    return false; // rate limited
+  }
+
+  // Increment counter
+  await sb.from("rate_limits")
+    .update({ count: existing.count + 1 })
+    .eq("id", existing.id);
+
+  return true; // allowed
 }
 
 serve(async (req) => {
@@ -22,90 +81,164 @@ serve(async (req) => {
     const body = await req.json();
     const { name, email, phone, title, specialties, reps_number, referred_by } = body;
 
+    // ── Validate required fields ──────────────────────────────────────────────
     if (!name || !email) {
-      return new Response(JSON.stringify({ error: "Name and email are required" }), { status: 400, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "Name and email are required" }), {
+        status: 400, headers: corsHeaders,
+      });
     }
 
-    const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    // Basic email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return new Response(JSON.stringify({ error: "Invalid email address" }), {
+        status: 400, headers: corsHeaders,
+      });
+    }
 
-    // Check if email already exists
-    const { data: existing } = await sb.from("trainers").select("id,slug").eq("email", email.toLowerCase()).single();
+    // ── Sanitize all inputs ───────────────────────────────────────────────────
+    const cleanName = sanitize(name);
+    const cleanEmail = sanitizeEmail(email);
+    const cleanPhone = sanitize(phone);
+    const cleanTitle = sanitize(title);
+    const cleanReps = sanitize(reps_number);
+    const cleanReferredBy = sanitize(referred_by);
+    const cleanSpecialties = Array.isArray(specialties)
+      ? specialties.slice(0, 10).map((s: string) => sanitize(s))
+      : [];
+
+    if (!cleanName) {
+      return new Response(JSON.stringify({ error: "Invalid name" }), {
+        status: 400, headers: corsHeaders,
+      });
+    }
+
+    const sb = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    // ── Rate limit: 5 registration attempts per email per 15 minutes ──────────
+    const allowed = await checkRateLimit(sb, `register:${cleanEmail}`, 5, 15);
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: "Too many attempts. Please try again in 15 minutes." }), {
+        status: 429, headers: corsHeaders,
+      });
+    }
+
+    // ── Check if email already exists ─────────────────────────────────────────
+    const { data: existing } = await sb.from("trainers")
+      .select("id,slug")
+      .eq("email", cleanEmail)
+      .single();
+
     if (existing) {
       // Send magic link to existing account
       const token = crypto.randomUUID() + "-" + Date.now().toString(36);
       await sb.from("magic_links").insert({
-        email: email.toLowerCase(), token, trainer_id: existing.id,
+        email: cleanEmail,
+        token,
+        trainer_id: existing.id,
         expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
       });
-      await sendWelcomeEmail(email, existing.slug, token, true);
+      await sendWelcomeEmail(cleanEmail, existing.slug, token, true);
       return new Response(JSON.stringify({ ok: true, existing: true, slug: existing.slug }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Generate unique slug
-    let baseSlug = slugify(name);
+    // ── Generate unique slug (bounded — max 10 attempts) ──────────────────────
+    // Using a bounded loop prevents infinite hang if DB is slow or under load.
+    // On collision after 10 attempts, we append a UUID fragment to guarantee uniqueness.
+    let baseSlug = slugify(cleanName) || "trainer";
     let slug = baseSlug;
-    let attempt = 0;
-    while (true) {
-      const { data: taken } = await sb.from("trainers").select("id").eq("slug", slug).single();
+
+    for (let attempt = 0; attempt <= 10; attempt++) {
+      if (attempt === 10) {
+        // Guaranteed unique fallback — append 6 random hex chars
+        slug = `${baseSlug}-${crypto.randomUUID().slice(0, 6)}`;
+        break;
+      }
+      const { data: taken } = await sb.from("trainers")
+        .select("id")
+        .eq("slug", slug)
+        .single();
       if (!taken) break;
-      attempt++;
-      slug = `${baseSlug}${attempt}`;
+      slug = attempt === 0 ? `${baseSlug}2` : `${baseSlug}${attempt + 2}`;
     }
 
-    // Create trainer
+    // ── Create trainer ─────────────────────────────────────────────────────────
     const { data: trainer, error } = await sb.from("trainers").insert({
-      slug, name: name.trim(), email: email.toLowerCase().trim(),
-      phone: phone?.trim() || null, title: title?.trim() || null,
-      specialties: specialties || [],
-      reps_number: reps_number?.trim() || null,
-      verification_status: reps_number ? "pending" : "unsubmitted",
-      referred_by: referred_by || null,
+      slug,
+      name: cleanName,
+      email: cleanEmail,
+      phone: cleanPhone || null,
+      title: cleanTitle || null,
+      specialties: cleanSpecialties,
+      reps_number: cleanReps || null,
+      verification_status: cleanReps ? "pending" : "unsubmitted",
+      referred_by: cleanReferredBy || null,
     }).select().single();
 
     if (error) throw error;
 
-    // Handle referral
-    if (referred_by) {
+    // ── Handle referral ────────────────────────────────────────────────────────
+    if (cleanReferredBy) {
       await sb.from("referrals").insert({
-        referrer_slug: referred_by, referred_email: email.toLowerCase(), referred_id: trainer.id,
+        referrer_slug: cleanReferredBy,
+        referred_email: cleanEmail,
+        referred_id: trainer.id,
       });
     }
 
-    // Generate magic link token
+    // ── Generate magic link token ──────────────────────────────────────────────
     const token = crypto.randomUUID() + "-" + Date.now().toString(36);
     await sb.from("magic_links").insert({
-      email: email.toLowerCase(), token, trainer_id: trainer.id,
+      email: cleanEmail,
+      token,
+      trainer_id: trainer.id,
       expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     });
 
-    // Send welcome email
-    await sendWelcomeEmail(email, slug, token, false);
+    // ── Send welcome email ─────────────────────────────────────────────────────
+    await sendWelcomeEmail(cleanEmail, slug, token, false);
 
     return new Response(JSON.stringify({ ok: true, slug, trainer_id: trainer.id }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+
   } catch (e) {
-    console.error(e);
-    return new Response(JSON.stringify({ error: "Internal error" }), { status: 500, headers: corsHeaders });
+    console.error("register-trainer error:", e);
+    return new Response(JSON.stringify({ error: "Internal error" }), {
+      status: 500, headers: corsHeaders,
+    });
   }
 });
 
-async function sendWelcomeEmail(email: string, slug: string, token: string, isExisting: boolean) {
+async function sendWelcomeEmail(
+  email: string,
+  slug: string,
+  token: string,
+  isExisting: boolean
+) {
   const editUrl = `https://trainedby.ae/edit?token=${token}`;
   const profileUrl = `https://trainedby.ae/${slug}`;
 
-  const subject = isExisting ? "Welcome back to TrainedBy" : "Your TrainedBy profile is ready 🔥";
+  const subject = isExisting
+    ? "Welcome back to TrainedBy"
+    : "Your TrainedBy profile is ready 🔥";
   const headline = isExisting ? "Welcome back!" : "Your profile is live!";
-  const body = isExisting
+  const bodyText = isExisting
     ? `Sign in to edit your profile and check your leads.`
     : `Your TrainedBy profile is live at <a href="${profileUrl}" style="color:#FF5C00;">${profileUrl}</a>. Complete your profile to get your REPs badge and start receiving leads.`;
+
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  if (!resendKey) return; // graceful no-op in dev environments
 
   await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`,
+      "Authorization": `Bearer ${resendKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -119,7 +252,7 @@ async function sendWelcomeEmail(email: string, slug: string, token: string, isEx
             <span style="color:#fff;font-family:Manrope,sans-serif;font-weight:800;font-size:16px;margin-left:8px;">TrainedBy</span>
           </div>
           <h1 style="color:#fff;font-family:Manrope,sans-serif;font-size:24px;font-weight:800;margin-bottom:8px;">${headline}</h1>
-          <p style="color:rgba(255,255,255,0.55);font-size:15px;margin-bottom:28px;line-height:1.6;">${body}</p>
+          <p style="color:rgba(255,255,255,0.55);font-size:15px;margin-bottom:28px;line-height:1.6;">${bodyText}</p>
           <a href="${editUrl}" style="display:inline-block;background:#FF5C00;color:#fff;font-family:Manrope,sans-serif;font-weight:700;font-size:15px;padding:16px 32px;border-radius:12px;text-decoration:none;">
             ${isExisting ? "Sign In →" : "Complete My Profile →"}
           </a>

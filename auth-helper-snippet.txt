@@ -1,0 +1,19 @@
+// ─── Auth Helper ──────────────────────────────────────────────────────────────
+// Reads the tb_session cookie (HttpOnly, set by verify-magic-link edge function).
+// Falls back to localStorage tb_edit_token for backward compatibility during migration.
+// All API calls use the session token as a Bearer token in the Authorization header.
+function getAuthToken() {
+  // Try cookie first (secure, HttpOnly-set session)
+  const cookies = document.cookie.split(';').map(c => c.trim());
+  for (const c of cookies) {
+    if (c.startsWith('tb_session=')) return c.slice('tb_session='.length);
+  }
+  // Fallback: legacy localStorage token (deprecated — will be removed in v2)
+  return localStorage.getItem('tb_edit_token');
+}
+function clearAuthToken() {
+  // Clear legacy localStorage token
+  localStorage.removeItem('tb_edit_token');
+  // Expire the cookie by setting it in the past
+  document.cookie = 'tb_session=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; SameSite=Strict';
+}

@@ -533,29 +533,47 @@ async function sendMagicLink() {
   }
 }
 
+// ===== AUTH HELPERS =====
+// Reads the tb_session HttpOnly cookie (set by verify-magic-link edge function).
+// Falls back to localStorage for backward compatibility during migration.
+function getAuthToken() {
+  const cookies = document.cookie.split(';').map(c => c.trim());
+  for (const c of cookies) {
+    if (c.startsWith('tb_session=')) return c.slice('tb_session='.length);
+  }
+  return localStorage.getItem('tb_edit_token');
+}
+function clearAuthToken() {
+  localStorage.removeItem('tb_edit_token');
+  document.cookie = 'tb_session=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; SameSite=Strict';
+}
+
 // ===== INIT =====
 async function init() {
-  // Check for magic link token in URL
   const params = new URLSearchParams(location.search);
-  const token = params.get('token') || localStorage.getItem('tb_edit_token');
+  const urlToken = params.get('token');
+  const token = urlToken || getAuthToken();
   if (!token) return; // show auth gate
 
   try {
     const res = await fetch(EDGE_BASE + '/verify-magic-link', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // receive HttpOnly Set-Cookie from edge function
       body: JSON.stringify({ token })
     });
     const data = await res.json();
     if (!res.ok || !data.trainer) throw new Error();
-    localStorage.setItem('tb_edit_token', token);
-    if (params.get('token')) history.replaceState({}, '', '/edit');
+    // Store in localStorage as fallback only when arriving from a URL token
+    if (urlToken) localStorage.setItem('tb_edit_token', token);
+    if (urlToken) history.replaceState({}, '', '/edit');
     trainer = data.trainer;
     populateForm(trainer);
     document.getElementById('auth-gate').classList.add('hidden');
     document.getElementById('edit-form').classList.remove('hidden');
     document.getElementById('view-profile-link').href = '/' + trainer.slug;
   } catch {
-    localStorage.removeItem('tb_edit_token');
+    clearAuthToken();
   }
 }
 
@@ -728,7 +746,7 @@ async function changeAvatar(input) {
     try {
       const res = await fetch(EDGE_BASE + '/upload-image', {
         method: 'POST', headers: { 'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('tb_edit_token') },
+          'Authorization': 'Bearer ' + getAuthToken() },
         body: JSON.stringify({ base64: e.target.result, type: 'avatar', trainer_id: trainer.id })
       });
       const data = await res.json();
@@ -770,7 +788,7 @@ async function submitRepsVerification() {
   if (!reps) { showToast('Please enter your REPs number', 'error'); return; }
   const res = await fetch(EDGE_BASE + '/verify-reps', {
     method: 'POST', headers: { 'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + localStorage.getItem('tb_edit_token') },
+      'Authorization': 'Bearer ' + getAuthToken() },
     body: JSON.stringify({ trainer_id: trainer.id, reps_number: reps })
   });
   if (res.ok) showToast('Verification submitted — we\'ll confirm within 24h', 'success');
@@ -802,7 +820,7 @@ async function saveAll() {
     };
     const res = await fetch(EDGE_BASE + '/update-trainer', {
       method: 'POST', headers: { 'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem('tb_edit_token') },
+        'Authorization': 'Bearer ' + getAuthToken() },
       body: JSON.stringify(payload)
     });
     if (!res.ok) throw new Error();
@@ -816,10 +834,10 @@ function confirmDelete() {
   if (!confirm('Are you sure? This permanently deletes your profile and all data.')) return;
   fetch(EDGE_BASE + '/update-trainer', {
     method: 'POST', headers: { 'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + localStorage.getItem('tb_edit_token') },
+      'Authorization': 'Bearer ' + getAuthToken() },
     body: JSON.stringify({ action: 'delete', trainer_id: trainer.id })
   }).then(r => {
-    if (r.ok) { localStorage.removeItem('tb_edit_token'); location.href = '/'; }
+    if (r.ok) { clearAuthToken(); location.href = '/'; }
     else showToast('Delete failed. Please try again.', 'error');
   });
 }

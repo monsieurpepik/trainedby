@@ -424,8 +424,16 @@ function setBilling(mode) {
   document.getElementById('premium-annual-note').textContent = isAnnual ? 'AED 1,908/yr — save AED 480' : '';
 }
 
+function getAuthToken() {
+  const cookies = document.cookie.split(';').map(c => c.trim());
+  for (const c of cookies) {
+    if (c.startsWith('tb_session=')) return c.slice('tb_session='.length);
+  }
+  return localStorage.getItem('tb_edit_token');
+}
+
 async function startCheckout(plan) {
-  const token = localStorage.getItem('tb_edit_token');
+  const token = getAuthToken();
   if (!token) { location.href = '/join'; return; }
   try {
     const res = await fetch(EDGE_BASE + '/create-checkout', {
