@@ -1,6 +1,5 @@
 [build]
   publish = "dist"
-  command = "pnpm astro build"
 
 [build.environment]
   NODE_VERSION = "22"
@@ -46,57 +45,7 @@
   to = "/find"
   status = 301
 
-# ── Named page exclusions (must come before catch-all) ──────────────────────
-# These are handled by Astro's static output — no redirect needed.
-# The catch-all below must NOT intercept these paths.
-
-[[redirects]]
-  from = "/landing"
-  to = "/landing/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/join"
-  to = "/join/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/pricing"
-  to = "/pricing/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/dashboard"
-  to = "/dashboard/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/edit"
-  to = "/edit/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/blog"
-  to = "/blog/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/plan-builder"
-  to = "/plan-builder/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/find"
-  to = "/find/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/profile"
-  to = "/profile/index.html"
-  status = 200
-
 # ── Catch-all: /:slug → profile page (reads slug from URL at runtime) ───────
-# MUST come last — after all named page redirects
 [[redirects]]
   from = "/:trainer"
   to = "/profile/index.html"
