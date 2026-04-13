@@ -1,6 +1,6 @@
 [build]
   publish = "dist"
-  command = "echo 'Using pre-built dist'"
+  command = "pnpm astro build"
 
 [build.environment]
   NODE_VERSION = "22"
