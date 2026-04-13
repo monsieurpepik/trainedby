@@ -198,8 +198,11 @@ footer {
 
   <div class="pricing-header">
     <div class="pricing-label">Pricing</div>
-    <h1 class="pricing-title">Simple, transparent pricing</h1>
-    <p class="pricing-sub">Start free. Upgrade when you're ready to grow.</p>
+    <h1 class="pricing-title">Invest AED 99.<br>Earn AED 10,000+.</h1>
+    <p class="pricing-sub">Pro pays for itself the moment your first affiliate commission lands. Most trainers see ROI in under 7 days.</p>
+    <div style="display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:8px 16px;border-radius:100px;border:1px solid rgba(0,200,83,0.25);background:rgba(0,200,83,0.06);font-size:12px;font-weight:600;color:#00C853">
+      🛡 ROI Guarantee: 1,000 AED in 30 days or full refund
+    </div>
   </div>
 
   <!-- Billing toggle -->
@@ -224,8 +227,8 @@ footer {
         <span class="plan-price-period">/mo</span>
       </div>
       <div class="plan-price-annual">&nbsp;</div>
-      <div class="plan-desc">Everything you need to get started. No credit card required.</div>
-      <button class="plan-btn plan-btn-ghost" onclick="location.href='/join'">Get Started Free</button>
+      <div class="plan-desc">Get your verified profile live in 2 minutes. No credit card required.</div>
+      <button class="plan-btn plan-btn-ghost" onclick="location.href='/join.html'">Get Started Free</button>
       <div class="plan-features">
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -241,19 +244,19 @@ footer {
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          1 session package
+        </div>
+        <div class="plan-feature excluded">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
           Fitness assessment tool
-        </div>
-        <div class="plan-feature included">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Up to 3 session packages
-        </div>
-        <div class="plan-feature included">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Basic analytics
         </div>
         <div class="plan-feature excluded">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
           WhatsApp lead notifications
+        </div>
+        <div class="plan-feature excluded">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
+          Analytics &amp; lead tracking
         </div>
         <div class="plan-feature excluded">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
@@ -272,12 +275,24 @@ footer {
         <span class="plan-price-period">/mo</span>
       </div>
       <div class="plan-price-annual" id="pro-annual-note">&nbsp;</div>
-      <div class="plan-desc">For trainers serious about growing their client base.</div>
-      <button class="plan-btn plan-btn-brand" onclick="startCheckout('pro')">Get Pro</button>
+      <div class="plan-desc">The complete income OS. Passive income from affiliates, digital products, and Grand Slam Offers — all in one place.</div>
+      <button class="plan-btn plan-btn-brand" onclick="startCheckout('pro')">Unlock Passive Income →</button>
       <div class="plan-features">
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
           Everything in Free
+        </div>
+        <div class="plan-feature included" style="background:rgba(255,92,0,0.04);border-radius:8px;padding:6px 8px;margin:-2px 0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5C00"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          <strong style="color:#FF5C00">💰 Master Affiliate Vault</strong> <span style="font-size:11px;color:var(--text-muted)">— earn from Gymshark, ZEROFAT &amp; more</span>
+        </div>
+        <div class="plan-feature included" style="background:rgba(255,92,0,0.04);border-radius:8px;padding:6px 8px;margin:-2px 0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5C00"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          <strong style="color:#FF5C00">📦 Digital Product Hub</strong> <span style="font-size:11px;color:var(--text-muted)">— sell PDFs, plans &amp; courses (5% fee)</span>
+        </div>
+        <div class="plan-feature included" style="background:rgba(255,92,0,0.04);border-radius:8px;padding:6px 8px;margin:-2px 0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5C00"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          <strong style="color:#FF5C00">🎯 Grand Slam Offer Builder</strong> <span style="font-size:11px;color:var(--text-muted)">— AI outcome + guarantee cards</span>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -297,7 +312,7 @@ footer {
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Advanced analytics + weekly report
+          <strong>Analytics dashboard + weekly report</strong>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -363,12 +378,15 @@ footer {
         <tr><td>Public profile page</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
         <tr><td>REPs UAE verified badge</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
         <tr><td>WhatsApp CTA</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Fitness assessment tool</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Session packages</td><td>3</td><td class="plan-highlight">Unlimited</td><td class="plan-highlight">Unlimited</td></tr>
+        <tr><td>Master Affiliate Vault</td><td><span class="cross">—</span></td><td><span class="check" style="color:#FF5C00">✓</span></td><td><span class="check" style="color:#FF5C00">✓</span></td></tr>
+        <tr><td>Digital Product Hub</td><td><span class="cross">—</span></td><td><span class="check" style="color:#FF5C00">✓</span></td><td><span class="check" style="color:#FF5C00">✓</span></td></tr>
+        <tr><td>Grand Slam Offer Builder</td><td><span class="cross">—</span></td><td><span class="check" style="color:#FF5C00">✓</span></td><td><span class="check" style="color:#FF5C00">✓</span></td></tr>
+        <tr><td>Fitness assessment tool</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Session packages</td><td>1</td><td class="plan-highlight">Unlimited</td><td class="plan-highlight">Unlimited</td></tr>
         <tr><td>Transformation gallery</td><td><span class="cross">—</span></td><td class="plan-highlight">9 photos</td><td class="plan-highlight">9 photos</td></tr>
         <tr><td>WhatsApp lead notifications</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
         <tr><td>Priority search placement</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Advanced analytics</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Analytics &amp; lead tracking</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
         <tr><td>Remove TrainedBy branding</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
         <tr><td>Multiple trainer profiles</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td class="plan-highlight">Up to 5</td></tr>
         <tr><td>Gym / agency page</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>

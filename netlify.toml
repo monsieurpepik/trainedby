@@ -28,6 +28,16 @@
   to = "/landing.html"
   status = 200
 
+[[redirects]]
+  from = "/blog"
+  to = "/blog.html"
+  status = 200
+
+[[redirects]]
+  from = "/plan-builder"
+  to = "/plan-builder.html"
+  status = 200
+
 # Catch-all: /:slug -> index.html (trainer profile pages)
 [[redirects]]
   from = "/:trainer"

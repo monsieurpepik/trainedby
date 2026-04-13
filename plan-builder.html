@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AI Plan Builder — TrainedBy</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF5C00'/%3E%3Ctext x='16' y='23' font-family='Manrope,Arial,sans-serif' font-size='14' font-weight='800' text-anchor='middle' fill='white'%3ETB%3C/text%3E%3C/svg%3E">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap&subset=latin" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap&subset=latin" rel="stylesheet"></noscript>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand: #FF5C00; --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
+      --reps: #00C853; --reps-dim: rgba(0,200,83,0.08); --reps-border: rgba(0,200,83,0.2);
+      --gold: #F5C842; --gold-dim: rgba(245,200,66,0.08); --gold-border: rgba(245,200,66,0.2);
+      --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c; --surface-4: #242424;
+      --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.14);
+      --text: #fff; --text-muted: rgba(255,255,255,0.5); --text-faint: rgba(255,255,255,0.25);
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--surface); color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+    /* ── LAYOUT ── */
+    .wrap { max-width: 860px; margin: 0 auto; padding: 0 20px max(80px, env(safe-area-inset-bottom)); }
+
+    /* ── HEADER ── */
+    .header { display: flex; align-items: center; justify-content: space-between; padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: 20px; border-bottom: 1px solid var(--border); margin: 0 -20px; padding-left: 20px; padding-right: 20px; }
+    .header-logo { display: flex; align-items: center; gap: 8px; font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 16px; text-decoration: none; color: var(--text); }
+    .header-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--brand-dim); border: 1px solid var(--brand-border); border-radius: 20px; font-size: 11px; font-weight: 700; color: var(--brand); }
+
+    /* ── PAGE TITLE ── */
+    .page-title { padding: 32px 0 28px; border-bottom: 1px solid var(--border); }
+    .page-title h1 { font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .page-title p { font-size: 14px; color: var(--text-muted); max-width: 520px; line-height: 1.6; }
+    .science-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 5px 12px; background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: 20px; font-size: 11px; font-weight: 700; color: var(--gold); }
+
+    /* ── FORM ── */
+    .form-section { padding: 28px 0; border-bottom: 1px solid var(--border); }
+    .form-section-title { font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 18px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .form-field { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    .form-input, .form-select { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; width: 100%; }
+    .form-input:focus, .form-select:focus { border-color: var(--brand); }
+    .form-select option { background: var(--surface-3); }
+
+    /* ── PLAN TYPE TOGGLE ── */
+    .type-toggle { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+    .type-btn { padding: 14px 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-muted); font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .type-btn:hover { border-color: var(--border-hover); color: var(--text); }
+    .type-btn.active { border-color: var(--brand-border); background: var(--brand-dim); color: var(--brand); }
+    .type-btn .type-icon { font-size: 22px; display: block; margin-bottom: 6px; }
+
+    /* ── PILL TOGGLES (restrictions) ── */
+    .pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; user-select: none; }
+    .pill:hover { border-color: var(--border-hover); color: var(--text); }
+    .pill.active { border-color: var(--brand-border); background: var(--brand-dim); color: var(--brand); }
+
+    /* ── GENERATE BUTTON ── */
+    .generate-wrap { padding: 28px 0; }
+    .generate-btn { width: 100%; padding: 16px; background: var(--brand); color: #fff; border: none; border-radius: 14px; font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .generate-btn:hover { background: #e05200; transform: translateY(-1px); }
+    .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .generate-note { text-align: center; font-size: 12px; color: var(--text-faint); margin-top: 10px; }
+
+    /* ── LOADING ── */
+    .loading-state { display: none; padding: 48px 0; text-align: center; }
+    .loading-state.visible { display: block; }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-steps { display: flex; flex-direction: column; gap: 8px; max-width: 320px; margin: 20px auto 0; }
+    .loading-step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-muted); padding: 8px 12px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); }
+    .loading-step.done { color: var(--reps); border-color: var(--reps-border); background: var(--reps-dim); }
+    .loading-step.active { color: var(--brand); border-color: var(--brand-border); background: var(--brand-dim); }
+
+    /* ── RESULT ── */
+    .result-section { display: none; }
+    .result-section.visible { display: block; }
+    .result-header { padding: 28px 0 20px; border-bottom: 1px solid var(--border); }
+    .result-title { font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+    .result-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+    .result-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .result-btn { padding: 9px 18px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; }
+    .result-btn-brand { background: var(--brand); color: #fff; }
+    .result-btn-brand:hover { background: #e05200; }
+    .result-btn-ghost { background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted); }
+    .result-btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
+
+    /* ── PLAN CARDS ── */
+    .plan-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-top: 16px; }
+    .plan-card-title { font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .plan-card-title .tag { padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+    .tag-diet { background: var(--reps-dim); border: 1px solid var(--reps-border); color: var(--reps); }
+    .tag-workout { background: var(--brand-dim); border: 1px solid var(--brand-border); color: var(--brand); }
+    .tag-science { background: var(--gold-dim); border: 1px solid var(--gold-border); color: var(--gold); }
+
+    /* ── MACRO BAR ── */
+    .macro-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .macro-card { background: var(--surface-3); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; }
+    .macro-val { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 20px; color: var(--brand); }
+    .macro-label { font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+    /* ── MEAL TABLE ── */
+    .meal-day { margin-bottom: 16px; }
+    .meal-day-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .meal-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; background: var(--surface-3); border-radius: 8px; margin-bottom: 6px; }
+    .meal-time { font-size: 11px; font-weight: 700; color: var(--brand); min-width: 64px; padding-top: 1px; }
+    .meal-name { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+    .meal-foods { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .meal-cals { font-size: 11px; font-weight: 700; color: var(--text-faint); margin-left: auto; white-space: nowrap; padding-top: 1px; }
+
+    /* ── EXERCISE TABLE ── */
+    .workout-week { margin-bottom: 20px; }
+    .workout-week-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+    .session-card { background: var(--surface-3); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+    .session-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .session-day { font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700; }
+    .session-focus { font-size: 11px; color: var(--brand); font-weight: 600; }
+    .session-duration { font-size: 11px; color: var(--text-faint); }
+    .exercise-row { display: grid; grid-template-columns: 1fr 80px 80px 60px; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; align-items: center; }
+    .exercise-row:last-child { border-bottom: none; }
+    .exercise-name { font-weight: 600; }
+    .exercise-meta { color: var(--text-muted); text-align: center; }
+    .exercise-note { font-size: 10px; color: var(--text-faint); grid-column: 1 / -1; margin-top: -4px; }
+
+    /* ── SUPPLEMENTS ── */
+    .supp-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--surface-3); border-radius: 8px; margin-bottom: 6px; }
+    .supp-name { font-size: 13px; font-weight: 600; flex: 1; }
+    .supp-dose { font-size: 11px; color: var(--text-muted); }
+    .supp-evidence { padding: 2px 8px; border-radius: 20px; font-size: 9px; font-weight: 800; }
+    .evidence-A { background: rgba(0,200,83,0.15); color: var(--reps); }
+    .evidence-B { background: var(--gold-dim); color: var(--gold); }
+    .evidence-C { background: var(--surface-4); color: var(--text-faint); }
+
+    /* ── CITATIONS ── */
+    .citations-list { display: flex; flex-direction: column; gap: 6px; }
+    .citation-item { font-size: 11px; color: var(--text-faint); padding: 6px 10px; background: var(--surface-3); border-radius: 6px; border-left: 2px solid var(--brand-border); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
+      .macro-row { grid-template-columns: 1fr 1fr 1fr; }
+      .exercise-row { grid-template-columns: 1fr 60px 60px; }
+      .exercise-row .exercise-meta:last-of-type { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="header">
+    <a href="/dashboard.html" class="header-logo">
+      <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
+      TrainedBy
+    </a>
+    <div class="header-badge">⚡ AI Plan Builder</div>
+  </header>
+
+  <!-- PAGE TITLE -->
+  <div class="page-title">
+    <h1>AI Plan Builder</h1>
+    <p>Generate evidence-based, personalised diet and workout plans for your clients. Each plan is grounded in current sports science research and branded with your name.</p>
+    <div class="science-badge">🔬 Powered by Perplexity Sonar + ACSM/ISSN Guidelines</div>
+  </div>
+
+  <!-- FORM -->
+  <form id="planForm">
+
+    <!-- Plan Type -->
+    <div class="form-section">
+      <div class="form-section-title">Plan Type</div>
+      <div class="type-toggle">
+        <button type="button" class="type-btn active" data-type="both">
+          <span class="type-icon">🎯</span>Diet + Workout
+        </button>
+        <button type="button" class="type-btn" data-type="diet">
+          <span class="type-icon">🥗</span>Diet Only
+        </button>
+        <button type="button" class="type-btn" data-type="workout">
+          <span class="type-icon">💪</span>Workout Only
+        </button>
+      </div>
+      <input type="hidden" id="planType" value="both">
+    </div>
+
+    <!-- Client Profile -->
+    <div class="form-section">
+      <div class="form-section-title">Client Profile</div>
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-field">
+          <label class="form-label">Client Name</label>
+          <input class="form-input" id="clientName" type="text" placeholder="Ahmed Al Rashidi" required>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Goal</label>
+          <select class="form-select" id="goal">
+            <option value="fat_loss">Fat Loss</option>
+            <option value="muscle_gain">Muscle Gain</option>
+            <option value="endurance">Endurance</option>
+            <option value="general_fitness" selected>General Fitness</option>
+            <option value="sport_performance">Sport Performance</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid-3" style="margin-bottom:14px">
+        <div class="form-field">
+          <label class="form-label">Age</label>
+          <input class="form-input" id="age" type="number" value="30" min="16" max="80" required>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Weight (kg)</label>
+          <input class="form-input" id="weight" type="number" value="80" min="40" max="200" required>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Height (cm)</label>
+          <input class="form-input" id="height" type="number" value="175" min="140" max="220" required>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">Gender</label>
+          <select class="form-select" id="gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Activity Level</label>
+          <select class="form-select" id="activityLevel">
+            <option value="sedentary">Sedentary (desk job)</option>
+            <option value="lightly_active">Lightly Active</option>
+            <option value="moderately_active" selected>Moderately Active</option>
+            <option value="very_active">Very Active</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workout Settings -->
+    <div class="form-section" id="workoutSection">
+      <div class="form-section-title">Training Settings</div>
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-field">
+          <label class="form-label">Training Days / Week</label>
+          <select class="form-select" id="trainingDays">
+            <option value="3">3 days</option>
+            <option value="4" selected>4 days</option>
+            <option value="5">5 days</option>
+            <option value="6">6 days</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Equipment Available</label>
+          <select class="form-select" id="equipment">
+            <option value="gym_full" selected>Full Gym</option>
+            <option value="gym_basic">Basic Gym</option>
+            <option value="home">Home / Minimal</option>
+            <option value="outdoor">Outdoor Only</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">Fitness Level</label>
+          <select class="form-select" id="fitnessLevel">
+            <option value="beginner">Beginner</option>
+            <option value="intermediate" selected>Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Injuries / Limitations</label>
+          <input class="form-input" id="injuries" type="text" placeholder="e.g. lower back, knee">
+        </div>
+      </div>
+    </div>
+
+    <!-- Diet Settings -->
+    <div class="form-section" id="dietSection">
+      <div class="form-section-title">Dietary Preferences</div>
+      <div class="form-field" style="margin-bottom:14px">
+        <label class="form-label">Dietary Restrictions</label>
+        <div class="pill-group" id="restrictionPills">
+          <div class="pill" data-val="halal">Halal</div>
+          <div class="pill" data-val="vegetarian">Vegetarian</div>
+          <div class="pill" data-val="vegan">Vegan</div>
+          <div class="pill" data-val="lactose_free">Lactose Free</div>
+          <div class="pill" data-val="gluten_free">Gluten Free</div>
+          <div class="pill" data-val="no_pork">No Pork</div>
+          <div class="pill" data-val="low_carb">Low Carb</div>
+          <div class="pill" data-val="high_protein">High Protein</div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Food Allergies</label>
+        <input class="form-input" id="allergies" type="text" placeholder="e.g. nuts, shellfish, eggs">
+      </div>
+    </div>
+
+    <!-- Generate -->
+    <div class="generate-wrap">
+      <button type="submit" class="generate-btn" id="generateBtn">
+        <span>🔬</span> Generate Evidence-Based Plan
+      </button>
+      <p class="generate-note">Sourced from ACSM, ISSN, and peer-reviewed sports science via Perplexity Sonar</p>
+    </div>
+
+  </form>
+
+  <!-- LOADING -->
+  <div class="loading-state" id="loadingState">
+    <div class="loading-spinner"></div>
+    <div style="font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;margin-bottom:6px">Building your plan...</div>
+    <div style="font-size:13px;color:var(--text-muted)">Sourcing current sports science research</div>
+    <div class="loading-steps">
+      <div class="loading-step active" id="step1">🔬 Querying Perplexity Sonar for latest research...</div>
+      <div class="loading-step" id="step2">🧮 Calculating TDEE and macronutrient targets...</div>
+      <div class="loading-step" id="step3">🥗 Generating personalised meal plan...</div>
+      <div class="loading-step" id="step4">💪 Building progressive workout programme...</div>
+      <div class="loading-step" id="step5">✅ Packaging your branded plan...</div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-section" id="resultSection">
+    <div class="result-header">
+      <div class="result-title" id="resultTitle">Plan Ready</div>
+      <div class="result-meta" id="resultMeta"></div>
+      <div class="result-actions">
+        <button class="result-btn result-btn-brand" onclick="printPlan()">⬇ Download PDF</button>
+        <button class="result-btn result-btn-ghost" onclick="copyPlan()">📋 Copy as Text</button>
+        <button class="result-btn result-btn-ghost" onclick="resetForm()">← New Plan</button>
+      </div>
+    </div>
+    <div id="planOutput"></div>
+  </div>
+
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://YOUR_SUPABASE_URL.supabase.co';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+  // ── Plan type toggle ──
+  let planType = 'both';
+  document.querySelectorAll('.type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      planType = btn.dataset.type;
+      document.getElementById('planType').value = planType;
+      document.getElementById('workoutSection').style.display = planType === 'diet' ? 'none' : '';
+      document.getElementById('dietSection').style.display = planType === 'workout' ? 'none' : '';
+    });
+  });
+
+  // ── Pill toggles ──
+  const selectedRestrictions = new Set();
+  document.querySelectorAll('#restrictionPills .pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      pill.classList.toggle('active');
+      const val = pill.dataset.val;
+      selectedRestrictions.has(val) ? selectedRestrictions.delete(val) : selectedRestrictions.add(val);
+    });
+  });
+
+  // ── Form submit ──
+  document.getElementById('planForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await generatePlan();
+  });
+
+  async function generatePlan() {
+    const btn = document.getElementById('generateBtn');
+    btn.disabled = true;
+    document.getElementById('planForm').style.display = 'none';
+    document.getElementById('loadingState').classList.add('visible');
+    document.getElementById('resultSection').classList.remove('visible');
+
+    // Animate loading steps
+    const steps = ['step1','step2','step3','step4','step5'];
+    let stepIdx = 0;
+    const stepInterval = setInterval(() => {
+      if (stepIdx > 0) document.getElementById(steps[stepIdx-1]).className = 'loading-step done';
+      if (stepIdx < steps.length) {
+        document.getElementById(steps[stepIdx]).className = 'loading-step active';
+        stepIdx++;
+      } else {
+        clearInterval(stepInterval);
+      }
+    }, 1800);
+
+    const payload = {
+      type: planType,
+      name: document.getElementById('clientName').value || 'Client',
+      age: parseInt(document.getElementById('age').value),
+      gender: document.getElementById('gender').value,
+      weight_kg: parseFloat(document.getElementById('weight').value),
+      height_cm: parseFloat(document.getElementById('height').value),
+      goal: document.getElementById('goal').value,
+      activity_level: document.getElementById('activityLevel').value,
+      training_days_per_week: parseInt(document.getElementById('trainingDays').value),
+      equipment: document.getElementById('equipment').value,
+      fitness_level: document.getElementById('fitnessLevel').value,
+      injuries: document.getElementById('injuries').value ? document.getElementById('injuries').value.split(',').map(s=>s.trim()) : [],
+      dietary_restrictions: [...selectedRestrictions],
+      food_allergies: document.getElementById('allergies').value ? document.getElementById('allergies').value.split(',').map(s=>s.trim()) : [],
+      trainer_name: 'Your Trainer',
+    };
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/generate-plan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      clearInterval(stepInterval);
+      steps.forEach(s => document.getElementById(s).className = 'loading-step done');
+      setTimeout(() => {
+        document.getElementById('loadingState').classList.remove('visible');
+        if (data.success) {
+          renderPlan(data.plan, data.meta);
+        } else {
+          alert('Error generating plan: ' + (data.error || 'Unknown error'));
+          resetForm();
+        }
+      }, 600);
+    } catch (err) {
+      clearInterval(stepInterval);
+      document.getElementById('loadingState').classList.remove('visible');
+      alert('Network error. Please try again.');
+      resetForm();
+    }
+  }
+
+  function renderPlan(plan, meta) {
+    const out = document.getElementById('planOutput');
+    document.getElementById('resultTitle').textContent = `${plan.client_name}'s Plan`;
+    document.getElementById('resultMeta').textContent = `Generated ${plan.generated_date} · By ${plan.trainer_name} · ${meta.research_grounded ? 'Research-grounded via Perplexity Sonar' : 'AI-generated'}`;
+    document.getElementById('resultSection').classList.add('visible');
+
+    let html = '';
+
+    // Goal summary
+    html += `<div class="plan-card">
+      <div class="plan-card-title">🎯 Programme Overview <span class="tag tag-science">Evidence-Based</span></div>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:12px">${plan.goal_summary}</p>
+      <p style="font-size:12px;color:var(--gold);font-style:italic">${plan.science_note}</p>
+    </div>`;
+
+    // Diet plan
+    if (plan.diet_plan) {
+      const d = plan.diet_plan;
+      html += `<div class="plan-card">
+        <div class="plan-card-title">🥗 Diet Plan <span class="tag tag-diet">Nutrition</span></div>
+        <div class="macro-row">
+          <div class="macro-card"><div class="macro-val">${d.daily_calories}</div><div class="macro-label">Calories</div></div>
+          <div class="macro-card"><div class="macro-val">${d.macros.protein_g}g</div><div class="macro-label">Protein</div></div>
+          <div class="macro-card"><div class="macro-val">${d.macros.carbs_g}g</div><div class="macro-label">Carbs</div></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <div class="macro-card" style="flex:1"><div class="macro-val">${d.macros.fat_g}g</div><div class="macro-label">Fat</div></div>
+          <div class="macro-card" style="flex:1"><div class="macro-val">${Math.round(d.hydration_ml/1000*10)/10}L</div><div class="macro-label">Water</div></div>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;padding:10px 12px;background:var(--surface-3);border-radius:8px">⏰ ${d.meal_timing_note}</p>`;
+
+      if (d.days && d.days.length > 0) {
+        d.days.slice(0, 3).forEach(day => {
+          html += `<div class="meal-day"><div class="meal-day-title">${day.day}</div>`;
+          day.meals.forEach(meal => {
+            html += `<div class="meal-row">
+              <div class="meal-time">${meal.time}</div>
+              <div style="flex:1">
+                <div class="meal-name">${meal.meal}</div>
+                <div class="meal-foods">${meal.foods.join(' · ')}</div>
+              </div>
+              <div class="meal-cals">${meal.calories} kcal<br><span style="font-size:9px;font-weight:400">${meal.protein_g}g protein</span></div>
+            </div>`;
+          });
+          html += `</div>`;
+        });
+        if (d.days.length > 3) {
+          html += `<p style="font-size:12px;color:var(--text-faint);text-align:center;padding:10px">+ ${d.days.length - 3} more days in the full plan</p>`;
+        }
+      }
+      html += `</div>`;
+    }
+
+    // Workout plan
+    if (plan.workout_plan) {
+      const w = plan.workout_plan;
+      html += `<div class="plan-card">
+        <div class="plan-card-title">💪 ${w.programme_name} <span class="tag tag-workout">Training</span></div>
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <div class="macro-card" style="flex:1"><div class="macro-val">${w.duration_weeks}</div><div class="macro-label">Weeks</div></div>
+          <div class="macro-card" style="flex:1"><div class="macro-val">${w.sessions_per_week}x</div><div class="macro-label">Per Week</div></div>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;padding:10px 12px;background:var(--surface-3);border-radius:8px">📈 ${w.progressive_overload_note}</p>`;
+
+      if (w.weeks && w.weeks.length > 0) {
+        w.weeks.slice(0, 2).forEach(week => {
+          html += `<div class="workout-week"><div class="workout-week-title">Week ${week.week}</div>`;
+          week.sessions.forEach(session => {
+            html += `<div class="session-card">
+              <div class="session-header">
+                <div><div class="session-day">${session.day}</div><div class="session-focus">${session.focus}</div></div>
+                <div class="session-duration">${session.duration_min} min</div>
+              </div>
+              <div style="font-size:10px;font-weight:700;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:grid;grid-template-columns:1fr 80px 80px 60px;gap:8px">
+                <span>Exercise</span><span style="text-align:center">Sets</span><span style="text-align:center">Reps</span><span style="text-align:center">Rest</span>
+              </div>`;
+            session.exercises.forEach(ex => {
+              html += `<div class="exercise-row">
+                <div class="exercise-name">${ex.name}</div>
+                <div class="exercise-meta">${ex.sets}</div>
+                <div class="exercise-meta">${ex.reps}</div>
+                <div class="exercise-meta">${ex.rest_sec}s</div>
+                ${ex.notes ? `<div class="exercise-note">${ex.notes}</div>` : ''}
+              </div>`;
+            });
+            html += `</div>`;
+          });
+          html += `</div>`;
+        });
+        if (w.weeks.length > 2) {
+          html += `<p style="font-size:12px;color:var(--text-faint);text-align:center;padding:10px">+ ${w.weeks.length - 2} more weeks in the full plan</p>`;
+        }
+      }
+      html += `</div>`;
+    }
+
+    // Supplements
+    if (plan.supplement_recommendations && plan.supplement_recommendations.length > 0) {
+      html += `<div class="plan-card">
+        <div class="plan-card-title">💊 Supplement Stack <span class="tag tag-science">Evidence-Rated</span></div>
+        <p style="font-size:11px;color:var(--text-faint);margin-bottom:12px">Evidence levels: A = Strong (multiple RCTs), B = Moderate, C = Emerging</p>`;
+      plan.supplement_recommendations.forEach(s => {
+        html += `<div class="supp-row">
+          <div class="supp-name">${s.supplement}</div>
+          <div class="supp-dose">${s.dose} · ${s.timing}</div>
+          <div class="supp-evidence evidence-${s.evidence_level}">Grade ${s.evidence_level}</div>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    // Citations
+    if (plan.citations && plan.citations.length > 0) {
+      html += `<div class="plan-card">
+        <div class="plan-card-title">📚 Research Sources <span class="tag tag-science">Cited</span></div>
+        <div class="citations-list">`;
+      plan.citations.forEach((c, i) => {
+        html += `<div class="citation-item">[${i+1}] ${c}</div>`;
+      });
+      html += `</div></div>`;
+    }
+
+    // Check-in questions
+    if (plan.weekly_check_in_questions && plan.weekly_check_in_questions.length > 0) {
+      html += `<div class="plan-card">
+        <div class="plan-card-title">📋 Weekly Check-In Questions</div>
+        <div style="display:flex;flex-direction:column;gap:8px">`;
+      plan.weekly_check_in_questions.forEach((q, i) => {
+        html += `<div style="font-size:13px;color:var(--text-muted);padding:8px 12px;background:var(--surface-3);border-radius:8px">${i+1}. ${q}</div>`;
+      });
+      html += `</div></div>`;
+    }
+
+    out.innerHTML = html;
+    window.currentPlan = plan;
+  }
+
+  function resetForm() {
+    document.getElementById('planForm').style.display = '';
+    document.getElementById('loadingState').classList.remove('visible');
+    document.getElementById('resultSection').classList.remove('visible');
+    document.getElementById('generateBtn').disabled = false;
+    document.querySelectorAll('.loading-step').forEach((s, i) => {
+      s.className = i === 0 ? 'loading-step active' : 'loading-step';
+    });
+  }
+
+  function printPlan() {
+    window.print();
+  }
+
+  function copyPlan() {
+    if (!window.currentPlan) return;
+    const text = JSON.stringify(window.currentPlan, null, 2);
+    navigator.clipboard.writeText(text).then(() => alert('Plan copied to clipboard as JSON'));
+  }
+</script>
+</body>
+</html>

@@ -36,7 +36,7 @@
   #bg{
     position:fixed;inset:0;z-index:0;
     background:#0a0a0a;
-    background-image:url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&q=85');
+    background-image:url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1400&q=85');
     background-size:cover;background-position:center top;
   }
   #bg::after{
@@ -56,6 +56,7 @@
     display:flex;align-items:center;justify-content:space-between;
     padding:env(safe-area-inset-top,16px) 20px 12px;
     padding-top:max(env(safe-area-inset-top),16px);
+    max-width:100%;
   }
   .tb-logo{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-60)}
   .tb-cta{
@@ -208,6 +209,15 @@
   .review-text{font-size:13px;line-height:1.7;color:var(--white-60)}
   .review-achievement{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:600;color:var(--green)}
 
+  /* Reviews empty state */
+  .reviews-empty{
+    text-align:center;padding:24px 16px;
+    border:1px dashed var(--glass-border);border-radius:12px;
+  }
+  .reviews-empty-icon{font-size:32px;margin-bottom:8px}
+  .reviews-empty-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:4px}
+  .reviews-empty-sub{font-size:12px;color:var(--white-60);line-height:1.6}
+
   /* Transformations */
   .transforms-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .transform-card{border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border)}
@@ -331,34 +341,77 @@
     border:1px solid var(--glass-border);
   }
 
-  /* Packages */
-  .pkg-list{display:flex;flex-direction:column;gap:8px}
+  /* Packages — Grand Slam Offer cards */
+  .pkg-list{display:flex;flex-direction:column;gap:10px}
   .pkg-card{
-    display:flex;align-items:center;justify-content:space-between;
     background:var(--white-06);border:1px solid var(--glass-border);
-    border-radius:var(--radius-sm);padding:14px 16px;
-    cursor:pointer;transition:background 0.15s;
-    text-decoration:none;
+    border-radius:var(--radius);padding:16px 18px;
+    cursor:pointer;transition:background 0.15s,border-color 0.15s;
+    text-decoration:none;display:block;
   }
+  .pkg-card:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,92,0,0.3)}
   .pkg-card:active{background:var(--white-10)}
+  .pkg-card.featured{
+    background:linear-gradient(135deg,rgba(255,92,0,0.12) 0%,rgba(255,92,0,0.04) 100%);
+    border-color:rgba(255,92,0,0.4);
+  }
+  .pkg-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
   .pkg-left{display:flex;align-items:center;gap:12px}
   .pkg-icon{
-    width:36px;height:36px;border-radius:9px;
-    background:var(--orange-dim);
+    width:40px;height:40px;border-radius:10px;
+    background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
     display:flex;align-items:center;justify-content:center;
-    font-size:16px;flex-shrink:0;
+    font-size:18px;flex-shrink:0;
   }
-  .pkg-name{font-size:14px;font-weight:700;color:var(--white)}
-  .pkg-sessions{font-size:12px;color:var(--white-60);margin-top:1px}
+  .pkg-name{font-size:15px;font-weight:800;color:var(--white);letter-spacing:-0.01em}
+  .pkg-sessions{font-size:12px;color:var(--white-60);margin-top:2px}
   .pkg-badge{
     font-size:10px;font-weight:700;letter-spacing:0.05em;
     background:var(--orange);color:#fff;
-    padding:2px 7px;border-radius:20px;margin-left:6px;
+    padding:2px 8px;border-radius:20px;margin-left:6px;
     vertical-align:middle;
   }
   .pkg-right{text-align:right;flex-shrink:0}
-  .pkg-price{font-size:16px;font-weight:800;color:var(--orange)}
-  .pkg-unit{font-size:11px;color:var(--white-60)}
+  .pkg-price{font-size:20px;font-weight:800;color:var(--orange);line-height:1}
+  .pkg-unit{font-size:11px;color:var(--white-60);margin-top:2px}
+  /* Grand Slam outcome row */
+  .pkg-outcome{
+    font-size:13px;font-weight:700;color:var(--white);
+    padding:8px 0 6px;
+    border-top:1px solid var(--glass-border);
+    margin-top:8px;
+    line-height:1.5;
+  }
+  .pkg-outcome-label{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--orange);margin-bottom:2px}
+  /* Guarantee badge */
+  .pkg-guarantee{
+    display:inline-flex;align-items:center;gap:5px;
+    background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);
+    border-radius:20px;padding:4px 10px;
+    font-size:11px;font-weight:600;color:var(--green);
+    margin-top:6px;
+  }
+  /* Bonuses row */
+  .pkg-bonuses{
+    display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;
+  }
+  .pkg-bonus-tag{
+    font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;
+    background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;
+  }
+  /* CTA row inside card */
+  .pkg-cta-row{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:12px;padding-top:10px;
+    border-top:1px solid var(--glass-border);
+  }
+  .pkg-cta-text{font-size:12px;color:var(--white-60)}
+  .pkg-cta-btn{
+    background:var(--orange);color:#fff;
+    font-size:12px;font-weight:700;padding:7px 14px;
+    border-radius:8px;border:none;cursor:pointer;
+    font-family:var(--font);
+  }
 
   /* Assessment */
   .assess-intro{font-size:13px;color:var(--white-60);margin-bottom:14px;line-height:1.6}
@@ -387,14 +440,105 @@
     display:none;
   }
 
-  /* Gallery */
+  /* ── TRAINING PHILOSOPHY ── */
+  .philosophy-block{
+    position:relative;
+    background:linear-gradient(135deg,rgba(255,92,0,0.08) 0%,rgba(255,92,0,0.03) 100%);
+    border:1px solid rgba(255,92,0,0.18);
+    border-radius:14px;padding:18px 18px 18px 22px;
+    margin-bottom:4px;
+  }
+  .philosophy-block::before{
+    content:'';
+    position:absolute;left:0;top:16px;bottom:16px;
+    width:3px;border-radius:2px;
+    background:var(--orange);
+  }
+  .philosophy-quote{
+    font-size:14px;line-height:1.75;color:var(--white);font-style:italic;
+    font-weight:500;
+  }
+  .philosophy-author{
+    font-size:11px;color:var(--orange);font-weight:700;
+    letter-spacing:0.06em;text-transform:uppercase;
+    margin-top:10px;
+  }
+
+  /* ── TRUST MODULE ── */
+  .trust-module{
+    display:flex;flex-wrap:wrap;gap:8px;
+    margin-bottom:4px;
+  }
+  .trust-pill{
+    display:flex;align-items:center;gap:6px;
+    background:var(--green-dim);border:1px solid rgba(34,197,94,0.2);
+    border-radius:20px;padding:5px 12px;
+    font-size:12px;font-weight:600;color:var(--green);
+  }
+  .trust-pill svg{width:13px;height:13px;flex-shrink:0}
+  .trust-pill.amber{
+    background:rgba(251,191,36,0.12);border-color:rgba(251,191,36,0.2);
+    color:#fbbf24;
+  }
+
+  /* ── EDITORIAL TRAINER'S STACK ── */
+  /* Affiliate Vault */
+  .affiliate-list{display:flex;flex-direction:column;gap:8px}
+  .affiliate-item{
+    display:flex;align-items:center;gap:12px;
+    background:var(--white-06);border:1px solid var(--glass-border);
+    border-radius:12px;padding:12px 14px;
+    text-decoration:none;transition:background 0.15s;
+  }
+  .affiliate-item:hover{background:rgba(255,255,255,0.09)}
+  .affiliate-logo{
+    width:40px;height:40px;border-radius:10px;
+    background:var(--white-10);border:1px solid var(--glass-border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;flex-shrink:0;overflow:hidden;
+  }
+  .affiliate-logo img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+  .affiliate-name{font-size:13px;font-weight:700;color:var(--white)}
+  .affiliate-cat{font-size:11px;color:var(--white-60);margin-top:1px}
+  .affiliate-arrow{margin-left:auto;color:var(--white-30)}
+  .affiliate-editorial-intro{
+    font-size:12px;color:var(--white-60);line-height:1.6;
+    margin-bottom:14px;
+    padding:10px 12px;
+    background:var(--white-06);border-radius:10px;
+    border-left:3px solid var(--orange);
+  }
+  .affiliate-editorial-intro strong{color:var(--white)}
+  .affiliate-discount{
+    font-size:10px;font-weight:700;letter-spacing:0.04em;
+    background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
+    color:var(--orange);padding:2px 7px;border-radius:20px;flex-shrink:0;
+  }
+
+  /* ── GALLERY — primary visual surface ── */
+  .gallery-hero{
+    width:100%;aspect-ratio:16/9;
+    border-radius:14px;overflow:hidden;
+    margin-bottom:8px;position:relative;
+    background:var(--white-06);
+  }
+  .gallery-hero img{width:100%;height:100%;object-fit:cover}
+  .gallery-hero-label{
+    position:absolute;bottom:10px;left:12px;
+    font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+    color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.5);
+    padding:3px 8px;border-radius:20px;
+    backdrop-filter:blur(6px);
+  }
   .gallery-grid{
     display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
   }
   .gallery-img{
     aspect-ratio:1;border-radius:8px;
     background:var(--white-06);overflow:hidden;
+    cursor:pointer;transition:opacity 0.15s;
   }
+  .gallery-img:hover{opacity:0.85}
   .gallery-img img{width:100%;height:100%;object-fit:cover}
 
   /* Powered by */
@@ -478,6 +622,147 @@
     background:var(--white-10);border:none;cursor:pointer;
     display:flex;align-items:center;justify-content:center;color:var(--white);
   }
+
+  /* ═══════════════════════════════════════════════
+     DESKTOP LAYOUT — 768px and above
+     Two-column: hero/CTAs left, sections right
+  ═══════════════════════════════════════════════ */
+  @media (min-width: 768px) {
+    /* Topbar gets a max-width container */
+    #topbar {
+      padding-left: max(calc(50vw - 560px), 32px);
+      padding-right: max(calc(50vw - 560px), 32px);
+    }
+
+    /* Background: shift image to left half */
+    #bg {
+      background-position: 30% top;
+    }
+    #bg::after {
+      background: linear-gradient(
+        to right,
+        rgba(0,0,0,0.55) 0%,
+        rgba(0,0,0,0.75) 45%,
+        rgba(0,0,0,0.97) 65%,
+        rgba(0,0,0,0.99) 100%
+      ),
+      linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.2) 0%,
+        rgba(0,0,0,0.5) 60%,
+        rgba(0,0,0,0.95) 100%
+      );
+    }
+
+    /* Page becomes a two-column grid */
+    #page {
+      flex-direction: row;
+      align-items: flex-start;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 80px 32px 48px;
+      gap: 0;
+      min-height: 100vh;
+    }
+
+    /* Left column: hero + CTAs (sticky) */
+    #left-col {
+      width: 360px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 80px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Right column: sections */
+    #right-col {
+      flex: 1;
+      min-width: 0;
+      padding-left: 40px;
+    }
+
+    #hero {
+      padding: 0 0 24px 0;
+      text-align: left;
+      align-items: flex-start;
+    }
+
+    .avatar-wrap {
+      width: 120px;
+      height: 120px;
+    }
+
+    .trainer-name { font-size: 30px; }
+
+    .stats-pill {
+      max-width: 100%;
+    }
+
+    .badge-row {
+      justify-content: flex-start;
+    }
+
+    .modes-row {
+      justify-content: flex-start;
+    }
+
+    .rating-row {
+      justify-content: flex-start;
+    }
+
+    #ctas {
+      padding: 0 0 24px 0;
+    }
+
+    #sections {
+      padding: 0;
+      margin-bottom: 48px;
+    }
+
+    #socials {
+      padding: 0 0 20px 0 !important;
+    }
+
+    .powered {
+      text-align: left;
+      padding: 16px 0;
+    }
+
+    /* Sections open by default on desktop */
+    .sec-body {
+      display: block;
+    }
+
+    /* Wider transforms grid on desktop */
+    .transforms-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Gallery wider */
+    .gallery-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Lead modal centered on desktop */
+    #leadModal {
+      align-items: center;
+    }
+    .modal-sheet {
+      border-radius: 24px;
+    }
+  }
+
+  /* Large desktop */
+  @media (min-width: 1024px) {
+    #left-col {
+      width: 400px;
+    }
+    #right-col {
+      padding-left: 56px;
+    }
+    .trainer-name { font-size: 34px; }
+  }
 </style>
 </head>
 <body>
@@ -517,233 +802,279 @@
   </div>
 </div>
 
-<!-- Main page -->
+<!-- Main page — two-column on desktop via JS-injected wrappers -->
 <div id="page" style="display:none">
 
-  <!-- Hero -->
-  <div id="hero">
-    <!-- Avatar -->
-    <div class="avatar-wrap" style="position:relative">
-      <div class="avatar-ring"></div>
-      <div class="avatar-inner">
-        <img id="avatarImg" src="" alt="" style="display:none">
-        <div id="avatarInitials" class="avatar-initials"></div>
-      </div>
-     <div class="avatar-video-btn" id="videoBadge" style="display:none" onclick="openVideoModal()">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-    </div>
-  </div>
+  <!-- Left column wrapper (desktop) / inline (mobile) -->
+  <div id="left-col">
 
-  <!-- Rating row -->
-  <div class="rating-row" id="ratingRow" style="display:none">
-    <div id="starsEl" style="display:flex;gap:2px"></div>
-    <span class="rating-score" id="ratingScore"></span>
-    <span class="rating-count" id="ratingCount"></span>
-  </div>
-
-  <!-- Name row -->    <div class="name-row">
-      <span id="trainerName" class="trainer-name">—</span>
-      <span id="verifiedIcon" class="verified-badge" style="display:none">
-        <svg viewBox="0 0 24 24" fill="white"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      </span>
-    </div>
-
-    <!-- Title -->
-    <div id="trainerTitle" class="trainer-title">—</div>
-
-    <!-- Badge row -->
-    <div class="badge-row">
-      <span id="repsNum" class="reps-num" style="display:none"></span>
-      <span id="repsBadge" class="reps-badge" style="display:none">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-        REPs UAE Verified
-      </span>
-      <span id="pendingBadge" class="reps-badge pending-badge" style="display:none">
-        ⏳ Verification Pending
-      </span>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-pill" id="statsPill">
-      <div class="stat-item">
-        <div class="stat-val" id="sYrs">—</div>
-        <div class="stat-lbl">Yrs Exp</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val" id="sClients">—</div>
-        <div class="stat-lbl">Clients</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val" id="sSessions">—</div>
-        <div class="stat-lbl">Sessions</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val accept" id="sAccept">✓</div>
-        <div class="stat-lbl">Accepting</div>
-      </div>
-    </div>
-
-    <!-- Training modes -->
-    <div class="modes-row" id="modesRow"></div>
-
-    <!-- Gym tag -->
-    <div id="gymTag" class="gym-tag" style="display:none">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-      <span id="gymName"></span>
-    </div>
-  </div>
-
-  <!-- CTAs -->
-  <div id="ctas">
-    <div class="btn-wa-wrap">
-    <a id="waBtn" href="#" class="btn-wa" style="display:none">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            WhatsApp Me
-    </a>
-    </div>
-    <button id="bookBtn" class="btn-book" onclick="openLead()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Book a Session
-    </button>
-    <div class="action-grid">
-      <button class="btn-action" onclick="scrollToPackages()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        Packages
-      </button>
-      <button class="btn-action" onclick="scrollToAssess()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        Free Assessment
-      </button>
-    </div>
-    <button class="btn-save" onclick="saveContact()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Save My Contact
-    </button>
-  </div>
-
-  <!-- Sections -->
-  <div id="sections">
-
-    <!-- Bio -->
-    <div class="sec-card" id="bioCard" style="display:none">
-      <div class="sec-header" onclick="toggleSec('bioBody',this)">
-        <span class="sec-title">About</span>
-        <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <div id="bioBody" class="sec-body">
-        <p id="bioText" class="bio-text"></p>
-        <div id="specTags" class="tag-row" style="margin-top:12px"></div>
-        <div id="certTags" class="tag-row" style="margin-top:8px"></div>
-      </div>
-    </div>
-
-    <!-- Packages -->
-    <div class="sec-card" id="pkgsCard" style="display:none">
-      <div class="sec-header" onclick="toggleSec('pkgsBody',this)">
-        <span class="sec-title">Training Packages</span>
-        <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <div id="pkgsBody" class="sec-body open">
-        <div id="pkgList" class="pkg-list"></div>
-      </div>
-    </div>
-
-    <!-- Assessment -->
-    <div class="sec-card">
-      <div class="sec-header" onclick="toggleSec('assessBody',this)">
-        <span class="sec-title">Free Fitness Assessment</span>
-        <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <div id="assessBody" class="sec-body">
-        <p class="assess-intro">Get your personalised fitness score, BMI, and a recommended training plan in 30 seconds.</p>
-        <div class="assess-form">
-          <div class="assess-row">
-            <div class="assess-field">
-              <label>Age</label>
-              <input type="number" id="aAge" placeholder="28" min="16" max="80">
-            </div>
-            <div class="assess-field">
-              <label>Gender</label>
-              <select id="aGender">
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
-            </div>
-          </div>
-          <div class="assess-row">
-            <div class="assess-field">
-              <label>Height (cm)</label>
-              <input type="number" id="aHeight" placeholder="175" min="140" max="220">
-            </div>
-            <div class="assess-field">
-              <label>Weight (kg)</label>
-              <input type="number" id="aWeight" placeholder="75" min="40" max="200">
-            </div>
-          </div>
-          <div class="assess-field">
-            <label>Goal</label>
-            <select id="aGoal">
-              <option value="fat_loss">Fat Loss</option>
-              <option value="muscle_gain">Muscle Gain</option>
-              <option value="endurance">Endurance</option>
-              <option value="general">General Fitness</option>
-            </select>
-          </div>
-          <div class="assess-field">
-            <label>Activity Level</label>
-            <select id="aActivity">
-              <option value="sedentary">Sedentary (desk job)</option>
-              <option value="light">Light (1–2x/week)</option>
-              <option value="moderate" selected>Moderate (3–4x/week)</option>
-              <option value="active">Active (5+x/week)</option>
-            </select>
-          </div>
-          <button class="btn-assess" onclick="runAssessment()">Get My Free Assessment →</button>
-          <div id="assessResult" class="assess-result"></div>
+    <!-- Hero -->
+    <div id="hero">
+      <!-- Avatar -->
+      <div class="avatar-wrap" style="position:relative">
+        <div class="avatar-ring"></div>
+        <div class="avatar-inner">
+          <img id="avatarImg" src="" alt="" style="display:none">
+          <div id="avatarInitials" class="avatar-initials"></div>
+        </div>
+        <div class="avatar-video-btn" id="videoBadge" style="display:none" onclick="openVideoModal()">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         </div>
       </div>
+
+      <!-- Rating row -->
+      <div class="rating-row" id="ratingRow" style="display:none">
+        <div id="starsEl" style="display:flex;gap:2px"></div>
+        <span class="rating-score" id="ratingScore"></span>
+        <span class="rating-count" id="ratingCount"></span>
+      </div>
+
+      <!-- Name row -->
+      <div class="name-row">
+        <span id="trainerName" class="trainer-name">—</span>
+        <span id="verifiedIcon" class="verified-badge" style="display:none">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </span>
+      </div>
+
+      <!-- Title -->
+      <div id="trainerTitle" class="trainer-title">—</div>
+
+      <!-- Badge row -->
+      <div class="badge-row">
+        <span id="repsNum" class="reps-num" style="display:none"></span>
+        <span id="repsBadge" class="reps-badge" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          REPs UAE Verified
+        </span>
+        <span id="pendingBadge" class="reps-badge pending-badge" style="display:none">
+          ⏳ Verification Pending
+        </span>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-pill" id="statsPill">
+        <div class="stat-item">
+          <div class="stat-val" id="sYrs">—</div>
+          <div class="stat-lbl">Yrs Exp</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" id="sClients">—</div>
+          <div class="stat-lbl">Clients</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" id="sSessions">—</div>
+          <div class="stat-lbl">Sessions</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val accept" id="sAccept">✓</div>
+          <div class="stat-lbl">Accepting</div>
+        </div>
+      </div>
+
+      <!-- Training modes -->
+      <div class="modes-row" id="modesRow"></div>
+
+      <!-- Gym tag -->
+      <div id="gymTag" class="gym-tag" style="display:none">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        <span id="gymName"></span>
+      </div>
     </div>
 
-    <!-- Transformations -->
-    <div class="sec-card" id="transformsCard" style="display:none">
-      <div class="sec-header" onclick="toggleSec('transformsBody',this)">
-        <span class="sec-title">Client Transformations</span>
-        <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    <!-- CTAs -->
+    <div id="ctas">
+      <div class="btn-wa-wrap">
+        <a id="waBtn" href="#" class="btn-wa" style="display:none">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp Me
+        </a>
       </div>
-      <div id="transformsBody" class="sec-body open">
-        <div id="transformsGrid" class="transforms-grid"></div>
+      <button id="bookBtn" class="btn-book" onclick="openLead()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Book a Session
+      </button>
+      <div class="action-grid">
+        <button class="btn-action" onclick="scrollToPackages()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Packages
+        </button>
+        <button class="btn-action" onclick="scrollToAssess()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Free Assessment
+        </button>
       </div>
+      <button class="btn-save" onclick="saveContact()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Save My Contact
+      </button>
     </div>
 
-    <!-- Reviews -->
-    <div class="sec-card" id="reviewsCard" style="display:none">
-      <div class="sec-header" onclick="toggleSec('reviewsBody',this)">
-        <span class="sec-title">Client Reviews</span>
-        <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    <!-- Socials (desktop: below CTAs in left col) -->
+    <div id="socials-desktop" style="display:none;gap:10px;padding:0 0 20px;flex-wrap:wrap"></div>
+
+  </div><!-- /left-col -->
+
+  <!-- Right column (sections) -->
+  <div id="right-col">
+
+    <!-- Sections -->
+    <div id="sections">
+
+      <!-- Training Philosophy -->
+      <div class="sec-card" id="philosophyCard" style="display:none">
+        <div class="sec-header" onclick="toggleSec('philosophyBody',this)">
+          <span class="sec-title">My Training Philosophy</span>
+          <svg class="sec-arrow open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="philosophyBody" class="sec-body open">
+          <div id="philosophyContent"></div>
+        </div>
       </div>
-      <div id="reviewsBody" class="sec-body open">
-        <div id="reviewsContent"></div>
+
+      <!-- Bio -->
+      <div class="sec-card" id="bioCard" style="display:none">
+        <div class="sec-header" onclick="toggleSec('bioBody',this)">
+          <span class="sec-title">About</span>
+          <svg class="sec-arrow open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="bioBody" class="sec-body open">
+          <p id="bioText" class="bio-text"></p>
+          <div id="specTags" class="tag-row" style="margin-top:12px"></div>
+          <div id="certTags" class="tag-row" style="margin-top:8px"></div>
+        </div>
       </div>
+
+      <!-- Packages -->
+      <div class="sec-card" id="pkgsCard" style="display:none">
+        <div class="sec-header" onclick="toggleSec('pkgsBody',this)">
+          <span class="sec-title">Training Packages</span>
+          <svg class="sec-arrow open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="pkgsBody" class="sec-body open">
+          <div id="pkgList" class="pkg-list"></div>
+        </div>
+      </div>
+
+      <!-- Assessment -->
+      <div class="sec-card">
+        <div class="sec-header" onclick="toggleSec('assessBody',this)">
+          <span class="sec-title">Free Fitness Assessment</span>
+          <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="assessBody" class="sec-body">
+          <p class="assess-intro">Get your personalised fitness score, BMI, and a recommended training plan in 30 seconds.</p>
+          <div class="assess-form">
+            <div class="assess-row">
+              <div class="assess-field">
+                <label>Age</label>
+                <input type="number" id="aAge" placeholder="28" min="16" max="80">
+              </div>
+              <div class="assess-field">
+                <label>Gender</label>
+                <select id="aGender">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            </div>
+            <div class="assess-row">
+              <div class="assess-field">
+                <label>Height (cm)</label>
+                <input type="number" id="aHeight" placeholder="175" min="140" max="220">
+              </div>
+              <div class="assess-field">
+                <label>Weight (kg)</label>
+                <input type="number" id="aWeight" placeholder="75" min="40" max="200">
+              </div>
+            </div>
+            <div class="assess-field">
+              <label>Goal</label>
+              <select id="aGoal">
+                <option value="fat_loss">Fat Loss</option>
+                <option value="muscle_gain">Muscle Gain</option>
+                <option value="endurance">Endurance</option>
+                <option value="general">General Fitness</option>
+              </select>
+            </div>
+            <div class="assess-field">
+              <label>Activity Level</label>
+              <select id="aActivity">
+                <option value="sedentary">Sedentary (desk job)</option>
+                <option value="light">Light (1–2x/week)</option>
+                <option value="moderate" selected>Moderate (3–4x/week)</option>
+                <option value="active">Active (5+x/week)</option>
+              </select>
+            </div>
+            <button class="btn-assess" onclick="runAssessment()">Get My Free Assessment →</button>
+            <div id="assessResult" class="assess-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transformations -->
+      <div class="sec-card" id="transformsCard" style="display:none">
+        <div class="sec-header" onclick="toggleSec('transformsBody',this)">
+          <span class="sec-title">Client Transformations</span>
+          <svg class="sec-arrow open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="transformsBody" class="sec-body open">
+          <div id="transformsGrid" class="transforms-grid"></div>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div class="sec-card" id="reviewsCard" style="display:none">
+        <div class="sec-header" onclick="toggleSec('reviewsBody',this)">
+          <span class="sec-title">Client Reviews</span>
+          <svg class="sec-arrow open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="reviewsBody" class="sec-body open">
+          <div id="reviewsContent"></div>
+        </div>
+      </div>
+
+      <!-- Affiliate Vault / Trainer's Stack -->
+      <div class="sec-card" id="affiliateCard" style="display:none">
+        <div class="sec-header" onclick="toggleSec('affiliateBody',this)">
+          <span class="sec-title">Trainer's Stack</span>
+          <svg class="sec-arrow open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="affiliateBody" class="sec-body open">
+          <div class="affiliate-editorial-intro">
+            <strong>What I actually use.</strong> These are the products, supplements, and gear I personally train with and recommend to my clients — with exclusive discount codes.
+          </div>
+          <div id="affiliateList" class="affiliate-list"></div>
+        </div>
+      </div>
+
+      <!-- Gallery -->
+      <div class="sec-card" id="galleryCard" style="display:none">
+        <div class="sec-header" onclick="toggleSec('galleryBody',this)">
+          <span class="sec-title">Gallery</span>
+          <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="galleryBody" class="sec-body">
+          <div id="galleryGrid" class="gallery-grid"></div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Gallery -->
-    <div class="sec-card" id="galleryCard" style="display:none">
-      <div class="sec-header" onclick="toggleSec('galleryBody',this)">
-        <span class="sec-title">Gallery</span>
-        <svg class="sec-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <div id="galleryBody" class="sec-body">
-        <div id="galleryGrid" class="gallery-grid"></div>
-      </div>
+    <!-- Socials (mobile: below sections) -->
+    <div id="socials" style="display:flex;gap:10px;padding:0 20px 20px;flex-wrap:wrap"></div>
+
+    <!-- Nearby Trainers — Strava-style discovery -->
+    <div id="nearbySection" style="display:none;padding:0 20px 20px;">
+      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;">Also in this gym</div>
+      <div id="nearbyList" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <a href="/find.html" style="display:block;text-align:center;margin-top:14px;font-size:12px;color:var(--orange);text-decoration:none;font-weight:600;">Browse all trainers →</a>
     </div>
 
-  </div>
+    <div class="powered">Powered by <a href="/landing.html">TrainedBy.ae</a> · <a href="/find.html" style="color:var(--orange)">Find a Trainer</a></div>
+  </div><!-- /right-col -->
 
-  <!-- Socials -->
-  <div id="socials" style="display:flex;gap:10px;padding:0 20px 20px;flex-wrap:wrap"></div>
-
-  <div class="powered">Powered by <a href="/landing.html">TrainedBy.ae</a> · <a href="/find.html" style="color:var(--orange)">Find a Trainer</a></div>
-</div>
+</div><!-- /page -->
 
 <!-- Video Modal -->
 <div id="videoModal">
@@ -778,6 +1109,7 @@ const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
 
 let TRAINER = null;
+const IS_DESKTOP = window.matchMedia('(min-width: 768px)').matches;
 
 function getSlug() {
   const path = location.pathname.replace(/^\//, '').trim();
@@ -796,7 +1128,6 @@ async function loadTrainer() {
     if (!r.ok) { showErr(); return; }
     const data = await r.json();
     if (!data || data.error) { showErr(); return; }
-    // API returns { trainer: {...}, packages: [...] }
     const trainer = data.trainer || data;
     trainer.packages = data.packages || data.session_packages || trainer.packages || [];
     TRAINER = trainer;
@@ -834,20 +1165,8 @@ function render(t) {
     document.getElementById('avatarInitials').textContent = initials;
   }
 
-  // Rating row
-  if (t.avg_rating && t.review_count > 0) {
-    document.getElementById('ratingRow').style.display = 'flex';
-    const score = parseFloat(t.avg_rating);
-    document.getElementById('ratingScore').textContent = score.toFixed(1);
-    document.getElementById('ratingCount').textContent = `(${t.review_count} reviews)`;
-    const starsEl = document.getElementById('starsEl');
-    for (let i = 1; i <= 5; i++) {
-      const s = document.createElement('span');
-      s.textContent = '★';
-      s.className = i <= Math.round(score) ? 'star-filled' : 'star-empty';
-      starsEl.appendChild(s);
-    }
-  }
+  // Rating row — only show if we have real verified reviews (loaded later)
+  // We defer this to loadReviews()
 
   // Video intro badge
   if (t.video_intro_url) {
@@ -893,7 +1212,6 @@ function render(t) {
   document.getElementById('sClients').textContent = cli ? `${cli}+` : '--';
   const sess = t.sessions_delivered;
   document.getElementById('sSessions').textContent = sess ? (sess >= 1000 ? `${(sess/1000).toFixed(1)}k` : sess) : '--';
-  // Hide stats pill if all values are empty
   if (!yrs && !cli && !sess) document.getElementById('statsPill').style.opacity = '0.4';
   const acc = t.accepting_clients !== false;
   document.getElementById('sAccept').textContent = acc ? '✓' : '✗';
@@ -906,19 +1224,51 @@ function render(t) {
     document.getElementById('gymTag').style.display = 'inline-flex';
   }
 
-  // WhatsApp — always show. If no number, clicking opens the lead form instead
+  // WhatsApp — always show
   const waBtn = document.getElementById('waBtn');
   if (t.whatsapp) {
     const wn = t.whatsapp.replace(/\D/g, '');
     waBtn.href = `https://wa.me/${wn}?text=Hi%20${encodeURIComponent(t.name)}%2C%20I%20found%20your%20profile%20on%20TrainedBy.ae`;
     waBtn.style.display = 'flex';
   } else {
-    // No WhatsApp — show button that opens lead form
     waBtn.href = '#';
     waBtn.onclick = (e) => { e.preventDefault(); openLead(); };
     waBtn.style.display = 'flex';
     waBtn.querySelector('svg').style.display = 'none';
     waBtn.childNodes[waBtn.childNodes.length-1].textContent = ' Contact Me';
+  }
+
+  // Training Philosophy
+  const philosophy = t.training_philosophy || t.philosophy || null;
+  if (philosophy) {
+    document.getElementById('philosophyCard').style.display = 'block';
+    document.getElementById('philosophyContent').innerHTML = `
+      <div class="philosophy-block">
+        <div class="philosophy-quote">${philosophy}</div>
+        <div class="philosophy-author">— ${t.name || 'Trainer'}</div>
+      </div>`;
+  }
+
+  // Trust Module — group all trust signals into one visual block
+  const trustContainer = document.createElement('div');
+  trustContainer.className = 'trust-module';
+  trustContainer.id = 'trustModule';
+  if (t.reps_verified || t.verification_status === 'verified') {
+    trustContainer.innerHTML += `<span class="trust-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>REPs UAE Verified</span>`;
+  }
+  if (t.years_experience && t.years_experience >= 3) {
+    trustContainer.innerHTML += `<span class="trust-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>${t.years_experience}+ Years Experience</span>`;
+  }
+  if (t.clients_trained && t.clients_trained >= 20) {
+    trustContainer.innerHTML += `<span class="trust-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>${t.clients_trained}+ Clients</span>`;
+  }
+  if (t.accepting_clients !== false) {
+    trustContainer.innerHTML += `<span class="trust-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Accepting Clients</span>`;
+  }
+  if (trustContainer.children.length > 0) {
+    // Insert trust module before the sections div
+    const sectionsDiv = document.getElementById('sections');
+    sectionsDiv.parentNode.insertBefore(trustContainer, sectionsDiv);
   }
 
   // Bio
@@ -951,61 +1301,123 @@ function render(t) {
     ];
     pkgs.forEach((p, i) => {
       const card = document.createElement('div');
-      card.className = 'pkg-card';
+      card.className = 'pkg-card' + (p.is_popular ? ' featured' : '');
       card.onclick = () => openLead(p.name);
+      const sessCount = p.sessions_count || p.sessions || 1;
+      const outcome = p.dream_outcome || p.outcome || null;
+      const guarantee = p.guarantee_text || p.guarantee || null;
+      const bonuses = p.bonuses ? (Array.isArray(p.bonuses) ? p.bonuses : [p.bonuses]) : [];
+      const timeline = p.timeline_weeks ? `${p.timeline_weeks}-week programme` : `${sessCount} session${sessCount>1?'s':''}`;
       card.innerHTML = `
-        <div class="pkg-left">
-          <div class="pkg-icon" style="display:flex;align-items:center;justify-content:center">${icons[i % icons.length]}</div>
-          <div>
-            <div class="pkg-name">${p.name || p.title || ''}${p.is_popular ? '<span class="pkg-badge">Popular</span>' : ''}</div>
-            <div class="pkg-sessions">${p.sessions_count || p.sessions || 1} session${(p.sessions_count||p.sessions||1)>1?'s':''}</div>
+        <div class="pkg-top">
+          <div class="pkg-left">
+            <div class="pkg-icon">${icons[i % icons.length]}</div>
+            <div>
+              <div class="pkg-name">${p.name || p.title || ''}${p.is_popular ? '<span class="pkg-badge">Popular</span>' : ''}</div>
+              <div class="pkg-sessions">${timeline}</div>
+            </div>
+          </div>
+          <div class="pkg-right">
+            <div class="pkg-price">AED ${(p.price||p.price_aed||0).toLocaleString()}</div>
+            <div class="pkg-unit">per pack</div>
           </div>
         </div>
-        <div class="pkg-right">
-          <div class="pkg-price">AED ${(p.price||p.price_aed||0).toLocaleString()}</div>
-          <div class="pkg-unit">per pack</div>
+        ${outcome ? `<div class="pkg-outcome"><div class="pkg-outcome-label">You'll achieve</div>${outcome}</div>` : ''}
+        ${guarantee ? `<div class="pkg-guarantee"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l7.59-7.59L18 9l-8 8z"/></svg>${guarantee}</div>` : ''}
+        ${bonuses.length ? `<div class="pkg-bonuses">${bonuses.map(b=>`<span class="pkg-bonus-tag">+ ${b}</span>`).join('')}</div>` : ''}
+        <div class="pkg-cta-row">
+          <span class="pkg-cta-text">Tap to enquire</span>
+          <button class="pkg-cta-btn">Book Now →</button>
         </div>`;
       document.getElementById('pkgList').appendChild(card);
     });
   }
 
-  // Gallery
+  // Affiliate Vault / Trainer's Stack
+  const affiliates = t.affiliate_links || t.affiliate_vault || t.trainer_stack || [];
+  if (affiliates.length) {
+    document.getElementById('affiliateCard').style.display = 'block';
+    const catEmoji = {
+      'meal_plan':'🥗','supplement':'💊','apparel':'👕','equipment':'🏋️',
+      'nutrition':'🥗','clothing':'👕','gear':'🏋️','wellness':'🧘'
+    };
+    affiliates.forEach(a => {
+      const item = document.createElement('a');
+      item.className = 'affiliate-item';
+      item.href = a.url || a.affiliate_url || '#';
+      item.target = '_blank';
+      item.rel = 'noopener noreferrer';
+      const emoji = catEmoji[a.category?.toLowerCase()] || '🔗';
+      item.innerHTML = `
+        <div class="affiliate-logo">${a.logo_url ? `<img src="${a.logo_url}" alt="${a.brand}">` : emoji}</div>
+        <div>
+          <div class="affiliate-name">${a.brand || a.name || ''}</div>
+          <div class="affiliate-cat">${a.category || 'Recommended'}</div>
+        </div>
+        ${a.discount_code ? `<span class="affiliate-discount">${a.discount_code}</span>` : ''}
+        <svg class="affiliate-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
+      document.getElementById('affiliateList').appendChild(item);
+    });
+  }
+
+  // Gallery — hero image first, then grid
   const gallery = t.gallery_urls || t.gallery || [];
   if (gallery.length) {
     document.getElementById('galleryCard').style.display = 'block';
-    gallery.slice(0,9).forEach(url => {
+    // Open gallery section by default
+    const galleryBody = document.getElementById('galleryBody');
+    galleryBody.classList.add('open');
+    const galleryArrow = document.querySelector('#galleryCard .sec-arrow');
+    if (galleryArrow) galleryArrow.classList.add('open');
+    // Hero image (first photo)
+    const heroDiv = document.createElement('div');
+    heroDiv.className = 'gallery-hero';
+    heroDiv.innerHTML = `<img src="${gallery[0]}" alt="${t.name || 'Trainer'} gallery" loading="lazy"><div class="gallery-hero-label">Latest</div>`;
+    document.getElementById('galleryGrid').parentNode.insertBefore(heroDiv, document.getElementById('galleryGrid'));
+    // Remaining images in grid
+    gallery.slice(1, 10).forEach((url, idx) => {
       const div = document.createElement('div');
       div.className = 'gallery-img';
-      div.innerHTML = `<img src="${url}" alt="Gallery" loading="lazy">`;
+      div.innerHTML = `<img src="${url}" alt="Gallery ${idx+2}" loading="lazy">`;
       document.getElementById('galleryGrid').appendChild(div);
     });
   }
 
-  // Socials
-  const sl = document.getElementById('socials');
+  // Socials — on desktop show in left col, on mobile show below sections
+  const socialLinks = [];
   if (t.instagram) {
-    const a = document.createElement('a');
-    a.className = 'tag cert-tag';
-    a.href = `https://instagram.com/${t.instagram.replace('@','')}`;
-    a.target = '_blank'; a.rel = 'noopener';
-    a.style.textDecoration = 'none';
-    a.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>${t.instagram}`;
-    sl.appendChild(a);
-    sl.style.display = 'flex';
+    socialLinks.push(`<a class="tag cert-tag" href="https://instagram.com/${t.instagram.replace('@','')}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>${t.instagram}</a>`);
+  }
+  if (t.tiktok) {
+    socialLinks.push(`<a class="tag cert-tag" href="https://tiktok.com/@${t.tiktok.replace('@','')}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.05a8.16 8.16 0 004.77 1.52V7.13a4.85 4.85 0 01-1-.44z"/></svg>@${t.tiktok.replace('@','')}</a>`);
+  }
+  if (socialLinks.length) {
+    const html = socialLinks.join('');
+    if (IS_DESKTOP) {
+      const sd = document.getElementById('socials-desktop');
+      sd.innerHTML = html;
+      sd.style.display = 'flex';
+    } else {
+      const sm = document.getElementById('socials');
+      sm.innerHTML = html;
+      sm.style.display = 'flex';
+    }
   }
 
   // Add no-photo class to avatar if no image
   if (!(t.avatar_url || t.photo_url || t.cover_url)) {
     document.querySelector('.avatar-inner').classList.add('no-photo');
   }
+
   // Show page
   document.getElementById('loading').style.display = 'none';
-  document.getElementById('page').style.display = 'flex';
+  document.getElementById('page').style.display = IS_DESKTOP ? 'flex' : 'flex';
 
-  // Load reviews and transformations
+  // Load reviews, transformations, and nearby trainers
   if (t.id) {
     loadReviews(t.id);
     loadTransformations(t.id);
+    loadNearbyTrainers(t);
   }
 
   // Track view
@@ -1018,9 +1430,37 @@ async function loadReviews(trainerId) {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
     });
     const reviews = await r.json();
-    if (!Array.isArray(reviews) || !reviews.length) return;
+
+    // Always show the reviews card — either with real reviews or an honest empty state
     document.getElementById('reviewsCard').style.display = 'block';
+
+    if (!Array.isArray(reviews) || reviews.length === 0) {
+      // Honest empty state — no fake reviews
+      document.getElementById('reviewsContent').innerHTML = `
+        <div class="reviews-empty">
+          <div class="reviews-empty-icon">⭐</div>
+          <div class="reviews-empty-title">No reviews yet</div>
+          <div class="reviews-empty-sub">This trainer is new to TrainedBy. Be the first to train with them and leave a review after your session.</div>
+        </div>`;
+      return;
+    }
+
+    // Show real verified reviews
     const avg = reviews.reduce((a,b) => a+b.rating, 0) / reviews.length;
+
+    // Update the rating row in hero with real data
+    document.getElementById('ratingRow').style.display = 'flex';
+    document.getElementById('ratingScore').textContent = avg.toFixed(1);
+    document.getElementById('ratingCount').textContent = `(${reviews.length} review${reviews.length>1?'s':''})`;
+    const starsEl = document.getElementById('starsEl');
+    starsEl.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+      const s = document.createElement('span');
+      s.textContent = '★';
+      s.className = i <= Math.round(avg) ? 'star-filled' : 'star-empty';
+      starsEl.appendChild(s);
+    }
+
     let starsHtml = '';
     for (let i=1;i<=5;i++) starsHtml += `<span style="color:${i<=Math.round(avg)?'var(--orange)':'rgba(255,255,255,0.2)'};font-size:14px">★</span>`;
     let html = `<div class="reviews-summary"><div class="reviews-big">${avg.toFixed(1)}</div><div class="reviews-meta"><div class="reviews-stars">${starsHtml}</div><div class="reviews-count">${reviews.length} verified review${reviews.length>1?'s':''}</div></div></div>`;
@@ -1030,7 +1470,16 @@ async function loadReviews(trainerId) {
       html += `<div class="review-card"><div class="review-header"><div class="review-av">${(rv.client_name||'?').substring(0,2).toUpperCase()}</div><div><div class="review-name">${rv.client_name||'Client'}</div><div class="review-verified">✓ Verified</div></div><div class="review-stars-sm">${rvStars}</div></div><div class="review-text">${rv.review_text||''}</div>${rv.goal_achieved?`<div class="review-achievement">🎯 ${rv.goal_achieved}</div>`:''}</div>`;
     });
     document.getElementById('reviewsContent').innerHTML = html;
-  } catch(e) {}
+  } catch(e) {
+    // On error, show empty state rather than nothing
+    document.getElementById('reviewsCard').style.display = 'block';
+    document.getElementById('reviewsContent').innerHTML = `
+      <div class="reviews-empty">
+        <div class="reviews-empty-icon">⭐</div>
+        <div class="reviews-empty-title">No reviews yet</div>
+        <div class="reviews-empty-sub">Be the first to train with this trainer and leave a review after your session.</div>
+      </div>`;
+  }
 }
 
 async function loadTransformations(trainerId) {
@@ -1045,8 +1494,38 @@ async function loadTransformations(trainerId) {
     transforms.forEach(tr => {
       const card = document.createElement('div');
       card.className = 'transform-card';
-      card.innerHTML = `<div class="transform-imgs"><img src="${tr.before_url}" class="transform-img" loading="lazy"><img src="${tr.after_url}" class="transform-img" loading="lazy"></div><div class="transform-labels"><span class="t-before">BEFORE</span><span class="t-after">AFTER</span></div>${tr.duration_weeks?`<div class="transform-meta">${tr.duration_weeks}w · ${(tr.goal_type||'').replace('-',' ')}</div>`:''}` ;
+      card.innerHTML = `<div class="transform-imgs"><img src="${tr.before_url}" class="transform-img" loading="lazy"><img src="${tr.after_url}" class="transform-img" loading="lazy"></div><div class="transform-labels"><span class="t-before">BEFORE</span><span class="t-after">AFTER</span></div>${tr.duration_weeks?`<div class="transform-meta">${tr.duration_weeks}w · ${(tr.goal_type||'').replace('-',' ')}</div>`:''}`;
       grid.appendChild(card);
+    });
+  } catch(e) {}
+}
+
+async function loadNearbyTrainers(trainer) {
+  // Strava-style: show other trainers at the same gym or in the same city
+  try {
+    const gym = trainer.gym_name || '';
+    const city = trainer.city || trainer.location || 'Dubai';
+    let url = `${SUPABASE_URL}/rest/v1/trainers?id=neq.${trainer.id}&accepting_clients=eq.true&order=created_at.desc&limit=3`;
+    if (gym) url += `&gym_name=eq.${encodeURIComponent(gym)}`;
+    else url += `&city=eq.${encodeURIComponent(city)}`;
+    const r = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+    const trainers = await r.json();
+    if (!Array.isArray(trainers) || !trainers.length) return;
+    document.getElementById('nearbySection').style.display = 'block';
+    const list = document.getElementById('nearbyList');
+    trainers.forEach(t => {
+      const initials = (t.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+      const avatarHtml = t.avatar_url || t.photo_url
+        ? `<img src="${t.avatar_url||t.photo_url}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,92,0,0.3);" alt="${t.name}">`
+        : `<div style="width:40px;height:40px;border-radius:50%;background:var(--surface-3);border:2px solid rgba(255,92,0,0.3);display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--orange);">${initials}</div>`;
+      const specs = (t.specialties||[]).slice(0,2).join(' · ');
+      const item = document.createElement('a');
+      item.href = `/${t.slug}`;
+      item.style.cssText = 'display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px;text-decoration:none;color:inherit;transition:border-color 0.2s;';
+      item.onmouseenter = () => item.style.borderColor = 'rgba(255,92,0,0.25)';
+      item.onmouseleave = () => item.style.borderColor = 'rgba(255,255,255,0.07)';
+      item.innerHTML = `${avatarHtml}<div style="flex:1;min-width:0;"><div style="font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name||''}</div><div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${specs||t.title||'Personal Trainer'}</div></div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
+      list.appendChild(item);
     });
   } catch(e) {}
 }
