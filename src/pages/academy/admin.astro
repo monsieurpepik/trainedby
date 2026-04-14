@@ -1,0 +1,519 @@
+---
+import Base from "../../layouts/Base.astro";
+---
+<Base title="Academy Admin — TrainedBy" description="Academy management dashboard">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#FF5C00;--orange-dim:rgba(255,92,0,0.15);
+  --green:#22c55e;--green-dim:rgba(34,197,94,0.12);
+  --red:#ef4444;--red-dim:rgba(239,68,68,0.12);
+  --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.12);
+  --white:#fff;--white-80:rgba(255,255,255,0.8);
+  --white-60:rgba(255,255,255,0.6);--white-30:rgba(255,255,255,0.3);
+  --white-10:rgba(255,255,255,0.1);--white-06:rgba(255,255,255,0.06);
+  --glass-border:rgba(255,255,255,0.12);
+  --radius:14px;--radius-sm:10px;--font:'Manrope',sans-serif;
+}
+html,body{height:100%;background:#0a0a0a;color:var(--white);font-family:var(--font);-webkit-font-smoothing:antialiased}
+/* ── LAYOUT ── */
+#app{display:flex;min-height:100vh}
+#sidebar{
+  width:220px;flex-shrink:0;background:#0f0f0f;border-right:1px solid var(--glass-border);
+  display:flex;flex-direction:column;padding:24px 0;position:fixed;top:0;bottom:0;left:0;z-index:10;
+}
+#content{margin-left:220px;flex:1;padding:28px 32px;max-width:1100px}
+@media(max-width:768px){
+  #sidebar{width:100%;height:auto;position:static;flex-direction:row;padding:12px 16px;overflow-x:auto;border-right:none;border-bottom:1px solid var(--glass-border)}
+  #content{margin-left:0;padding:20px 16px}
+}
+/* ── SIDEBAR ── */
+.sidebar-logo{padding:0 20px 24px;font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--white-60)}
+.sidebar-logo span{color:var(--orange)}
+.sidebar-academy{padding:0 16px 20px;border-bottom:1px solid var(--glass-border);margin-bottom:16px}
+.sidebar-academy-name{font-size:14px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-academy-sport{font-size:12px;color:var(--white-60)}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;
+  color:var(--white-60);transition:color 0.15s,background 0.15s;
+  border-left:3px solid transparent;
+}
+.nav-item:hover{color:var(--white);background:var(--white-06)}
+.nav-item.active{color:var(--white);border-left-color:var(--orange);background:var(--orange-dim)}
+.sidebar-footer{margin-top:auto;padding:16px 20px}
+.view-profile-btn{
+  display:block;text-align:center;background:var(--white-06);border:1px solid var(--glass-border);
+  color:var(--white-60);font-size:12px;font-weight:600;padding:9px;border-radius:var(--radius-sm);
+  text-decoration:none;transition:background 0.15s;
+}
+.view-profile-btn:hover{background:var(--white-10);color:var(--white)}
+/* ── KPI CARDS ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.kpi-card{
+  background:var(--white-06);border:1px solid var(--glass-border);
+  border-radius:var(--radius);padding:18px;
+}
+.kpi-label{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--white-60);margin-bottom:8px}
+.kpi-value{font-size:28px;font-weight:800;line-height:1}
+.kpi-sub{font-size:12px;color:var(--white-60);margin-top:4px}
+/* ── SECTION ── */
+.section-title{font-size:18px;font-weight:700;margin-bottom:16px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--white-60);padding:10px 12px;text-align:left;border-bottom:1px solid var(--glass-border)}
+.data-table td{padding:12px;border-bottom:1px solid var(--white-06);font-size:13px;vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--white-06)}
+/* ── STATUS BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:capitalize}
+.badge-confirmed{background:var(--green-dim);color:var(--green);border:1px solid var(--green)}
+.badge-pending{background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange)}
+.badge-cancelled{background:var(--red-dim);color:var(--red);border:1px solid var(--red)}
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:9px 16px;border-radius:var(--radius-sm);cursor:pointer;border:none;transition:opacity 0.15s}
+.btn:hover{opacity:0.85}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-secondary{background:var(--white-10);color:var(--white);border:1px solid var(--glass-border)}
+.btn-sm{padding:6px 12px;font-size:12px}
+/* ── PROGRAM CARDS ── */
+.prog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.prog-admin-card{
+  background:var(--white-06);border:1px solid var(--glass-border);
+  border-radius:var(--radius);padding:18px;
+}
+.prog-admin-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.prog-admin-meta{font-size:12px;color:var(--white-60);margin-bottom:12px}
+.prog-admin-stats{display:flex;gap:16px;margin-bottom:14px}
+.prog-stat{text-align:center}
+.prog-stat-val{font-size:18px;font-weight:800}
+.prog-stat-lbl{font-size:10px;color:var(--white-60);text-transform:uppercase;letter-spacing:0.06em}
+.capacity-bar{height:4px;background:var(--white-10);border-radius:2px;overflow:hidden;margin-bottom:14px}
+.capacity-fill{height:100%;background:var(--green);border-radius:2px;transition:width 0.3s}
+.capacity-fill.warn{background:#f59e0b}
+.capacity-fill.full{background:var(--red)}
+/* ── MODAL ── */
+#addProgModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px}
+#addProgModal.open{display:flex}
+.modal-box{background:#111;border:1px solid var(--glass-border);border-radius:20px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:20px}
+.form-group{margin-bottom:14px}
+.form-label{font-size:11px;font-weight:700;color:var(--white-60);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:0.06em}
+.form-input,.form-select{width:100%;background:var(--white-06);border:1px solid var(--glass-border);color:var(--white);font-size:14px;padding:11px 13px;border-radius:var(--radius-sm);font-family:var(--font);outline:none}
+.form-input:focus,.form-select:focus{border-color:var(--orange)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-select option{background:#111}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+/* ── AUTH GATE ── */
+#authGate{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.auth-box{background:#111;border:1px solid var(--glass-border);border-radius:20px;padding:32px;max-width:380px;width:100%;text-align:center}
+.auth-title{font-size:22px;font-weight:800;margin-bottom:8px}
+.auth-sub{font-size:14px;color:var(--white-60);margin-bottom:24px}
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:48px 20px;color:var(--white-60)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+/* ── TABS ── */
+.tab-bar{display:flex;gap:4px;background:var(--white-06);border:1px solid var(--glass-border);border-radius:12px;padding:4px;margin-bottom:24px;width:fit-content}
+.tab{padding:8px 18px;font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;color:var(--white-60);transition:all 0.15s}
+.tab.active{background:var(--orange);color:#fff}
+</style>
+
+<!-- AUTH GATE -->
+<div id="authGate">
+  <div class="auth-box">
+    <div style="font-size:36px;margin-bottom:12px">🏟</div>
+    <div class="auth-title">Academy Dashboard</div>
+    <div class="auth-sub">Enter your admin access token to continue</div>
+    <input class="form-input" id="tokenInput" placeholder="Paste your admin token" type="password" style="margin-bottom:12px">
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="authenticate()">Access Dashboard →</button>
+    <p style="font-size:12px;color:var(--white-60);margin-top:12px">Check your welcome email for the admin link</p>
+  </div>
+</div>
+
+<!-- MAIN APP (hidden until auth) -->
+<div id="app" style="display:none">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sidebar-logo">Trained<span>By</span></div>
+    <div class="sidebar-academy">
+      <div class="sidebar-academy-name" id="sb-name">Loading...</div>
+      <div class="sidebar-academy-sport" id="sb-sport"></div>
+    </div>
+    <div class="nav-item active" onclick="showTab('overview')">📊 Overview</div>
+    <div class="nav-item" onclick="showTab('programmes')">📋 Programmes</div>
+    <div class="nav-item" onclick="showTab('bookings')">🎟 Bookings</div>
+    <div class="nav-item" onclick="showTab('payouts')">💰 Payouts</div>
+    <div class="sidebar-footer">
+      <a class="view-profile-btn" id="view-profile-link" href="#" target="_blank">View Public Profile →</a>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- OVERVIEW TAB -->
+    <div id="tab-overview">
+      <h1 class="section-title" id="overview-title">Overview</h1>
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card"><div class="kpi-label">Active Programmes</div><div class="kpi-value" id="kpi-progs">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Total Bookings</div><div class="kpi-value" id="kpi-bookings">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Revenue (All Time)</div><div class="kpi-value" id="kpi-revenue">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Platform Fee (10%)</div><div class="kpi-value" id="kpi-fee">—</div></div>
+      </div>
+      <div class="section-header">
+        <div class="section-title">Recent Bookings</div>
+        <button class="btn btn-secondary btn-sm" onclick="showTab('bookings')">View All</button>
+      </div>
+      <div id="recent-bookings-table"></div>
+    </div>
+
+    <!-- PROGRAMMES TAB -->
+    <div id="tab-programmes" style="display:none">
+      <div class="section-header">
+        <div class="section-title">Programmes</div>
+        <button class="btn btn-primary" onclick="openAddProg()">+ Add Programme</button>
+      </div>
+      <div class="prog-grid" id="prog-grid">
+        <div style="color:var(--white-60);font-size:14px">Loading...</div>
+      </div>
+    </div>
+
+    <!-- BOOKINGS TAB -->
+    <div id="tab-bookings" style="display:none">
+      <div class="section-header">
+        <div class="section-title">All Bookings</div>
+        <div style="font-size:13px;color:var(--white-60)" id="bookings-count"></div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Child</th><th>Parent</th><th>Programme</th>
+              <th>Amount</th><th>Status</th><th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="bookings-tbody">
+            <tr><td colspan="6" style="text-align:center;color:var(--white-60);padding:32px">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAYOUTS TAB -->
+    <div id="tab-payouts" style="display:none">
+      <div class="section-title">Payouts</div>
+      <div style="background:var(--orange-dim);border:1px solid var(--orange);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px;font-size:14px;color:var(--white-80)">
+        💡 <strong>How payouts work:</strong> TrainedBy collects all payments on your behalf. After deducting the 10% platform fee, your net earnings are transferred to your registered bank account weekly (every Monday). No trade license required.
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr><th>Period</th><th>Bookings</th><th>Gross</th><th>Fee (10%)</th><th>Net Payout</th><th>Status</th></tr>
+          </thead>
+          <tbody id="payouts-tbody">
+            <tr><td colspan="6" style="text-align:center;color:var(--white-60);padding:32px">No payout records yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD PROGRAMME MODAL -->
+<div id="addProgModal" onclick="if(event.target===this)closeAddProg()">
+  <div class="modal-box">
+    <div class="modal-title">Add New Programme</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Programme Name *</label>
+        <input class="form-input" id="pName" placeholder="U10 Football Term 3">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sport *</label>
+        <input class="form-input" id="pSport" placeholder="Football">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-select" id="pType">
+          <option value="term">Term</option>
+          <option value="holiday_camp">Holiday Camp</option>
+          <option value="drop_in">Drop-In</option>
+          <option value="private">Private</option>
+          <option value="trial">Trial</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Age Group</label>
+        <input class="form-input" id="pAge" placeholder="U10 / Adults / All ages">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <input class="form-input" id="pDesc" placeholder="Brief description of the programme">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Price (AED)</label>
+        <input class="form-input" id="pPriceAed" type="number" placeholder="1500">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Max Capacity</label>
+        <input class="form-input" id="pCapacity" type="number" placeholder="20">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Start Date</label>
+        <input class="form-input" id="pStart" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">End Date</label>
+        <input class="form-input" id="pEnd" type="date">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Sessions / Week</label>
+        <input class="form-input" id="pFreq" type="number" placeholder="2" min="1" max="7">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Location</label>
+        <input class="form-input" id="pLocation" placeholder="Dubai Sports City">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveProgram()">Save Programme</button>
+      <button class="btn btn-secondary" onclick="closeAddProg()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://mezhtdbfyvkshpuplqqw.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM2MDk3NTQsImV4cCI6MjA1OTE4NTc1NH0.vPDjMbWBCHgHEMkHHJMFCgPPIFbKDMqkfTCUQFGxGaY";
+const FN = `${SUPABASE_URL}/functions/v1`;
+
+let ACADEMY = null;
+let PROGRAMS = [];
+let BOOKINGS = [];
+let PAYOUTS = [];
+let TOKEN = null;
+
+// ── AUTH ──────────────────────────────────────────────────────
+async function authenticate() {
+  const token = document.getElementById("tokenInput").value.trim();
+  if (!token) return;
+
+  // Verify token by calling get-academy with it
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/academies?admin_magic_token=eq.${encodeURIComponent(token)}&select=id,slug,name,sport`, {
+      headers: { "apikey": SUPABASE_ANON, "Authorization": `Bearer ${SUPABASE_ANON}` }
+    });
+    const data = await res.json();
+    if (!data || data.length === 0) {
+      alert("Invalid token. Please check your admin link.");
+      return;
+    }
+    TOKEN = token;
+    ACADEMY = data[0];
+    document.getElementById("authGate").style.display = "none";
+    document.getElementById("app").style.display = "flex";
+    initDashboard();
+  } catch(e) {
+    alert("Authentication failed. Please try again.");
+  }
+}
+
+// Check URL token on load
+window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const urlToken = params.get("token");
+  if (urlToken) {
+    document.getElementById("tokenInput").value = urlToken;
+    authenticate();
+  }
+});
+
+// ── INIT ──────────────────────────────────────────────────────
+async function initDashboard() {
+  document.getElementById("sb-name").textContent = ACADEMY.name;
+  document.getElementById("sb-sport").textContent = ACADEMY.sport;
+  document.getElementById("view-profile-link").href = `/academy/${ACADEMY.slug}`;
+  document.getElementById("overview-title").textContent = `${ACADEMY.name} — Overview`;
+
+  await Promise.all([loadPrograms(), loadBookings(), loadPayouts()]);
+  renderOverview();
+}
+
+async function loadPrograms() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/programs?academy_id=eq.${ACADEMY.id}&order=created_at.desc`, {
+    headers: { "apikey": SUPABASE_ANON, "Authorization": `Bearer ${SUPABASE_ANON}` }
+  });
+  PROGRAMS = await res.json();
+  renderPrograms();
+}
+
+async function loadBookings() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/academy_bookings?academy_id=eq.${ACADEMY.id}&order=created_at.desc&limit=100`, {
+    headers: { "apikey": SUPABASE_ANON, "Authorization": `Bearer ${SUPABASE_ANON}` }
+  });
+  BOOKINGS = await res.json();
+  renderBookings();
+}
+
+async function loadPayouts() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/coach_payouts?academy_id=eq.${ACADEMY.id}&order=period_start.desc`, {
+    headers: { "apikey": SUPABASE_ANON, "Authorization": `Bearer ${SUPABASE_ANON}` }
+  });
+  PAYOUTS = await res.json();
+  renderPayouts();
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function renderOverview() {
+  const confirmed = BOOKINGS.filter(b => b.status === "confirmed");
+  const totalRevenue = confirmed.reduce((s, b) => s + Number(b.amount_paid || 0), 0);
+  const totalFee = confirmed.reduce((s, b) => s + Number(b.platform_fee || 0), 0);
+  const activeProgs = PROGRAMS.filter(p => p.is_active).length;
+
+  document.getElementById("kpi-progs").textContent = activeProgs;
+  document.getElementById("kpi-bookings").textContent = confirmed.length;
+  document.getElementById("kpi-revenue").textContent = `AED ${totalRevenue.toFixed(0)}`;
+  document.getElementById("kpi-fee").textContent = `AED ${totalFee.toFixed(0)}`;
+
+  // Recent bookings table
+  const recent = BOOKINGS.slice(0, 5);
+  const tbody = recent.length ? `<table class="data-table"><thead><tr><th>Child</th><th>Parent</th><th>Programme</th><th>Amount</th><th>Status</th></tr></thead><tbody>
+    ${recent.map(b => `<tr>
+      <td><strong>${b.child_name}</strong></td>
+      <td>${b.parent_name}<br><span style="font-size:11px;color:var(--white-60)">${b.parent_email}</span></td>
+      <td>${PROGRAMS.find(p => p.id === b.program_id)?.name || "—"}</td>
+      <td>${b.currency} ${b.amount_paid}</td>
+      <td><span class="badge badge-${b.status}">${b.status}</span></td>
+    </tr>`).join("")}
+  </tbody></table>` : `<div class="empty-state"><div class="empty-icon">🎟</div><p>No bookings yet</p></div>`;
+  document.getElementById("recent-bookings-table").innerHTML = tbody;
+}
+
+function renderPrograms() {
+  const grid = document.getElementById("prog-grid");
+  if (!PROGRAMS.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📋</div><p>No programmes yet.<br>Add your first programme to start accepting bookings.</p></div>`;
+    return;
+  }
+  grid.innerHTML = PROGRAMS.map(p => {
+    const pct = Math.min(100, Math.round(((p.enrolled_count || 0) / p.max_capacity) * 100));
+    const fillClass = pct >= 100 ? "full" : pct >= 75 ? "warn" : "";
+    const price = p.currency === "GBP" ? `£${p.price_gbp}` : `AED ${p.price_aed}`;
+    return `<div class="prog-admin-card">
+      <div class="prog-admin-name">${p.name}</div>
+      <div class="prog-admin-meta">${p.sport} · ${p.program_type} · ${p.age_label || "All ages"}</div>
+      <div class="prog-admin-stats">
+        <div class="prog-stat"><div class="prog-stat-val">${p.enrolled_count || 0}</div><div class="prog-stat-lbl">Enrolled</div></div>
+        <div class="prog-stat"><div class="prog-stat-val">${p.max_capacity}</div><div class="prog-stat-lbl">Capacity</div></div>
+        <div class="prog-stat"><div class="prog-stat-val">${price}</div><div class="prog-stat-lbl">Price</div></div>
+      </div>
+      <div class="capacity-bar"><div class="capacity-fill ${fillClass}" style="width:${pct}%"></div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="toggleProgram('${p.id}',${!p.is_active})">${p.is_active ? "Deactivate" : "Activate"}</button>
+        <span class="badge ${p.is_active ? "badge-confirmed" : "badge-cancelled"}">${p.is_active ? "Active" : "Inactive"}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderBookings() {
+  const tbody = document.getElementById("bookings-tbody");
+  document.getElementById("bookings-count").textContent = `${BOOKINGS.length} total`;
+  if (!BOOKINGS.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--white-60);padding:32px">No bookings yet</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = BOOKINGS.map(b => `<tr>
+    <td><strong>${b.child_name}</strong>${b.child_notes ? `<br><span style="font-size:11px;color:var(--white-60)">${b.child_notes}</span>` : ""}</td>
+    <td>${b.parent_name}<br><span style="font-size:11px;color:var(--white-60)">${b.parent_email} · ${b.parent_phone}</span></td>
+    <td>${PROGRAMS.find(p => p.id === b.program_id)?.name || "—"}</td>
+    <td>${b.currency} ${b.amount_paid}<br><span style="font-size:11px;color:var(--white-60)">Net: ${b.currency} ${b.academy_payout || (b.amount_paid * 0.9).toFixed(2)}</span></td>
+    <td><span class="badge badge-${b.status}">${b.status}</span></td>
+    <td style="font-size:12px;color:var(--white-60)">${new Date(b.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"2-digit"})}</td>
+  </tr>`).join("");
+}
+
+function renderPayouts() {
+  const tbody = document.getElementById("payouts-tbody");
+  if (!PAYOUTS.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--white-60);padding:32px">No payout records yet. Payouts are processed weekly.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = PAYOUTS.map(p => `<tr>
+    <td>${p.period_start} → ${p.period_end}</td>
+    <td>${p.sessions_count}</td>
+    <td>${p.currency} ${p.gross_amount}</td>
+    <td>${p.currency} ${p.platform_fee}</td>
+    <td><strong>${p.currency} ${p.net_amount}</strong></td>
+    <td><span class="badge badge-${p.status === "paid" ? "confirmed" : p.status === "pending" ? "pending" : "cancelled"}">${p.status}</span></td>
+  </tr>`).join("");
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+function showTab(tab) {
+  ["overview","programmes","bookings","payouts"].forEach(t => {
+    document.getElementById(`tab-${t}`).style.display = t === tab ? "block" : "none";
+  });
+  document.querySelectorAll(".nav-item").forEach((el, i) => {
+    el.classList.toggle("active", ["overview","programmes","bookings","payouts"][i] === tab);
+  });
+}
+
+// ── ADD PROGRAMME ─────────────────────────────────────────────
+function openAddProg() { document.getElementById("addProgModal").classList.add("open"); }
+function closeAddProg() { document.getElementById("addProgModal").classList.remove("open"); }
+
+async function saveProgram() {
+  const name = document.getElementById("pName").value.trim();
+  const sport = document.getElementById("pSport").value.trim();
+  if (!name || !sport) { alert("Name and sport are required."); return; }
+
+  const body = {
+    name, sport,
+    program_type: document.getElementById("pType").value,
+    age_label: document.getElementById("pAge").value.trim() || null,
+    description: document.getElementById("pDesc").value.trim() || null,
+    price_aed: parseFloat(document.getElementById("pPriceAed").value) || null,
+    max_capacity: parseInt(document.getElementById("pCapacity").value) || 20,
+    start_date: document.getElementById("pStart").value || null,
+    end_date: document.getElementById("pEnd").value || null,
+    sessions_per_week: parseInt(document.getElementById("pFreq").value) || 1,
+    location: document.getElementById("pLocation").value.trim() || null,
+  };
+
+  try {
+    const res = await fetch(`${FN}/create-program`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": SUPABASE_ANON, "x-academy-token": TOKEN },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) { alert(data.error || "Failed to save programme."); return; }
+    closeAddProg();
+    await loadPrograms();
+    showTab("programmes");
+  } catch(e) {
+    alert("Network error. Please try again.");
+  }
+}
+
+async function toggleProgram(id, isActive) {
+  await fetch(`${SUPABASE_URL}/rest/v1/programs?id=eq.${id}`, {
+    method: "PATCH",
+    headers: { "apikey": SUPABASE_ANON, "Authorization": `Bearer ${SUPABASE_ANON}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ is_active: isActive }),
+  });
+  await loadPrograms();
+}
+</script>
+</Base>
