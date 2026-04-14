@@ -920,5 +920,97 @@ if (new URLSearchParams(location.search).get('upgraded') === '1') {
 }
 
 init();
+
+// ── Support Chatbot Widget ──────────────────────────────────────────────────────────
+(function() {
+  const SUPPORT_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1/support-agent';
+  const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
+
+  const style = document.createElement('style');
+  style.textContent = [
+    '.tb-chat-btn{position:fixed;bottom:24px;right:20px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#FF5C00;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,92,0,.4);transition:transform .2s,box-shadow .2s}',
+    '.tb-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(255,92,0,.5)}',
+    '.tb-chat-btn svg{width:24px;height:24px;fill:#fff}',
+    '.tb-chat-window{position:fixed;bottom:88px;right:20px;z-index:9998;width:min(360px,calc(100vw - 40px));background:#111;border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.6);display:none;flex-direction:column;font-family:Inter,sans-serif}',
+    '.tb-chat-window.open{display:flex}',
+    '.tb-chat-header{padding:14px 16px;background:#FF5C00;display:flex;align-items:center;justify-content:space-between}',
+    '.tb-chat-header-title{font-weight:700;font-size:14px;color:#fff}',
+    '.tb-chat-header-sub{font-size:11px;color:rgba(255,255,255,.75);margin-top:1px}',
+    '.tb-chat-close{background:none;border:none;cursor:pointer;color:#fff;opacity:.7;padding:2px;line-height:1}',
+    '.tb-chat-close:hover{opacity:1}',
+    '.tb-chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;max-height:280px;min-height:120px}',
+    '.tb-msg{max-width:85%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.5}',
+    '.tb-msg.bot{background:#1c1c1c;color:rgba(255,255,255,.9);border-bottom-left-radius:4px;align-self:flex-start}',
+    '.tb-msg.user{background:#FF5C00;color:#fff;border-bottom-right-radius:4px;align-self:flex-end}',
+    '.tb-msg.typing{opacity:.5;font-style:italic}',
+    '.tb-chat-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid rgba(255,255,255,.08);background:#0a0a0a}',
+    '.tb-chat-input{flex:1;background:#1c1c1c;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:#fff;font-size:13px;outline:none;font-family:inherit}',
+    '.tb-chat-input:focus{border-color:rgba(255,92,0,.5)}',
+    '.tb-chat-input::placeholder{color:rgba(255,255,255,.3)}',
+    '.tb-chat-send{background:#FF5C00;border:none;border-radius:8px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}',
+    '.tb-chat-send:hover{background:#e05200}',
+    '.tb-chat-send svg{width:16px;height:16px;fill:#fff}',
+    '.tb-chat-send:disabled{opacity:.4;cursor:not-allowed}'
+  ].join('');
+  document.head.appendChild(style);
+
+  const btn = document.createElement('button');
+  btn.className = 'tb-chat-btn';
+  btn.title = 'Ask a question';
+  btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>';
+
+  const win = document.createElement('div');
+  win.className = 'tb-chat-window';
+  win.innerHTML = '<div class="tb-chat-header"><div><div class="tb-chat-header-title">TrainedBy Support</div><div class="tb-chat-header-sub">Ask me anything about your account</div></div><button class="tb-chat-close" id="tb-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div><div class="tb-chat-messages" id="tb-msgs"><div class="tb-msg bot">Hey! Ask me anything about TrainedBy \u2014 pricing, REPs verification, referrals, or how features work.</div></div><div class="tb-chat-input-row"><input class="tb-chat-input" id="tb-input" placeholder="Ask a question..." maxlength="300"/><button class="tb-chat-send" id="tb-send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div>';
+
+  document.body.appendChild(btn);
+  document.body.appendChild(win);
+
+  let open = false, busy = false;
+
+  btn.addEventListener('click', function() {
+    open = !open;
+    win.classList.toggle('open', open);
+    if (open) document.getElementById('tb-input').focus();
+  });
+  document.getElementById('tb-close').addEventListener('click', function() {
+    open = false; win.classList.remove('open');
+  });
+
+  async function sendQ() {
+    const inp = document.getElementById('tb-input');
+    const q = inp.value.trim();
+    if (!q || busy) return;
+    busy = true; inp.value = '';
+    document.getElementById('tb-send').disabled = true;
+    const msgs = document.getElementById('tb-msgs');
+    msgs.innerHTML += '<div class="tb-msg user">' + q.replace(/</g,'&lt;') + '</div>';
+    const typing = document.createElement('div');
+    typing.className = 'tb-msg bot typing';
+    typing.textContent = 'Thinking...';
+    msgs.appendChild(typing);
+    msgs.scrollTop = msgs.scrollHeight;
+    try {
+      const res = await fetch(SUPPORT_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','Authorization':'Bearer '+ANON_KEY},
+        body: JSON.stringify({question: q})
+      });
+      const data = await res.json();
+      typing.className = 'tb-msg bot';
+      typing.textContent = data.answer || 'Sorry, I could not find an answer to that.';
+    } catch(e) {
+      typing.className = 'tb-msg bot';
+      typing.textContent = 'Connection error. Please try again.';
+    }
+    msgs.scrollTop = msgs.scrollHeight;
+    busy = false;
+    document.getElementById('tb-send').disabled = false;
+    document.getElementById('tb-input').focus();
+  }
+
+  document.getElementById('tb-send').addEventListener('click', sendQ);
+  document.getElementById('tb-input').addEventListener('keydown', function(e) { if(e.key==='Enter') sendQ(); });
+})();
 </script>
 </Base>
