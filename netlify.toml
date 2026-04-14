@@ -46,6 +46,18 @@
   to = "/find"
   status = 301
 
+# ── Academy admin: must come before profile catch-all ───────────────────────
+[[redirects]]
+  from = "/academy/:slug/admin"
+  to = "/academy/admin/index.html"
+  status = 200
+
+# ── Academy profile: /academy/:slug → academy index ─────────────────────────
+[[redirects]]
+  from = "/academy/:slug"
+  to = "/academy/index.html"
+  status = 200
+
 # ── Catch-all: /:slug → profile page (reads slug from URL at runtime) ───────
 [[redirects]]
   from = "/:trainer"
