@@ -257,33 +257,61 @@ const market = getMarket(Astro.url.hostname);
   </nav>
 
   <!-- HERO -->
+  {market.market === 'in' && (
+    <div style="background:linear-gradient(135deg,#012169,#C8102E);padding:10px 24px;text-align:center;font-size:13px;font-weight:600;letter-spacing:0.03em;color:#fff">
+      🇬🇧 Built in Britain &nbsp;·&nbsp; UK-Standard Verification &nbsp;·&nbsp; Now Available in India
+    </div>
+  )}
   <section class="hero">
-    <div class="hero-eyebrow">🇦🇪 The UAE Trainer's Operating System &nbsp;·&nbsp; <span id="spots-counter" style="color:#fff">87/100</span> Early Access Spots Claimed</div>
-    <h1 class="hero-headline">Stop trading<br>time for money.<br><em>Start building</em><br>an empire.</h1>
-    <p class="hero-sub">The only platform that turns your fitness expertise into a high-ticket business — with digital products, affiliate income, and a Grand Slam Offer builder built in.</p>
+    <div class="hero-eyebrow">
+      {market.market === 'in' ? '🇮🇳 India Early Access — UK-Standard Verified Profiles' :
+       market.market === 'uk' ? '🇬🇧 The UK Trainer\'s Operating System' :
+       market.market === 'com' ? '🌍 The Global Trainer Platform' :
+       '🇦🇪 The UAE Trainer\'s Operating System'}
+      &nbsp;·&nbsp; <span id="spots-counter" style="color:#fff">87/100</span> Early Access Spots Claimed
+    </div>
+    <h1 class="hero-headline">
+      {market.market === 'in' ? <Fragment>UK-Standard<br>Verification.<br><em>Now in</em><br>India.</Fragment> :
+       <Fragment>Stop trading<br>time for money.<br><em>Start building</em><br>an empire.</Fragment>}
+    </h1>
+    <p class="hero-sub">
+      {market.market === 'in'
+        ? 'The same verification standard trusted by personal trainers in London — now available to India\'s best fitness professionals. Digital products, affiliate income, and a Grand Slam Offer builder built in.'
+        : 'The only platform that turns your fitness expertise into a high-ticket business — with digital products, affiliate income, and a Grand Slam Offer builder built in.'}
+    </p>
     <div class="hero-guarantee">
-      <span style="font-size:14px">🛡</span> ROI Guarantee: 1,000 AED in 30 days or your money back
+      {market.market === 'in'
+        ? <Fragment><span style="font-size:14px">🛡</span> ROI Guarantee: ₹10,000 in 30 days or your money back</Fragment>
+        : <Fragment><span style="font-size:14px">🛡</span> ROI Guarantee: 1,000 AED in 30 days or your money back</Fragment>}
     </div>
     <div class="hero-actions">
-      <a href="/join" class="btn-primary">Get Your OS Free →</a>
+      <a href="/join" class="btn-primary">{market.ctaText} →</a>
       <a href="/sarah" class="btn-ghost">See a Live Profile ⊙</a>
     </div>
     <div class="hero-income-wrap">
       <div class="income-card">
         <div class="income-label">Sessions (Today)</div>
-        <div class="income-value">8,400</div>
-        <div class="income-desc">AED/month from 6 clients × 1,400 AED packages</div>
+        <div class="income-value">{market.market === 'in' ? '52,000' : market.market === 'uk' ? '3,200' : '8,400'}</div>
+        <div class="income-desc">
+          {market.market === 'in' ? '₹/month from 6 clients × ₹8,500 packages' :
+           market.market === 'uk' ? '£/month from 6 clients × £530 packages' :
+           'AED/month from 6 clients × 1,400 AED packages'}
+        </div>
       </div>
       <div class="income-card highlight">
         <div class="income-label">With TrainedBy Pro</div>
-        <div class="income-value brand">24,600</div>
+        <div class="income-value brand">{market.market === 'in' ? '1,52,000' : market.market === 'uk' ? '9,400' : '24,600'}</div>
         <div class="income-desc">Sessions + digital products + affiliate commissions</div>
         <div class="income-badge"><span style="width:5px;height:5px;border-radius:50%;background:#00C853;display:inline-block"></span> +193% income</div>
       </div>
       <div class="income-card">
         <div class="income-label">Passive (Monthly)</div>
-        <div class="income-value">6,200</div>
-        <div class="income-desc">AED while you sleep — digital products & affiliate deals</div>
+        <div class="income-value">{market.market === 'in' ? '38,000' : market.market === 'uk' ? '2,300' : '6,200'}</div>
+        <div class="income-desc">
+          {market.market === 'in' ? '₹ while you sleep — digital products & affiliate deals' :
+           market.market === 'uk' ? '£ while you sleep — digital products & affiliate deals' :
+           'AED while you sleep — digital products & affiliate deals'}
+        </div>
       </div>
     </div>
   </section>

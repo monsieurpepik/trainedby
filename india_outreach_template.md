@@ -5,7 +5,9 @@ This document contains the exact templates you should send to your influential c
 ## The Strategy
 In India, distribution beats product. If a respected gym owner, fitness influencer, or certification body head tells their trainers to use a platform, they will.
 
-We are positioning TrainedBy.in not as a software tool, but as **India's first verified professional standard** for trainers.
+**The key positioning shift:** Lead with the UK origin, not the UAE origin. In India, UK-standard credentials carry disproportionate trust. The mental model is: London = professional standard. Dubai = regional. Always open with “built in the UK, now in India” — that sequence is the trust transfer.
+
+We are positioning TrainedBy.in as **the UK-standard verification platform for India’s best fitness professionals**.
 
 ---
 
@@ -17,15 +19,14 @@ We are positioning TrainedBy.in not as a software tool, but as **India's first v
 **Message:**
 > Hey [Name],
 >
-> Hope you're doing well. I'm launching a new platform called TrainedBy — it's basically a verified professional network for personal trainers. We've built it in Dubai and are bringing it to India now.
+> Hope you're doing well. I wanted to share something with you before we go public.
 >
-> The problem we're solving is that anyone can call themselves a PT on Instagram. We verify their certifications (NSCA, ACSM, ACE) and give them a professional booking page that actually looks good.
+> I'm involved with a platform called TrainedBy — it started in the UK and we're doing a quiet India launch now. The idea is simple: give Indian fitness professionals the same verified profile standard that trainers in London use. UK-standard verification, CIMSPA-aligned, with tools to earn beyond sessions (digital products, affiliate income, AI offer builder).
 >
-> Since you have some of the best trainers in [City/Network], I wanted to give your team early access before we open it to the public. It's completely free for them to set up.
+> Since you have some of the best trainers in [City/Network], I wanted to give your team early access before we open it up. It’s completely free for them to set up.
 >
-> If you think it's useful, I can send you a private invite link to share in your trainer WhatsApp group. Let me know what you think.
+> If you think it’s useful, I can send you a private invite link to share in your trainer WhatsApp group. Let me know.
 >
-> Best,
 > [Your Name]
 
 ---
@@ -38,17 +39,14 @@ We are positioning TrainedBy.in not as a software tool, but as **India's first v
 **Message:**
 > Hey [Name],
 >
-> I'm bringing a platform we built in Dubai over to India and wanted to show it to you first.
+> Quick one — I know you’re particular about what you put in front of your community, so I wanted to run this by you first.
 >
-> It's called TrainedBy. It's a verified professional profile for personal trainers. Right now, good trainers are competing with uncertified influencers on Instagram. We fix that by verifying their credentials and giving them a Linktree-style page on steroids (booking, digital products, affiliate links).
+> There’s a platform called TrainedBy that launched in the UK and is now doing an India early access. It gives certified fitness professionals a verified profile (UK-standard, CIMSPA-aligned) plus tools to sell digital products and earn affiliate income — all in one place.
 >
-> Because your community is exactly the tier of professional we want on the platform, I'd love to give your audience early access.
+> The reason I thought of you: your audience is exactly who this is built for. Serious trainers who want to build a real business, not just collect followers.
 >
-> We can set up a custom invite link for you. It's free for them to join and get verified.
+> Early access is free. If you want to take a look before deciding whether to share it, I can set you up with a profile. No obligation.
 >
-> Let me know if you're open to sharing it with them.
->
-> Best,
 > [Your Name]
 
 ---
@@ -57,22 +55,37 @@ We are positioning TrainedBy.in not as a software tool, but as **India's first v
 *When they say "Yes, send me the link", give them this exact message to copy-paste into their WhatsApp groups. Do not make them write it themselves.*
 
 **Message for them to forward:**
-> Hey team,
+> 🇬🇧 → 🇮🇳 UK fitness platform just opened India early access
 >
-> A contact of mine is launching a new platform for verified personal trainers called TrainedBy. They built it in Dubai and are opening it up in India now.
+> TrainedBy started in the UK and is now available in India. It gives certified personal trainers:
+> — A verified profile (UK-standard, CIMSPA-aligned)
+> — Tools to sell workout plans, nutrition guides, and programmes online
+> — Affiliate deals with supplement and wellness brands
+> — An AI offer builder to close clients at higher rates
 >
-> It gives you a professional profile page, verifies your certifications, and lets you sell digital products/plans directly from your bio.
+> Free to join. Takes 2 minutes.
 >
-> They've given us early access before the public launch. It's free to set up.
+> Early access link: https://trainedby.in/join
 >
-> Claim your profile here: https://trainedby.in/join
+> (Sharing because a few of you have asked me about building income beyond sessions — this is the best thing I’ve seen for it.)
+
+---
+
+## Template 4 — Follow-Up (if no response after 5 days)
+
+> Hey [Name], just following up on the TrainedBy message.
 >
-> Takes about 2 minutes to set up. Highly recommend grabbing your name/handle before someone else does.
+> We’ve had a good number of trainers join from India already — mostly from Mumbai and Bengaluru. Thought you’d want to know it’s moving.
+>
+> Still happy to set you up with early access if you want it.
 
 ---
 
 ## Next Steps for You
 1. Identify your top 5–10 contacts in the Indian fitness space.
 2. Send Template 1 or 2 via WhatsApp (it converts better than email in India).
-3. When they agree, send them Template 3.
-4. Watch the CEO bot in Telegram — it will ping you every time an Indian trainer signs up.
+3. When they agree, send them Template 3 to forward to their groups.
+4. If no response in 5 days, send Template 4 once.
+5. Watch the CEO bot in Telegram — it will ping you every time an Indian trainer signs up.
+
+**Critical:** Always lead with “built in the UK” — never “built in Dubai” when talking to Indian contacts. The UK positioning is the entire trust transfer.
