@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getLocale, getPersona, getMarket } from '../_shared/locale.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,6 +27,9 @@ interface PlanRequest {
   // Trainer branding
   trainer_name?: string;
   trainer_slug?: string;
+  // Locale / market
+  locale?: string;  // e.g. 'fr', 'it', 'es', 'en-ae'
+  domain?: string;  // alternative: detect from trainer's domain
 }
 
 serve(async (req) => {
@@ -42,6 +46,12 @@ serve(async (req) => {
       equipment = "gym_full", fitness_level = "intermediate",
       injuries = [], trainer_name, trainer_slug,
     } = body;
+
+    // ── Locale detection ──
+    const locale = getLocale(body.locale || body.domain || req.headers.get('origin'));
+    const market = getMarket(locale);
+    const persona = getPersona(locale);
+    const isEnglish = market.languageCode === 'en';
 
     // ── 1. PERPLEXITY SONAR: Source credible, up-to-date science ──
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
@@ -108,9 +118,24 @@ serve(async (req) => {
     };
     const targetCalories = goalCalories[goal];
 
-    const systemPrompt = `You are an elite personal trainer and registered sports dietitian creating professional, personalised plans for clients in the UAE. 
+    // Build locale-aware system prompt
+    const localFoods: Record<string, string> = {
+      'en-ae': 'dates, labneh, grilled chicken shawarma, hummus, fattoush, grilled hammour, Arabic bread',
+      'en-uk': 'oats, chicken breast, sweet potato, Greek yoghurt, cottage cheese, salmon, brown rice',
+      'en-us': 'chicken breast, brown rice, sweet potato, Greek yoghurt, oatmeal, turkey, quinoa',
+      'en-in': 'dal, paneer, roti, brown rice, curd, chickpeas, moong, rajma, poha',
+      'fr': 'poulet grillé, riz complet, fromage blanc, lentilles, pain complet, saumon, légumes de saison',
+      'it': 'pollo alla griglia, riso integrale, ricotta, legumi, pasta integrale, pesce, verdure di stagione',
+      'es': 'pollo a la plancha, arroz integral, legumbres, yogur griego, tortilla española, pescado, verduras',
+    };
+    const localFoodStr = localFoods[locale] || localFoods['en-ae'];
+
+    const systemPrompt = `${persona}
+
+You are creating professional, personalised ${market.language}-language fitness plans for clients in ${market.country}.
 You produce structured, actionable plans that trainers can deliver to their clients with their own branding.
-Always include specific foods common in the UAE/MENA region (dates, labneh, grilled chicken shawarma, hummus, etc.) when relevant.
+${!isEnglish ? `CRITICAL: Your ENTIRE response including all JSON string values must be in ${market.language}. Translate all labels, descriptions, meal names, exercise names, and tips into ${market.language}.` : ''}
+Always include specific foods common in ${market.country} (${localFoodStr}) when relevant.
 Format your response as valid JSON only — no markdown, no explanation outside the JSON.`;
 
     const userPrompt = `Create a ${type === "both" ? "combined diet and workout" : type} plan for:

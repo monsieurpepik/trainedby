@@ -13,6 +13,7 @@ import { jsonResponse, errorResponse, CORS_HEADERS } from '../_shared/errors.ts'
 import { createLogger } from '../_shared/logger.ts';
 import { calculateSlopScore } from '../_shared/voice.ts';
 import { callClaude } from '../_shared/claude.ts';
+import { getLocale, getMarket, getEmailCopy } from '../_shared/locale.ts';
 
 const log = createLogger('support-agent');
 
@@ -41,11 +42,18 @@ async function handleQuestion(req: Request): Promise<Response> {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const { question, trainer_id, conversation_id } = body as {
+    const { question, trainer_id, conversation_id, locale: bodyLocale, domain } = body as {
       question: string;
       trainer_id?: string;
       conversation_id?: string;
+      locale?: string;
+      domain?: string;
     };
+
+    // Detect locale from body, domain, or request origin
+    const locale = getLocale(bodyLocale || domain || req.headers.get('origin'));
+    const market = getMarket(locale);
+    const isEnglish = market.languageCode === 'en';
 
     if (!question || typeof question !== 'string' || question.trim().length < 3) {
       return errorResponse('Missing or invalid question', 400, 'VALIDATION_ERROR');
@@ -116,23 +124,28 @@ async function handleQuestion(req: Request): Promise<Response> {
 
       context = matched.slice(0, 3).join('\n\n');
     }
+    // ── 2. Build system prompt (locale-aware) ─────────────────────────────────────────
+    const supportEmail = `support@${market.domain}`;
+    const platformName = market.brandName;
+    const languageInstruction = isEnglish
+      ? ''
+      : `IMPORTANT: You MUST respond entirely in ${market.language}. Do not use English.`;
 
-    // ── 2. Build system prompt ────────────────────────────────────────────────
-    const systemPrompt = `You are the TrainedBy support assistant. You know this platform inside out — you've helped hundreds of UAE personal trainers get set up.
+    const systemPrompt = `You are the ${platformName} support assistant. You know this platform inside out — you've helped hundreds of personal trainers in ${market.country} get set up.
 
 Your tone: Direct, warm, no-nonsense. Answer like a knowledgeable colleague, not a customer service bot.
+${languageInstruction}
 
 Hard rules:
 - Answer in 2-4 sentences MAX unless a short list genuinely helps clarity
 - Never start with "Great question!", "Certainly!", "I'd be happy to help", or any filler
 - Never hedge with "it might be worth considering" or "you may want to"
-- If the answer isn't in the context, say exactly: "I don't have that info — email support@trainedby.ae and they'll sort you out."
-- Use bold only for key prices or numbers (e.g. **149 AED/month**)
+- If the answer isn't in the context, say exactly: "I don't have that info — email ${supportEmail} and they'll sort you out."
+- Use bold only for key prices or numbers (e.g. **${market.pricingTier}**)
 - Never invent features or prices
 
 Context (answer ONLY from this):
 ${context}`;
-
     // ── 3. Call Claude ────────────────────────────────────────────────────────
     let answer = '';
     try {

@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { callClaude } from '../_shared/claude.ts';
 import { TRAINEDBY_PERSONA } from '../_shared/voice.ts';
+import { getLocale, getEmailCopy, getPersona, getMarket } from '../_shared/locale.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,7 +9,7 @@ const corsHeaders = {
 };
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || '';
-const FROM_EMAIL = 'TrainedBy <hello@trainedby.ae>';
+// FROM_EMAIL is now locale-aware — set per-send below
 const TELEGRAM_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN') || '';
 const FOUNDER_CHAT_ID = Deno.env.get('FOUNDER_CHAT_ID') || '';
 
@@ -203,8 +204,13 @@ function monthlyReportEmail(t: Trainer, stats: { views: number; leads: number; }
   };
 }
 
-// ── Send email via Resend ─────────────────────────────────────────────────────
-async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+// ── Send email via Resend ──────────────────────────────────────────────────
+async function sendEmail(
+  to: string,
+  subject: string,
+  html: string,
+  fromEmail = 'TrainedBy <hello@trainedby.ae>'
+): Promise<boolean> {
   if (!RESEND_API_KEY) {
     console.log(`[lifecycle-email] No Resend key — would send to ${to}: ${subject}`);
     return true; // Graceful no-op when key not set
@@ -216,7 +222,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
       'Authorization': `Bearer ${RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ from: FROM_EMAIL, to, subject, html }),
+    body: JSON.stringify({ from: fromEmail, to, subject, html }),
   });
 
   if (!res.ok) {
@@ -273,6 +279,13 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ── Locale detection ──
+    // Detect from trainer's domain field, or fall back to request origin
+    const trainerLocale = getLocale(trainer.domain || req.headers.get('origin'));
+    const emailCopy = getEmailCopy(trainerLocale);
+    const marketConfig = getMarket(trainerLocale);
+    const fromEmail = `${emailCopy.from_name} <${emailCopy.from_email}>`;
+
     let email: { subject: string; html: string } | null = null;
 
     switch (type) {
@@ -306,7 +319,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const ok = await sendEmail(trainer.email, email.subject, email.html);
+    const ok = await sendEmail(trainer.email, email.subject, email.html, fromEmail);
 
     // Log the email send
     await sb.from('email_log').insert({
