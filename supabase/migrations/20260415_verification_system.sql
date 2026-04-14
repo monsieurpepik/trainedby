@@ -58,7 +58,7 @@ ALTER TABLE cert_reviews ENABLE ROW LEVEL SECURITY;
 
 -- Admins (service role) can do everything — handled via service role key in edge functions
 -- Trainers can read their own reviews only (via anon key + trainer_id match)
-CREATE POLICY IF NOT EXISTS "trainers_read_own_cert_reviews"
+CREATE POLICY "trainers_read_own_cert_reviews"
   ON cert_reviews FOR SELECT
   USING (
     trainer_id IN (
@@ -69,13 +69,13 @@ CREATE POLICY IF NOT EXISTS "trainers_read_own_cert_reviews"
 -- ─── 5. Scheduled cron for monthly re-verification ───────────────────────────
 -- Runs on the 1st of each month at 03:00 UTC (05:00 GST)
 -- Requires pg_cron extension (enabled by default on Supabase Pro)
-DO $$
+DO $outer$
 BEGIN
   IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN
     PERFORM cron.schedule(
       'monthly-reverify',
       '0 3 1 * *',
-      $$
+      $cron$
         SELECT net.http_post(
           url := current_setting('app.supabase_url') || '/functions/v1/reverify-agent',
           headers := jsonb_build_object(
@@ -84,10 +84,10 @@ BEGIN
           ),
           body := '{}'::jsonb
         );
-      $$
+      $cron$
     );
   END IF;
-END $$;
+END $outer$;
 
 -- ─── 6. Helper view: verification queue ──────────────────────────────────────
 -- Used by admin dashboard to show pending cert reviews with trainer info.
