@@ -2,6 +2,9 @@
 import Base from '../layouts/Base.astro';
 import { getMarket } from '../lib/market.ts';
 const market = getMarket(Astro.url.hostname);
+const isWaitlist = market.waitlistEnabled;
+const isPaid = market.paymentEnabled;
+const brandName = market.brandName || 'TrainedBy';
 ---
 
 <Base
@@ -539,6 +542,38 @@ const market = getMarket(Astro.url.hostname);
     </div>
   </div>
 
+  <!-- WAITLIST SECTION (shown for markets without payment enabled) -->
+  {isWaitlist && (
+    <div id="waitlist-section" style="background:linear-gradient(135deg,rgba(255,92,0,0.10),rgba(255,92,0,0.03));border-top:1px solid rgba(255,92,0,0.2);border-bottom:1px solid rgba(255,92,0,0.2);padding:72px 24px;text-align:center;">
+      <div style="max-width:520px;margin:0 auto;">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;border:1px solid rgba(255,92,0,0.3);background:rgba(255,92,0,0.08);font-size:11px;font-weight:700;color:var(--brand);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:24px;">
+          {market.flag} Coming Soon
+        </div>
+        <h2 style="font-family:'Manrope',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:900;letter-spacing:-1px;line-height:1.15;margin-bottom:16px;">
+          {market.i18nLocale === 'fr' ? 'Soyez le premier. Bloquez le prix de lancement.' :
+           market.i18nLocale === 'it' ? 'Sii il primo. Blocca il prezzo di lancio.' :
+           market.i18nLocale === 'es' ? 'Sé el primero. Bloquea el precio de lanzamiento.' :
+           'Be first. Lock in the launch price.'}
+        </h2>
+        <p style="font-size:15px;color:var(--text-2);line-height:1.7;margin-bottom:32px;">{market.paymentNote}</p>
+        <form id="waitlist-form" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <input id="wl-name" type="text"
+            placeholder={market.i18nLocale === 'fr' ? 'Votre prénom' : market.i18nLocale === 'it' ? 'Il tuo nome' : market.i18nLocale === 'es' ? 'Tu nombre' : 'Your name'}
+            style="flex:1;min-width:150px;padding:12px 18px;border-radius:100px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--text);font-size:14px;outline:none;" />
+          <input id="wl-email" type="email" required
+            placeholder={market.i18nLocale === 'fr' ? 'Votre email' : market.i18nLocale === 'it' ? 'La tua email' : market.i18nLocale === 'es' ? 'Tu email' : 'Your email'}
+            style="flex:1;min-width:200px;padding:12px 18px;border-radius:100px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--text);font-size:14px;outline:none;" />
+          <button type="button" onclick="submitWaitlist()" class="btn-primary" style="white-space:nowrap;padding:12px 24px;font-size:14px;">
+            {market.i18nLocale === 'fr' ? 'Rejoindre la liste →' : market.i18nLocale === 'it' ? 'Unisciti alla lista →' : market.i18nLocale === 'es' ? 'Unirse a la lista →' : 'Join the Waitlist →'}
+          </button>
+        </form>
+        <div id="wl-success" style="display:none;margin-top:20px;padding:12px 24px;border-radius:100px;background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.2);color:#00C853;font-size:14px;font-weight:600;">
+          {market.i18nLocale === 'fr' ? '✓ Vous êtes sur la liste !' : market.i18nLocale === 'it' ? '✓ Sei nella lista!' : market.i18nLocale === 'es' ? '✓ ¡Estás en la lista!' : '✓ You\'re on the list! We\'ll email you when we launch.'}
+        </div>
+      </div>
+    </div>
+  )}
+
   <!-- PRICING -->
   <div style="border-top:1px solid var(--border)">
     <div class="section" id="pricing">
@@ -580,7 +615,11 @@ const market = getMarket(Astro.url.hostname);
             <li>Priority in search results</li>
             <li>Trainer referral programme (20% recurring)</li>
           </ul>
-          <a href="/join" class="pricing-btn pricing-btn-primary">Get the OS →</a>
+          {isPaid ? (
+            <a href="/join" class="pricing-btn pricing-btn-primary">Get the OS →</a>
+          ) : (
+            <a href="#waitlist-section" class="pricing-btn pricing-btn-primary">Join the Waitlist →</a>
+          )}
         </div>
         <div class="pricing-card">
           <div class="pricing-tier">Agency</div>
@@ -623,7 +662,11 @@ const market = getMarket(Astro.url.hostname);
     <p class="cta-bottom-sub">Join UAE personal trainers already building passive income on TrainedBy. Free to start, live in 2 minutes.</p>
     <p class="cta-bottom-guarantee">🛡 ROI Guarantee: 1,000 AED in 30 days or your money back.</p>
     <div class="cta-bottom-actions">
-      <a href="/join" class="btn-primary" style="font-size:16px;padding:16px 32px">Get Your OS Free →</a>
+      {isPaid ? (
+        <a href="/join" class="btn-primary" style="font-size:16px;padding:16px 32px">Get Your OS Free →</a>
+      ) : (
+        <a href="#waitlist-section" class="btn-primary" style="font-size:16px;padding:16px 32px">Join the Waitlist →</a>
+      )}
       <a href="/sarah" class="btn-ghost" style="font-size:16px;padding:16px 32px">See a Live Profile ⊙</a>
     </div>
   </div>
@@ -641,7 +684,27 @@ const market = getMarket(Astro.url.hostname);
     <div class="footer-copy">© {new Date().getFullYear()} TrainedBy.ae · UAE</div>
   </footer>
 
-  <script>
+  <script define:vars={{ market: { market: market.market, waitlistEnabled: market.waitlistEnabled } }}>
+    // Waitlist form submission
+    async function submitWaitlist() {
+      const email = document.getElementById('wl-email').value;
+      const name = document.getElementById('wl-name').value;
+      if (!email) return;
+      const btn = document.querySelector('#waitlist-form button');
+      if (btn) { btn.textContent = '...'; btn.disabled = true; }
+      try {
+        await fetch('https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1/join-waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, name, market: market.market, source_domain: window.location.hostname, role: 'trainer' })
+        });
+        document.getElementById('waitlist-form').style.display = 'none';
+        document.getElementById('wl-success').style.display = 'block';
+      } catch(e) {
+        if (btn) { btn.textContent = 'Try again'; btn.disabled = false; }
+      }
+    }
+
     // Nav scroll effect
     const nav = document.getElementById('nav');
     window.addEventListener('scroll', () => { nav?.classList.toggle('scrolled', window.scrollY > 40); }, { passive: true });

@@ -45,6 +45,17 @@ export interface MarketConfig {
   // i18n
   i18nLocale?: 'en' | 'fr' | 'it' | 'es';
   brandName?: string;
+  // Payment & waitlist
+  paymentEnabled: boolean;
+  waitlistEnabled: boolean;
+  paymentNote?: string;
+  // Market income numbers for landing page calculator
+  incomeSession: string;
+  incomePro: string;
+  incomePassive: string;
+  incomeSessionLabel: string;
+  incomeProLabel: string;
+  incomePassiveLabel: string;
 }
 
 const MARKETS: Record<string, MarketConfig> = {
@@ -63,6 +74,12 @@ const MARKETS: Record<string, MarketConfig> = {
     locale: 'en-AE',
     flag: '🇦🇪',
     phonePrefix: '+971',
+    paymentEnabled: true,
+    waitlistEnabled: false,
+    incomeSession: '8,400', incomePro: '24,600', incomePassive: '6,200',
+    incomeSessionLabel: 'AED/month from 6 clients × 1,400 AED packages',
+    incomeProLabel: 'Sessions + digital products + affiliate commissions',
+    incomePassiveLabel: 'AED while you sleep — digital products & affiliate deals',
     paymentProvider: 'stripe',
     siteTitle: 'TrainedBy.ae — Verified Personal Trainers in the UAE',
     metaDescription: 'Find REPs UAE verified personal trainers in Dubai, Abu Dhabi, and across the UAE. Build your verified trainer profile for free.',
@@ -86,6 +103,12 @@ const MARKETS: Record<string, MarketConfig> = {
     locale: 'en-GB',
     flag: '🇬🇧',
     phonePrefix: '+44',
+    paymentEnabled: true,
+    waitlistEnabled: false,
+    incomeSession: '3,200', incomePro: '9,400', incomePassive: '2,300',
+    incomeSessionLabel: '£/month from 6 clients × £530 packages',
+    incomeProLabel: 'Sessions + digital products + affiliate commissions',
+    incomePassiveLabel: '£ while you sleep — digital products & affiliate deals',
     paymentProvider: 'stripe',
     siteTitle: 'TrainedBy.uk — Verified Personal Trainers in the UK',
     metaDescription: 'Find REPs UK registered personal trainers near you. Build your verified trainer profile for free.',
@@ -111,6 +134,13 @@ const MARKETS: Record<string, MarketConfig> = {
     locale: 'en-IN',
     flag: '🇮🇳',
     phonePrefix: '+91',
+    paymentEnabled: false,
+    waitlistEnabled: true,
+    paymentNote: 'Payments launching soon in India. Join the waitlist for early access and lock in the launch price.',
+    incomeSession: '52,000', incomePro: '1,52,000', incomePassive: '38,000',
+    incomeSessionLabel: '₹/month from 6 clients × ₹8,500 packages',
+    incomeProLabel: 'Sessions + digital products + affiliate commissions',
+    incomePassiveLabel: '₹ while you sleep — digital products & affiliate deals',
     paymentProvider: 'razorpay',
     siteTitle: 'TrainedBy.in — UK-Standard Verified Fitness Professionals in India',
     metaDescription: 'The UK-origin platform for verified personal trainers and fitness coaches in India. Get your UK-Standard Verified badge and grow your client base for free.',
@@ -134,6 +164,12 @@ const MARKETS: Record<string, MarketConfig> = {
     locale: 'en-US',
     flag: '🌍',
     phonePrefix: '+1',
+    paymentEnabled: true,
+    waitlistEnabled: false,
+    incomeSession: '2,400', incomePro: '7,200', incomePassive: '1,800',
+    incomeSessionLabel: '$/month from 6 clients × $400 packages',
+    incomeProLabel: 'Sessions + digital products + affiliate commissions',
+    incomePassiveLabel: '$ while you sleep — digital products & affiliate deals',
     paymentProvider: 'stripe',
     siteTitle: 'TrainedBy — Verified Personal Trainers Worldwide',
     metaDescription: 'The global platform for NASM, ACE, and NSCA certified personal trainers. Build your verified profile for free.',
@@ -159,6 +195,13 @@ const MARKETS: Record<string, MarketConfig> = {
     locale: 'fr-FR',
     flag: '🇫🇷',
     phonePrefix: '+33',
+    paymentEnabled: false,
+    waitlistEnabled: true,
+    paymentNote: 'Les paiements arrivent bientôt en France. Rejoignez la liste d\'attente pour un accès anticipé et bloquez le prix de lancement.',
+    incomeSession: '2,400', incomePro: '7,200', incomePassive: '1,800',
+    incomeSessionLabel: '€/mois de 6 clients × 400€ forfaits',
+    incomeProLabel: 'Séances + produits digitaux + commissions d\'affiliation',
+    incomePassiveLabel: '€ pendant que vous dormez — produits digitaux & affiliation',
     paymentProvider: 'stripe',
     siteTitle: 'CoachéPar — Coachs Sportifs Certifiés en France',
     metaDescription: 'Trouvez un coach sportif certifié BPJEPS ou STAPS près de chez vous. Créez votre profil de coach vérifié gratuitement.',
@@ -184,6 +227,13 @@ const MARKETS: Record<string, MarketConfig> = {
     locale: 'it-IT',
     flag: '🇮🇹',
     phonePrefix: '+39',
+    paymentEnabled: false,
+    waitlistEnabled: true,
+    paymentNote: 'I pagamenti arriveranno presto in Italia. Unisciti alla lista d\'attesa per l\'accesso anticipato e blocca il prezzo di lancio.',
+    incomeSession: '2,400', incomePro: '7,200', incomePassive: '1,800',
+    incomeSessionLabel: '€/mese da 6 clienti × 400€ pacchetti',
+    incomeProLabel: 'Sessioni + prodotti digitali + commissioni di affiliazione',
+    incomePassiveLabel: '€ mentre dormi — prodotti digitali & affiliazione',
     paymentProvider: 'stripe',
     siteTitle: 'AllenatoCon — Personal Trainer Certificati in Italia',
     metaDescription: 'Trova un personal trainer certificato EQF o CONI vicino a te. Crea il tuo profilo verificato gratuitamente.',
@@ -209,6 +259,13 @@ const MARKETS: Record<string, MarketConfig> = {
     locale: 'es-ES',
     flag: '🇪🇸',
     phonePrefix: '+34',
+    paymentEnabled: false,
+    waitlistEnabled: true,
+    paymentNote: 'Los pagos llegarán pronto en España. Únete a la lista de espera para acceso anticipado y bloquea el precio de lanzamiento.',
+    incomeSession: '2,400', incomePro: '7,200', incomePassive: '1,800',
+    incomeSessionLabel: '€/mes de 6 clientes × 400€ paquetes',
+    incomeProLabel: 'Sesiones + productos digitales + comisiones de afiliados',
+    incomePassiveLabel: '€ mientras duermes — productos digitales & afiliación',
     paymentProvider: 'stripe',
     siteTitle: 'EntrenaCon — Entrenadores Personales Certificados',
     metaDescription: 'Encuentra un entrenador personal certificado NSCA, ISSA o CFES cerca de ti. Crea tu perfil verificado gratis.',
@@ -234,6 +291,13 @@ const MARKETS: Record<string, MarketConfig> = {
     locale: 'es-MX',
     flag: '🇲🇽',
     phonePrefix: '+52',
+    paymentEnabled: false,
+    waitlistEnabled: true,
+    paymentNote: 'Los pagos llegarán pronto en México. Únete a la lista de espera para acceso anticipado y bloquea el precio de lanzamiento.',
+    incomeSession: '48,000', incomePro: '1,44,000', incomePassive: '36,000',
+    incomeSessionLabel: 'MX$/mes de 6 clientes × MX$8,000 paquetes',
+    incomeProLabel: 'Sesiones + productos digitales + comisiones de afiliados',
+    incomePassiveLabel: 'MX$ mientras duermes — productos digitales & afiliación',
     paymentProvider: 'stripe',
     siteTitle: 'EntrenaCon — Entrenadores Personales Certificados en México',
     metaDescription: 'Encuentra un entrenador personal certificado CONADE, NSCA o ISSA cerca de ti. Crea tu perfil verificado gratis.',

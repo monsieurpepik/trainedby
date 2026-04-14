@@ -1,0 +1,459 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="TrainedBy — Global Command Centre" description="Super admin dashboard for all markets">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --brand: #FF5C00; --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
+    --surface: #0a0a0a; --surface-2: #111; --surface-3: #1a1a1a; --surface-4: #222;
+    --border: rgba(255,255,255,0.07); --border-2: rgba(255,255,255,0.12);
+    --text: #f2f2f2; --text-2: #888; --green: #00C853; --red: #FF3B3B; --gold: #F5C842;
+  }
+  body { background: var(--surface); color: var(--text); font-family: 'Manrope', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+  .topbar { position: sticky; top: 0; z-index: 100; background: rgba(10,10,10,0.95); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; gap: 24px; }
+  .topbar-logo { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 18px; color: var(--brand); margin-right: auto; }
+  .topbar-badge { padding: 3px 10px; border-radius: 100px; background: rgba(255,92,0,0.12); border: 1px solid rgba(255,92,0,0.25); color: var(--brand); font-size: 11px; font-weight: 700; }
+  .topbar-time { font-size: 12px; color: var(--text-2); }
+  .gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .gate-box { background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 20px; padding: 48px; max-width: 400px; width: 100%; text-align: center; }
+  .gate-title { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 24px; margin-bottom: 8px; }
+  .gate-sub { font-size: 14px; color: var(--text-2); margin-bottom: 28px; }
+  .gate-input { width: 100%; padding: 12px 18px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--surface-3); color: var(--text); font-size: 14px; outline: none; margin-bottom: 12px; }
+  .gate-btn { width: 100%; padding: 12px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 700; border: none; cursor: pointer; }
+  .main { display: none; padding: 32px; max-width: 1400px; margin: 0 auto; }
+  .page-title { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 32px; letter-spacing: -1px; margin-bottom: 4px; }
+  .page-sub { font-size: 14px; color: var(--text-2); margin-bottom: 32px; }
+
+  /* GLOBAL KPIs */
+  .global-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .kpi { background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+  .kpi.highlight { border-color: var(--brand-border); background: var(--brand-dim); }
+  .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .kpi-value { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 28px; letter-spacing: -1px; }
+  .kpi-sub { font-size: 11px; color: var(--text-2); margin-top: 4px; }
+
+  /* MARKET GRID */
+  .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin-bottom: 40px; }
+  .market-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+  .market-card.live { border-color: rgba(0,200,83,0.2); }
+  .market-card.waitlist { border-color: rgba(255,92,0,0.15); }
+  .market-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .market-flag { font-size: 24px; }
+  .market-name { font-family: 'Manrope',sans-serif; font-weight: 800; font-size: 18px; }
+  .market-domain { font-size: 12px; color: var(--text-2); }
+  .market-status { margin-left: auto; padding: 3px 10px; border-radius: 100px; font-size: 10px; font-weight: 700; }
+  .status-live { background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.2); color: var(--green); }
+  .status-waitlist { background: rgba(255,92,0,0.1); border: 1px solid rgba(255,92,0,0.2); color: var(--brand); }
+  .market-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .mstat { background: var(--surface-3); border-radius: 10px; padding: 12px; text-align: center; }
+  .mstat-val { font-family: 'Manrope',sans-serif; font-weight: 800; font-size: 20px; }
+  .mstat-label { font-size: 10px; color: var(--text-2); margin-top: 2px; }
+  .market-revenue { margin-top: 12px; padding: 12px; background: var(--surface-3); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .rev-label { font-size: 11px; color: var(--text-2); }
+  .rev-value { font-family: 'Manrope',sans-serif; font-weight: 800; font-size: 16px; color: var(--brand); }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+  .tab { padding: 10px 20px; border-radius: 8px 8px 0 0; font-size: 13px; font-weight: 600; color: var(--text-2); cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab.active { color: var(--brand); border-bottom-color: var(--brand); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; font-size: 10px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border); }
+  td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:hover td { background: var(--surface-3); }
+  .badge { display: inline-flex; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+  .badge-green { background: rgba(0,200,83,0.1); color: var(--green); }
+  .badge-orange { background: rgba(255,92,0,0.1); color: var(--brand); }
+  .badge-gray { background: rgba(255,255,255,0.06); color: var(--text-2); }
+  .badge-red { background: rgba(255,59,59,0.1); color: var(--red); }
+
+  /* WAITLIST TABLE */
+  .waitlist-filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filter-btn { padding: 6px 14px; border-radius: 100px; border: 1px solid var(--border-2); background: none; color: var(--text-2); font-size: 12px; cursor: pointer; }
+  .filter-btn.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+  /* REFRESH */
+  .refresh-btn { padding: 8px 16px; border-radius: 100px; background: var(--surface-3); border: 1px solid var(--border-2); color: var(--text-2); font-size: 12px; font-weight: 600; cursor: pointer; }
+  .refresh-btn:hover { color: var(--text); }
+
+  @media (max-width: 640px) { .main { padding: 16px; } .market-grid { grid-template-columns: 1fr; } .global-kpis { grid-template-columns: repeat(2, 1fr); } }
+</style>
+
+<!-- AUTH GATE -->
+<div id="gate" class="gate">
+  <div class="gate-box">
+    <div style="font-size:32px;margin-bottom:16px">🌍</div>
+    <div class="gate-title">Global Command Centre</div>
+    <div class="gate-sub">Enter your admin password to access all markets</div>
+    <input id="gate-input" class="gate-input" type="password" placeholder="Admin password" onkeydown="if(event.key==='Enter')checkGate()" />
+    <button class="gate-btn" onclick="checkGate()">Access Dashboard →</button>
+    <div id="gate-error" style="color:#FF3B3B;font-size:12px;margin-top:12px;display:none">Incorrect password</div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar" style="display:none">
+  <div class="topbar-logo">TrainedBy</div>
+  <div class="topbar-badge">Global Command Centre</div>
+  <div class="topbar-time" id="clock"></div>
+  <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+</div>
+
+<!-- MAIN DASHBOARD -->
+<div class="main" id="main">
+  <div class="page-title">Global Overview</div>
+  <div class="page-sub" id="last-updated">Loading...</div>
+
+  <!-- GLOBAL KPIs -->
+  <div class="global-kpis" id="global-kpis">
+    <div class="kpi highlight"><div class="kpi-label">Total Trainers</div><div class="kpi-value" id="g-trainers">—</div><div class="kpi-sub">across all markets</div></div>
+    <div class="kpi"><div class="kpi-label">Pro Subscribers</div><div class="kpi-value" id="g-pro">—</div><div class="kpi-sub">paying trainers</div></div>
+    <div class="kpi"><div class="kpi-label">Verified</div><div class="kpi-value" id="g-verified">—</div><div class="kpi-sub">cert verified</div></div>
+    <div class="kpi"><div class="kpi-label">Waitlist</div><div class="kpi-value" id="g-waitlist">—</div><div class="kpi-sub">across 4 markets</div></div>
+    <div class="kpi"><div class="kpi-label">New This Week</div><div class="kpi-value" id="g-week">—</div><div class="kpi-sub">trainer signups</div></div>
+    <div class="kpi highlight"><div class="kpi-label">Est. MRR</div><div class="kpi-value" id="g-mrr">—</div><div class="kpi-sub">all markets</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('markets')">Markets</button>
+    <button class="tab" onclick="switchTab('trainers')">All Trainers</button>
+    <button class="tab" onclick="switchTab('waitlist')">Waitlist</button>
+    <button class="tab" onclick="switchTab('revenue')">Revenue</button>
+  </div>
+
+  <!-- MARKETS TAB -->
+  <div class="tab-panel active" id="tab-markets">
+    <div class="market-grid" id="market-grid">
+      <div style="color:var(--text-2);font-size:14px">Loading market data...</div>
+    </div>
+  </div>
+
+  <!-- TRAINERS TAB -->
+  <div class="tab-panel" id="tab-trainers">
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+      <input id="trainer-search" type="text" placeholder="Search by name, email, market..." style="flex:1;min-width:200px;padding:10px 16px;border-radius:100px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--text);font-size:13px;outline:none;" oninput="filterTrainers()" />
+      <select id="trainer-market-filter" style="padding:10px 16px;border-radius:100px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--text);font-size:13px;outline:none;" onchange="filterTrainers()">
+        <option value="">All Markets</option>
+        <option value="ae">UAE</option>
+        <option value="uk">UK</option>
+        <option value="com">Global</option>
+        <option value="in">India</option>
+        <option value="fr">France</option>
+        <option value="it">Italy</option>
+        <option value="es">Spain</option>
+        <option value="mx">Mexico</option>
+      </select>
+      <select id="trainer-plan-filter" style="padding:10px 16px;border-radius:100px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--text);font-size:13px;outline:none;" onchange="filterTrainers()">
+        <option value="">All Plans</option>
+        <option value="pro">Pro</option>
+        <option value="free">Free</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Trainer</th><th>Market</th><th>Plan</th><th>Verified</th><th>Joined</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="trainers-tbody"><tr><td colspan="6" style="color:var(--text-2);text-align:center;padding:32px">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- WAITLIST TAB -->
+  <div class="tab-panel" id="tab-waitlist">
+    <div class="waitlist-filters" id="waitlist-filters">
+      <button class="filter-btn active" onclick="filterWaitlist('all', this)">All</button>
+      <button class="filter-btn" onclick="filterWaitlist('fr', this)">🇫🇷 France</button>
+      <button class="filter-btn" onclick="filterWaitlist('it', this)">🇮🇹 Italy</button>
+      <button class="filter-btn" onclick="filterWaitlist('es', this)">🇪🇸 Spain</button>
+      <button class="filter-btn" onclick="filterWaitlist('mx', this)">🇲🇽 Mexico</button>
+      <button class="filter-btn" onclick="filterWaitlist('in', this)">🇮🇳 India</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Email</th><th>Name</th><th>Market</th><th>Role</th><th>Source</th><th>Signed Up</th>
+        </tr></thead>
+        <tbody id="waitlist-tbody"><tr><td colspan="6" style="color:var(--text-2);text-align:center;padding:32px">Loading...</td></tr></tbody>
+      </table>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:12px;">
+      <button onclick="exportWaitlist()" style="padding:8px 20px;border-radius:100px;background:var(--surface-3);border:1px solid var(--border-2);color:var(--text);font-size:12px;cursor:pointer;">Export CSV</button>
+    </div>
+  </div>
+
+  <!-- REVENUE TAB -->
+  <div class="tab-panel" id="tab-revenue">
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Market</th><th>Brand</th><th>Currency</th><th>Pro Trainers</th><th>Est. MRR</th><th>Academy Revenue</th><th>Total Revenue</th><th>Payment Status</th>
+        </tr></thead>
+        <tbody id="revenue-tbody"><tr><td colspan="8" style="color:var(--text-2);text-align:center;padding:32px">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MzE5NTIsImV4cCI6MjA2MDIwNzk1Mn0.Yd4OGMBqwvLz5_6vFAFqBNRLNFBMXCRKFiGJFCqQUYI';
+  const ADMIN_SECRET = 'trainedby-admin-2026';
+
+  let allTrainers = [];
+  let allWaitlist = [];
+  let currentWaitlistFilter = 'all';
+
+  const MARKET_META = {
+    ae: { flag: '🇦🇪', name: 'TrainedBy UAE', domain: 'trainedby.ae', live: true, currency: 'AED', proPrice: 149 },
+    uk: { flag: '🇬🇧', name: 'TrainedBy UK', domain: 'trainedby.uk', live: true, currency: 'GBP', proPrice: 9.99 },
+    com: { flag: '🌍', name: 'TrainedBy Global', domain: 'trainedby.com', live: true, currency: 'USD', proPrice: 19 },
+    in: { flag: '🇮🇳', name: 'TrainedBy India', domain: 'trainedby.in', live: false, currency: 'INR', proPrice: 499 },
+    fr: { flag: '🇫🇷', name: 'CoachéPar', domain: 'coachepar.fr', live: false, currency: 'EUR', proPrice: 19 },
+    it: { flag: '🇮🇹', name: 'AllenatoCon', domain: 'allenaticon.it', live: false, currency: 'EUR', proPrice: 19 },
+    es: { flag: '🇪🇸', name: 'EntrenaCon', domain: 'entrenacon.com', live: false, currency: 'EUR', proPrice: 19 },
+    mx: { flag: '🇲🇽', name: 'EntrenaCon MX', domain: 'entrenacon.mx', live: false, currency: 'MXN', proPrice: 399 },
+  };
+
+  function checkGate() {
+    const val = document.getElementById('gate-input').value;
+    if (val === ADMIN_SECRET) {
+      document.getElementById('gate').style.display = 'none';
+      document.getElementById('topbar').style.display = 'flex';
+      document.getElementById('main').style.display = 'block';
+      startClock();
+      loadAll();
+    } else {
+      document.getElementById('gate-error').style.display = 'block';
+    }
+  }
+
+  function startClock() {
+    function tick() {
+      document.getElementById('clock').textContent = new Date().toUTCString().replace(' GMT', ' UTC');
+    }
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  async function sbFetch(path) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': `Bearer ${SUPABASE_ANON}`,
+        'x-admin-secret': ADMIN_SECRET,
+        'Prefer': 'return=representation'
+      }
+    });
+    if (!res.ok) return [];
+    return res.json();
+  }
+
+  async function loadAll() {
+    document.getElementById('last-updated').textContent = 'Refreshing...';
+    await Promise.all([loadGlobalStats(), loadTrainers(), loadWaitlist(), loadRevenue()]);
+    document.getElementById('last-updated').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+  }
+
+  async function loadGlobalStats() {
+    const [trainers, waitlist] = await Promise.all([
+      sbFetch('trainers?select=id,plan,market,verification_status,created_at'),
+      sbFetch('market_waitlist?select=id,market')
+    ]);
+
+    const total = trainers.length;
+    const pro = trainers.filter(t => t.plan === 'pro').length;
+    const verified = trainers.filter(t => t.verification_status === 'verified').length;
+    const week = trainers.filter(t => new Date(t.created_at) > new Date(Date.now() - 7*24*60*60*1000)).length;
+    const wl = waitlist.length;
+
+    // Estimate MRR
+    let mrr = 0;
+    trainers.filter(t => t.plan === 'pro').forEach(t => {
+      const m = MARKET_META[t.market];
+      if (m) mrr += m.proPrice;
+    });
+
+    document.getElementById('g-trainers').textContent = total.toLocaleString();
+    document.getElementById('g-pro').textContent = pro.toLocaleString();
+    document.getElementById('g-verified').textContent = verified.toLocaleString();
+    document.getElementById('g-waitlist').textContent = wl.toLocaleString();
+    document.getElementById('g-week').textContent = `+${week}`;
+    document.getElementById('g-mrr').textContent = `~$${Math.round(mrr).toLocaleString()}`;
+
+    // Build market cards
+    const byMarket = {};
+    trainers.forEach(t => {
+      if (!byMarket[t.market]) byMarket[t.market] = { total: 0, pro: 0, verified: 0 };
+      byMarket[t.market].total++;
+      if (t.plan === 'pro') byMarket[t.market].pro++;
+      if (t.verification_status === 'verified') byMarket[t.market].verified++;
+    });
+    const wlByMarket = {};
+    waitlist.forEach(w => {
+      wlByMarket[w.market] = (wlByMarket[w.market] || 0) + 1;
+    });
+
+    const grid = document.getElementById('market-grid');
+    grid.innerHTML = Object.entries(MARKET_META).map(([key, m]) => {
+      const stats = byMarket[key] || { total: 0, pro: 0, verified: 0 };
+      const wlCount = wlByMarket[key] || 0;
+      const mrr = stats.pro * m.proPrice;
+      return `
+        <div class="market-card ${m.live ? 'live' : 'waitlist'}">
+          <div class="market-header">
+            <div class="market-flag">${m.flag}</div>
+            <div>
+              <div class="market-name">${m.name}</div>
+              <div class="market-domain">${m.domain}</div>
+            </div>
+            <div class="market-status ${m.live ? 'status-live' : 'status-waitlist'}">${m.live ? 'LIVE' : 'WAITLIST'}</div>
+          </div>
+          <div class="market-stats">
+            <div class="mstat"><div class="mstat-val">${stats.total}</div><div class="mstat-label">Trainers</div></div>
+            <div class="mstat"><div class="mstat-val">${stats.pro}</div><div class="mstat-label">Pro</div></div>
+            <div class="mstat"><div class="mstat-val">${m.live ? stats.verified : wlCount}</div><div class="mstat-label">${m.live ? 'Verified' : 'Waitlist'}</div></div>
+          </div>
+          ${m.live ? `
+          <div class="market-revenue">
+            <div class="rev-label">Est. MRR</div>
+            <div class="rev-value">${m.currency} ${mrr.toLocaleString()}</div>
+          </div>` : `
+          <div class="market-revenue">
+            <div class="rev-label">Payments</div>
+            <div class="rev-value" style="color:var(--text-2);font-size:13px;">Coming soon</div>
+          </div>`}
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function loadTrainers() {
+    allTrainers = await sbFetch('trainers?select=id,full_name,email,market,plan,verification_status,created_at,slug&order=created_at.desc&limit=500');
+    renderTrainers(allTrainers);
+  }
+
+  function renderTrainers(trainers) {
+    const tbody = document.getElementById('trainers-tbody');
+    if (!trainers.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-2);text-align:center;padding:32px">No trainers found</td></tr>'; return; }
+    tbody.innerHTML = trainers.map(t => {
+      const m = MARKET_META[t.market] || { flag: '?', name: t.market };
+      const planBadge = t.plan === 'pro' ? '<span class="badge badge-orange">PRO</span>' : '<span class="badge badge-gray">FREE</span>';
+      const verBadge = t.verification_status === 'verified' ? '<span class="badge badge-green">✓ Verified</span>' :
+                       t.verification_status === 'pending' ? '<span class="badge badge-orange">Pending</span>' :
+                       '<span class="badge badge-gray">Unverified</span>';
+      const joined = new Date(t.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'2-digit' });
+      return `<tr>
+        <td><div style="font-weight:600">${t.full_name || '—'}</div><div style="font-size:11px;color:var(--text-2)">${t.email || ''}</div></td>
+        <td>${m.flag} ${m.name}</td>
+        <td>${planBadge}</td>
+        <td>${verBadge}</td>
+        <td style="color:var(--text-2)">${joined}</td>
+        <td><a href="/${t.slug || t.id}" target="_blank" style="color:var(--brand);font-size:12px;text-decoration:none">View →</a></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function filterTrainers() {
+    const search = document.getElementById('trainer-search').value.toLowerCase();
+    const market = document.getElementById('trainer-market-filter').value;
+    const plan = document.getElementById('trainer-plan-filter').value;
+    const filtered = allTrainers.filter(t => {
+      const matchSearch = !search || (t.full_name || '').toLowerCase().includes(search) || (t.email || '').toLowerCase().includes(search);
+      const matchMarket = !market || t.market === market;
+      const matchPlan = !plan || t.plan === plan;
+      return matchSearch && matchMarket && matchPlan;
+    });
+    renderTrainers(filtered);
+  }
+
+  async function loadWaitlist() {
+    allWaitlist = await sbFetch('market_waitlist?select=*&order=created_at.desc&limit=1000');
+    renderWaitlist(allWaitlist);
+  }
+
+  function renderWaitlist(list) {
+    const tbody = document.getElementById('waitlist-tbody');
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-2);text-align:center;padding:32px">No waitlist entries yet</td></tr>'; return; }
+    tbody.innerHTML = list.map(w => {
+      const m = MARKET_META[w.market] || { flag: '?', name: w.market };
+      const joined = new Date(w.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'2-digit' });
+      const roleBadge = w.role === 'trainer' ? '<span class="badge badge-orange">Trainer</span>' : '<span class="badge badge-gray">Client</span>';
+      return `<tr>
+        <td style="font-weight:500">${w.email}</td>
+        <td style="color:var(--text-2)">${w.name || '—'}</td>
+        <td>${m.flag} ${m.name}</td>
+        <td>${roleBadge}</td>
+        <td style="font-size:11px;color:var(--text-2)">${w.source_domain || '—'}</td>
+        <td style="color:var(--text-2)">${joined}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function filterWaitlist(market, btn) {
+    currentWaitlistFilter = market;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filtered = market === 'all' ? allWaitlist : allWaitlist.filter(w => w.market === market);
+    renderWaitlist(filtered);
+  }
+
+  function exportWaitlist() {
+    const list = currentWaitlistFilter === 'all' ? allWaitlist : allWaitlist.filter(w => w.market === currentWaitlistFilter);
+    const csv = ['Email,Name,Market,Role,Source,Signed Up', ...list.map(w =>
+      `"${w.email}","${w.name || ''}","${w.market}","${w.role || ''}","${w.source_domain || ''}","${w.created_at}"`
+    )].join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = `waitlist-${currentWaitlistFilter}-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+  }
+
+  async function loadRevenue() {
+    const trainers = await sbFetch('trainers?select=market,plan');
+    const byMarket = {};
+    trainers.forEach(t => {
+      if (!byMarket[t.market]) byMarket[t.market] = { pro: 0 };
+      if (t.plan === 'pro') byMarket[t.market].pro++;
+    });
+
+    const tbody = document.getElementById('revenue-tbody');
+    let totalMRR = 0;
+    tbody.innerHTML = Object.entries(MARKET_META).map(([key, m]) => {
+      const stats = byMarket[key] || { pro: 0 };
+      const mrr = stats.pro * m.proPrice;
+      totalMRR += mrr;
+      const payStatus = m.live ? '<span class="badge badge-green">Live</span>' : '<span class="badge badge-orange">Coming Soon</span>';
+      return `<tr>
+        <td>${m.flag} ${key.toUpperCase()}</td>
+        <td style="font-weight:600">${m.name}</td>
+        <td>${m.currency}</td>
+        <td style="text-align:center">${stats.pro}</td>
+        <td style="font-weight:700;color:var(--brand)">${m.currency} ${mrr.toLocaleString()}</td>
+        <td style="color:var(--text-2)">—</td>
+        <td style="font-weight:700">${m.currency} ${mrr.toLocaleString()}</td>
+        <td>${payStatus}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById(`tab-${tab}`).classList.add('active');
+  }
+
+  // Enter key on gate
+  document.getElementById('gate-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkGate();
+  });
+</script>
+</Base>
