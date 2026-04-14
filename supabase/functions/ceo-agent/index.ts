@@ -148,6 +148,21 @@ async function handleTelegramUpdate(req: Request): Promise<Response> {
       case '/help':
         await handleHelp(chatId);
         break;
+      case '/global':
+        await handleGlobal(chatId);
+        break;
+      case '/waitlist':
+        await handleWaitlist(chatId, args);
+        break;
+      case '/markets':
+        await handleMarkets(chatId);
+        break;
+      case '/pending':
+        await handlePending(chatId);
+        break;
+      case '/academy':
+        await handleAcademy(chatId);
+        break;
       case '/learn':
         if (!args) {
           await sendMessage(chatId, '📚 Usage: `/learn <topic>`\n\nExamples:\n`/learn hormozi` — show all Hormozi frameworks\n`/learn growth` — show all growth frameworks\n`/learn pricing` — show pricing frameworks');
@@ -211,7 +226,12 @@ What do you want to know?`);
 async function handleHelp(chatId: number): Promise<void> {
   await sendMessage(chatId, `*TrainedBy CEO Agent — Commands*
 
-/status — Live health check + key metrics
+  /status — Live health check + key metrics
+/global — All markets overview (trainers, MRR, waitlist)
+/markets — Per-market breakdown table
+/waitlist [market] — Latest waitlist signups
+/pending — Cert reviews awaiting approval
+/academy — Academy bookings and revenue
 /growth — Trigger growth agent digest now
 /content — Generate + publish a new blog post
 /meta — Run product improvement memo now
@@ -789,4 +809,177 @@ async function handleNotify(req: Request): Promise<Response> {
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
+}
+
+// ── New global dashboard commands ─────────────────────────────────────────────
+
+async function handleGlobal(chatId: number): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+
+  const [trainers, waitlist, certReviews, academyBookings] = await Promise.all([
+    sb.from('trainers').select('plan, market, created_at'),
+    sb.from('market_waitlist').select('market', { count: 'exact' }),
+    sb.from('cert_reviews').select('final_status').eq('final_status', 'pending'),
+    sb.from('academy_bookings').select('amount_paid, status').eq('status', 'confirmed'),
+  ]);
+
+  const allTrainers = trainers.data ?? [];
+  const totalTrainers = allTrainers.length;
+  const proTrainers = allTrainers.filter((t: { plan: string }) => t.plan === 'pro').length;
+  const freeTrainers = totalTrainers - proTrainers;
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const newThisWeek = allTrainers.filter((t: { created_at: string }) => new Date(t.created_at) > weekAgo).length;
+  const mrrAed = proTrainers * 149;
+  const totalWaitlist = waitlist.count ?? 0;
+  const pendingCerts = certReviews.data?.length ?? 0;
+  const academyRevenue = (academyBookings.data ?? []).reduce((sum: number, b: { amount_paid: number }) => sum + (b.amount_paid ?? 0), 0);
+
+  // Market breakdown
+  const marketCounts: Record<string, { total: number; pro: number }> = {};
+  for (const t of allTrainers as { plan: string; market: string }[]) {
+    const m = t.market ?? 'ae';
+    if (!marketCounts[m]) marketCounts[m] = { total: 0, pro: 0 };
+    marketCounts[m].total++;
+    if (t.plan === 'pro') marketCounts[m].pro++;
+  }
+
+  const marketLines = Object.entries(marketCounts)
+    .sort((a, b) => b[1].total - a[1].total)
+    .map(([m, c]) => `  ${m.toUpperCase()}: ${c.total} trainers (${c.pro} Pro)`)
+    .join('\n');
+
+  await sendMessage(chatId, `🌍 *TrainedBy Global Dashboard*
+
+👥 *Trainers*
+  Total: *${totalTrainers}* | Pro: *${proTrainers}* | Free: *${freeTrainers}*
+  New this week: *${newThisWeek}*
+
+💰 *Revenue*
+  Trainer MRR: *${mrrAed} AED* (~$${Math.round(mrrAed / 3.67)})
+  Academy revenue: *${academyRevenue.toFixed(0)} AED*
+
+📋 *Pipeline*
+  Waitlist signups: *${totalWaitlist}* (unlaunched markets)
+  Cert reviews pending: *${pendingCerts}*
+
+🗺 *By Market*
+${marketLines || '  No market data yet'}
+
+Use /markets for full breakdown | /waitlist for signups | /pending for cert queue`);
+}
+
+async function handleMarkets(chatId: number): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+
+  const [trainers, waitlist] = await Promise.all([
+    sb.from('trainers').select('plan, market'),
+    sb.from('market_waitlist').select('market'),
+  ]);
+
+  const MARKETS = [
+    { code: 'ae', name: 'UAE 🇦🇪', currency: 'AED', price: 149, live: true },
+    { code: 'uk', name: 'UK 🇬🇧', currency: 'GBP', price: 39, live: true },
+    { code: 'us', name: 'US 🇺🇸', currency: 'USD', price: 49, live: true },
+    { code: 'in', name: 'India 🇮🇳', currency: 'INR', price: 1999, live: false },
+    { code: 'fr', name: 'France 🇫🇷', currency: 'EUR', price: 39, live: false },
+    { code: 'it', name: 'Italy 🇮🇹', currency: 'EUR', price: 39, live: false },
+    { code: 'es', name: 'Spain 🇪🇸', currency: 'EUR', price: 39, live: false },
+    { code: 'mx', name: 'Mexico 🇲🇽', currency: 'MXN', price: 399, live: false },
+  ];
+
+  const trainerData = trainers.data ?? [];
+  const waitlistData = waitlist.data ?? [];
+
+  const lines = MARKETS.map(m => {
+    const mTrainers = trainerData.filter((t: { market: string }) => (t.market ?? 'ae') === m.code);
+    const mPro = mTrainers.filter((t: { plan: string }) => t.plan === 'pro').length;
+    const mWait = waitlistData.filter((w: { market: string }) => w.market === m.code).length;
+    const mMrr = mPro * m.price;
+    const status = m.live ? '🟢' : '🟡';
+    return `${status} *${m.name}*\n   Trainers: ${mTrainers.length} (${mPro} Pro) | MRR: ${mMrr} ${m.currency}${!m.live ? ` | Waitlist: ${mWait}` : ''}`;
+  }).join('\n\n');
+
+  await sendMessage(chatId, `🗺 *Market Breakdown*\n\n${lines}\n\n🟢 Live | 🟡 Waitlist mode`);
+}
+
+async function handleWaitlist(chatId: number, filter: string): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+
+  let query = sb.from('market_waitlist').select('name, email, market, source_domain, role, created_at').order('created_at', { ascending: false }).limit(15);
+  if (filter) query = query.eq('market', filter.toLowerCase().trim());
+
+  const { data, count } = await query;
+
+  if (!data || data.length === 0) {
+    await sendMessage(chatId, `📋 No waitlist signups yet${filter ? ` for market "${filter}"` : ''}.\n\nWaitlist is active on: IN, FR, IT, ES, MX`);
+    return;
+  }
+
+  const list = (data as Array<{ name: string; email: string; market: string; role: string; created_at: string }>)
+    .map((w, i) => `${i + 1}. *${w.name || 'Anonymous'}* (${w.market.toUpperCase()})\n   ${w.email} | ${w.role} | ${new Date(w.created_at).toLocaleDateString('en-AE')}`)
+    .join('\n\n');
+
+  await sendMessage(chatId, `📋 *Waitlist Signups*${filter ? ` — ${filter.toUpperCase()}` : ' — All Markets'}\n\n${list}\n\nUse /waitlist fr, /waitlist it, /waitlist es etc. to filter by market.`);
+}
+
+async function handlePending(chatId: number): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+
+  const { data } = await sb
+    .from('cert_reviews')
+    .select('id, trainer_id, extracted_name, issuing_body, expiry_date, claude_confidence, created_at')
+    .eq('final_status', 'pending')
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  if (!data || data.length === 0) {
+    await sendMessage(chatId, '✅ No pending cert reviews. All clear!');
+    return;
+  }
+
+  const list = (data as Array<{ id: string; trainer_id: string; extracted_name: string; issuing_body: string; expiry_date: string; claude_confidence: number; created_at: string }>)
+    .map((r, i) => `${i + 1}. *${r.extracted_name || 'Unknown'}*\n   ${r.issuing_body || 'Unknown body'} | Expires: ${r.expiry_date || 'N/A'}\n   Confidence: ${Math.round((r.claude_confidence ?? 0) * 100)}% | ${new Date(r.created_at).toLocaleDateString('en-AE')}\n   ID: \`${r.id.substring(0, 8)}\``)
+    .join('\n\n');
+
+  await sendMessage(chatId, `⏳ *Pending Cert Reviews* (${data.length})\n\n${list}\n\nReview at: trainedby.ae/admin → Verification Queue`);
+}
+
+async function handleAcademy(chatId: number): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+
+  const [academies, bookings] = await Promise.all([
+    sb.from('academies').select('name, sport, city, plan, created_at'),
+    sb.from('academy_bookings').select('amount_paid, platform_fee, status, created_at').order('created_at', { ascending: false }).limit(50),
+  ]);
+
+  const allAcademies = academies.data ?? [];
+  const allBookings = bookings.data ?? [];
+  const confirmedBookings = allBookings.filter((b: { status: string }) => b.status === 'confirmed');
+  const totalRevenue = confirmedBookings.reduce((sum: number, b: { amount_paid: number }) => sum + (b.amount_paid ?? 0), 0);
+  const totalFees = confirmedBookings.reduce((sum: number, b: { platform_fee: number }) => sum + (b.platform_fee ?? 0), 0);
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const bookingsThisWeek = confirmedBookings.filter((b: { created_at: string }) => new Date(b.created_at) > weekAgo).length;
+
+  const academyList = allAcademies.slice(0, 5).map((a: { name: string; sport: string; city: string; plan: string }, i: number) =>
+    `  ${i + 1}. *${a.name}* — ${a.sport} | ${a.city} | ${a.plan}`
+  ).join('\n');
+
+  await sendMessage(chatId, `🏟 *Academy Module*
+
+🏫 *Academies*
+  Total registered: *${allAcademies.length}*
+${academyList || '  None yet'}
+
+💰 *Bookings*
+  Total confirmed: *${confirmedBookings.length}*
+  This week: *${bookingsThisWeek}*
+  Gross revenue: *${totalRevenue.toFixed(0)} AED*
+  Platform fees (10%): *${totalFees.toFixed(0)} AED*
+
+To onboard an academy: POST to /functions/v1/create-academy`);
 }
