@@ -32,6 +32,27 @@ serve(async (req) => {
             subscription_status: "active",
             stripe_subscription_id: session.subscription as string,
           }).eq("id", trainer_id);
+
+          // Fetch trainer details for notifications
+          const { data: trainer } = await sb.from("trainers").select("name, email").eq("id", trainer_id).single();
+          const SELF_BASE = `https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1`;
+          const svcKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+          // Telegram alert to founder
+          if (trainer) {
+            fetch(`${SELF_BASE}/ceo-agent/notify`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${svcKey}` },
+              body: JSON.stringify({ type: 'pro_upgrade', data: { name: trainer.name, email: trainer.email } })
+            }).catch(() => {});
+
+            // Pro welcome lifecycle email
+            fetch(`${SELF_BASE}/lifecycle-email`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${svcKey}` },
+              body: JSON.stringify({ trainer_id, type: 'pro_welcome' })
+            }).catch(() => {});
+          }
         }
         break;
       }

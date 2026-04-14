@@ -203,6 +203,30 @@ serve(async (req) => {
     // ── Send welcome email ─────────────────────────────────────────────────────
     await sendWelcomeEmail(cleanEmail, slug, token, false);
 
+    // ── Notify CEO agent (Telegram alert) ─────────────────────────────────────
+    const SELF_BASE = `https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1`;
+    fetch(`${SELF_BASE}/ceo-agent/notify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` },
+      body: JSON.stringify({
+        type: 'new_signup',
+        data: {
+          name: cleanName,
+          email: cleanEmail,
+          city: null,
+          reps_verified: false,
+          completion_pct: cleanSpecialties.length > 0 ? 10 : 0,
+        }
+      })
+    }).catch(() => {}); // Non-fatal
+
+    // ── Queue lifecycle welcome email (via lifecycle-email function) ────────────
+    fetch(`${SELF_BASE}/lifecycle-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` },
+      body: JSON.stringify({ trainer_id: trainer.id, type: 'welcome' })
+    }).catch(() => {}); // Non-fatal
+
     return new Response(JSON.stringify({ ok: true, slug, trainer_id: trainer.id }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

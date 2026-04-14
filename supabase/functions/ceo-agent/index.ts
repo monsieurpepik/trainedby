@@ -477,6 +477,43 @@ async function handleNotify(req: Request): Promise<Response> {
       case 'meta_memo':
         await sendMessage(chatId, `🧠 *Weekly Product Memo ready*\n\n${data.summary ?? 'Check /memo for details'}`);
         break;
+      case 'new_signup': {
+        const t = data as any;
+        const pct = t.completion_pct ?? 0;
+        const bar = '█'.repeat(Math.round(pct / 10)) + '░'.repeat(10 - Math.round(pct / 10));
+        await sendMessage(chatId,
+          `🆕 *New trainer signed up*\n\n` +
+          `👤 *${t.name}*\n` +
+          `📧 ${t.email}\n` +
+          `📍 ${t.city || 'City not set'}\n` +
+          `🏅 REPs: ${t.reps_verified ? '✓ Verified' : 'Not yet'}\n` +
+          `📊 Profile: ${bar} ${pct}%\n\n` +
+          `Reply within the hour for best conversion.`
+        );
+        break;
+      }
+      case 'pro_upgrade': {
+        const t = data as any;
+        await sendMessage(chatId,
+          `💰 *Pro upgrade!*\n\n` +
+          `👤 *${t.name}*\n` +
+          `📧 ${t.email}\n` +
+          `💳 149 AED/month\n\n` +
+          `That's your MRR growing. Send them the Pro welcome email.`
+        );
+        break;
+      }
+      case 'first_lead': {
+        const t = data as any;
+        await sendMessage(chatId,
+          `🎯 *First lead for a trainer*\n\n` +
+          `Trainer: *${t.trainer_name}*\n` +
+          `Lead: ${t.lead_name} (${t.lead_email || 'no email'})\n` +
+          `Interest: ${t.interest || 'General enquiry'}\n\n` +
+          `The trainer has been notified. This is the moment they decide if TrainedBy is worth it.`
+        );
+        break;
+      }
       case 'anomaly':
         await sendMessage(chatId, `🚨 *Anomaly detected*\n\n${data.message}`);
         break;

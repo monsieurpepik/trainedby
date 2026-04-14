@@ -1,0 +1,558 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base
+  title="Admin CRM — TrainedBy"
+  description="Internal trainer CRM dashboard."
+>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --brand: #FF5C00; --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
+  --reps: #00C853; --reps-dim: rgba(0,200,83,0.08); --reps-border: rgba(0,200,83,0.2);
+  --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c; --surface-4: #242424;
+  --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.14);
+  --text: #fff; --text-muted: rgba(255,255,255,0.5); --text-faint: rgba(255,255,255,0.25);
+  --danger: #ff4444; --warning: #ffaa00; --success: #00C853;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--surface); color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; min-height: 100vh;
+}
+.admin-wrap { max-width: 1200px; margin: 0 auto; padding: 24px 20px 80px; }
+
+/* Header */
+.admin-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
+}
+.admin-title {
+  font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800;
+}
+.admin-title span { color: var(--brand); }
+.admin-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.admin-actions { display: flex; gap: 10px; }
+.btn {
+  padding: 9px 16px; border-radius: 10px; font-size: 12px; font-weight: 700;
+  cursor: pointer; border: none; transition: all 0.2s; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover { background: #e05200; }
+.btn-ghost { background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted); }
+.btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
+
+/* KPI row */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.kpi-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px;
+}
+.kpi-card.brand { background: var(--brand-dim); border-color: var(--brand-border); }
+.kpi-card.green { background: var(--reps-dim); border-color: var(--reps-border); }
+.kpi-value {
+  font-family: 'Manrope', sans-serif; font-size: 28px; font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.kpi-card.brand .kpi-value { color: var(--brand); }
+.kpi-card.green .kpi-value { color: var(--reps); }
+.kpi-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+
+/* Filters */
+.filters {
+  display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+}
+.filter-input {
+  flex: 1; min-width: 200px; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 9px 14px; color: var(--text); font-size: 13px; outline: none;
+}
+.filter-input:focus { border-color: var(--brand-border); }
+.filter-input::placeholder { color: var(--text-faint); }
+.filter-select {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 9px 14px; color: var(--text-muted); font-size: 12px;
+  outline: none; cursor: pointer;
+}
+.filter-select:focus { border-color: var(--brand-border); }
+
+/* Table */
+.table-wrap {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+}
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 900px; }
+thead { background: var(--surface-3); }
+th {
+  padding: 12px 16px; text-align: left;
+  font-size: 10px; font-weight: 700; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--text-muted); }
+td {
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  font-size: 13px; vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* Trainer cell */
+.trainer-cell { display: flex; align-items: center; gap: 10px; }
+.trainer-avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background: var(--surface-3); border: 2px solid var(--border);
+  object-fit: cover; display: flex; align-items: center; justify-content: center;
+  font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 13px; color: var(--text-muted);
+}
+.trainer-name { font-weight: 700; font-size: 13px; }
+.trainer-email { font-size: 11px; color: var(--text-muted); }
+
+/* Badges */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+}
+.badge-pro { background: var(--brand-dim); border: 1px solid var(--brand-border); color: var(--brand); }
+.badge-free { background: var(--surface-3); border: 1px solid var(--border); color: var(--text-faint); }
+.badge-reps { background: var(--reps-dim); border: 1px solid var(--reps-border); color: var(--reps); }
+.badge-pending { background: rgba(255,170,0,0.1); border: 1px solid rgba(255,170,0,0.25); color: var(--warning); }
+.badge-test { background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.2); color: var(--danger); }
+
+/* Profile completion bar */
+.completion-wrap { display: flex; align-items: center; gap: 8px; min-width: 120px; }
+.completion-bar {
+  flex: 1; height: 4px; background: var(--surface-3);
+  border-radius: 2px; overflow: hidden;
+}
+.completion-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+.completion-pct { font-size: 11px; font-weight: 700; color: var(--text-muted); min-width: 28px; }
+
+/* Action buttons */
+.row-actions { display: flex; gap: 6px; }
+.action-btn {
+  padding: 5px 10px; border-radius: 7px; font-size: 11px; font-weight: 700;
+  cursor: pointer; border: none; transition: all 0.2s; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.action-btn.view { background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted); }
+.action-btn.view:hover { color: var(--text); border-color: var(--border-hover); }
+.action-btn.email { background: rgba(100,100,255,0.08); border: 1px solid rgba(100,100,255,0.2); color: #8888ff; }
+.action-btn.email:hover { background: rgba(100,100,255,0.15); }
+.action-btn.delete { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); color: var(--danger); }
+.action-btn.delete:hover { background: rgba(255,68,68,0.15); }
+
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--text-muted);
+}
+.empty-state h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+
+/* Loading */
+.loading { text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+  background: var(--surface-3); border: 1px solid var(--border);
+  padding: 12px 20px; border-radius: 12px; font-size: 13px; font-weight: 600;
+  transition: transform 0.3s; z-index: 9999; white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: var(--reps-border); color: var(--reps); }
+.toast.error { border-color: rgba(255,68,68,0.3); color: var(--danger); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: none; align-items: center; justify-content: center;
+  z-index: 9000; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 28px; max-width: 480px; width: 100%;
+  max-height: 80vh; overflow-y: auto;
+}
+.modal-title { font-family: 'Manrope', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+.modal-field { margin-bottom: 16px; }
+.modal-label { font-size: 11px; font-weight: 700; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.modal-value { font-size: 13px; color: var(--text); }
+.modal-value.muted { color: var(--text-muted); }
+.modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+.modal-close { position: absolute; top: 16px; right: 16px; }
+</style>
+
+<div class="admin-wrap">
+  <div class="admin-header">
+    <div>
+      <div class="admin-title">Trainer <span>CRM</span></div>
+      <div class="admin-subtitle" id="last-updated">Loading...</div>
+    </div>
+    <div class="admin-actions">
+      <button class="btn btn-ghost" onclick="exportCSV()">↓ Export CSV</button>
+      <button class="btn btn-primary" onclick="sendWelcomeAll()">✉ Send Welcome Emails</button>
+    </div>
+  </div>
+
+  <div class="kpi-row" id="kpi-row">
+    <div class="kpi-card"><div class="kpi-value" id="kpi-total">—</div><div class="kpi-label">Total Trainers</div></div>
+    <div class="kpi-card brand"><div class="kpi-value" id="kpi-pro">—</div><div class="kpi-label">Pro Subscribers</div></div>
+    <div class="kpi-card green"><div class="kpi-value" id="kpi-reps">—</div><div class="kpi-label">REPs Verified</div></div>
+    <div class="kpi-card"><div class="kpi-value" id="kpi-complete">—</div><div class="kpi-label">Profile ≥80% Complete</div></div>
+    <div class="kpi-card"><div class="kpi-value" id="kpi-week">—</div><div class="kpi-label">New This Week</div></div>
+  </div>
+
+  <div class="filters">
+    <input class="filter-input" id="search" placeholder="Search by name, email, city..." oninput="applyFilters()" />
+    <select class="filter-select" id="filter-plan" onchange="applyFilters()">
+      <option value="">All Plans</option>
+      <option value="pro">Pro</option>
+      <option value="free">Free</option>
+    </select>
+    <select class="filter-select" id="filter-reps" onchange="applyFilters()">
+      <option value="">All REPs Status</option>
+      <option value="verified">REPs Verified</option>
+      <option value="unverified">Not Verified</option>
+    </select>
+    <select class="filter-select" id="filter-completion" onchange="applyFilters()">
+      <option value="">All Completion</option>
+      <option value="high">≥80%</option>
+      <option value="low">&lt;50%</option>
+    </select>
+    <select class="filter-select" id="filter-sort" onchange="applyFilters()">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="completion">By Completion</option>
+      <option value="name">By Name</option>
+    </select>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Trainer</th>
+            <th>Plan</th>
+            <th>REPs</th>
+            <th>Profile</th>
+            <th>City</th>
+            <th>Joined</th>
+            <th>Last Seen</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="trainer-tbody">
+          <tr><td colspan="8" class="loading">Loading trainers...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Trainer Detail Modal -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal" style="position:relative">
+    <button class="action-btn view modal-close" onclick="closeModal()">✕ Close</button>
+    <div class="modal-title" id="modal-name">Trainer Details</div>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="modal-email-btn">✉ Send Email</button>
+      <a class="btn btn-ghost" id="modal-profile-link" href="#" target="_blank">↗ View Profile</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const EDGE_BASE = 'https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
+
+let allTrainers = [];
+let filteredTrainers = [];
+
+// ── Completion score ──────────────────────────────────────────────────────────
+function completionScore(t) {
+  let score = 0;
+  if (t.avatar_url) score += 20;
+  if (t.bio && t.bio.length > 30) score += 20;
+  if (t.reps_verified) score += 15;
+  if (t.specialties && t.specialties.length > 0) score += 10;
+  if (t.city) score += 10;
+  if (t.instagram) score += 10;
+  if (t.packages && t.packages.length > 0) score += 10;
+  if (t.years_experience) score += 5;
+  return score;
+}
+
+function completionColor(pct) {
+  if (pct >= 80) return '#00C853';
+  if (pct >= 50) return '#ffaa00';
+  return '#ff4444';
+}
+
+function isTestTrainer(t) {
+  return (t.email && t.email.includes('xss_test')) ||
+         (t.email && t.email === 'not-an-email') ||
+         (t.name && t.name.includes('<script>'));
+}
+
+// ── Load trainers ─────────────────────────────────────────────────────────────
+async function loadTrainers() {
+  try {
+    const res = await fetch(`${EDGE_BASE}/get-trainer?all=true`, {
+      headers: { 'Authorization': 'Bearer ' + ANON_KEY }
+    });
+
+    // Fallback: use Supabase REST API directly
+    const rest = await fetch(
+      'https://mezhtdbfyvkshpuplqqw.supabase.co/rest/v1/trainers?select=*&order=created_at.desc',
+      { headers: { 'Authorization': 'Bearer ' + ANON_KEY, 'apikey': ANON_KEY } }
+    );
+    allTrainers = await rest.json();
+
+    if (!Array.isArray(allTrainers)) {
+      allTrainers = [];
+    }
+
+    updateKPIs();
+    applyFilters();
+    document.getElementById('last-updated').textContent =
+      'Last updated: ' + new Date().toLocaleTimeString('en-AE');
+  } catch (err) {
+    document.getElementById('trainer-tbody').innerHTML =
+      '<tr><td colspan="8" class="loading" style="color:#ff4444">Error loading trainers: ' + err.message + '</td></tr>';
+  }
+}
+
+// ── KPIs ──────────────────────────────────────────────────────────────────────
+function updateKPIs() {
+  const real = allTrainers.filter(t => !isTestTrainer(t));
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  document.getElementById('kpi-total').textContent = real.length;
+  document.getElementById('kpi-pro').textContent = real.filter(t => t.plan === 'pro').length;
+  document.getElementById('kpi-reps').textContent = real.filter(t => t.reps_verified).length;
+  document.getElementById('kpi-complete').textContent = real.filter(t => completionScore(t) >= 80).length;
+  document.getElementById('kpi-week').textContent = real.filter(t => new Date(t.created_at) > weekAgo).length;
+}
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+function applyFilters() {
+  const search = document.getElementById('search').value.toLowerCase();
+  const plan = document.getElementById('filter-plan').value;
+  const reps = document.getElementById('filter-reps').value;
+  const completion = document.getElementById('filter-completion').value;
+  const sort = document.getElementById('filter-sort').value;
+
+  filteredTrainers = allTrainers.filter(t => {
+    if (search && !(
+      (t.name || '').toLowerCase().includes(search) ||
+      (t.email || '').toLowerCase().includes(search) ||
+      (t.city || '').toLowerCase().includes(search)
+    )) return false;
+    if (plan && t.plan !== plan) return false;
+    if (reps === 'verified' && !t.reps_verified) return false;
+    if (reps === 'unverified' && t.reps_verified) return false;
+    const pct = completionScore(t);
+    if (completion === 'high' && pct < 80) return false;
+    if (completion === 'low' && pct >= 50) return false;
+    return true;
+  });
+
+  filteredTrainers.sort((a, b) => {
+    if (sort === 'oldest') return new Date(a.created_at) - new Date(b.created_at);
+    if (sort === 'completion') return completionScore(b) - completionScore(a);
+    if (sort === 'name') return (a.name || '').localeCompare(b.name || '');
+    return new Date(b.created_at) - new Date(a.created_at); // newest
+  });
+
+  renderTable();
+}
+
+// ── Render table ──────────────────────────────────────────────────────────────
+function renderTable() {
+  const tbody = document.getElementById('trainer-tbody');
+  if (filteredTrainers.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><h3>No trainers found</h3><p>Try adjusting your filters.</p></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filteredTrainers.map(t => {
+    const pct = completionScore(t);
+    const color = completionColor(pct);
+    const initials = (t.name || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const isTest = isTestTrainer(t);
+    const joined = new Date(t.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: '2-digit' });
+    const lastSeen = t.last_seen_at
+      ? timeAgo(new Date(t.last_seen_at))
+      : '<span style="color:var(--text-faint)">Never</span>';
+
+    return `<tr>
+      <td>
+        <div class="trainer-cell">
+          ${t.avatar_url
+            ? `<img class="trainer-avatar" src="${t.avatar_url}" alt="${initials}">`
+            : `<div class="trainer-avatar">${initials}</div>`}
+          <div>
+            <div class="trainer-name">${sanitize(t.name || 'Unknown')} ${isTest ? '<span class="badge badge-test">TEST</span>' : ''}</div>
+            <div class="trainer-email">${sanitize(t.email || '—')}</div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <span class="badge ${t.plan === 'pro' ? 'badge-pro' : 'badge-free'}">
+          ${t.plan === 'pro' ? '★ Pro' : 'Free'}
+        </span>
+      </td>
+      <td>
+        ${t.reps_verified
+          ? '<span class="badge badge-reps">✓ Verified</span>'
+          : '<span class="badge badge-pending">Pending</span>'}
+      </td>
+      <td>
+        <div class="completion-wrap">
+          <div class="completion-bar">
+            <div class="completion-fill" style="width:${pct}%;background:${color}"></div>
+          </div>
+          <span class="completion-pct" style="color:${color}">${pct}%</span>
+        </div>
+      </td>
+      <td style="color:var(--text-muted)">${sanitize(t.city || '—')}</td>
+      <td style="color:var(--text-muted);white-space:nowrap">${joined}</td>
+      <td style="color:var(--text-muted)">${lastSeen}</td>
+      <td>
+        <div class="row-actions">
+          <button class="action-btn view" onclick="openDetail('${t.id}')">View</button>
+          <button class="action-btn email" onclick="sendEmail('${t.id}','${sanitize(t.email || '')}','${sanitize(t.name || '')}')">Email</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Detail modal ──────────────────────────────────────────────────────────────
+function openDetail(id) {
+  const t = allTrainers.find(x => x.id === id);
+  if (!t) return;
+
+  const pct = completionScore(t);
+  const missing = [];
+  if (!t.avatar_url) missing.push('Profile photo');
+  if (!t.bio || t.bio.length < 30) missing.push('Bio');
+  if (!t.reps_verified) missing.push('REPs verification');
+  if (!t.specialties || t.specialties.length === 0) missing.push('Specialties');
+  if (!t.city) missing.push('City');
+  if (!t.instagram) missing.push('Instagram');
+
+  document.getElementById('modal-name').textContent = t.name || 'Unknown Trainer';
+  document.getElementById('modal-profile-link').href = 'https://trainedby.ae/' + (t.slug || '');
+  document.getElementById('modal-email-btn').onclick = () => sendEmail(t.id, t.email, t.name);
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-field"><div class="modal-label">Email</div><div class="modal-value">${sanitize(t.email || '—')}</div></div>
+    <div class="modal-field"><div class="modal-label">Phone</div><div class="modal-value ${t.phone ? '' : 'muted'}">${sanitize(t.phone || 'Not provided')}</div></div>
+    <div class="modal-field"><div class="modal-label">Plan</div><div class="modal-value">${t.plan === 'pro' ? '★ Pro' : 'Free'}</div></div>
+    <div class="modal-field"><div class="modal-label">REPs Status</div><div class="modal-value">${t.reps_verified ? '✓ Verified (Level ' + (t.reps_level || '?') + ')' : 'Not verified'}</div></div>
+    <div class="modal-field"><div class="modal-label">City</div><div class="modal-value ${t.city ? '' : 'muted'}">${sanitize(t.city || 'Not set')}</div></div>
+    <div class="modal-field"><div class="modal-label">Joined</div><div class="modal-value">${new Date(t.created_at).toLocaleDateString('en-AE', {day:'numeric',month:'long',year:'numeric'})}</div></div>
+    <div class="modal-field"><div class="modal-label">Profile Completion</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+        <div class="completion-bar" style="flex:1;height:6px"><div class="completion-fill" style="width:${pct}%;background:${completionColor(pct)}"></div></div>
+        <span style="font-weight:700;color:${completionColor(pct)}">${pct}%</span>
+      </div>
+    </div>
+    ${missing.length > 0 ? `<div class="modal-field"><div class="modal-label">Missing</div><div class="modal-value muted">${missing.join(', ')}</div></div>` : ''}
+    ${t.bio ? `<div class="modal-field"><div class="modal-label">Bio</div><div class="modal-value muted" style="font-size:12px;line-height:1.6">${sanitize(t.bio)}</div></div>` : ''}
+    ${t.instagram ? `<div class="modal-field"><div class="modal-label">Instagram</div><div class="modal-value"><a href="https://instagram.com/${t.instagram}" target="_blank" style="color:var(--brand)">@${sanitize(t.instagram)}</a></div></div>` : ''}
+  `;
+
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('detail-modal').classList.remove('open');
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+async function sendEmail(id, email, name) {
+  if (!email || email === 'not-an-email' || email.includes('example.com')) {
+    showToast('Invalid email address', 'error');
+    return;
+  }
+  closeModal();
+  showToast('Sending welcome email to ' + name + '...', '');
+  try {
+    const res = await fetch(`${EDGE_BASE}/lifecycle-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ANON_KEY },
+      body: JSON.stringify({ trainer_id: id, type: 'welcome', force: true })
+    });
+    const data = await res.json();
+    if (data.ok) showToast('Email sent to ' + name, 'success');
+    else showToast('Email failed: ' + (data.error || 'Unknown error'), 'error');
+  } catch (e) {
+    showToast('Email failed: ' + e.message, 'error');
+  }
+}
+
+async function sendWelcomeAll() {
+  const real = allTrainers.filter(t => !isTestTrainer(t) && t.email && t.email.includes('@'));
+  if (real.length === 0) { showToast('No real trainers to email', 'error'); return; }
+  if (!confirm(`Send welcome emails to ${real.length} trainer(s)?`)) return;
+  showToast('Sending ' + real.length + ' emails...', '');
+  for (const t of real) {
+    await sendEmail(t.id, t.email, t.name);
+    await new Promise(r => setTimeout(r, 500));
+  }
+}
+
+function exportCSV() {
+  const headers = ['Name', 'Email', 'Plan', 'REPs', 'City', 'Completion%', 'Joined'];
+  const rows = filteredTrainers.map(t => [
+    t.name || '', t.email || '', t.plan || '', t.reps_verified ? 'Yes' : 'No',
+    t.city || '', completionScore(t), t.created_at?.substring(0, 10) || ''
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'trainedby-trainers-' + new Date().toISOString().substring(0, 10) + '.csv';
+  a.click();
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function sanitize(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function timeAgo(date) {
+  const diff = (Date.now() - date.getTime()) / 1000;
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+  return date.toLocaleDateString('en-AE', { day: 'numeric', month: 'short' });
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Close modal on overlay click
+document.getElementById('detail-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+loadTrainers();
+setInterval(loadTrainers, 60000); // Auto-refresh every 60s
+</script>
+</Base>
