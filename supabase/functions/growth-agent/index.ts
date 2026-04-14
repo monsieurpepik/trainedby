@@ -1,26 +1,22 @@
 /**
- * TrainedBy — Growth Agent
+ * TrainedBy — Growth Agent v2
  * ─────────────────────────────────────────────────────────────────────────────
- * Dual-purpose edge function:
+ * Funnel event tracking + weekly owner digest with human-sounding analysis.
  *
- *   POST /functions/v1/growth-agent          — track a funnel event (client-side)
- *   POST /functions/v1/growth-agent/digest   — generate + email weekly owner digest (cron)
+ * POST /functions/v1/growth-agent          — track a funnel event
+ * POST /functions/v1/growth-agent/digest   — generate weekly digest (cron)
  *
- * Funnel events tracked:
- *   landing_view, join_step_1, join_step_2, join_complete,
- *   pricing_view, profile_view, wa_tap, plan_builder_open, plan_builder_complete
- *
- * The weekly digest:
- *   - Computes conversion rates at each funnel step
- *   - Identifies the biggest drop-off point
- *   - Generates an LLM hypothesis for why the drop-off happened
- *   - Emails the owner with a ranked list of improvement suggestions
- *   - Writes the memo to the `agent_memos` table for the meta-agent to consume
+ * Anti-slop measures:
+ *   1. Persona injection: the LLM writes as a blunt growth analyst
+ *   2. Hypothesis must be a single, specific, falsifiable sentence
+ *   3. Suggestions must be concrete actions, not vague recommendations
+ *   4. Slop filter applied to hypothesis text
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { jsonResponse, errorResponse, CORS_HEADERS } from '../_shared/errors.ts';
 import { createLogger } from '../_shared/logger.ts';
+import { calculateSlopScore } from '../_shared/voice.ts';
 
 const log = createLogger('growth-agent');
 
@@ -31,7 +27,6 @@ const FUNNEL_STEPS = [
   'join_complete',
 ];
 
-// ─── Main handler ─────────────────────────────────────────────────────────────
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 200, headers: CORS_HEADERS });
@@ -40,12 +35,10 @@ Deno.serve(async (req: Request) => {
   const url = new URL(req.url);
   const path = url.pathname;
 
-  // ── Route: POST /growth-agent/digest (cron or manual trigger) ──────────────
   if (req.method === 'POST' && path.endsWith('/digest')) {
-    return handleDigest(req);
+    return handleDigest();
   }
 
-  // ── Route: POST /growth-agent (track event) ────────────────────────────────
   if (req.method === 'POST') {
     return handleTrackEvent(req);
   }
@@ -53,7 +46,6 @@ Deno.serve(async (req: Request) => {
   return errorResponse('Method not allowed', 405);
 });
 
-// ─── Track a funnel event ─────────────────────────────────────────────────────
 async function handleTrackEvent(req: Request): Promise<Response> {
   const start = Date.now();
   try {
@@ -72,19 +64,13 @@ async function handleTrackEvent(req: Request): Promise<Response> {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
-    // Capture session/device context from headers
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
     const ua = req.headers.get('user-agent') ?? 'unknown';
     const referer = req.headers.get('referer') ?? '';
 
     const { error } = await sb.from('funnel_events').insert({
       event,
-      properties: {
-        ...properties,
-        ip,
-        ua,
-        referer,
-      },
+      properties: { ...properties, ip, ua, referer },
       created_at: new Date().toISOString(),
     });
 
@@ -101,10 +87,9 @@ async function handleTrackEvent(req: Request): Promise<Response> {
   }
 }
 
-// ─── Generate weekly growth digest ───────────────────────────────────────────
-async function handleDigest(req: Request): Promise<Response> {
+async function handleDigest(): Promise<Response> {
   const start = Date.now();
-  log.info('Growth digest started');
+  log.info('Growth digest v2 started');
 
   try {
     const sb = createClient(
@@ -116,7 +101,6 @@ async function handleDigest(req: Request): Promise<Response> {
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString();
 
-    // ── 1. Pull funnel event counts for this week and last week ──────────────
     const [thisWeekRows, lastWeekRows, trainersThisWeek, trainersLastWeek, leadsThisWeek, leadsLastWeek] =
       await Promise.all([
         sb.from('funnel_events').select('event').gte('created_at', weekAgo),
@@ -127,7 +111,6 @@ async function handleDigest(req: Request): Promise<Response> {
         sb.from('leads').select('id', { count: 'exact' }).gte('created_at', twoWeeksAgo).lt('created_at', weekAgo),
       ]);
 
-    // Count events by type
     const countEvents = (rows: { event: string }[]) => {
       const counts: Record<string, number> = {};
       for (const r of rows) counts[r.event] = (counts[r.event] ?? 0) + 1;
@@ -137,18 +120,9 @@ async function handleDigest(req: Request): Promise<Response> {
     const thisWeek = countEvents(thisWeekRows.data ?? []);
     const lastWeek = countEvents(lastWeekRows.data ?? []);
 
-    // ── 2. Compute funnel conversion rates ───────────────────────────────────
-    const funnelThis = FUNNEL_STEPS.map(step => ({
-      step,
-      count: thisWeek[step] ?? 0,
-    }));
+    const funnelThis = FUNNEL_STEPS.map(step => ({ step, count: thisWeek[step] ?? 0 }));
+    const funnelLast = FUNNEL_STEPS.map(step => ({ step, count: lastWeek[step] ?? 0 }));
 
-    const funnelLast = FUNNEL_STEPS.map(step => ({
-      step,
-      count: lastWeek[step] ?? 0,
-    }));
-
-    // Find biggest drop-off step this week
     let biggestDropStep = '';
     let biggestDropPct = 0;
     for (let i = 1; i < funnelThis.length; i++) {
@@ -169,15 +143,16 @@ async function handleDigest(req: Request): Promise<Response> {
       ? ((bottomOfFunnel / topOfFunnel) * 100).toFixed(1)
       : '0.0';
 
-    // ── 3. Generate LLM hypothesis for biggest drop-off ──────────────────────
     let hypothesis = '';
     let suggestions: string[] = [];
 
     const openaiKey = Deno.env.get('OPENAI_API_KEY');
-    if (openaiKey && biggestDropStep) {
-      const prompt = `You are a growth analyst for TrainedBy.ae, a UAE platform for personal trainers.
+    const openaiBase = (Deno.env.get('OPENAI_BASE_URL') ?? 'https://api.openai.com/v1');
 
-This week's funnel data:
+    if (openaiKey && biggestDropStep) {
+      const prompt = `You are a blunt, no-nonsense growth analyst. You have looked at this week's funnel data for TrainedBy.ae.
+
+Funnel data:
 ${funnelThis.map(f => `  ${f.step}: ${f.count} events`).join('\n')}
 
 Biggest drop-off: ${biggestDropStep} (${biggestDropPct.toFixed(0)}% drop from previous step)
@@ -185,15 +160,17 @@ Overall conversion: ${overallConversion}%
 New trainer signups: ${trainersThisWeek.count ?? 0} (vs ${trainersLastWeek.count ?? 0} last week)
 New leads: ${leadsThisWeek.count ?? 0} (vs ${leadsLastWeek.count ?? 0} last week)
 
-Generate:
-1. A one-sentence hypothesis for WHY the biggest drop-off is happening at "${biggestDropStep}"
-2. Three specific, actionable product changes ranked by expected impact (highest first)
-3. One A/B test to run this week
+Your job:
+1. Write ONE sentence explaining WHY the drop-off is happening at "${biggestDropStep}". Be specific. No hedging. No "it could be" — pick the most likely cause and state it as fact.
+2. Give THREE specific product changes to fix it. Each suggestion must be a concrete action (e.g. "Remove the specialty dropdown from step 2 and replace it with 3 preset options"). Not vague advice.
+3. Name ONE A/B test to run this week. Be specific about what changes and what metric you're measuring.
+
+Do NOT use: "it's important", "consider", "might", "could", "perhaps", "leverage", "optimize".
 
 Respond as JSON: { "hypothesis": "...", "suggestions": ["...", "...", "..."], "ab_test": "..." }`;
 
       try {
-        const aiRes = await fetch((Deno.env.get('OPENAI_BASE_URL') ?? 'https://api.openai.com/v1') + '/chat/completions', {
+        const aiRes = await fetch(`${openaiBase}/chat/completions`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${openaiKey}`,
@@ -212,19 +189,24 @@ Respond as JSON: { "hypothesis": "...", "suggestions": ["...", "...", "..."], "a
         suggestions = parsed.suggestions ?? [];
         const abTest = parsed.ab_test ?? '';
         if (abTest) suggestions.push(`A/B test: ${abTest}`);
+
+        // Check slop
+        const { score, found } = calculateSlopScore(hypothesis + ' ' + suggestions.join(' '));
+        if (score > 20) {
+          log.warn('Slop detected in growth hypothesis', { score, found });
+        }
       } catch (aiErr) {
         log.warn('LLM hypothesis generation failed', { error: String(aiErr) });
-        hypothesis = `High drop-off at ${biggestDropStep} — manual review needed.`;
-        suggestions = ['Review UX at drop-off step', 'Check for mobile rendering issues', 'Simplify copy at this step'];
+        hypothesis = `${biggestDropStep.replace(/_/g, ' ')} has a ${biggestDropPct.toFixed(0)}% drop — check the UX on that step.`;
+        suggestions = ['Review the UX at the drop-off step on mobile', 'Reduce the number of required fields', 'Add social proof near the CTA'];
       }
     } else {
       hypothesis = biggestDropStep
-        ? `High drop-off at ${biggestDropStep} — manual review needed.`
-        : 'Insufficient funnel data this week.';
-      suggestions = ['Add more funnel tracking events', 'Drive more top-of-funnel traffic', 'Review join flow on mobile'];
+        ? `${biggestDropStep.replace(/_/g, ' ')} is losing ${biggestDropPct.toFixed(0)}% of users — needs manual review.`
+        : 'Not enough funnel data this week.';
+      suggestions = ['Add funnel tracking events to the frontend', 'Drive more top-of-funnel traffic', 'Review join flow on mobile'];
     }
 
-    // ── 4. Build memo object ─────────────────────────────────────────────────
     const memo = {
       agent: 'growth-agent',
       week_ending: now.toISOString(),
@@ -242,15 +224,12 @@ Respond as JSON: { "hypothesis": "...", "suggestions": ["...", "...", "..."], "a
       generated_at: now.toISOString(),
     };
 
-    // ── 5. Write memo to agent_memos table ───────────────────────────────────
-    const { error: memoErr } = await sb.from('agent_memos').insert({
+    await sb.from('agent_memos').insert({
       agent: 'growth-agent',
       memo,
       created_at: now.toISOString(),
     });
-    if (memoErr) log.warn('Failed to write memo to DB', { error: memoErr.message });
 
-    // ── 6. Send email digest to owner ────────────────────────────────────────
     const ownerEmail = Deno.env.get('OWNER_EMAIL') ?? 'admin@trainedby.ae';
     const emailSent = await sendDigestEmail(ownerEmail, memo);
 
@@ -268,16 +247,9 @@ Respond as JSON: { "hypothesis": "...", "suggestions": ["...", "...", "..."], "a
   }
 }
 
-// ─── Send digest email via Supabase (Resend) ─────────────────────────────────
-async function sendDigestEmail(
-  to: string,
-  memo: Record<string, unknown>,
-): Promise<boolean> {
+async function sendDigestEmail(to: string, memo: Record<string, unknown>): Promise<boolean> {
   const resendKey = Deno.env.get('RESEND_API_KEY');
-  if (!resendKey) {
-    log.warn('RESEND_API_KEY not set — skipping email');
-    return false;
-  }
+  if (!resendKey) return false;
 
   const funnel = memo.funnel_this_week as Array<{ step: string; count: number }>;
   const suggestions = memo.suggestions as string[];
@@ -295,65 +267,48 @@ async function sendDigestEmail(
 
   const html = `<!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>TrainedBy Weekly Growth Digest</title></head>
+<head><meta charset="UTF-8"></head>
 <body style="font-family:'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e0e0e0;padding:32px;max-width:600px;margin:0 auto;">
   <div style="border-bottom:2px solid #FF5C00;padding-bottom:16px;margin-bottom:24px;">
     <h1 style="color:#fff;font-size:22px;margin:0;">TrainedBy <span style="color:#FF5C00;">Growth Digest</span></h1>
     <p style="color:#888;font-size:13px;margin:4px 0 0;">Week ending ${weekEnding}</p>
   </div>
-
-  <h2 style="color:#fff;font-size:16px;margin-bottom:12px;">📊 Funnel This Week</h2>
+  <h2 style="color:#fff;font-size:16px;margin-bottom:12px;">Funnel This Week</h2>
   <table style="width:100%;border-collapse:collapse;background:#111;border-radius:8px;overflow:hidden;margin-bottom:24px;">
-    <thead><tr style="background:#1a1a1a;">
-      <th style="padding:8px 12px;text-align:left;color:#888;font-size:12px;text-transform:uppercase;">Step</th>
-      <th style="padding:8px 12px;text-align:right;color:#888;font-size:12px;text-transform:uppercase;">Events</th>
-    </tr></thead>
+    <thead><tr style="background:#1a1a1a;"><th style="padding:8px 12px;text-align:left;color:#888;font-size:12px;">Step</th><th style="padding:8px 12px;text-align:right;color:#888;font-size:12px;">Events</th></tr></thead>
     <tbody>${funnelRows}</tbody>
   </table>
-
   <div style="background:#111;border-left:3px solid #FF5C00;padding:16px;border-radius:4px;margin-bottom:24px;">
-    <p style="margin:0;font-size:13px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">Overall Conversion</p>
+    <p style="margin:0;font-size:13px;color:#888;text-transform:uppercase;">Overall Conversion</p>
     <p style="margin:4px 0 0;font-size:28px;font-weight:700;color:#fff;">${memo.overall_conversion_pct}%</p>
     <p style="margin:8px 0 0;font-size:13px;color:#aaa;">Biggest drop-off: <strong style="color:#FF5C00;">${String(memo.biggest_drop_step).replace(/_/g, ' ')}</strong> (${memo.biggest_drop_pct}% drop)</p>
   </div>
-
   <div style="background:#111;border:1px solid #222;padding:16px;border-radius:8px;margin-bottom:24px;">
-    <h3 style="color:#fff;font-size:14px;margin:0 0 8px;">🤖 Agent Hypothesis</h3>
+    <h3 style="color:#fff;font-size:14px;margin:0 0 8px;">What's happening</h3>
     <p style="color:#ccc;font-size:14px;margin:0;line-height:1.6;">${memo.hypothesis}</p>
   </div>
-
-  <h2 style="color:#fff;font-size:16px;margin-bottom:12px;">🎯 Ranked Improvement Suggestions</h2>
-  <ul style="background:#111;border:1px solid #222;border-radius:8px;padding:16px 16px 16px 32px;margin-bottom:24px;color:#ccc;font-size:14px;line-height:1.7;">
-    ${suggestionItems}
-  </ul>
-
+  <h2 style="color:#fff;font-size:16px;margin-bottom:12px;">What to do about it</h2>
+  <ul style="background:#111;border:1px solid #222;border-radius:8px;padding:16px 16px 16px 32px;margin-bottom:24px;color:#ccc;font-size:14px;line-height:1.7;">${suggestionItems}</ul>
   <div style="background:#111;border:1px solid #222;padding:16px;border-radius:8px;margin-bottom:24px;">
-    <h3 style="color:#fff;font-size:14px;margin:0 0 8px;">📈 Signups & Leads</h3>
-    <p style="color:#ccc;font-size:14px;margin:0;">New trainers: <strong style="color:#fff;">${memo.new_trainers}</strong> (${(memo.new_trainers_delta as number) >= 0 ? '+' : ''}${memo.new_trainers_delta} vs last week)</p>
-    <p style="color:#ccc;font-size:14px;margin:4px 0 0;">New leads: <strong style="color:#fff;">${memo.new_leads}</strong> (${(memo.new_leads_delta as number) >= 0 ? '+' : ''}${memo.new_leads_delta} vs last week)</p>
+    <p style="color:#ccc;font-size:14px;margin:0;">New trainers: <strong style="color:#fff;">${memo.new_trainers}</strong> (${(memo.new_trainers_delta as number) >= 0 ? '+' : ''}${memo.new_trainers_delta}) &nbsp;·&nbsp; New leads: <strong style="color:#fff;">${memo.new_leads}</strong> (${(memo.new_leads_delta as number) >= 0 ? '+' : ''}${memo.new_leads_delta})</p>
   </div>
-
-  <p style="color:#555;font-size:12px;text-align:center;margin-top:32px;">Generated by TrainedBy Growth Agent · <a href="https://trainedby-ae.netlify.app" style="color:#FF5C00;">trainedby.ae</a></p>
+  <p style="color:#555;font-size:12px;text-align:center;margin-top:32px;">TrainedBy Growth Agent · <a href="https://trainedby-ae.netlify.app" style="color:#FF5C00;">trainedby.ae</a></p>
 </body>
 </html>`;
 
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendKey}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from: 'TrainedBy Growth Agent <growth@trainedby.ae>',
         to: [to],
-        subject: `📊 TrainedBy Weekly Digest — ${memo.overall_conversion_pct}% conversion, ${memo.new_trainers} new trainers`,
+        subject: `TrainedBy Weekly: ${memo.overall_conversion_pct}% conversion, ${memo.new_trainers} new trainers`,
         html,
       }),
     });
     return res.ok;
-  } catch (err) {
-    log.warn('Email send failed', { error: String(err) });
+  } catch {
     return false;
   }
 }
