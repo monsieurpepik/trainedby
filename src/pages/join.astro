@@ -312,9 +312,9 @@ body {
   <div class="join-header">
     <a href="/landing.html" class="join-logo">
       <svg width="28" height="28" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
-      TrainedBy
+      <span data-brand-name>TrainedBy</span>
     </a>
-    <a href="/edit.html" class="join-login-link">Already a member? <span>Sign in</span></a>
+    <a href="/edit.html" class="join-login-link"><span data-i18n="join.already">Already a member?</span> <span data-i18n="join.login">Sign in</span></a>
   </div>
 
   <!-- Progress -->
@@ -331,8 +331,8 @@ body {
 
   <!-- ===== STEP 1: Essentials ===== -->
   <div id="step-1">
-    <h1 class="step-title">Your trainer page,<br>live in 60 seconds.</h1>
-    <p class="step-subtitle">Free forever. No credit card. {market.certificationBody} verified.</p>
+    <h1 class="step-title" data-i18n="join.title">Your trainer page,<br>live in 60 seconds.</h1>
+    <p class="step-subtitle" data-i18n="join.sub">Free forever. No credit card. {market.certificationBody} verified.</p>
 
     <!-- Auto-Build from Instagram -->
     <div style="background:linear-gradient(135deg,rgba(255,92,0,0.07),rgba(255,92,0,0.02));border:1px solid rgba(255,92,0,0.2);border-radius:14px;padding:14px 16px;margin-bottom:20px;">
@@ -351,7 +351,7 @@ body {
     </div>
 
     <div class="field">
-      <label>Full Name <span class="field-req">*</span></label>
+      <label data-i18n="join.name_label">Full Name <span class="field-req">*</span></label>
       <input type="text" id="s1-name" placeholder="e.g. Sarah Al Mansoori" autocomplete="name">
     </div>
 

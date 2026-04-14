@@ -34,7 +34,11 @@ const defaultStructuredData = {
 const jsonLd = structuredData ?? defaultStructuredData;
 
 import { getMarket } from '../lib/market.ts';
+import { getLocale, TRANSLATIONS, BRAND, getLocaleScript } from '../lib/i18n.ts';
 const market = getMarket(Astro.url.hostname);
+const locale = getLocale(Astro.request);
+const brand = BRAND[locale];
+const i18nStrings = TRANSLATIONS[locale];
 
 // Market-aware canonical URL
 const marketCanonicalBase = canonical ?? `https://${market.domain}${Astro.url.pathname}`;
@@ -190,6 +194,13 @@ const marketOgLocale = market.locale.replace('-', '_');
       .visually-hidden { @extend .sr-only; }
     </style>
 
+    <!-- ── i18n: locale + brand + translation strings ─────────────────── -->
+    <script is:inline set:html={`
+      window.__LOCALE__ = '${locale}';
+      window.__BRAND__ = ${JSON.stringify(brand)};
+      window.__I18N__ = ${JSON.stringify(i18nStrings)};
+    `} />
+
     <!-- ── Lazy image loading polyfill (inline, tiny) ─────────────────── -->
     <script is:inline>
       // Ensure all dynamically inserted images get loading="lazy"
@@ -205,6 +216,49 @@ const marketOgLocale = market.locale.replace('-', '_');
   </head>
   <body>
     <slot />
+
+    <!-- ── i18n runtime: translate data-i18n elements ───────────────── -->
+    <script is:inline>
+      (function() {
+        var locale = window.__LOCALE__;
+        if (!locale || locale === 'en') return;
+        var strings = window.__I18N__;
+        var brand = window.__BRAND__;
+        if (!strings) return;
+        function translate() {
+          // Text content
+          document.querySelectorAll('[data-i18n]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n');
+            if (strings[key]) el.textContent = strings[key];
+          });
+          // Placeholders
+          document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n-placeholder');
+            if (strings[key]) el.placeholder = strings[key];
+          });
+          // Brand name
+          if (brand) {
+            document.querySelectorAll('[data-brand-name]').forEach(function(el) {
+              el.textContent = brand.name;
+            });
+            document.querySelectorAll('[data-brand-tagline]').forEach(function(el) {
+              el.textContent = brand.tagline;
+            });
+            // Update page title
+            if (document.title.includes('TrainedBy')) {
+              document.title = document.title.replace(/TrainedBy/g, brand.name);
+            }
+          }
+          // Update html lang
+          document.documentElement.lang = locale;
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', translate);
+        } else {
+          translate();
+        }
+      })();
+    </script>
 
     <!-- ── Error boundary: catch unhandled errors and log them ─────────── -->
     <script is:inline>

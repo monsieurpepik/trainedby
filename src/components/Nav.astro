@@ -9,22 +9,22 @@ const { variant = 'landing', activePage = '' } = Astro.props;
 {variant === 'landing' ? (
   <nav class="nav" id="nav">
     <a href="/landing" class="nav-logo">
-      Trained<span style="color:#fff">By</span><span
+      <span data-brand-name>Trained<span style="color:#fff">By</span></span><span
         style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:2px;vertical-align:middle;margin-bottom:3px"
       ></span>
     </a>
     <div class="nav-links">
-      <a href="#how">How it works</a>
-      <a href="#income">Income calculator</a>
-      <a href="#pricing">Pricing</a>
-      <a href="/sarah">See a Profile</a>
+      <a href="#how" data-i18n="nav.how_it_works">How it works</a>
+      <a href="#income" data-i18n="nav.income">Income calculator</a>
+      <a href="#pricing" data-i18n="nav.pricing">Pricing</a>
+      <a href="/sarah" data-i18n="nav.see_profile">See a Profile</a>
     </div>
-    <a href="/join" class="nav-cta">Get Your OS →</a>
+    <a href="/join" class="nav-cta" data-i18n="nav.get_os">Get Your OS →</a>
   </nav>
 ) : (
   <header class="app-header">
     <a href="/landing" class="nav-logo" style="font-family:'Manrope',sans-serif;font-weight:900;font-size:18px;color:var(--brand);text-decoration:none;">
-      Trained<span style="color:#fff">By</span>
+      <span data-brand-name>Trained<span style="color:#fff">By</span></span>
     </a>
     <div class="header-nav">
       <a href="/edit" class={`nav-edit${activePage === 'edit' ? ' active' : ''}`}>Edit</a>
