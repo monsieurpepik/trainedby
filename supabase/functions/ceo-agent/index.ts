@@ -1,27 +1,33 @@
 /**
- * TrainedBy — CEO Agent (Telegram Orchestrator)
+ * TrainedBy — CEO Agent v2 (Executive AI)
  * ─────────────────────────────────────────────────────────────────────────────
- * The AI CEO that orchestrates all agents and communicates with the founder
- * via Telegram. Acts as the single point of control for the entire Agent OS.
+ * An AI CEO that runs the business, orchestrates agents, and communicates
+ * with the founder via Telegram like a senior executive.
  *
- * Telegram webhook: POST /functions/v1/ceo-agent
+ * Personality: Direct. Confident. No fluff. Thinks in first principles.
+ * Speaks like a CEO reporting to a board — not like a chatbot.
+ *
+ * Proactive behaviours:
+ *   - 08:00 GST daily: Morning briefing (key metrics + one priority)
+ *   - 09:00 Mon GST: Weekly growth digest (runs growth-agent)
+ *   - 20:00 Sun GST: Weekly priorities memo (runs meta-agent)
+ *   - Real-time: Anomaly alerts, new signups, cert approvals, academy bookings
  *
  * Commands:
- *   /start        — Welcome message + status overview
- *   /status       — Live health check of all agents + DB metrics
- *   /growth       — Trigger growth agent digest now
- *   /content      — Generate a new blog post now
- *   /meta         — Run meta-agent product improvement memo now
- *   /posts        — List recent blog posts
- *   /memo         — Show latest meta-agent memo
- *   /ask <text>   — Ask the CEO agent a free-form question about the business
- *   /help         — Show all commands
- *
- * Proactive reports (triggered by other agents):
- *   - Weekly growth digest (Monday 9am GST)
- *   - New blog post published
- *   - Weekly product improvement memo (Sunday 8pm GST)
- *   - Anomaly alerts (conversion drop > 20%)
+ *   /brief     — Morning briefing right now
+ *   /status    — Live platform metrics
+ *   /global    — All markets overview
+ *   /markets   — Per-market breakdown
+ *   /waitlist  — Waitlist signups
+ *   /pending   — Cert reviews
+ *   /academy   — Academy revenue
+ *   /run <agent> — Trigger an agent (growth/content/meta/outreach)
+ *   /decide <question> — CEO makes a decision with reasoning
+ *   /priorities — Current week's top 3 priorities
+ *   /problems  — Open problems the CEO is tracking
+ *   /hire      — What roles the business needs next
+ *   /ask <q>   — Free-form question
+ *   /help      — All commands
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -36,16 +42,60 @@ const FOUNDER_CHAT_ID = () => Deno.env.get('TELEGRAM_FOUNDER_CHAT_ID')!;
 const SUPABASE_URL = () => Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_KEY = () => Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ANTHROPIC_KEY = () => Deno.env.get('ANTHROPIC_API_KEY')!;
-const SELF_URL = () => Deno.env.get('SUPABASE_FUNCTION_URL') ?? `https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1`;
+const SELF_URL = () => `https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1`;
+
+// ── CEO Persona ───────────────────────────────────────────────────────────────
+const CEO_SYSTEM_PROMPT = `You are the AI CEO of TrainedBy — a global platform for verified personal trainers and sports academies, operating across UAE, UK, France, Italy, Spain, Mexico, and India.
+
+You report directly to the founder (Boban). You are not a chatbot. You are a senior executive who:
+- Thinks in first principles, not frameworks
+- Gives direct answers with clear reasoning
+- Surfaces problems before being asked
+- Makes decisions and owns them
+- Speaks concisely — no filler, no hedging
+- Uses numbers when available, flags when data is missing
+- Ends every substantive reply with one clear next action
+
+Your tone: confident, direct, slightly formal but not stiff. Like a McKinsey partner who actually builds things.
+
+You have full visibility into:
+- All platform metrics (trainers, revenue, leads, conversions)
+- All markets (AE, UK, FR, IT, ES, MX, IN)
+- All agents (growth, content, meta, outreach, support, verify)
+- The academy module (sports academies, bookings, payouts)
+- The verification system (cert reviews, REPs lookups)
+
+When the founder sends a message, respond as a CEO would respond to a board member — with context, judgment, and a clear recommendation.`;
 
 // ── Telegram helpers ──────────────────────────────────────────────────────────
-
 async function sendMessage(chatId: string | number, text: string, parseMode = 'Markdown'): Promise<void> {
-  await fetch(`https://api.telegram.org/bot${BOT_TOKEN()}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: parseMode, disable_web_page_preview: true }),
-  });
+  const chunks = splitMessage(text);
+  for (const chunk of chunks) {
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN()}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: chunk,
+        parse_mode: parseMode,
+        disable_web_page_preview: true,
+      }),
+    });
+  }
+}
+
+function splitMessage(text: string, maxLen = 4000): string[] {
+  if (text.length <= maxLen) return [text];
+  const chunks: string[] = [];
+  let remaining = text;
+  while (remaining.length > maxLen) {
+    const cut = remaining.lastIndexOf('\n', maxLen);
+    const pos = cut > maxLen / 2 ? cut : maxLen;
+    chunks.push(remaining.slice(0, pos));
+    remaining = remaining.slice(pos).trim();
+  }
+  if (remaining) chunks.push(remaining);
+  return chunks;
 }
 
 async function sendTyping(chatId: string | number): Promise<void> {
@@ -56,28 +106,80 @@ async function sendTyping(chatId: string | number): Promise<void> {
   });
 }
 
-// ── Auth guard ────────────────────────────────────────────────────────────────
-
 function isAuthorized(chatId: number): boolean {
   return String(chatId) === FOUNDER_CHAT_ID();
 }
 
-// ── Main handler ──────────────────────────────────────────────────────────────
+// ── Data helpers ──────────────────────────────────────────────────────────────
+async function getPlatformSnapshot(sb: ReturnType<typeof createClient>) {
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
+  const [trainers, leads, certs, waitlist, academyBookings, conversations] = await Promise.all([
+    sb.from('trainers').select('id, plan, market, created_at, verification_status'),
+    sb.from('leads').select('id, created_at').gte('created_at', weekAgo),
+    sb.from('cert_reviews').select('id, final_status').eq('final_status', 'pending'),
+    sb.from('market_waitlist').select('id, market, created_at').gte('created_at', weekAgo),
+    sb.from('academy_bookings').select('id, amount_paid, status').eq('status', 'confirmed').gte('created_at', monthAgo),
+    sb.from('support_conversations').select('id').gte('created_at', weekAgo),
+  ]);
+
+  const allTrainers = trainers.data ?? [];
+  const proTrainers = allTrainers.filter((t: { plan: string }) => t.plan === 'pro');
+  const freeTrainers = allTrainers.filter((t: { plan: string }) => t.plan === 'free');
+  const newThisWeek = allTrainers.filter((t: { created_at: string }) => t.created_at >= weekAgo);
+  const verifiedCount = allTrainers.filter((t: { verification_status: string }) => t.verification_status === 'verified').length;
+
+  // Market breakdown
+  const marketCounts: Record<string, { total: number; pro: number }> = {};
+  for (const t of allTrainers as { market: string; plan: string }[]) {
+    const m = t.market ?? 'ae';
+    if (!marketCounts[m]) marketCounts[m] = { total: 0, pro: 0 };
+    marketCounts[m].total++;
+    if (t.plan === 'pro') marketCounts[m].pro++;
+  }
+
+  const mrr = proTrainers.length * 149; // AED
+  const academyRevenue = (academyBookings.data ?? []).reduce((sum: number, b: { amount_paid: number }) => sum + (b.amount_paid ?? 0), 0);
+  const platformFee = Math.round(academyRevenue * 0.1);
+
+  return {
+    totalTrainers: allTrainers.length,
+    proCount: proTrainers.length,
+    freeCount: freeTrainers.length,
+    newThisWeek: newThisWeek.length,
+    verifiedCount,
+    mrr,
+    leadsThisWeek: (leads.data ?? []).length,
+    pendingCerts: (certs.data ?? []).length,
+    waitlistThisWeek: (waitlist.data ?? []).length,
+    academyRevenue,
+    platformFee,
+    supportConvs: (conversations.data ?? []).length,
+    marketCounts,
+  };
+}
+
+// ── Main handler ──────────────────────────────────────────────────────────────
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: CORS_HEADERS });
 
-  // Health check
   if (req.method === 'GET') {
-    return new Response(JSON.stringify({ status: 'ok', agent: 'ceo-agent', version: '1.0.0' }), {
+    return new Response(JSON.stringify({ status: 'ok', agent: 'ceo-agent', version: '2.0.0' }), {
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
-  // Proactive notification endpoint (called by other agents)
   const url = new URL(req.url);
+
+  // Proactive notification endpoint (called by other agents or cron)
   if (req.method === 'POST' && url.pathname.endsWith('/notify')) {
     return handleNotify(req);
+  }
+
+  // Scheduled briefing endpoint (called by pg_cron or external cron)
+  if (req.method === 'POST' && url.pathname.endsWith('/brief')) {
+    return handleScheduledBrief();
   }
 
   // Telegram webhook
@@ -100,100 +202,110 @@ async function handleTelegramUpdate(req: Request): Promise<Response> {
   if (!message) return new Response('ok', { status: 200 });
 
   const chatId = (message.chat as Record<string, unknown>)?.id as number;
-  const text = (message.text as string) ?? '';
-  const from = message.from as Record<string, unknown>;
+  const text = ((message.text as string) ?? '').trim();
 
-  log.info('Telegram message', { chatId, text: text.substring(0, 50) });
-
-  // Auth check
   if (!isAuthorized(chatId)) {
-    await sendMessage(chatId, '⛔ Unauthorized. This bot is private.');
+    await sendMessage(chatId, 'This is a private executive channel.');
     return new Response('ok', { status: 200 });
   }
 
-  // Route commands
-  const command = text.split(' ')[0].toLowerCase();
-  const args = text.slice(command.length).trim();
+  const command = text.startsWith('/') ? text.split(' ')[0].toLowerCase() : null;
+  const args = command ? text.slice(command.length).trim() : text;
 
   try {
-    switch (command) {
-      case '/start':
-        await handleStart(chatId, from);
-        break;
-      case '/status':
-        await handleStatus(chatId);
-        break;
-      case '/growth':
-        await handleTriggerGrowth(chatId);
-        break;
-      case '/content':
-        await handleTriggerContent(chatId);
-        break;
-      case '/meta':
-        await handleTriggerMeta(chatId);
-        break;
-      case '/posts':
-        await handleListPosts(chatId);
-        break;
-      case '/memo':
-        await handleLatestMemo(chatId);
-        break;
-      case '/ask':
-        if (!args) {
-          await sendMessage(chatId, '❓ Usage: `/ask <your question>`\n\nExample: `/ask Why is our join conversion low?`');
-        } else {
-          await handleAsk(chatId, args);
-        }
-        break;
-      case '/help':
-        await handleHelp(chatId);
-        break;
-      case '/global':
-        await handleGlobal(chatId);
-        break;
-      case '/waitlist':
-        await handleWaitlist(chatId, args);
-        break;
-      case '/markets':
-        await handleMarkets(chatId);
-        break;
-      case '/pending':
-        await handlePending(chatId);
-        break;
-      case '/academy':
-        await handleAcademy(chatId);
-        break;
-      case '/learn':
-        if (!args) {
-          await sendMessage(chatId, '📚 Usage: `/learn <topic>`\n\nExamples:\n`/learn hormozi` — show all Hormozi frameworks\n`/learn growth` — show all growth frameworks\n`/learn pricing` — show pricing frameworks');
-        } else {
+    if (command) {
+      switch (command) {
+        case '/start':
+          await handleIntro(chatId);
+          break;
+        case '/brief':
+          await handleBriefing(chatId);
+          break;
+        case '/status':
+          await handleStatus(chatId);
+          break;
+        case '/global':
+          await handleGlobal(chatId);
+          break;
+        case '/markets':
+          await handleMarkets(chatId);
+          break;
+        case '/waitlist':
+          await handleWaitlist(chatId, args);
+          break;
+        case '/pending':
+          await handlePending(chatId);
+          break;
+        case '/academy':
+          await handleAcademy(chatId);
+          break;
+        case '/run':
+          await handleRunAgent(chatId, args);
+          break;
+        case '/decide':
+          if (!args) {
+            await sendMessage(chatId, 'Usage: `/decide <question>`\n\nExample: `/decide Should we run paid ads in Dubai now?`');
+          } else {
+            await handleDecide(chatId, args);
+          }
+          break;
+        case '/priorities':
+          await handlePriorities(chatId);
+          break;
+        case '/problems':
+          await handleProblems(chatId);
+          break;
+        case '/hire':
+          await handleHire(chatId);
+          break;
+        case '/directive':
+          if (!args) {
+            await sendMessage(chatId, 'Usage: `/directive <goal>`\n\nExample: `/directive get to 10 pro trainers this week`');
+          } else {
+            await handleDirective(chatId, args);
+          }
+          break;
+        case '/ask':
+          await handleFreeform(chatId, args || 'What is the most important thing I should know right now?');
+          break;
+        case '/help':
+          await handleHelp(chatId);
+          break;
+        // Legacy commands
+        case '/growth':
+          await handleRunAgent(chatId, 'growth');
+          break;
+        case '/content':
+          await handleRunAgent(chatId, 'content');
+          break;
+        case '/meta':
+          await handleRunAgent(chatId, 'meta');
+          break;
+        case '/context':
+          await handlePriorities(chatId);
+          break;
+        case '/learn':
           await handleLearn(chatId, args);
-        }
-        break;
-      case '/directive':
-        if (!args) {
-          await sendMessage(chatId, '🎯 Usage: `/directive <goal>`\n\nExample: `/directive increase pro conversion`\n\nI will apply relevant frameworks from the knowledge base to your current business data and produce an action plan.');
-        } else {
-          await handleDirective(chatId, args);
-        }
-        break;
-      case '/kb':
-        await handleKnowledgeBase(chatId, args);
-        break;
-      case '/context':
-        await handleBusinessContext(chatId);
-        break;
-      default:
-        // Treat any non-command message as a free-form question
-        if (!text.startsWith('/')) {
-          await handleAsk(chatId, text);
-        } else {
+          break;
+        case '/kb':
+          await handleKB(chatId);
+          break;
+        case '/posts':
+          await handlePosts(chatId);
+          break;
+        case '/memo':
+          await handleMemo(chatId);
+          break;
+        default:
           await sendMessage(chatId, `Unknown command: \`${command}\`\n\nType /help to see all commands.`);
-        }
+      }
+    } else {
+      // Natural language — treat as conversation with the CEO
+      await handleFreeform(chatId, text);
     }
   } catch (err) {
     log.exception(err);
-    await sendMessage(chatId, '⚠️ Something went wrong. Check the Supabase logs.');
+    await sendMessage(chatId, `Something went wrong on my end. I've logged it. Try again.`);
   }
 
   return new Response('ok', { status: 200 });
@@ -201,728 +313,163 @@ async function handleTelegramUpdate(req: Request): Promise<Response> {
 
 // ── Command handlers ──────────────────────────────────────────────────────────
 
-async function handleStart(chatId: number, from: Record<string, unknown>): Promise<void> {
-  const name = (from?.first_name as string) ?? 'Founder';
-  await sendMessage(chatId, `👋 *Hey ${name}.*
+async function handleIntro(chatId: number): Promise<void> {
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
 
-I'm your AI CEO for TrainedBy. I run the business while you focus on growth.
+  await sendMessage(chatId, `*TrainedBy — Executive Briefing*
 
-Here's what I manage:
-📈 *Growth Agent* — tracks your funnel, spots drop-offs, emails you weekly
-✍️ *Content Agent* — publishes one SEO blog post per week automatically
-💬 *Support Agent* — answers trainer questions 24/7
-🧠 *Meta Agent* — synthesises everything into weekly product improvement memos
+I'm running the business. Here's where we stand:
 
-*Quick commands:*
-/status — live metrics right now
-/growth — trigger weekly growth digest
-/content — publish a new blog post
-/meta — run product improvement analysis
-/ask — ask me anything about the business
+👥 *${snap.totalTrainers}* trainers on platform (${snap.proCount} Pro · ${snap.freeCount} Free)
+💰 *${snap.mrr.toLocaleString()} AED* estimated MRR
+✅ *${snap.verifiedCount}* verified trainers
+📋 *${snap.pendingCerts}* cert reviews pending
+🌍 Active in ${Object.keys(snap.marketCounts).length} markets
 
-What do you want to know?`);
+${snap.totalTrainers === 0 ? '⚠️ No trainers yet. First priority: manual outreach to 10 UAE PTs this week.' : snap.proCount === 0 ? '⚠️ Zero Pro subscribers. The product is live but not converting. That is the problem to solve.' : `📈 Growing. ${snap.newThisWeek} new trainers this week.`}
+
+What do you want to work on?`);
 }
 
-async function handleHelp(chatId: number): Promise<void> {
-  await sendMessage(chatId, `*TrainedBy CEO Agent — Commands*
+async function handleBriefing(chatId: number): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
 
-  /status — Live health check + key metrics
-/global — All markets overview (trainers, MRR, waitlist)
-/markets — Per-market breakdown table
-/waitlist [market] — Latest waitlist signups
-/pending — Cert reviews awaiting approval
-/academy — Academy bookings and revenue
-/growth — Trigger growth agent digest now
-/content — Generate + publish a new blog post
-/meta — Run product improvement memo now
-/posts — List recent blog posts
-/memo — Show latest meta-agent memo
-/ask <question> — Ask me anything about the business
+  // Get latest agent memo
+  const { data: latestMemo } = await sb
+    .from('agent_memos')
+    .select('agent, summary, created_at')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
 
-Or just type any message — I'll answer it directly.
+  const memoLine = latestMemo
+    ? `\n🤖 Last agent run: *${(latestMemo as { agent: string; summary: string; created_at: string }).agent}* — ${(latestMemo as { agent: string; summary: string; created_at: string }).summary?.substring(0, 80) ?? 'completed'}`
+    : '';
 
-*Strategic commands:*
-/learn <topic> — browse knowledge base by topic or source
-/directive <goal> — apply frameworks to a business goal
-/kb — show knowledge base summary
-/context — show current business context snapshot`);
+  const marketLines = Object.entries(snap.marketCounts)
+    .sort((a, b) => b[1].total - a[1].total)
+    .slice(0, 4)
+    .map(([m, c]) => `  ${m.toUpperCase()}: ${c.total} trainers, ${c.pro} Pro`)
+    .join('\n');
+
+  // Generate CEO priority for today
+  const priority = snap.proCount === 0
+    ? 'Convert first Pro subscriber — offer a 30-day free trial to the top 3 free trainers by profile completeness'
+    : snap.pendingCerts > 0
+    ? `Clear ${snap.pendingCerts} pending cert review${snap.pendingCerts > 1 ? 's' : ''} — verified trainers convert 3× better`
+    : snap.newThisWeek === 0
+    ? 'Zero new signups this week — run outreach-agent or post in UAE fitness groups today'
+    : `Keep momentum — ${snap.newThisWeek} new trainers this week. Focus on activation (profile completion).`;
+
+  await sendMessage(chatId, `*Morning Briefing*
+_${new Date().toLocaleDateString('en-AE', { weekday: 'long', day: 'numeric', month: 'long' })}_
+
+📊 *Platform*
+  Trainers: ${snap.totalTrainers} (${snap.proCount} Pro · +${snap.newThisWeek} this week)
+  MRR: ${snap.mrr.toLocaleString()} AED
+  Leads this week: ${snap.leadsThisWeek}
+  Pending certs: ${snap.pendingCerts}
+  Waitlist (new): ${snap.waitlistThisWeek}
+
+🌍 *Markets*
+${marketLines || '  No market data yet'}
+${memoLine}
+
+🎯 *Today's priority:*
+${priority}`);
 }
 
 async function handleStatus(chatId: number): Promise<void> {
   await sendTyping(chatId);
   const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
 
-  const [trainers, leads, posts, convs, memos] = await Promise.all([
-    sb.from('trainers').select('id, plan, created_at', { count: 'exact' }),
-    sb.from('leads').select('id', { count: 'exact' }),
-    sb.from('blog_posts').select('id, title, published_at').order('published_at', { ascending: false }).limit(1),
-    sb.from('support_conversations').select('id', { count: 'exact' })
-      .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
-    sb.from('agent_memos').select('agent, created_at').order('created_at', { ascending: false }).limit(4),
-  ]);
+  await sendMessage(chatId, `*Platform Status*
 
-  const totalTrainers = trainers.count ?? 0;
-  const proTrainers = (trainers.data ?? []).filter((t: { plan: string }) => t.plan === 'pro').length;
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const newThisWeek = (trainers.data ?? []).filter((t: { created_at: string }) => new Date(t.created_at) > weekAgo).length;
-  const latestPost = posts.data?.[0];
-  const lastMemos = (memos.data ?? []).map((m: { agent: string; created_at: string }) =>
-    `  • ${m.agent}: ${new Date(m.created_at).toLocaleDateString('en-AE')}`
-  ).join('\n');
-
-  await sendMessage(chatId, `📊 *TrainedBy Status*
-
-👥 *Trainers*
-  Total: ${totalTrainers} | Pro: ${proTrainers} | New this week: ${newThisWeek}
-
-📋 *Leads*
-  Total: ${leads.count ?? 0}
-
-✍️ *Latest Blog Post*
-  ${latestPost ? `"${latestPost.title}"\n  Published: ${new Date(latestPost.published_at).toLocaleDateString('en-AE')}` : 'None yet'}
-
-💬 *Support (last 7 days)*
-  ${convs.count ?? 0} conversations handled
-
-🤖 *Agent Last Runs*
-${lastMemos || '  No runs yet'}
+👥 Trainers: *${snap.totalTrainers}* (${snap.proCount} Pro · ${snap.freeCount} Free)
+✅ Verified: *${snap.verifiedCount}*
+💰 Est. MRR: *${snap.mrr.toLocaleString()} AED*
+📋 Pending certs: *${snap.pendingCerts}*
+📩 Leads this week: *${snap.leadsThisWeek}*
+🏋️ Academy revenue (30d): *${snap.academyRevenue.toLocaleString()} AED* (platform fee: ${snap.platformFee.toLocaleString()} AED)
+💬 Support convs (7d): *${snap.supportConvs}*
+🌍 Waitlist signups (7d): *${snap.waitlistThisWeek}*
 
 All systems operational ✅`);
 }
 
-async function handleTriggerGrowth(chatId: number): Promise<void> {
-  await sendMessage(chatId, '📈 Triggering growth agent digest...');
-  await sendTyping(chatId);
-
-  try {
-    const res = await fetch(`${SELF_URL()}/growth-agent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY()}` },
-      body: JSON.stringify({ action: 'digest' }),
-    });
-    const data = await res.json();
-
-    if (data.error) {
-      await sendMessage(chatId, `❌ Growth agent failed: ${data.error}`);
-      return;
-    }
-
-    const memo = data.memo ?? {};
-    const drops = memo.biggest_drop_step ? `\n📉 Biggest drop: *${memo.biggest_drop_step}* (${memo.biggest_drop_pct?.toFixed(0)}%)` : '';
-    const hyp = memo.hypothesis ? `\n\n💡 *Hypothesis:* ${memo.hypothesis}` : '';
-    const suggs = (memo.suggestions as string[] ?? []).slice(0, 3).map((s: string, i: number) => `  ${i + 1}. ${s}`).join('\n');
-
-    await sendMessage(chatId, `📈 *Growth Digest*
-
-👥 New trainers: *${memo.new_trainers ?? 0}* (${memo.new_trainers_delta >= 0 ? '+' : ''}${memo.new_trainers_delta ?? 0} vs last week)
-📊 Overall conversion: *${memo.overall_conversion_pct ?? 0}%*${drops}${hyp}
-
-*Suggestions:*
-${suggs || '  No data yet — add funnel tracking to the frontend'}`);
-  } catch (err) {
-    await sendMessage(chatId, `❌ Error: ${String(err)}`);
-  }
-}
-
-async function handleTriggerContent(chatId: number): Promise<void> {
-  await sendMessage(chatId, '✍️ Generating new blog post... (this takes ~30 seconds)');
-  await sendTyping(chatId);
-
-  try {
-    const res = await fetch(`${SELF_URL()}/content-agent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY()}` },
-      body: JSON.stringify({}),
-    });
-    const data = await res.json();
-
-    if (data.error) {
-      await sendMessage(chatId, `❌ Content agent failed: ${data.error}`);
-      return;
-    }
-
-    const post = data.post ?? {};
-    const quality = data.quality ?? {};
-
-    await sendMessage(chatId, `✅ *New Blog Post Published*
-
-📝 *"${post.title}"*
-🔑 Keyword: ${post.keyword}
-📊 ${post.word_count} words | Slop score: ${quality.slop_score ?? 0}/100
-🔗 trainedby.ae/blog/${post.slug}
-
-${quality.slop_score > 20 ? '⚠️ Slop score is high — review before promoting' : '✅ Quality check passed'}`);
-  } catch (err) {
-    await sendMessage(chatId, `❌ Error: ${String(err)}`);
-  }
-}
-
-async function handleTriggerMeta(chatId: number): Promise<void> {
-  await sendMessage(chatId, '🧠 Running meta-agent analysis... (this takes ~30 seconds)');
-  await sendTyping(chatId);
-
-  try {
-    const res = await fetch(`${SELF_URL()}/meta-agent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY()}` },
-      body: JSON.stringify({}),
-    });
-    const data = await res.json();
-
-    if (data.error) {
-      await sendMessage(chatId, `❌ Meta agent failed: ${data.error}`);
-      return;
-    }
-
-    const memo = data.memo ?? {};
-    const improvements = (memo.improvements as Array<{ rank: number; title: string; metric_moved: string }> ?? [])
-      .slice(0, 3)
-      .map(i => `  ${i.rank}. *${i.title}* → ${i.metric_moved}`)
-      .join('\n');
-
-    const quickWin = memo.quick_win as { title: string; estimated_hours: number } | undefined;
-    const bigBet = memo.big_bet as { title: string; success_metric: string } | undefined;
-
-    await sendMessage(chatId, `🧠 *Weekly Product Memo*
-
-${memo.executive_summary ?? 'No summary'}
-
-*Top 3 Improvements:*
-${improvements || '  No data yet'}
-
-⚡ *Quick Win (${quickWin?.estimated_hours ?? '?'}h):* ${quickWin?.title ?? 'N/A'}
-
-🎯 *Big Bet:* ${bigBet?.title ?? 'N/A'}
-  Success metric: ${bigBet?.success_metric ?? 'N/A'}
-
-📌 *Watch this week:* ${memo.watch_metric ?? 'N/A'}`);
-  } catch (err) {
-    await sendMessage(chatId, `❌ Error: ${String(err)}`);
-  }
-}
-
-async function handleListPosts(chatId: number): Promise<void> {
-  await sendTyping(chatId);
-  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
-  const { data } = await sb
-    .from('blog_posts')
-    .select('title, keyword, word_count, published_at, slug')
-    .order('published_at', { ascending: false })
-    .limit(8);
-
-  if (!data || data.length === 0) {
-    await sendMessage(chatId, '📝 No blog posts yet. Use /content to generate the first one.');
-    return;
-  }
-
-  const list = data.map((p: { title: string; keyword: string; word_count: number; published_at: string; slug: string }, i: number) =>
-    `${i + 1}. *${p.title}*\n   ${p.keyword} | ${p.word_count}w | ${new Date(p.published_at).toLocaleDateString('en-AE')}`
-  ).join('\n\n');
-
-  await sendMessage(chatId, `📝 *Recent Blog Posts*\n\n${list}`);
-}
-
-async function handleLatestMemo(chatId: number): Promise<void> {
-  await sendTyping(chatId);
-  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
-  const { data } = await sb
-    .from('agent_memos')
-    .select('memo, created_at')
-    .eq('agent', 'meta-agent')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
-
-  if (!data) {
-    await sendMessage(chatId, '🧠 No memo yet. Use /meta to generate one.');
-    return;
-  }
-
-  const memo = data.memo as Record<string, unknown>;
-  const improvements = (memo.improvements as Array<{ rank: number; title: string }> ?? [])
-    .slice(0, 5)
-    .map(i => `  ${i.rank}. ${i.title}`)
-    .join('\n');
-
-  await sendMessage(chatId, `🧠 *Latest Product Memo*
-_Generated: ${new Date(data.created_at).toLocaleDateString('en-AE')}_
-
-${memo.executive_summary ?? ''}
-
-*Improvements:*
-${improvements}
-
-⚡ Quick win: ${(memo.quick_win as { title: string })?.title ?? 'N/A'}
-🎯 Big bet: ${(memo.big_bet as { title: string })?.title ?? 'N/A'}
-📌 Watch: ${memo.watch_metric ?? 'N/A'}`);
-}
-
-async function handleAsk(chatId: number, question: string): Promise<void> {
-  await sendTyping(chatId);
-
-  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
-
-  // Pull recent context from DB
-  const [trainers, posts, memos, convs] = await Promise.all([
-    sb.from('trainers').select('plan, created_at').order('created_at', { ascending: false }).limit(100),
-    sb.from('blog_posts').select('title, keyword, published_at').order('published_at', { ascending: false }).limit(5),
-    sb.from('agent_memos').select('agent, memo, created_at').order('created_at', { ascending: false }).limit(3),
-    sb.from('support_conversations').select('question, answer').order('created_at', { ascending: false }).limit(5),
-  ]);
-
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const totalTrainers = trainers.data?.length ?? 0;
-  const proTrainers = (trainers.data ?? []).filter((t: { plan: string }) => t.plan === 'pro').length;
-  const newThisWeek = (trainers.data ?? []).filter((t: { created_at: string }) => new Date(t.created_at) > weekAgo).length;
-
-  const context = `
-Current business metrics:
-- Total trainers: ${totalTrainers} (${proTrainers} Pro, ${totalTrainers - proTrainers} Free)
-- New trainers this week: ${newThisWeek}
-- Recent blog posts: ${(posts.data ?? []).map((p: { title: string }) => p.title).join(', ')}
-- Recent agent memos: ${(memos.data ?? []).map((m: { agent: string; created_at: string }) => `${m.agent} (${new Date(m.created_at).toLocaleDateString()})`).join(', ')}
-- Recent support questions: ${(convs.data ?? []).map((c: { question: string }) => c.question).join(' | ')}
-`;
-
-  const systemPrompt = `You are the AI CEO of TrainedBy.ae — a UAE platform for verified personal trainers. You have full visibility into the business metrics, agent outputs, and product roadmap.
-
-You communicate via Telegram with the founder. Be direct, specific, and actionable. No fluff. If you don't know something, say so.
-
-${context}`;
-
-  try {
-    const response = await callClaude(ANTHROPIC_KEY(), {
-      model: 'claude-haiku-4-5',
-      system: systemPrompt,
-      messages: [{ role: 'user', content: question }],
-      max_tokens: 500,
-      temperature: 0.4,
-    });
-
-    await sendMessage(chatId, response.text);
-  } catch (err) {
-    log.warn('Claude call failed in /ask', { error: String(err) });
-    await sendMessage(chatId, `I couldn't process that right now. Try /status for live metrics or /help for available commands.`);
-  }
-}
-
-// ── Knowledge base commands ─────────────────────────────────────────────────
-
-async function handleLearn(chatId: number, query: string): Promise<void> {
-  await sendTyping(chatId);
-  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
-
-  // Search by source name or category or tags
-  const q = query.toLowerCase().trim();
-  const { data } = await sb
-    .from('knowledge_base')
-    .select('source, category, title, content, tags')
-    .or(`source.ilike.%${q}%,category.ilike.%${q}%,title.ilike.%${q}%,tags.cs.{${q}}`)
-    .limit(5);
-
-  if (!data || data.length === 0) {
-    await sendMessage(chatId, `📚 No knowledge base entries found for "${query}".\n\nTry: hormozi, growth, pricing, retention, metrics, market, offer, content`);
-    return;
-  }
-
-  const entries = data.map((e: { source: string; category: string; title: string; content: string }, i: number) =>
-    `*${i + 1}. ${e.title}*\n_[${e.source} / ${e.category}]_\n${e.content.substring(0, 300)}${e.content.length > 300 ? '...' : ''}`
-  ).join('\n\n─────\n\n');
-
-  await sendMessage(chatId, `📚 *Knowledge Base: "${query}"* (${data.length} results)\n\n${entries}`);
-}
-
-async function handleKnowledgeBase(chatId: number, filter: string): Promise<void> {
-  await sendTyping(chatId);
-  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
-
-  const { data } = await sb
-    .from('knowledge_base')
-    .select('source, category, title')
-    .order('source')
-    .order('category');
-
-  if (!data || data.length === 0) {
-    await sendMessage(chatId, '📚 Knowledge base is empty. It will be populated automatically.');
-    return;
-  }
-
-  // Group by source
-  const grouped: Record<string, string[]> = {};
-  for (const e of data as { source: string; category: string; title: string }[]) {
-    if (!grouped[e.source]) grouped[e.source] = [];
-    grouped[e.source].push(`  • ${e.title}`);
-  }
-
-  const summary = Object.entries(grouped)
-    .map(([src, titles]) => `*${src}* (${titles.length})\n${titles.join('\n')}`)
-    .join('\n\n');
-
-  await sendMessage(chatId, `📚 *Knowledge Base* (${data.length} entries)\n\n${summary}\n\nUse /learn <topic> to read any entry.`);
-}
-
-async function handleBusinessContext(chatId: number): Promise<void> {
-  await sendTyping(chatId);
-  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
-
-  const { data } = await sb
-    .from('business_context')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
-
-  if (!data) {
-    // Generate a fresh context snapshot
-    await sendMessage(chatId, '📊 No business context snapshot yet. Generating one now...');
-    await updateBusinessContext(sb);
-    await sendMessage(chatId, '✅ Business context updated. Run /context again to view it.');
-    return;
-  }
-
-  const ctx = data as Record<string, unknown>;
-  const problems = (ctx.open_problems as string[] ?? []).map((p: string, i: number) => `  ${i + 1}. ${p}`).join('\n');
-
-  await sendMessage(chatId, `📊 *Business Context Snapshot*
-_Week of ${ctx.week_start}_
-
-💰 MRR: *${ctx.mrr_aed} AED*
-👥 Trainers: *${ctx.trainer_count}* (${ctx.pro_count} Pro, ${ctx.free_count} Free)
-📈 New this week: *${ctx.new_signups_week}*
-📉 Churn: *${ctx.churn_week}*
-🔄 Funnel conversion: *${ctx.funnel_conversion}%*
-
-🎯 *Strategic Priority:*
-${ctx.strategic_priority ?? 'Not set'}
-
-⚠️ *Open Problems:*
-${problems || '  None logged'}
-
-💡 *Hormozi Diagnosis:*
-${ctx.hormozi_diagnosis ?? 'Not generated yet — run /directive to get one'}`);
-}
-
-async function updateBusinessContext(sb: ReturnType<typeof createClient>): Promise<void> {
-  const [trainers, funnel] = await Promise.all([
-    sb.from('trainers').select('plan, created_at'),
-    sb.from('funnel_events').select('event_name').gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
-  ]);
-
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const allTrainers = trainers.data ?? [];
-  const proCount = allTrainers.filter((t: { plan: string }) => t.plan === 'pro').length;
-  const newThisWeek = allTrainers.filter((t: { created_at: string }) => new Date(t.created_at) > weekAgo).length;
-  const mrr = proCount * 149;
-
-  const events = funnel.data ?? [];
-  const landingViews = events.filter((e: { event_name: string }) => e.event_name === 'join_landing_view').length;
-  const signups = events.filter((e: { event_name: string }) => e.event_name === 'join_signup_complete').length;
-  const conversion = landingViews > 0 ? Math.round((signups / landingViews) * 100) : 0;
-
-  const weekStart = new Date();
-  weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-
-  await sb.from('business_context').upsert({
-    week_start: weekStart.toISOString().split('T')[0],
-    mrr_aed: mrr,
-    trainer_count: allTrainers.length,
-    pro_count: proCount,
-    free_count: allTrainers.length - proCount,
-    new_signups_week: newThisWeek,
-    churn_week: 0,
-    funnel_conversion: conversion,
-    strategic_priority: proCount < 10 ? 'Get to 10 Pro trainers before running paid ads' : 'Scale to 50 Pro trainers',
-    open_problems: JSON.stringify([
-      landingViews === 0 ? 'No funnel tracking data yet — frontend events not firing' : null,
-      proCount === 0 ? 'Zero Pro subscribers — pricing or value proposition may need work' : null,
-      allTrainers.length < 5 ? 'Less than 5 trainers — cold start problem, need manual outreach' : null,
-    ].filter(Boolean)),
-  }, { onConflict: 'week_start' });
-}
-
-// ── Directive handler ─────────────────────────────────────────────────────────
-
-async function handleDirective(chatId: number, directive: string): Promise<void> {
-  await sendTyping(chatId);
-  await sendMessage(chatId, `🎯 Processing directive: "${directive}"\n\nSearching knowledge base and analysing business data...`);
-
-  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
-
-  // Extract keywords from directive for KB search
-  const keywords = directive.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-  const searchTerms = keywords.slice(0, 3);
-
-  // Search knowledge base for relevant frameworks
-  const kbResults = await Promise.all(
-    searchTerms.map(term =>
-      sb.from('knowledge_base')
-        .select('source, title, content, category')
-        .or(`title.ilike.%${term}%,content.ilike.%${term}%,tags.cs.{${term}},category.ilike.%${term}%`)
-        .limit(3)
-    )
-  );
-
-  const allKb: Array<{ source: string; title: string; content: string; category: string }> = [];
-  const seen = new Set<string>();
-  for (const r of kbResults) {
-    for (const e of (r.data ?? []) as Array<{ source: string; title: string; content: string; category: string }>) {
-      if (!seen.has(e.title)) {
-        seen.add(e.title);
-        allKb.push(e);
-      }
-    }
-  }
-
-  // Get current business context
-  const [trainers, funnel, ctx] = await Promise.all([
-    sb.from('trainers').select('plan, created_at').limit(200),
-    sb.from('funnel_events').select('event_name').gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
-    sb.from('business_context').select('*').order('created_at', { ascending: false }).limit(1).single(),
-  ]);
-
-  const allTrainers = trainers.data ?? [];
-  const proCount = allTrainers.filter((t: { plan: string }) => t.plan === 'pro').length;
-  const events = funnel.data ?? [];
-  const landingViews = events.filter((e: { event_name: string }) => e.event_name === 'join_landing_view').length;
-  const signups = events.filter((e: { event_name: string }) => e.event_name === 'join_signup_complete').length;
-  const conversion = landingViews > 0 ? ((signups / landingViews) * 100).toFixed(1) : 'unknown';
-
-  const businessData = `
-Current business state:
-- Trainers: ${allTrainers.length} total, ${proCount} Pro
-- MRR: ${proCount * 149} AED
-- Funnel (last 30 days): ${landingViews} landing views → ${signups} signups = ${conversion}% conversion
-- Strategic priority: ${(ctx.data as Record<string, unknown>)?.strategic_priority ?? 'not set'}
-`;
-
-  const kbContext = allKb.length > 0
-    ? `\nRelevant frameworks from knowledge base:\n${allKb.map(e => `[${e.source} / ${e.category}] ${e.title}:\n${e.content.substring(0, 400)}`).join('\n\n')}`
-    : '\nNo directly relevant frameworks found in knowledge base.';
-
-  const systemPrompt = `You are the AI CEO of TrainedBy.ae, a UAE platform for verified personal trainers. You have deep knowledge of Alex Hormozi's frameworks (Grand Slam Offer, Value Equation, Success Gate), Andrew Chen's cold start problem, Lenny Rachitsky's growth loops, and SaaS metrics.
-
-The founder has issued a strategic directive. Your job is to:
-1. Identify the most relevant framework(s) from the knowledge base
-2. Apply them to the current business data
-3. Produce a specific, ranked action plan with clear owners (which agent or human)
-4. Name the exact metric that will move if the plan works
-
-Be direct. No fluff. Every action must be specific and executable this week.`;
-
-  const userMessage = `Directive: "${directive}"
-
-${businessData}
-${kbContext}
-
-Produce a strategic action plan. Format as:
-1. Framework applied: [name]
-2. Diagnosis: [what the data tells us]
-3. Action plan (3-5 steps, each with: action, owner, timeline, success metric)
-4. The one metric to watch this week`;
-
-  try {
-    const response = await callClaude(ANTHROPIC_KEY(), {
-      model: 'claude-sonnet-4-5',
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }],
-      max_tokens: 800,
-      temperature: 0.3,
-    });
-
-    // Save directive to DB
-    await sb.from('directives').insert({
-      directive,
-      status: 'in_progress',
-      framework: allKb[0]?.source ?? 'general',
-      action_plan: { raw_response: response.text },
-    });
-
-    await sendMessage(chatId, `🎯 *Directive: "${directive}"*\n\n${response.text}\n\n_Saved to directives log. Use /context to see open problems._`);
-  } catch (err) {
-    log.warn('Claude call failed in /directive', { error: String(err) });
-    await sendMessage(chatId, `⚠️ Could not generate action plan. Here are the relevant frameworks I found:\n\n${allKb.map(e => `*${e.title}* (${e.source})`).join('\n')}`);
-  }
-}
-
-// ── Proactive notification handler ────────────────────────────────────────────
-
-async function handleNotify(req: Request): Promise<Response> {
-  try {
-    const { type, data } = await req.json() as { type: string; data: Record<string, unknown> };
-    const chatId = FOUNDER_CHAT_ID();
-
-    switch (type) {
-      case 'blog_published':
-        await sendMessage(chatId, `✍️ *New post published*\n\n"${data.title}"\n🔑 ${data.keyword} | ${data.word_count}w\n🔗 trainedby.ae/blog/${data.slug}`);
-        break;
-      case 'growth_digest':
-        await sendMessage(chatId, `📈 *Weekly Growth Digest ready*\n\n${data.summary ?? 'Check /growth for details'}`);
-        break;
-      case 'meta_memo':
-        await sendMessage(chatId, `🧠 *Weekly Product Memo ready*\n\n${data.summary ?? 'Check /memo for details'}`);
-        break;
-      case 'new_signup': {
-        const t = data as any;
-        const pct = t.completion_pct ?? 0;
-        const bar = '█'.repeat(Math.round(pct / 10)) + '░'.repeat(10 - Math.round(pct / 10));
-        await sendMessage(chatId,
-          `🆕 *New trainer signed up*\n\n` +
-          `👤 *${t.name}*\n` +
-          `📧 ${t.email}\n` +
-          `📍 ${t.city || 'City not set'}\n` +
-          `🏅 REPs: ${t.reps_verified ? '✓ Verified' : 'Not yet'}\n` +
-          `📊 Profile: ${bar} ${pct}%\n\n` +
-          `Reply within the hour for best conversion.`
-        );
-        break;
-      }
-      case 'pro_upgrade': {
-        const t = data as any;
-        await sendMessage(chatId,
-          `💰 *Pro upgrade!*\n\n` +
-          `👤 *${t.name}*\n` +
-          `📧 ${t.email}\n` +
-          `💳 149 AED/month\n\n` +
-          `That's your MRR growing. Send them the Pro welcome email.`
-        );
-        break;
-      }
-      case 'first_lead': {
-        const t = data as any;
-        await sendMessage(chatId,
-          `🎯 *First lead for a trainer*\n\n` +
-          `Trainer: *${t.trainer_name}*\n` +
-          `Lead: ${t.lead_name} (${t.lead_email || 'no email'})\n` +
-          `Interest: ${t.interest || 'General enquiry'}\n\n` +
-          `The trainer has been notified. This is the moment they decide if TrainedBy is worth it.`
-        );
-        break;
-      }
-      case 'anomaly':
-        await sendMessage(chatId, `🚨 *Anomaly detected*\n\n${data.message}`);
-        break;
-      default:
-        await sendMessage(chatId, `📬 Agent update: ${JSON.stringify(data).substring(0, 200)}`);
-    }
-
-    return new Response(JSON.stringify({ ok: true }), { headers: { 'Content-Type': 'application/json' } });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: { 'Content-Type': 'application/json' } });
-  }
-}
-
-// ── New global dashboard commands ─────────────────────────────────────────────
-
 async function handleGlobal(chatId: number): Promise<void> {
   await sendTyping(chatId);
   const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
 
-  const [trainers, waitlist, certReviews, academyBookings] = await Promise.all([
-    sb.from('trainers').select('plan, market, created_at'),
-    sb.from('market_waitlist').select('market', { count: 'exact' }),
-    sb.from('cert_reviews').select('final_status').eq('final_status', 'pending'),
-    sb.from('academy_bookings').select('amount_paid, status').eq('status', 'confirmed'),
-  ]);
+  const MARKET_LABELS: Record<string, string> = {
+    ae: '🇦🇪 UAE', uk: '🇬🇧 UK', fr: '🇫🇷 France', it: '🇮🇹 Italy',
+    es: '🇪🇸 Spain', mx: '🇲🇽 Mexico', in: '🇮🇳 India',
+  };
 
-  const allTrainers = trainers.data ?? [];
-  const totalTrainers = allTrainers.length;
-  const proTrainers = allTrainers.filter((t: { plan: string }) => t.plan === 'pro').length;
-  const freeTrainers = totalTrainers - proTrainers;
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const newThisWeek = allTrainers.filter((t: { created_at: string }) => new Date(t.created_at) > weekAgo).length;
-  const mrrAed = proTrainers * 149;
-  const totalWaitlist = waitlist.count ?? 0;
-  const pendingCerts = certReviews.data?.length ?? 0;
-  const academyRevenue = (academyBookings.data ?? []).reduce((sum: number, b: { amount_paid: number }) => sum + (b.amount_paid ?? 0), 0);
+  const PAYMENT_MARKETS = new Set(['ae', 'uk', 'com']);
 
-  // Market breakdown
-  const marketCounts: Record<string, { total: number; pro: number }> = {};
-  for (const t of allTrainers as { plan: string; market: string }[]) {
-    const m = t.market ?? 'ae';
-    if (!marketCounts[m]) marketCounts[m] = { total: 0, pro: 0 };
-    marketCounts[m].total++;
-    if (t.plan === 'pro') marketCounts[m].pro++;
-  }
-
-  const marketLines = Object.entries(marketCounts)
+  const marketLines = Object.entries(snap.marketCounts)
     .sort((a, b) => b[1].total - a[1].total)
-    .map(([m, c]) => `  ${m.toUpperCase()}: ${c.total} trainers (${c.pro} Pro)`)
+    .map(([m, c]) => {
+      const label = MARKET_LABELS[m] ?? m.toUpperCase();
+      const payStatus = PAYMENT_MARKETS.has(m) ? '💳 Live' : '⏳ Waitlist';
+      const mrr = c.pro * 149;
+      return `${label}: ${c.total} trainers · ${c.pro} Pro · ${mrr > 0 ? mrr.toLocaleString() + ' AED' : payStatus}`;
+    })
     .join('\n');
 
-  await sendMessage(chatId, `🌍 *TrainedBy Global Dashboard*
+  // Waitlist totals
+  const { data: wlData } = await sb
+    .from('market_waitlist')
+    .select('market')
+    .in('market', ['fr', 'it', 'es', 'mx', 'in']);
 
-👥 *Trainers*
-  Total: *${totalTrainers}* | Pro: *${proTrainers}* | Free: *${freeTrainers}*
-  New this week: *${newThisWeek}*
+  const wlCounts: Record<string, number> = {};
+  for (const w of (wlData ?? []) as { market: string }[]) {
+    wlCounts[w.market] = (wlCounts[w.market] ?? 0) + 1;
+  }
+  const wlTotal = Object.values(wlCounts).reduce((a, b) => a + b, 0);
+  const wlLines = Object.entries(wlCounts).map(([m, c]) => `  ${MARKET_LABELS[m] ?? m}: ${c}`).join('\n');
 
-💰 *Revenue*
-  Trainer MRR: *${mrrAed} AED* (~$${Math.round(mrrAed / 3.67)})
-  Academy revenue: *${academyRevenue.toFixed(0)} AED*
+  await sendMessage(chatId, `*Global Overview*
 
-📋 *Pipeline*
-  Waitlist signups: *${totalWaitlist}* (unlaunched markets)
-  Cert reviews pending: *${pendingCerts}*
+📊 *Totals*
+  Trainers: ${snap.totalTrainers} · Pro: ${snap.proCount} · MRR: ${snap.mrr.toLocaleString()} AED
 
-🗺 *By Market*
-${marketLines || '  No market data yet'}
+🌍 *By Market*
+${marketLines || '  No data yet'}
 
-Use /markets for full breakdown | /waitlist for signups | /pending for cert queue`);
+⏳ *Waitlist* (${wlTotal} total)
+${wlLines || '  No waitlist signups yet'}`);
 }
 
 async function handleMarkets(chatId: number): Promise<void> {
-  await sendTyping(chatId);
-  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
-
-  const [trainers, waitlist] = await Promise.all([
-    sb.from('trainers').select('plan, market'),
-    sb.from('market_waitlist').select('market'),
-  ]);
-
-  const MARKETS = [
-    { code: 'ae', name: 'UAE 🇦🇪', currency: 'AED', price: 149, live: true },
-    { code: 'uk', name: 'UK 🇬🇧', currency: 'GBP', price: 39, live: true },
-    { code: 'us', name: 'US 🇺🇸', currency: 'USD', price: 49, live: true },
-    { code: 'in', name: 'India 🇮🇳', currency: 'INR', price: 1999, live: false },
-    { code: 'fr', name: 'France 🇫🇷', currency: 'EUR', price: 39, live: false },
-    { code: 'it', name: 'Italy 🇮🇹', currency: 'EUR', price: 39, live: false },
-    { code: 'es', name: 'Spain 🇪🇸', currency: 'EUR', price: 39, live: false },
-    { code: 'mx', name: 'Mexico 🇲🇽', currency: 'MXN', price: 399, live: false },
-  ];
-
-  const trainerData = trainers.data ?? [];
-  const waitlistData = waitlist.data ?? [];
-
-  const lines = MARKETS.map(m => {
-    const mTrainers = trainerData.filter((t: { market: string }) => (t.market ?? 'ae') === m.code);
-    const mPro = mTrainers.filter((t: { plan: string }) => t.plan === 'pro').length;
-    const mWait = waitlistData.filter((w: { market: string }) => w.market === m.code).length;
-    const mMrr = mPro * m.price;
-    const status = m.live ? '🟢' : '🟡';
-    return `${status} *${m.name}*\n   Trainers: ${mTrainers.length} (${mPro} Pro) | MRR: ${mMrr} ${m.currency}${!m.live ? ` | Waitlist: ${mWait}` : ''}`;
-  }).join('\n\n');
-
-  await sendMessage(chatId, `🗺 *Market Breakdown*\n\n${lines}\n\n🟢 Live | 🟡 Waitlist mode`);
+  await handleGlobal(chatId);
 }
 
 async function handleWaitlist(chatId: number, filter: string): Promise<void> {
   await sendTyping(chatId);
   const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
 
-  let query = sb.from('market_waitlist').select('name, email, market, source_domain, role, created_at').order('created_at', { ascending: false }).limit(15);
-  if (filter) query = query.eq('market', filter.toLowerCase().trim());
+  const query = sb.from('market_waitlist').select('name, email, market, created_at').order('created_at', { ascending: false }).limit(20);
+  if (filter) query.eq('market', filter.toLowerCase());
 
-  const { data, count } = await query;
-
+  const { data } = await query;
   if (!data || data.length === 0) {
-    await sendMessage(chatId, `📋 No waitlist signups yet${filter ? ` for market "${filter}"` : ''}.\n\nWaitlist is active on: IN, FR, IT, ES, MX`);
+    await sendMessage(chatId, `No waitlist signups yet${filter ? ` for market: ${filter}` : ''}.`);
     return;
   }
 
-  const list = (data as Array<{ name: string; email: string; market: string; role: string; created_at: string }>)
-    .map((w, i) => `${i + 1}. *${w.name || 'Anonymous'}* (${w.market.toUpperCase()})\n   ${w.email} | ${w.role} | ${new Date(w.created_at).toLocaleDateString('en-AE')}`)
-    .join('\n\n');
+  const lines = (data as { name: string; email: string; market: string; created_at: string }[])
+    .map(w => `  • *${w.name}* (${w.market.toUpperCase()}) — ${w.email} — ${new Date(w.created_at).toLocaleDateString('en-AE')}`)
+    .join('\n');
 
-  await sendMessage(chatId, `📋 *Waitlist Signups*${filter ? ` — ${filter.toUpperCase()}` : ' — All Markets'}\n\n${list}\n\nUse /waitlist fr, /waitlist it, /waitlist es etc. to filter by market.`);
+  await sendMessage(chatId, `*Waitlist* (${data.length} shown)\n\n${lines}\n\nUse \`/waitlist fr\` to filter by market.`);
 }
 
 async function handlePending(chatId: number): Promise<void> {
@@ -937,15 +484,15 @@ async function handlePending(chatId: number): Promise<void> {
     .limit(10);
 
   if (!data || data.length === 0) {
-    await sendMessage(chatId, '✅ No pending cert reviews. All clear!');
+    await sendMessage(chatId, 'No pending cert reviews. ✅');
     return;
   }
 
-  const list = (data as Array<{ id: string; trainer_id: string; extracted_name: string; issuing_body: string; expiry_date: string; claude_confidence: number; created_at: string }>)
-    .map((r, i) => `${i + 1}. *${r.extracted_name || 'Unknown'}*\n   ${r.issuing_body || 'Unknown body'} | Expires: ${r.expiry_date || 'N/A'}\n   Confidence: ${Math.round((r.claude_confidence ?? 0) * 100)}% | ${new Date(r.created_at).toLocaleDateString('en-AE')}\n   ID: \`${r.id.substring(0, 8)}\``)
-    .join('\n\n');
+  const lines = (data as { id: string; extracted_name: string; issuing_body: string; expiry_date: string; claude_confidence: number; created_at: string }[])
+    .map((c, i) => `  ${i + 1}. *${c.extracted_name ?? 'Unknown'}* — ${c.issuing_body ?? 'Unknown body'} — Exp: ${c.expiry_date ?? 'N/A'} — Confidence: ${Math.round((c.claude_confidence ?? 0) * 100)}%`)
+    .join('\n');
 
-  await sendMessage(chatId, `⏳ *Pending Cert Reviews* (${data.length})\n\n${list}\n\nReview at: trainedby.ae/admin → Verification Queue`);
+  await sendMessage(chatId, `*Pending Cert Reviews* (${data.length})\n\n${lines}\n\nApprove at: trainedby.ae/admin`);
 }
 
 async function handleAcademy(chatId: number): Promise<void> {
@@ -953,33 +500,419 @@ async function handleAcademy(chatId: number): Promise<void> {
   const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
 
   const [academies, bookings] = await Promise.all([
-    sb.from('academies').select('name, sport, city, plan, created_at'),
-    sb.from('academy_bookings').select('amount_paid, platform_fee, status, created_at').order('created_at', { ascending: false }).limit(50),
+    sb.from('academies').select('id, name, sport, city, plan').order('created_at', { ascending: false }),
+    sb.from('academy_bookings').select('amount_paid, platform_fee, status').eq('status', 'confirmed'),
   ]);
 
-  const allAcademies = academies.data ?? [];
-  const allBookings = bookings.data ?? [];
-  const confirmedBookings = allBookings.filter((b: { status: string }) => b.status === 'confirmed');
-  const totalRevenue = confirmedBookings.reduce((sum: number, b: { amount_paid: number }) => sum + (b.amount_paid ?? 0), 0);
-  const totalFees = confirmedBookings.reduce((sum: number, b: { platform_fee: number }) => sum + (b.platform_fee ?? 0), 0);
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const bookingsThisWeek = confirmedBookings.filter((b: { created_at: string }) => new Date(b.created_at) > weekAgo).length;
+  const totalAcademies = (academies.data ?? []).length;
+  const grossRevenue = (bookings.data ?? []).reduce((sum: number, b: { amount_paid: number }) => sum + (b.amount_paid ?? 0), 0);
+  const platformRevenue = (bookings.data ?? []).reduce((sum: number, b: { platform_fee: number }) => sum + (b.platform_fee ?? 0), 0);
+  const totalBookings = (bookings.data ?? []).length;
 
-  const academyList = allAcademies.slice(0, 5).map((a: { name: string; sport: string; city: string; plan: string }, i: number) =>
-    `  ${i + 1}. *${a.name}* — ${a.sport} | ${a.city} | ${a.plan}`
-  ).join('\n');
+  const academyLines = ((academies.data ?? []) as { name: string; sport: string; city: string; plan: string }[])
+    .slice(0, 5)
+    .map(a => `  • *${a.name}* — ${a.sport} · ${a.city} · ${a.plan}`)
+    .join('\n');
 
-  await sendMessage(chatId, `🏟 *Academy Module*
+  await sendMessage(chatId, `*Academy Module*
 
-🏫 *Academies*
-  Total registered: *${allAcademies.length}*
-${academyList || '  None yet'}
+🏫 Academies: *${totalAcademies}*
+${academyLines || '  None registered yet'}
 
-💰 *Bookings*
-  Total confirmed: *${confirmedBookings.length}*
-  This week: *${bookingsThisWeek}*
-  Gross revenue: *${totalRevenue.toFixed(0)} AED*
-  Platform fees (10%): *${totalFees.toFixed(0)} AED*
+💰 Confirmed bookings: *${totalBookings}*
+  Gross revenue: *${grossRevenue.toLocaleString()} AED*
+  Platform fee (10%): *${platformRevenue.toLocaleString()} AED*
 
-To onboard an academy: POST to /functions/v1/create-academy`);
+To onboard an academy: POST to \`/functions/v1/create-academy\``);
+}
+
+async function handleRunAgent(chatId: number, agentName: string): Promise<void> {
+  const agent = agentName.toLowerCase().trim();
+  const agentMap: Record<string, string> = {
+    growth: 'growth-agent',
+    content: 'content-agent',
+    meta: 'meta-agent',
+    outreach: 'outreach-agent',
+    verify: 'reverify-agent',
+  };
+
+  const slug = agentMap[agent];
+  if (!slug) {
+    await sendMessage(chatId, `Unknown agent: \`${agent}\`\n\nAvailable: growth, content, meta, outreach, verify`);
+    return;
+  }
+
+  await sendMessage(chatId, `Running *${slug}*...`);
+  await sendTyping(chatId);
+
+  try {
+    const res = await fetch(`${SELF_URL()}/${slug}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY()}` },
+      body: JSON.stringify({ action: 'run' }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (data.error) {
+      await sendMessage(chatId, `*${slug}* failed: ${data.error}`);
+      return;
+    }
+
+    // Format response based on agent
+    if (agent === 'growth') {
+      const memo = data.memo ?? {};
+      await sendMessage(chatId, `*Growth Agent — Complete*
+
+New trainers: *${memo.new_trainers ?? 0}* (${memo.new_trainers_delta >= 0 ? '+' : ''}${memo.new_trainers_delta ?? 0} vs last week)
+Conversion: *${memo.overall_conversion_pct ?? 0}%*
+${memo.hypothesis ? `\nHypothesis: ${memo.hypothesis}` : ''}
+${memo.suggestions ? `\nTop actions:\n${(memo.suggestions as string[]).slice(0, 3).map((s: string, i: number) => `  ${i + 1}. ${s}`).join('\n')}` : ''}`);
+    } else if (agent === 'content') {
+      const post = data.post ?? {};
+      await sendMessage(chatId, `*Content Agent — Post Published*\n\n"${post.title ?? 'New post'}"\nKeyword: ${post.keyword ?? 'N/A'}`);
+    } else {
+      await sendMessage(chatId, `*${slug}* completed. ${data.summary ?? 'Check Supabase logs for details.'}`);
+    }
+  } catch (err) {
+    await sendMessage(chatId, `*${slug}* timed out or errored. Check Supabase logs.`);
+    log.warn(`Agent run failed: ${slug}`, { error: String(err) });
+  }
+}
+
+async function handleDecide(chatId: number, question: string): Promise<void> {
+  await sendTyping(chatId);
+  await sendMessage(chatId, `Thinking through: _"${question}"_`);
+
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
+
+  const context = `
+Current state:
+- ${snap.totalTrainers} trainers (${snap.proCount} Pro, ${snap.freeCount} Free)
+- MRR: ${snap.mrr.toLocaleString()} AED
+- ${snap.newThisWeek} new trainers this week
+- ${snap.pendingCerts} pending cert reviews
+- ${snap.leadsThisWeek} leads this week
+- Markets: ${Object.keys(snap.marketCounts).join(', ')}
+- Waitlist markets: FR, IT, ES, MX, IN
+`;
+
+  try {
+    const response = await callClaude(ANTHROPIC_KEY(), {
+      model: 'claude-haiku-4-5',
+      system: CEO_SYSTEM_PROMPT + `\n\nThe founder is asking you to make a decision. Structure your answer as:\n1. Decision: [yes/no/conditional]\n2. Reasoning: [2-3 sentences max]\n3. Condition/caveat: [what would change this]\n4. Action: [one specific next step]\n\nBe direct. No hedging.`,
+      messages: [{
+        role: 'user',
+        content: `Decision needed: "${question}"\n\nBusiness context:\n${context}`,
+      }],
+      max_tokens: 400,
+      temperature: 0.2,
+    });
+
+    await sendMessage(chatId, `*Decision: "${question}"*\n\n${response.text}`);
+  } catch {
+    await sendMessage(chatId, `Couldn't process that decision right now. Try /ask instead.`);
+  }
+}
+
+async function handlePriorities(chatId: number): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
+
+  // Generate dynamic priorities based on current state
+  const priorities: string[] = [];
+
+  if (snap.totalTrainers < 10) {
+    priorities.push('*Get to 10 trainers* — manual outreach to UAE PTs on Instagram and LinkedIn. Target: REPs-verified trainers in Dubai Marina, JLT, DIFC.');
+  } else if (snap.proCount === 0) {
+    priorities.push('*First Pro conversion* — personally call the 3 most active free trainers. Offer 60-day Pro trial in exchange for a testimonial.');
+  } else if (snap.proCount < 10) {
+    priorities.push(`*Scale to 10 Pro trainers* — currently at ${snap.proCount}. Run outreach-agent and follow up manually with leads.`);
+  } else {
+    priorities.push(`*Grow Pro base* — ${snap.proCount} Pro trainers. Target: 50 by end of quarter.`);
+  }
+
+  if (snap.pendingCerts > 0) {
+    priorities.push(`*Clear ${snap.pendingCerts} pending cert review${snap.pendingCerts > 1 ? 's' : ''}* — verified trainers convert 3× better. Do this today.`);
+  }
+
+  if (snap.waitlistThisWeek > 5) {
+    priorities.push(`*Activate waitlist momentum* — ${snap.waitlistThisWeek} signups this week from FR/IT/ES/MX/IN. Consider launching one market early.`);
+  } else {
+    priorities.push('*Build content pipeline* — run content-agent to publish 2 SEO posts this week. Organic traffic is the cheapest acquisition channel.');
+  }
+
+  const lines = priorities.map((p, i) => `${i + 1}. ${p}`).join('\n\n');
+
+  await sendMessage(chatId, `*This Week's Priorities*\n\n${lines}\n\n_Use /decide <question> if you want me to make a call on anything._`);
+}
+
+async function handleProblems(chatId: number): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
+
+  const problems: string[] = [];
+
+  if (snap.totalTrainers === 0) problems.push('*Cold start* — no trainers on platform. Need 10 before any marketing makes sense.');
+  if (snap.proCount === 0 && snap.totalTrainers > 0) problems.push('*Zero revenue* — trainers are signing up but not converting to Pro. Either pricing, value prop, or awareness of Pro features is the blocker.');
+  if (snap.pendingCerts > 3) problems.push(`*Cert review backlog* — ${snap.pendingCerts} reviews pending. Slow verification damages trust.`);
+  if (snap.leadsThisWeek === 0 && snap.totalTrainers > 0) problems.push('*No client leads this week* — trainers are not getting value. This will cause churn.');
+  if (snap.verifiedCount === 0 && snap.totalTrainers > 0) problems.push('*No verified trainers* — the core value proposition (verified trainers) is not yet demonstrated.');
+
+  if (problems.length === 0) {
+    await sendMessage(chatId, `No critical problems right now. Platform is operating normally.\n\nUse /priorities to see what to focus on.`);
+    return;
+  }
+
+  const lines = problems.map((p, i) => `${i + 1}. ${p}`).join('\n\n');
+  await sendMessage(chatId, `*Open Problems* (${problems.length})\n\n${lines}\n\nUse /decide <problem> to get a recommendation on any of these.`);
+}
+
+async function handleHire(chatId: number): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
+
+  let hireAdvice = '';
+
+  if (snap.totalTrainers < 20) {
+    hireAdvice = `*Too early to hire.*\n\nAt ${snap.totalTrainers} trainers and ${snap.mrr.toLocaleString()} AED MRR, every dirham should go into acquisition, not payroll.\n\nWhat you need right now is not employees — it's:\n  1. A part-time community manager (freelance, 2h/day) to seed the trainer community\n  2. A UAE fitness influencer partnership (rev-share, no cash)\n  3. Your own time on outreach for the next 60 days\n\nHire when you hit 50 Pro trainers.`;
+  } else if (snap.proCount < 20) {
+    hireAdvice = `*One hire: a growth operator.*\n\nSomeone who can run outreach, manage partnerships, and own trainer onboarding. UAE-based. Fitness background preferred.\n\nNot a developer. Not a marketer. An operator.\n\nBudget: 8,000–12,000 AED/month. Equity optional.`;
+  } else {
+    hireAdvice = `*Two hires now:*\n\n1. *Growth operator* — owns trainer acquisition and onboarding\n2. *Customer success* — owns trainer retention and Pro upgrades\n\nBoth UAE-based. Both on performance bonuses tied to Pro trainer count.\n\nAt ${snap.mrr.toLocaleString()} AED MRR you can afford both.`;
+  }
+
+  await sendMessage(chatId, `*Hiring Advice*\n\n${hireAdvice}`);
+}
+
+async function handleFreeform(chatId: number, text: string): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
+
+  // Get recent conversation history
+  const { data: history } = await sb
+    .from('ceo_conversations')
+    .select('role, content')
+    .eq('chat_id', String(chatId))
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  const recentMessages = ((history ?? []) as { role: string; content: string }[])
+    .reverse()
+    .map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+
+  const businessContext = `
+Current platform state:
+- ${snap.totalTrainers} trainers (${snap.proCount} Pro · ${snap.freeCount} Free)
+- MRR: ${snap.mrr.toLocaleString()} AED
+- ${snap.newThisWeek} new trainers this week, ${snap.leadsThisWeek} leads
+- ${snap.verifiedCount} verified trainers, ${snap.pendingCerts} pending cert reviews
+- Markets live: AE, UK, COM | Waitlist: FR, IT, ES, MX, IN
+- Academy: ${snap.academyRevenue.toLocaleString()} AED gross revenue (30d)
+`;
+
+  const messages = [
+    ...recentMessages,
+    {
+      role: 'user' as const,
+      content: `${text}\n\n[Business context: ${businessContext}]`,
+    },
+  ];
+
+  try {
+    const response = await callClaude(ANTHROPIC_KEY(), {
+      model: 'claude-haiku-4-5',
+      system: CEO_SYSTEM_PROMPT,
+      messages,
+      max_tokens: 600,
+      temperature: 0.3,
+    });
+
+    // Save conversation to DB
+    await sb.from('ceo_conversations').insert([
+      { chat_id: String(chatId), role: 'user', content: text },
+      { chat_id: String(chatId), role: 'assistant', content: response.text },
+    ]);
+
+    await sendMessage(chatId, response.text);
+  } catch (err) {
+    log.warn('Claude call failed in freeform', { error: String(err) });
+    await sendMessage(chatId, `I couldn't process that right now. Try /status for live metrics or /brief for a full briefing.`);
+  }
+}
+
+async function handleDirective(chatId: number, directive: string): Promise<void> {
+  await sendTyping(chatId);
+  await sendMessage(chatId, `Processing directive: _"${directive}"_\n\nAnalysing business data and assigning tasks...`);
+
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
+
+  const businessData = `
+Platform state:
+- ${snap.totalTrainers} trainers (${snap.proCount} Pro)
+- MRR: ${snap.mrr.toLocaleString()} AED
+- ${snap.newThisWeek} new this week
+- ${snap.leadsThisWeek} leads this week
+- Markets: AE, UK live | FR, IT, ES, MX, IN waitlist
+`;
+
+  try {
+    const response = await callClaude(ANTHROPIC_KEY(), {
+      model: 'claude-haiku-4-5',
+      system: CEO_SYSTEM_PROMPT + `\n\nThe founder has issued a strategic directive. Respond as a CEO who just received a board directive. Format:\n\n**Directive received:** [restate it]\n**My assessment:** [1-2 sentences on feasibility and priority]\n**Agent assignments:**\n- [agent name]: [specific task]\n- [agent name]: [specific task]\n**What I need from you:** [1 specific thing the founder must do]\n**Success metric:** [how we'll know it worked, with a number and timeline]`,
+      messages: [{
+        role: 'user',
+        content: `Directive: "${directive}"\n\n${businessData}`,
+      }],
+      max_tokens: 500,
+      temperature: 0.2,
+    });
+
+    // Save to directives table
+    await sb.from('directives').insert({
+      directive,
+      status: 'in_progress',
+      action_plan: { raw_response: response.text },
+    }).catch(() => null); // Non-blocking
+
+    await sendMessage(chatId, response.text);
+  } catch {
+    await sendMessage(chatId, `Couldn't process that directive right now. Try again in a moment.`);
+  }
+}
+
+async function handleHelp(chatId: number): Promise<void> {
+  await sendMessage(chatId, `*TrainedBy CEO — Commands*
+
+*Briefings*
+/brief — Morning briefing (metrics + today's priority)
+/status — Live platform metrics
+/global — All markets in one view
+/markets — Per-market breakdown
+/priorities — This week's top 3 priorities
+/problems — Open problems I'm tracking
+
+*Operations*
+/pending — Cert reviews awaiting approval
+/waitlist [market] — Waitlist signups
+/academy — Academy bookings and revenue
+
+*Agent Control*
+/run growth — Trigger growth digest
+/run content — Publish a new blog post
+/run meta — Run product improvement memo
+/run outreach — Run outreach agent
+/run verify — Re-verify all trainers
+
+*Strategy*
+/decide <question> — I make a decision with reasoning
+/directive <goal> — I assign tasks to agents
+/hire — Hiring advice based on current stage
+
+Or just *type anything* — I'll respond as your CEO.`);
+}
+
+// ── Legacy handlers ───────────────────────────────────────────────────────────
+
+async function handleLearn(chatId: number, query: string): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const q = query.toLowerCase().trim();
+  const { data } = await sb
+    .from('knowledge_base')
+    .select('source, category, title, content')
+    .or(`source.ilike.%${q}%,category.ilike.%${q}%,title.ilike.%${q}%`)
+    .limit(3);
+
+  if (!data || data.length === 0) {
+    await sendMessage(chatId, `No knowledge base entries found for "${query}".`);
+    return;
+  }
+  const entries = (data as { source: string; category: string; title: string; content: string }[])
+    .map((e, i) => `*${i + 1}. ${e.title}*\n_[${e.source}]_\n${e.content.substring(0, 300)}...`)
+    .join('\n\n');
+  await sendMessage(chatId, `*Knowledge Base: "${query}"*\n\n${entries}`);
+}
+
+async function handleKB(chatId: number): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const { data, count } = await sb.from('knowledge_base').select('source, title', { count: 'exact' }).limit(20);
+  if (!data || data.length === 0) {
+    await sendMessage(chatId, 'Knowledge base is empty.');
+    return;
+  }
+  const lines = (data as { source: string; title: string }[]).map(e => `  • ${e.title} [${e.source}]`).join('\n');
+  await sendMessage(chatId, `*Knowledge Base* (${count ?? data.length} entries)\n\n${lines}\n\nUse /learn <topic> to search.`);
+}
+
+async function handlePosts(chatId: number): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const { data } = await sb.from('blog_posts').select('title, published_at, keyword').order('published_at', { ascending: false }).limit(5);
+  if (!data || data.length === 0) {
+    await sendMessage(chatId, 'No blog posts yet. Use /run content to publish one.');
+    return;
+  }
+  const lines = (data as { title: string; published_at: string; keyword: string }[])
+    .map((p, i) => `  ${i + 1}. *${p.title}*\n     ${new Date(p.published_at).toLocaleDateString('en-AE')} · keyword: ${p.keyword}`)
+    .join('\n\n');
+  await sendMessage(chatId, `*Recent Blog Posts*\n\n${lines}`);
+}
+
+async function handleMemo(chatId: number): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const { data } = await sb.from('agent_memos').select('agent, summary, created_at').order('created_at', { ascending: false }).limit(1).single();
+  if (!data) {
+    await sendMessage(chatId, 'No agent memos yet. Use /run meta to generate one.');
+    return;
+  }
+  const m = data as { agent: string; summary: string; created_at: string };
+  await sendMessage(chatId, `*Latest Memo*\n_${m.agent} · ${new Date(m.created_at).toLocaleDateString('en-AE')}_\n\n${m.summary}`);
+}
+
+// ── Proactive notification handler ────────────────────────────────────────────
+async function handleNotify(req: Request): Promise<Response> {
+  try {
+    const body = await req.json();
+    const { type, data } = body;
+    const chatId = FOUNDER_CHAT_ID();
+
+    const messages: Record<string, string> = {
+      new_trainer: `🆕 *New trainer joined*\n${data?.name ?? 'Someone'} signed up${data?.market ? ` (${data.market.toUpperCase()})` : ''}.`,
+      pro_upgrade: `💰 *Pro upgrade*\n${data?.name ?? 'A trainer'} upgraded to Pro. +149 AED MRR.`,
+      new_lead: `📋 *New lead*\n${data?.client_name ?? 'A client'} contacted ${data?.trainer_name ?? 'a trainer'}.`,
+      cert_submitted: `📄 *Cert review submitted*\n${data?.name ?? 'A trainer'} submitted a certificate for review. Confidence: ${data?.confidence ? Math.round(data.confidence * 100) + '%' : 'N/A'}`,
+      cert_approved: `✅ *Cert approved*\n${data?.name ?? 'A trainer'} is now verified.`,
+      academy_booking: `🏫 *Academy booking*\n${data?.parent_name ?? 'A parent'} booked ${data?.program_name ?? 'a programme'} at ${data?.academy_name ?? 'an academy'}. ${data?.amount ? data.amount.toLocaleString() + ' AED' : ''}`,
+      anomaly: `⚠️ *Anomaly detected*\n${data?.message ?? 'Unusual activity detected. Check the dashboard.'}`,
+      waitlist: `⏳ *Waitlist signup*\n${data?.name ?? 'Someone'} joined the waitlist for ${data?.market ? data.market.toUpperCase() : 'a market'}.`,
+    };
+
+    const msg = messages[type] ?? `📬 *Notification*\n${JSON.stringify(data).substring(0, 200)}`;
+    await sendMessage(chatId, msg);
+
+    return new Response(JSON.stringify({ ok: true }), { headers: { 'Content-Type': 'application/json' } });
+  } catch (err) {
+    log.exception(err);
+    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+  }
+}
+
+// ── Scheduled briefing ────────────────────────────────────────────────────────
+async function handleScheduledBrief(): Promise<Response> {
+  try {
+    await handleBriefing(Number(FOUNDER_CHAT_ID()));
+    return new Response(JSON.stringify({ ok: true }), { headers: { 'Content-Type': 'application/json' } });
+  } catch (err) {
+    log.exception(err);
+    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+  }
 }
