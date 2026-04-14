@@ -1,25 +1,18 @@
 /**
- * TrainedBy — Content Agent v2
+ * TrainedBy — Content Agent v3 (Claude)
  * ─────────────────────────────────────────────────────────────────────────────
- * Generates one SEO-optimised blog post per week targeting UAE personal trainer
- * search queries. Uses the TrainedBy Voice System to ensure every post sounds
- * like a real trainer wrote it — not an AI.
+ * Generates one SEO blog post per week using Claude 3.5 Sonnet.
+ * Claude writes more naturally than GPT for long-form content.
  *
  * POST /functions/v1/content-agent   — generate + publish a new post (cron)
  * GET  /functions/v1/content-agent   — return list of recent posts
- *
- * Anti-slop measures:
- *   1. Strong persona injection via TRAINEDBY_PERSONA
- *   2. Banned phrase list enforced in the prompt
- *   3. Slop score calculated on output — regenerates up to 2x if score > 20
- *   4. Structural constraints: asymmetric sections, UAE-specific examples required
- *   5. Temperature 0.8 for natural variation
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { jsonResponse, errorResponse, CORS_HEADERS } from '../_shared/errors.ts';
 import { createLogger } from '../_shared/logger.ts';
-import { buildSystemPrompt, calculateSlopScore, TRAINEDBY_PERSONA } from '../_shared/voice.ts';
+import { buildSystemPrompt, calculateSlopScore } from '../_shared/voice.ts';
+import { callClaudeJSON } from '../_shared/claude.ts';
 
 const log = createLogger('content-agent');
 
@@ -47,22 +40,17 @@ const KEYWORD_POOL = [
 ];
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers: CORS_HEADERS });
-  }
+  if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: CORS_HEADERS });
   if (req.method === 'GET') return handleListPosts();
   if (req.method === 'POST') return handleGeneratePost();
   return errorResponse('Method not allowed', 405);
 });
 
 async function handleListPosts(): Promise<Response> {
-  const sb = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-  );
+  const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
   const { data, error } = await sb
     .from('blog_posts')
-    .select('id, slug, title, keyword, published_at, word_count, slop_score')
+    .select('id, slug, title, keyword, published_at, word_count')
     .order('published_at', { ascending: false })
     .limit(20);
   if (error) return errorResponse('Failed to fetch posts', 500);
@@ -71,115 +59,88 @@ async function handleListPosts(): Promise<Response> {
 
 async function handleGeneratePost(): Promise<Response> {
   const start = Date.now();
-  log.info('Content agent v2 started');
+  log.info('Content agent v3 (Claude) started');
 
-  const openaiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!openaiKey) return errorResponse('OPENAI_API_KEY not configured', 500);
+  const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
+  if (!anthropicKey) return errorResponse('ANTHROPIC_API_KEY not configured', 500);
 
-  const openaiBase = (Deno.env.get('OPENAI_BASE_URL') ?? 'https://api.openai.com/v1');
-
-  const sb = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-  );
+  const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
   // ── 1. Pick unused keyword ─────────────────────────────────────────────────
   const { data: existingPosts } = await sb
-    .from('blog_posts')
-    .select('keyword')
-    .order('published_at', { ascending: false })
-    .limit(50);
-
+    .from('blog_posts').select('keyword').order('published_at', { ascending: false }).limit(50);
   const usedKeywords = new Set((existingPosts ?? []).map((p: { keyword: string }) => p.keyword));
   const keyword = KEYWORD_POOL.find(k => !usedKeywords.has(k)) ?? KEYWORD_POOL[0];
   log.info('Selected keyword', { keyword });
 
-  // ── 2. Build prompt with voice system ─────────────────────────────────────
+  // ── 2. Build system prompt with persona ───────────────────────────────────
   const systemPrompt = buildSystemPrompt(`
-You are writing a blog post for TrainedBy.ae, the UAE's platform for verified personal trainers.
+You are writing a blog post for TrainedBy.ae — the UAE platform for verified personal trainers.
 Target keyword: "${keyword}"
+
+This post will be read by UAE-based personal trainers and potential clients searching for trainers.
 `);
 
   const userPrompt = `Write a blog post targeting: "${keyword}"
 
 Requirements:
-- 900-1100 words
-- UAE-specific: mention Dubai or Abu Dhabi naturally at least twice
-- Include a specific, concrete example (a real scenario, not a hypothetical)
-- Reference REPs UAE certification where it makes sense
-- End with a single, direct call to action to create a free TrainedBy profile
-- Do NOT use bullet points for the main body — write in paragraphs
-- Structure: a punchy intro (no more than 3 sentences), 3-4 H2 sections of UNEQUAL length, a short direct conclusion
+- 900-1100 words total
+- Mention Dubai or Abu Dhabi naturally at least twice (not forced)
+- Include one specific, concrete scenario (a real situation a trainer faces, not a vague hypothetical)
+- Reference REPs UAE certification where it fits naturally
+- End with a single direct CTA: create a free TrainedBy profile at trainedby.ae
+- Write in paragraphs — no bullet points in the main body
+- Structure: punchy 2-3 sentence intro, 3-4 H2 sections of UNEQUAL length, short direct conclusion
+- At least one sentence must start with "But" or "Here's the thing"
 
-Respond as JSON:
+Return valid JSON only (no markdown wrapping):
 {
-  "title": "Direct, specific title (50-60 chars, no clickbait)",
-  "meta_description": "155-160 char meta description",
-  "slug": "url-slug",
-  "excerpt": "2-3 sentence excerpt — direct and specific, no vague promises",
-  "content_markdown": "full post in Markdown",
+  "title": "Direct title, 50-60 chars, no clickbait",
+  "meta_description": "155-160 char meta description, includes keyword",
+  "slug": "url-slug-with-hyphens",
+  "excerpt": "2-3 sentence excerpt, direct and specific",
+  "content_markdown": "full post in Markdown with ## headings",
   "word_count": 950,
   "tags": ["tag1", "tag2", "tag3"]
 }`;
 
-  // ── 3. Generate with retry on high slop score ──────────────────────────────
+  // ── 3. Generate with slop retry ────────────────────────────────────────────
   let post: Record<string, unknown> = {};
   let slopScore = 0;
   let slopFound: string[] = [];
   let attempts = 0;
-  const MAX_ATTEMPTS = 3;
 
-  while (attempts < MAX_ATTEMPTS) {
+  while (attempts < 3) {
     attempts++;
     try {
-      const aiRes = await fetch(`${openaiBase}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4.1-mini',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
-          ],
-          response_format: { type: 'json_object' },
-          temperature: 0.8,
-          max_tokens: 2500,
-        }),
+      post = await callClaudeJSON(anthropicKey, {
+        model: 'claude-sonnet-4-5',
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+        max_tokens: 3000,
+        temperature: 0.8,
       });
-      const aiData = await aiRes.json();
-      post = JSON.parse(aiData.choices?.[0]?.message?.content ?? '{}');
     } catch (err) {
       log.exception(err, { step: 'llm_generation', attempt: attempts });
-      if (attempts >= MAX_ATTEMPTS) return errorResponse('LLM generation failed', 500);
+      if (attempts >= 3) return errorResponse('LLM generation failed', 500);
       continue;
     }
 
     if (!post.title || !post.content_markdown) {
-      if (attempts >= MAX_ATTEMPTS) return errorResponse('LLM returned incomplete post', 500);
+      if (attempts >= 3) return errorResponse('LLM returned incomplete post', 500);
       continue;
     }
 
-    // Check slop score
     const check = calculateSlopScore(String(post.content_markdown));
     slopScore = check.score;
     slopFound = check.found;
-
     log.info('Slop check', { attempt: attempts, score: slopScore, found: slopFound });
 
-    if (slopScore <= 20) break; // Clean enough
-
-    log.warn('High slop score — regenerating', { score: slopScore, found: slopFound });
-    // Add the banned phrases to the next attempt's prompt
-    if (attempts < MAX_ATTEMPTS) {
-      // The next iteration will use the same prompt — the randomness of temperature 0.8
-      // combined with the persona injection usually fixes it on attempt 2
-    }
+    if (slopScore <= 20) break;
+    log.warn('High slop score — regenerating', { score: slopScore });
   }
 
-  // ── 4. Insert into blog_posts ──────────────────────────────────────────────
+  // ── 4. Save to DB ──────────────────────────────────────────────────────────
   const now = new Date().toISOString();
   const { data: inserted, error: insertErr } = await sb
     .from('blog_posts')
@@ -192,7 +153,6 @@ Respond as JSON:
       keyword,
       tags: post.tags ?? [],
       word_count: post.word_count ?? 0,
-      slop_score: slopScore,
       published_at: now,
       status: 'published',
       author: 'TrainedBy Content Agent',
@@ -201,61 +161,8 @@ Respond as JSON:
     .single();
 
   if (insertErr) {
-    // Try without slop_score column if it doesn't exist yet
-    const { data: inserted2, error: insertErr2 } = await sb
-      .from('blog_posts')
-      .insert({
-        slug: post.slug,
-        title: post.title,
-        meta_description: post.meta_description,
-        excerpt: post.excerpt,
-        content_markdown: post.content_markdown,
-        keyword,
-        tags: post.tags ?? [],
-        word_count: post.word_count ?? 0,
-        published_at: now,
-        status: 'published',
-        author: 'TrainedBy Content Agent',
-      })
-      .select('id, slug')
-      .single();
-
-    if (insertErr2) {
-      log.error('Failed to insert blog post', { error: insertErr2.message });
-      return errorResponse('Failed to save post', 500);
-    }
-
-    log.info('Blog post saved (without slop_score)', { id: inserted2.id, slug: inserted2.slug });
-
-    // Trigger Netlify deploy
-    const deployTriggered = await triggerNetlifyDeploy();
-
-    // Write memo
-    await sb.from('agent_memos').insert({
-      agent: 'content-agent',
-      memo: {
-        agent: 'content-agent',
-        week_ending: now,
-        post_id: inserted2.id,
-        post_slug: inserted2.slug,
-        keyword,
-        title: post.title,
-        word_count: post.word_count,
-        slop_score: slopScore,
-        slop_found: slopFound,
-        attempts,
-        deploy_triggered: deployTriggered,
-        generated_at: now,
-      },
-      created_at: now,
-    });
-
-    return jsonResponse({
-      ok: true,
-      post: { id: inserted2.id, slug: inserted2.slug, title: post.title, keyword, word_count: post.word_count },
-      quality: { slop_score: slopScore, slop_found: slopFound, attempts },
-      deploy_triggered: deployTriggered,
-    });
+    log.error('Failed to insert blog post', { error: insertErr.message });
+    return errorResponse('Failed to save post', 500);
   }
 
   log.info('Blog post saved', { id: inserted.id, slug: inserted.slug, slop_score: slopScore });
@@ -278,6 +185,7 @@ Respond as JSON:
       slop_found: slopFound,
       attempts,
       deploy_triggered: deployTriggered,
+      model: 'claude-3-5-sonnet',
       generated_at: now,
     },
     created_at: now,

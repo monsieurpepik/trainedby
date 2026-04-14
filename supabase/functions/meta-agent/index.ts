@@ -19,6 +19,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { jsonResponse, errorResponse, CORS_HEADERS } from '../_shared/errors.ts';
 import { createLogger } from '../_shared/logger.ts';
 import { calculateSlopScore } from '../_shared/voice.ts';
+import { callClaudeJSON } from '../_shared/claude.ts';
 
 const log = createLogger('meta-agent');
 
@@ -52,10 +53,8 @@ async function handleRunMetaAnalysis(): Promise<Response> {
   const start = Date.now();
   log.info('Meta-agent v2 started');
 
-  const openaiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!openaiKey) return errorResponse('OPENAI_API_KEY not configured', 500);
-
-  const openaiBase = (Deno.env.get('OPENAI_BASE_URL') ?? 'https://api.openai.com/v1');
+  const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
+  if (!anthropicKey) return errorResponse('ANTHROPIC_API_KEY not configured', 500);
 
   const sb = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -156,22 +155,12 @@ Respond as JSON:
 
   let analysis: Record<string, unknown> = {};
   try {
-    const aiRes = await fetch(`${openaiBase}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4.1-mini',
-        messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' },
-        temperature: 0.3,
-        max_tokens: 2000,
-      }),
+    analysis = await callClaudeJSON(anthropicKey, {
+      model: 'claude-sonnet-4-5',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.3,
+      max_tokens: 2000,
     });
-    const aiData = await aiRes.json();
-    analysis = JSON.parse(aiData.choices?.[0]?.message?.content ?? '{}');
 
     // Check slop
     const allText = [

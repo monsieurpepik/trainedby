@@ -1,28 +1,21 @@
 /**
- * TrainedBy — Support Agent v2
+ * TrainedBy — Support Agent v3 (Claude)
  * ─────────────────────────────────────────────────────────────────────────────
- * RAG-powered chatbot with the TrainedBy Voice System applied.
+ * RAG chatbot powered by Claude 3.5 Haiku.
  * Answers trainer questions like a knowledgeable colleague, not a corporate bot.
  *
  * POST /functions/v1/support-agent   — answer a trainer question
  * GET  /functions/v1/support-agent   — health check
- *
- * Anti-slop measures:
- *   1. Persona injection: answers like a senior trainer who knows the platform
- *   2. Banned phrase list enforced
- *   3. Response length capped at 3-4 sentences (prevents over-explaining)
- *   4. Slop score logged for monitoring (no retry — speed matters in chat)
- *   5. Temperature 0.3 (factual accuracy) with persona to prevent blandness
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { jsonResponse, errorResponse, CORS_HEADERS } from '../_shared/errors.ts';
 import { createLogger } from '../_shared/logger.ts';
 import { calculateSlopScore } from '../_shared/voice.ts';
+import { callClaude } from '../_shared/claude.ts';
 
 const log = createLogger('support-agent');
 
-// Fallback knowledge base
 const FALLBACK_KB: Record<string, string> = {
   pricing: 'TrainedBy has two tiers: Free (verified profile, public listing, basic analytics — no card needed) and Pro (149 AED/month — digital product sales, Affiliate Vault, Grand Slam Offer builder, priority listing, advanced analytics, custom domain). Upgrade or downgrade any time from your dashboard.',
   reps: 'REPs UAE is the official UAE fitness register. TrainedBy verifies your REPs status automatically at signup. Your badge appears on your public profile and updates within 24 hours if your status changes.',
@@ -37,12 +30,8 @@ const FALLBACK_KB: Record<string, string> = {
 };
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers: CORS_HEADERS });
-  }
-  if (req.method === 'GET') {
-    return jsonResponse({ status: 'ok', agent: 'support-agent', version: '2.0.0' });
-  }
+  if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: CORS_HEADERS });
+  if (req.method === 'GET') return jsonResponse({ status: 'ok', agent: 'support-agent', version: '3.0.0', model: 'claude-3-5-haiku' });
   if (req.method === 'POST') return handleQuestion(req);
   return errorResponse('Method not allowed', 405);
 });
@@ -64,10 +53,8 @@ async function handleQuestion(req: Request): Promise<Response> {
 
     const trimmedQuestion = question.trim().substring(0, 500);
 
-    const openaiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openaiKey) return errorResponse('Support agent not configured', 500);
-
-    const openaiBase = (Deno.env.get('OPENAI_BASE_URL') ?? 'https://api.openai.com/v1');
+    const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
+    if (!anthropicKey) return errorResponse('Support agent not configured', 500);
 
     const sb = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -130,54 +117,42 @@ async function handleQuestion(req: Request): Promise<Response> {
       context = matched.slice(0, 3).join('\n\n');
     }
 
-    // ── 2. Build human-sounding system prompt ─────────────────────────────────
-    const systemPrompt = `You are the TrainedBy support assistant. You know this platform inside out.
+    // ── 2. Build system prompt ────────────────────────────────────────────────
+    const systemPrompt = `You are the TrainedBy support assistant. You know this platform inside out — you've helped hundreds of UAE personal trainers get set up.
 
-Your tone: Direct, warm, no-nonsense. You answer like a knowledgeable colleague — not a customer service bot.
+Your tone: Direct, warm, no-nonsense. Answer like a knowledgeable colleague, not a customer service bot.
 
-Rules:
-- Answer in 2-4 sentences MAX unless a short list genuinely helps
-- No corporate phrases ("I'd be happy to help", "Great question!", "Certainly!")
-- No hedging ("It might be worth considering...")
-- If the answer isn't in the context below, say: "I don't have that info — email support@trainedby.ae and they'll sort you out."
-- Use Markdown sparingly (bold for key numbers/prices only)
-- Never make up features or prices
+Hard rules:
+- Answer in 2-4 sentences MAX unless a short list genuinely helps clarity
+- Never start with "Great question!", "Certainly!", "I'd be happy to help", or any filler
+- Never hedge with "it might be worth considering" or "you may want to"
+- If the answer isn't in the context, say exactly: "I don't have that info — email support@trainedby.ae and they'll sort you out."
+- Use bold only for key prices or numbers (e.g. **149 AED/month**)
+- Never invent features or prices
 
-Context (use ONLY this):
+Context (answer ONLY from this):
 ${context}`;
 
-    // ── 3. Call LLM (with graceful fallback to KB-only answer) ──────────────────
+    // ── 3. Call Claude ────────────────────────────────────────────────────────
     let answer = '';
     try {
-      const aiRes = await fetch(`${openaiBase}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4.1-nano',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: trimmedQuestion },
-          ],
-          temperature: 0.3,
-          max_tokens: 300,
-        }),
+      const response = await callClaude(anthropicKey, {
+        model: 'claude-haiku-4-5',
+        system: systemPrompt,
+        messages: [{ role: 'user', content: trimmedQuestion }],
+        max_tokens: 300,
+        temperature: 0.3,
       });
-
-      if (!aiRes.ok) throw new Error(`LLM returned ${aiRes.status}`);
-      const aiData = await aiRes.json();
-      answer = aiData.choices?.[0]?.message?.content ?? '';
+      answer = response.text;
+      log.info('Claude response', { input_tokens: response.input_tokens, output_tokens: response.output_tokens });
     } catch (llmErr) {
-      log.warn('LLM call failed — using KB fallback', { error: String(llmErr) });
+      log.warn('Claude call failed — using KB fallback', { error: String(llmErr) });
     }
 
-    // KB-only fallback: return the most relevant context chunk directly
+    // KB-only fallback
     if (!answer) {
       if (context) {
-        // Extract the first meaningful sentence from the context
-        const firstChunk = context.split('\n\n')[0].replace(/^###.*\n/, '').trim();
+        const firstChunk = context.split('\n\n')[0].replace(/^[^:]+:\s*/, '').trim();
         answer = firstChunk.length > 20
           ? firstChunk
           : "I don't have that info — email support@trainedby.ae and they'll sort you out.";
@@ -186,7 +161,7 @@ ${context}`;
       }
     }
 
-    // ── 4. Log slop score (no retry for chat — speed matters) ─────────────────
+    // ── 4. Slop check ─────────────────────────────────────────────────────────
     const { score: slopScore, found: slopFound } = calculateSlopScore(answer);
     if (slopScore > 20) {
       log.warn('High slop score in support response', { score: slopScore, found: slopFound });

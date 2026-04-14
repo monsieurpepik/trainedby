@@ -17,6 +17,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { jsonResponse, errorResponse, CORS_HEADERS } from '../_shared/errors.ts';
 import { createLogger } from '../_shared/logger.ts';
 import { calculateSlopScore } from '../_shared/voice.ts';
+import { callClaudeJSON } from '../_shared/claude.ts';
 
 const log = createLogger('growth-agent');
 
@@ -146,13 +147,12 @@ async function handleDigest(): Promise<Response> {
     let hypothesis = '';
     let suggestions: string[] = [];
 
-    const openaiKey = Deno.env.get('OPENAI_API_KEY');
-    const openaiBase = (Deno.env.get('OPENAI_BASE_URL') ?? 'https://api.openai.com/v1');
+    const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
 
-    if (openaiKey && biggestDropStep) {
-      const prompt = `You are a blunt, no-nonsense growth analyst. You have looked at this week's funnel data for TrainedBy.ae.
+    if (anthropicKey && biggestDropStep) {
+      const prompt = `You are a blunt, no-nonsense growth analyst reviewing funnel data for TrainedBy.ae — a UAE platform for verified personal trainers.
 
-Funnel data:
+Funnel data (this week):
 ${funnelThis.map(f => `  ${f.step}: ${f.count} events`).join('\n')}
 
 Biggest drop-off: ${biggestDropStep} (${biggestDropPct.toFixed(0)}% drop from previous step)
@@ -161,42 +161,30 @@ New trainer signups: ${trainersThisWeek.count ?? 0} (vs ${trainersLastWeek.count
 New leads: ${leadsThisWeek.count ?? 0} (vs ${leadsLastWeek.count ?? 0} last week)
 
 Your job:
-1. Write ONE sentence explaining WHY the drop-off is happening at "${biggestDropStep}". Be specific. No hedging. No "it could be" — pick the most likely cause and state it as fact.
-2. Give THREE specific product changes to fix it. Each suggestion must be a concrete action (e.g. "Remove the specialty dropdown from step 2 and replace it with 3 preset options"). Not vague advice.
-3. Name ONE A/B test to run this week. Be specific about what changes and what metric you're measuring.
+1. Write ONE sentence explaining WHY the drop-off is happening at "${biggestDropStep}". Be specific. No hedging. Pick the most likely cause and state it as fact.
+2. Give THREE specific product changes to fix it. Each must be a concrete action (e.g. "Remove the specialty dropdown from step 2 and replace it with 3 preset options"). Not vague advice.
+3. Name ONE A/B test to run this week with a specific success metric.
 
 Do NOT use: "it's important", "consider", "might", "could", "perhaps", "leverage", "optimize".
 
-Respond as JSON: { "hypothesis": "...", "suggestions": ["...", "...", "..."], "ab_test": "..." }`;
+Return JSON only: { "hypothesis": "...", "suggestions": ["...", "...", "..."], "ab_test": "..." }`;
 
       try {
-        const aiRes = await fetch(`${openaiBase}/chat/completions`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${openaiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'gpt-4.1-mini',
-            messages: [{ role: 'user', content: prompt }],
-            response_format: { type: 'json_object' },
-            temperature: 0.4,
-          }),
+        const parsed = await callClaudeJSON<{ hypothesis: string; suggestions: string[]; ab_test: string }>(anthropicKey, {
+          model: 'claude-haiku-4-5',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 600,
+          temperature: 0.4,
         });
-        const aiData = await aiRes.json();
-        const parsed = JSON.parse(aiData.choices?.[0]?.message?.content ?? '{}');
         hypothesis = parsed.hypothesis ?? '';
         suggestions = parsed.suggestions ?? [];
         const abTest = parsed.ab_test ?? '';
         if (abTest) suggestions.push(`A/B test: ${abTest}`);
 
-        // Check slop
         const { score, found } = calculateSlopScore(hypothesis + ' ' + suggestions.join(' '));
-        if (score > 20) {
-          log.warn('Slop detected in growth hypothesis', { score, found });
-        }
+        if (score > 20) log.warn('Slop detected in growth hypothesis', { score, found });
       } catch (aiErr) {
-        log.warn('LLM hypothesis generation failed', { error: String(aiErr) });
+        log.warn('Claude hypothesis generation failed', { error: String(aiErr) });
         hypothesis = `${biggestDropStep.replace(/_/g, ' ')} has a ${biggestDropPct.toFixed(0)}% drop — check the UX on that step.`;
         suggestions = ['Review the UX at the drop-off step on mobile', 'Reduce the number of required fields', 'Add social proof near the CTA'];
       }
