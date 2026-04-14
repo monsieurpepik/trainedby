@@ -8,7 +8,7 @@
  * Markets:
  *   trainedby.ae  → UAE (AED, REPs UAE, Dubai/Abu Dhabi focus)
  *   trainedby.uk  → UK  (GBP, REPs UK, CIMSPA focus)
- *   trainedby.in  → India (INR, NSCA/ACSM focus)
+ *   trainedby.in  → India (INR, TrainedBy Verified, ₹499 early access)
  *   trainedby.com → Global (USD, NASM/ACE/NSCA)
  *
  * In development / Netlify preview, defaults to .ae
@@ -21,6 +21,8 @@ export interface MarketConfig {
   currencySymbol: string;
   proPrice: number;
   proPriceLabel: string;
+  proAltPrice?: number;           // A/B test alternate price
+  proAltPriceLabel?: string;
   certificationBody: string;
   heroHeadline: string;
   heroSubline: string;
@@ -28,10 +30,12 @@ export interface MarketConfig {
   trustBadges: string[];
   locale: string;
   flag: string;
+  phonePrefix: string;            // Default phone country code prefix
+  paymentProvider: 'stripe' | 'razorpay';
   // SEO
   siteTitle: string;
   metaDescription: string;
-  // Certification verification URL hint
+  // Certification verification
   certVerifyLabel: string;
   certVerifyPlaceholder: string;
 }
@@ -51,6 +55,8 @@ const MARKETS: Record<string, MarketConfig> = {
     trustBadges: ['REPs UAE Verified', 'Dubai Fitness Challenge Partner', 'ADNOC Wellness Network'],
     locale: 'en-AE',
     flag: '🇦🇪',
+    phonePrefix: '+971',
+    paymentProvider: 'stripe',
     siteTitle: 'TrainedBy.ae — Verified Personal Trainers in the UAE',
     metaDescription: 'Find REPs UAE verified personal trainers in Dubai, Abu Dhabi, and across the UAE. Build your verified trainer profile for free.',
     certVerifyLabel: 'REPs UAE Number',
@@ -70,6 +76,8 @@ const MARKETS: Record<string, MarketConfig> = {
     trustBadges: ['REPs UK Registered', 'CIMSPA Endorsed', 'UK Active Partner'],
     locale: 'en-GB',
     flag: '🇬🇧',
+    phonePrefix: '+44',
+    paymentProvider: 'stripe',
     siteTitle: 'TrainedBy.uk — Verified Personal Trainers in the UK',
     metaDescription: 'Find REPs UK registered personal trainers near you. Build your verified trainer profile for free.',
     certVerifyLabel: 'REPs UK Number',
@@ -80,19 +88,23 @@ const MARKETS: Record<string, MarketConfig> = {
     domain: 'trainedby.in',
     currency: 'INR',
     currencySymbol: '₹',
-    proPrice: 999,
-    proPriceLabel: '₹999/month',
-    certificationBody: 'NSCA / ACSM India',
-    heroHeadline: "India's Verified Fitness Professional Platform",
-    heroSubline: 'NSCA & ACSM certified trainers. Build your client base online.',
-    ctaText: 'Create Your Free Profile',
-    trustBadges: ['NSCA Certified', 'ACSM Accredited', 'Cult.fit Partner Network'],
+    proPrice: 499,
+    proPriceLabel: '₹499/month',
+    proAltPrice: 999,
+    proAltPriceLabel: '₹999/month',
+    certificationBody: 'TrainedBy Verified',
+    heroHeadline: "India's First Verified Fitness Professional Platform",
+    heroSubline: 'Get your TrainedBy Verified badge. Build your client base. Free forever.',
+    ctaText: 'Get Your Free Verified Profile',
+    trustBadges: ['TrainedBy Verified', 'NSCA / ACSM Recognised', 'Early Access — India'],
     locale: 'en-IN',
     flag: '🇮🇳',
+    phonePrefix: '+91',
+    paymentProvider: 'razorpay',
     siteTitle: 'TrainedBy.in — Verified Fitness Professionals in India',
-    metaDescription: 'India\'s platform for NSCA and ACSM certified personal trainers. Build your verified profile and grow your client base.',
-    certVerifyLabel: 'NSCA / ACSM Certification Number',
-    certVerifyPlaceholder: 'e.g. NSCA-CPT-12345',
+    metaDescription: "India's first verified platform for personal trainers and fitness coaches. Get your TrainedBy Verified badge and grow your client base for free.",
+    certVerifyLabel: 'Certification Number (NSCA, ACSM, ACE or equivalent)',
+    certVerifyPlaceholder: 'e.g. NSCA-CPT-12345 or ACE-12345',
   },
   com: {
     market: 'com',
@@ -108,6 +120,8 @@ const MARKETS: Record<string, MarketConfig> = {
     trustBadges: ['NASM Certified', 'ACE Accredited', 'NSCA Member'],
     locale: 'en-US',
     flag: '🌍',
+    phonePrefix: '+1',
+    paymentProvider: 'stripe',
     siteTitle: 'TrainedBy — Verified Personal Trainers Worldwide',
     metaDescription: 'The global platform for NASM, ACE, and NSCA certified personal trainers. Build your verified profile for free.',
     certVerifyLabel: 'Certification Number',

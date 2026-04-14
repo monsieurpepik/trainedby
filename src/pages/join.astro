@@ -375,7 +375,7 @@ body {
       <div class="field" style="margin-bottom:0">
         <label>WhatsApp <span class="field-req">*</span></label>
         <div class="phone-field" id="wa-field-wrap">
-          <span class="phone-prefix">+971</span>
+          <span class="phone-prefix" id="phone-prefix-display">{market.phonePrefix}</span>
           <input type="tel" id="s1-phone" placeholder="50 123 4567" inputmode="tel" autocomplete="tel"
             onfocus="document.getElementById('wa-field-wrap').style.borderColor='var(--brand)'"
             onblur="document.getElementById('wa-field-wrap').style.borderColor='var(--border)'">
@@ -397,7 +397,7 @@ body {
 
     <div class="field">
       <label>{market.certVerifyLabel} <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
-      <input type="text" id="s1-reps" placeholder="e.g. REP-12345" autocomplete="off" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.05em;">
+      <input type="text" id="s1-reps" placeholder="{market.certVerifyPlaceholder}" autocomplete="off" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.05em;">
       <div class="field-hint">Find yours at <a href="https://repsuae.com/searcht" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">repsuae.com/searcht</a> — leave blank to add later</div>
     </div>
 
@@ -800,7 +800,7 @@ async function verifyAndCreate() {
       name: state.name,
       slug: state.slug,
       email: state.email,
-      whatsapp: '+971' + state.phone,
+      whatsapp: (document.getElementById('phone-prefix-display')?.textContent ?? '{market.phonePrefix}') + state.phone,
       reps_number: state.reps_number || null,
       verification_status: state.reps_number ? 'pending' : 'unverified',
       specialties: state.specialties,
