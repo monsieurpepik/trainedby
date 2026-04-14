@@ -2,14 +2,12 @@
 import Base from '../layouts/Base.astro';
 import { getMarket } from '../lib/market.ts';
 const market = getMarket(Astro.url.hostname);
-const isWaitlist = market.waitlistEnabled;
-const isPaid = market.paymentEnabled;
 const brandName = market.brandName || 'TrainedBy';
 ---
 
 <Base
-  title={`TrainedBy.${market.market} — Stop Trading Time for Money`}
-  description={`${market.heroSubline} Digital products, affiliate income, and a Grand Slam Offer builder — all in one place.`}
+  title={`${brandName} — Find a Verified Personal Trainer`}
+  description={`Discover verified personal trainers in ${market.cityName || 'your city'}. Every trainer is ${market.certificationBody}-certified and background-checked. Real results, real people.`}
 >
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -17,7 +15,6 @@ const brandName = market.brandName || 'TrainedBy';
       --brand: #FF5C00;
       --brand-dim: rgba(255,92,0,0.10);
       --brand-border: rgba(255,92,0,0.25);
-      --brand-glow: rgba(255,92,0,0.15);
       --reps: #00C853;
       --gold: #F5C842;
       --surface: #0a0a0a;
@@ -28,732 +25,424 @@ const brandName = market.brandName || 'TrainedBy';
       --border-2: rgba(255,255,255,0.12);
       --text: #f2f2f2;
       --text-2: #888888;
-      --text-3: #444444;
+      --text-3: #555555;
       --max: 1100px;
     }
     body { background: var(--surface); color: var(--text); font-family: 'Manrope', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
     /* NAV */
-    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 32px; height: 60px; display: flex; align-items: center; gap: 32px; transition: background 0.3s, border-color 0.3s; border-bottom: 1px solid transparent; }
-    .nav.scrolled { background: rgba(10,10,10,0.94); backdrop-filter: blur(16px); border-color: var(--border); }
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 32px; height: 64px; display: flex; align-items: center; gap: 32px; transition: background 0.3s, border-color 0.3s; border-bottom: 1px solid transparent; }
+    .nav.scrolled { background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); border-color: var(--border); }
     .nav-logo { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 20px; color: var(--brand); text-decoration: none; letter-spacing: -0.5px; margin-right: auto; }
-    .nav-links { display: flex; gap: 28px; }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
     .nav-links a { color: var(--text-2); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
     .nav-links a:hover { color: var(--text); }
-    .nav-cta { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; }
+    .nav-links a.for-trainers { color: var(--brand); font-weight: 700; }
+    .nav-links a.for-trainers:hover { color: #e05200; }
+    .nav-cta { display: inline-flex; align-items: center; gap: 6px; padding: 9px 20px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; white-space: nowrap; }
     .nav-cta:hover { background: #e05200; transform: translateY(-1px); }
     @media (max-width: 640px) { .nav-links { display: none; } .nav { padding: 0 20px; } }
 
-    /* BUTTONS */
-    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 15px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; }
+    /* HERO — Consumer Search */
+    .hero { min-height: 92vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 90% 70% at 50% 30%, rgba(255,92,0,0.06) 0%, transparent 65%); pointer-events: none; }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 100px; border: 1px solid var(--brand-border); background: var(--brand-dim); font-size: 12px; font-weight: 700; color: var(--brand); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 28px; }
+    .hero-headline { font-family: 'Manrope', sans-serif; font-size: clamp(38px, 7vw, 80px); font-weight: 900; line-height: 1.0; letter-spacing: -3px; max-width: 820px; margin-bottom: 20px; }
+    .hero-headline em { font-style: normal; color: var(--brand); }
+    .hero-sub { font-size: clamp(15px, 2vw, 17px); color: var(--text-2); max-width: 480px; line-height: 1.7; margin-bottom: 40px; }
+
+    /* SEARCH BAR */
+    .search-wrap { width: 100%; max-width: 640px; position: relative; margin-bottom: 24px; }
+    .search-bar { width: 100%; padding: 18px 140px 18px 56px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text); font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .search-bar:focus { border-color: rgba(255,92,0,0.4); box-shadow: 0 0 0 3px rgba(255,92,0,0.08); }
+    .search-bar::placeholder { color: var(--text-3); }
+    .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-2); pointer-events: none; }
+    .search-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); padding: 10px 22px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+    .search-btn:hover { background: #e05200; }
+
+    /* QUICK FILTERS */
+    .quick-filters { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 56px; }
+    .qf-pill { padding: 8px 16px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text-2); font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.15s; }
+    .qf-pill:hover { border-color: var(--brand-border); color: var(--brand); background: var(--brand-dim); }
+
+    /* TRUST STRIP */
+    .trust-strip { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; justify-content: center; }
+    .trust-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-2); font-weight: 600; }
+    .trust-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--reps); flex-shrink: 0; }
+
+    /* SECTION STRUCTURE */
+    .section { padding: 80px 24px; max-width: var(--max); margin: 0 auto; }
+    .section-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+    .section-title { font-family: 'Manrope', sans-serif; font-size: clamp(26px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+    .section-sub { font-size: 15px; color: var(--text-2); line-height: 1.7; max-width: 480px; }
+
+    /* FEATURED TRAINERS */
+    .trainers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 40px; }
+    .trainer-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.2s, transform 0.2s; display: block; }
+    .trainer-card:hover { border-color: var(--border-2); transform: translateY(-2px); }
+    .trainer-card-img { width: 100%; aspect-ratio: 4/3; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 36px; color: var(--brand); position: relative; overflow: hidden; }
+    .trainer-card-img .verified-badge { position: absolute; top: 10px; right: 10px; padding: 3px 9px; border-radius: 20px; background: rgba(0,200,83,0.15); border: 1px solid rgba(0,200,83,0.3); color: #00C853; font-size: 10px; font-weight: 700; }
+    .trainer-card-body { padding: 16px; }
+    .trainer-card-name { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 15px; margin-bottom: 3px; }
+    .trainer-card-meta { font-size: 12px; color: var(--text-2); margin-bottom: 10px; }
+    .trainer-card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .trainer-tag { padding: 3px 9px; border-radius: 20px; background: var(--surface-3); border: 1px solid var(--border); font-size: 11px; color: var(--text-2); font-weight: 600; }
+    .trainer-card-price { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 14px; color: var(--text); }
+    .trainer-card-price span { font-size: 11px; font-weight: 500; color: var(--text-2); }
+
+    /* TRANSFORMATIONS */
+    .transforms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 40px; }
+    .transform-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .transform-header { padding: 20px 20px 0; }
+    .transform-trainer { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .transform-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 14px; color: var(--brand); flex-shrink: 0; }
+    .transform-trainer-name { font-weight: 700; font-size: 13px; }
+    .transform-trainer-cert { font-size: 11px; color: #00C853; font-weight: 600; }
+    .transform-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.3px; margin-bottom: 10px; }
+    .transform-body { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
+    .transform-stats { display: flex; gap: 0; border-top: 1px solid var(--border); }
+    .transform-stat { flex: 1; padding: 14px 16px; text-align: center; border-right: 1px solid var(--border); }
+    .transform-stat:last-child { border-right: none; }
+    .transform-stat-val { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 18px; color: var(--brand); letter-spacing: -0.5px; }
+    .transform-stat-label { font-size: 10px; color: var(--text-2); margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* BLOG PREVIEW */
+    .blog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 40px; }
+    .blog-grid .featured { grid-column: 1 / -1; }
+    .blog-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; text-decoration: none; color: inherit; display: block; transition: border-color 0.2s, transform 0.2s; }
+    .blog-card:hover { border-color: var(--border-2); transform: translateY(-2px); }
+    .blog-card.featured { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; }
+    .blog-cat { display: inline-block; padding: 4px 12px; border-radius: 100px; background: var(--brand-dim); border: 1px solid var(--brand-border); color: var(--brand); font-size: 11px; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 14px; }
+    .blog-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; line-height: 1.25; margin-bottom: 10px; }
+    .blog-card:not(.featured) .blog-title { font-size: 16px; }
+    .blog-excerpt { font-size: 14px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
+    .blog-author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2); }
+    .blog-author-dot { width: 5px; height: 5px; border-radius: 50%; background: #00C853; }
+    .blog-visual { background: var(--surface-3); border-radius: 12px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    @media (max-width: 720px) { .blog-grid { grid-template-columns: 1fr; } .blog-card.featured { grid-template-columns: 1fr; } }
+
+    /* FOR TRAINERS BANNER */
+    .trainer-banner { margin: 0 24px; border-radius: 20px; background: linear-gradient(135deg, rgba(255,92,0,0.12) 0%, rgba(255,92,0,0.04) 100%); border: 1px solid rgba(255,92,0,0.2); padding: 56px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+    .trainer-banner-text {}
+    .trainer-banner-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+    .trainer-banner-title { font-family: 'Manrope', sans-serif; font-size: clamp(22px, 3vw, 36px); font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; }
+    .trainer-banner-sub { font-size: 15px; color: var(--text-2); line-height: 1.6; max-width: 420px; }
+    .trainer-banner-actions { display: flex; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
     .btn-primary:hover { background: #e05200; transform: translateY(-2px); }
-    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: var(--text); font-size: 15px; font-weight: 600; text-decoration: none; border: 1px solid var(--border-2); transition: border-color 0.2s, transform 0.2s; }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--border-2); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
     .btn-ghost:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-2px); }
 
-    /* HERO */
-    .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
-    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(255,92,0,0.08) 0%, transparent 70%); pointer-events: none; }
-    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 100px; border: 1px solid var(--brand-border); background: var(--brand-dim); font-size: 12px; font-weight: 700; color: var(--brand); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 32px; }
-    .hero-headline { font-family: 'Manrope', sans-serif; font-size: clamp(42px, 8vw, 88px); font-weight: 900; line-height: 1.0; letter-spacing: -3px; max-width: 860px; margin-bottom: 24px; }
-    .hero-headline em { font-style: normal; color: var(--brand); }
-    .hero-sub { font-size: clamp(15px, 2vw, 18px); color: var(--text-2); max-width: 520px; line-height: 1.7; margin-bottom: 16px; }
-    .hero-guarantee { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 100px; border: 1px solid rgba(0,200,83,0.25); background: rgba(0,200,83,0.06); font-size: 12px; font-weight: 600; color: #00C853; margin-bottom: 36px; }
-    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 80px; }
-
-    /* HERO INCOME CARDS */
-    .hero-income-wrap { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; max-width: 760px; }
-    .income-card { background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 16px; padding: 20px 24px; text-align: left; min-width: 200px; flex: 1; }
-    .income-card.highlight { border-color: var(--brand-border); background: linear-gradient(135deg, rgba(255,92,0,0.08) 0%, var(--surface-2) 100%); }
-    .income-label { font-size: 11px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
-    .income-value { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 28px; letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
-    .income-value.brand { color: var(--brand); }
-    .income-desc { font-size: 11px; color: var(--text-2); line-height: 1.5; }
-    .income-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.2); color: #00C853; font-size: 9px; font-weight: 700; margin-top: 8px; }
-    @media (max-width: 640px) { .hero-income-wrap { gap: 10px; } .income-card { min-width: 140px; padding: 14px 16px; } .income-value { font-size: 22px; } }
-
-    /* PROOF BAR */
-    .proof-bar { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 32px 24px; display: flex; align-items: center; justify-content: center; gap: 56px; flex-wrap: wrap; }
-    .proof-item { text-align: center; }
-    .proof-num { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 30px; color: var(--text); letter-spacing: -1px; }
-    .proof-label { font-size: 12px; color: var(--text-2); margin-top: 3px; }
-
-    /* SECTION */
-    .section { padding: 100px 24px; max-width: var(--max); margin: 0 auto; }
-    .section-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
-    .section-title { font-family: 'Manrope', sans-serif; font-size: clamp(30px, 5vw, 54px); font-weight: 900; letter-spacing: -2px; line-height: 1.05; margin-bottom: 20px; }
-    .section-sub { font-size: 16px; color: var(--text-2); line-height: 1.7; max-width: 520px; }
-
-    /* PROBLEM / SOLUTION */
-    .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
-    .split-col { padding: 48px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; }
-    .split-col.problem { border-color: rgba(255,60,60,0.15); background: rgba(255,40,40,0.03); }
-    .split-col.solution { border-color: var(--brand-border); background: var(--brand-dim); }
-    .split-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
-    .split-label.red { color: rgba(255,80,80,0.8); }
-    .split-label.orange { color: var(--brand); }
-    .split-item { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; font-size: 14px; line-height: 1.6; color: var(--text-2); }
-    .split-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
-    .split-icon.x { background: rgba(255,60,60,0.15); color: rgba(255,80,80,0.9); }
-    .split-icon.check { background: rgba(255,92,0,0.15); color: var(--brand); }
-    @media (max-width: 720px) { .split-grid { grid-template-columns: 1fr; } .split-col { padding: 28px; } }
-
-    /* FEATURES */
-    .features-grid { display: flex; flex-direction: column; gap: 2px; }
-    .feature-row { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface-2); }
-    .feature-row.reverse { direction: rtl; }
-    .feature-row.reverse > * { direction: ltr; }
-    .feature-text { padding: 56px 48px; display: flex; flex-direction: column; justify-content: center; }
-    .feature-tag { display: inline-block; padding: 4px 12px; background: var(--brand-dim); border: 1px solid var(--brand-border); border-radius: 100px; color: var(--brand); font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 20px; width: fit-content; }
-    .feature-title { font-family: 'Manrope',sans-serif; font-weight: 800; font-size: clamp(22px, 3vw, 32px); letter-spacing: -1px; line-height: 1.15; margin-bottom: 16px; }
-    .feature-desc { font-size: 15px; color: var(--text-2); line-height: 1.7; margin-bottom: 16px; }
-    .feature-proof { font-size: 13px; color: var(--brand); font-weight: 600; }
-    .feature-visual { background: var(--surface-3); display: flex; align-items: center; justify-content: center; min-height: 320px; padding: 40px; position: relative; overflow: hidden; }
-    .feature-visual::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(255,92,0,0.05) 0%, transparent 70%); }
-    @media (max-width: 720px) { .feature-row { grid-template-columns: 1fr; } .feature-row.reverse { direction: ltr; } .feature-text { padding: 36px 28px; } .feature-visual { min-height: 200px; } }
-
-    /* MOCKUP */
-    .mockup-box { background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 12px; padding: 16px; position: relative; z-index: 1; width: 220px; }
-    .m-reps { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.2); border-radius: 20px; color: #00C853; font-size: 9px; font-weight: 700; margin-bottom: 10px; }
-    .m-avatar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .m-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-4); display: flex; align-items: center; justify-content: center; font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 14px; color: var(--brand); flex-shrink: 0; }
-    .m-name { font-family: 'Manrope',sans-serif; font-weight: 700; font-size: 12px; }
-    .m-sub { font-size: 10px; color: var(--text-2); }
-    .m-pkg { background: var(--surface-3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
-    .m-pkg-row { display: flex; justify-content: space-between; }
-    .m-pkg-name { font-size: 10px; font-weight: 600; }
-    .m-pkg-price { font-size: 11px; font-weight: 800; color: var(--brand); }
-    .m-pkg-meta { font-size: 9px; color: var(--text-2); margin-top: 2px; }
-    .m-guarantee { background: rgba(0,200,83,0.08); border: 1px solid rgba(0,200,83,0.2); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 9px; color: #00C853; font-weight: 600; }
-    .m-chart { height: 60px; display: flex; align-items: flex-end; gap: 4px; margin-bottom: 12px; }
-    .m-bar { flex: 1; background: var(--surface-4); border-radius: 3px 3px 0 0; }
-    .m-bar.hi { background: var(--brand); }
-    .m-stat-row { display: flex; justify-content: space-between; }
-    .m-stat-v { font-family: 'Manrope',sans-serif; font-weight: 800; font-size: 16px; color: var(--brand); }
-    .m-stat-l { font-size: 9px; color: var(--text-2); text-transform: uppercase; }
-    .m-result { background: var(--surface-3); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
-    .m-result-label { font-size: 9px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.3px; }
-    .m-result-val { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 20px; color: var(--brand); }
-    .m-result-desc { font-size: 9px; color: var(--text-2); }
-    .m-cta { width: 100%; padding: 7px; background: var(--brand); border-radius: 6px; color: #fff; font-size: 10px; font-weight: 700; text-align: center; border: none; margin-top: 8px; }
-    .m-product { background: var(--surface-3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
-    .m-product-name { font-size: 10px; font-weight: 600; }
-    .m-product-price { font-size: 11px; font-weight: 800; color: var(--brand); }
-    .m-product-badge { font-size: 8px; color: var(--text-2); margin-top: 2px; }
-    .m-affiliate-row { display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: rgba(245,200,66,0.06); border: 1px solid rgba(245,200,66,0.15); border-radius: 6px; margin-bottom: 6px; }
-    .m-affiliate-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
-    .m-affiliate-name { font-size: 9px; font-weight: 600; color: var(--gold); flex: 1; }
-    .m-affiliate-pct { font-size: 9px; font-weight: 800; color: var(--gold); }
-
-    /* INCOME CALCULATOR */
-    .calc-wrap { background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 20px; padding: 40px; max-width: 680px; margin: 0 auto; }
-    .calc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .calc-field { display: flex; flex-direction: column; gap: 8px; }
-    .calc-label { font-size: 12px; font-weight: 600; color: var(--text-2); }
-    .calc-input { background: var(--surface-3); border: 1px solid var(--border-2); border-radius: 10px; padding: 12px 14px; color: var(--text); font-family: 'Manrope',sans-serif; font-size: 15px; font-weight: 600; outline: none; transition: border-color 0.2s; }
-    .calc-input:focus { border-color: var(--brand); }
-    .calc-divider { height: 1px; background: var(--border); margin: 24px 0; }
-    .calc-results { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-    .calc-result { background: var(--surface-3); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
-    .calc-result.total { border-color: var(--brand-border); background: var(--brand-dim); }
-    .calc-result-label { font-size: 10px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    .calc-result-value { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 22px; letter-spacing: -1px; color: var(--text); }
-    .calc-result.total .calc-result-value { color: var(--brand); font-size: 26px; }
-    @media (max-width: 640px) { .calc-row { grid-template-columns: 1fr; } .calc-results { grid-template-columns: 1fr; } .calc-wrap { padding: 24px; } }
-
-    /* STACK */
-    .stack-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    .stack-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; transition: border-color 0.2s, transform 0.2s; }
-    .stack-card:hover { border-color: var(--border-2); transform: translateY(-3px); }
-    .stack-card.gold { border-color: rgba(245,200,66,0.2); background: rgba(245,200,66,0.03); }
-    .stack-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 16px; }
-    .stack-icon.orange { background: var(--brand-dim); border: 1px solid var(--brand-border); }
-    .stack-icon.green { background: rgba(0,200,83,0.08); border: 1px solid rgba(0,200,83,0.2); }
-    .stack-icon.gold-bg { background: rgba(245,200,66,0.08); border: 1px solid rgba(245,200,66,0.2); }
-    .stack-icon.blue { background: rgba(0,120,255,0.08); border: 1px solid rgba(0,120,255,0.2); }
-    .stack-card-title { font-family: 'Manrope',sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -0.5px; margin-bottom: 8px; }
-    .stack-card-desc { font-size: 14px; color: var(--text-2); line-height: 1.6; margin-bottom: 12px; }
-    .stack-card-value { font-size: 12px; font-weight: 700; color: var(--brand); }
-    @media (max-width: 720px) { .stack-grid { grid-template-columns: 1fr; } }
-
-    /* HOW IT WORKS */
-    .how-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
-    .how-steps { display: flex; flex-direction: column; }
-    .how-step { display: flex; gap: 20px; padding: 28px 0; border-bottom: 1px solid var(--border); }
-    .how-step:last-child { border-bottom: none; }
-    .how-num { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 13px; color: var(--brand); min-width: 24px; padding-top: 2px; }
-    .how-title { font-family: 'Manrope',sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 6px; }
-    .how-desc { font-size: 14px; color: var(--text-2); line-height: 1.6; }
-    .how-visual { position: sticky; top: 100px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 16px; padding: 40px; display: flex; align-items: center; justify-content: center; min-height: 400px; }
-    @media (max-width: 720px) { .how-wrap { grid-template-columns: 1fr; gap: 40px; } .how-visual { display: none; } }
-
-    /* TESTIMONIALS */
-    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .testimonial-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; }
-    .testimonial-quote { font-size: 15px; color: var(--text-2); line-height: 1.7; margin-bottom: 20px; font-style: italic; }
-    .testimonial-author { display: flex; align-items: center; gap: 12px; }
-    .t-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 14px; color: var(--brand); flex-shrink: 0; }
-    .t-name { font-family: 'Manrope',sans-serif; font-weight: 700; font-size: 14px; }
-    .t-role { font-size: 12px; color: var(--text-2); }
-    .t-reps { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.2); border-radius: 20px; color: #00C853; font-size: 9px; font-weight: 700; margin-top: 4px; }
-    @media (max-width: 860px) { .testimonials-grid { grid-template-columns: 1fr; } }
-
-    /* PRICING */
-    .pricing-header { text-align: center; margin-bottom: 56px; }
-    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .pricing-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 32px 28px; display: flex; flex-direction: column; transition: border-color 0.2s, transform 0.2s; position: relative; }
-    .pricing-card:hover { border-color: var(--border-2); transform: translateY(-4px); }
-    .pricing-card.featured { border-color: var(--brand-border); background: linear-gradient(160deg, rgba(255,92,0,0.07) 0%, var(--surface-2) 60%); }
-    .pricing-popular { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); padding: 4px 16px; background: var(--brand); color: #fff; border-radius: 100px; font-size: 11px; font-weight: 700; white-space: nowrap; }
-    .pricing-tier { font-size: 12px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
-    .pricing-price { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 40px; letter-spacing: -2px; line-height: 1; margin-bottom: 4px; }
-    .pricing-price span { font-size: 16px; font-weight: 500; color: var(--text-2); letter-spacing: 0; }
-    .pricing-desc { font-size: 13px; color: var(--text-2); line-height: 1.5; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
-    .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; flex: 1; }
-    .pricing-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-2); line-height: 1.4; }
-    .pricing-features li::before { content: '✓'; color: var(--brand); font-weight: 700; font-size: 13px; flex-shrink: 0; margin-top: 1px; }
-    .pricing-features li.muted::before { content: '–'; color: var(--text-3); }
-    .pricing-features li.muted { color: var(--text-3); }
-    .pricing-guarantee { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(0,200,83,0.06); border: 1px solid rgba(0,200,83,0.15); border-radius: 10px; font-size: 11px; color: #00C853; font-weight: 600; margin-bottom: 16px; }
-    .pricing-btn { display: block; text-align: center; padding: 13px; border-radius: 100px; font-size: 14px; font-weight: 700; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer; }
-    .pricing-btn-primary { background: var(--brand); color: #fff; }
-    .pricing-btn-primary:hover { background: #e05200; }
-    .pricing-btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border-2); }
-    .pricing-btn-ghost:hover { border-color: rgba(255,255,255,0.25); }
-    @media (max-width: 860px) { .pricing-grid { grid-template-columns: 1fr; max-width: 380px; margin: 0 auto; } }
-
-    /* FAQ */
-    .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
-    .faq-item { padding: 28px 0; border-bottom: 1px solid var(--border); }
-    .faq-item:nth-child(odd) { padding-right: 48px; border-right: 1px solid var(--border); }
-    .faq-item:nth-child(even) { padding-left: 48px; }
-    .faq-q { font-family: 'Manrope',sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 10px; }
-    .faq-a { font-size: 14px; color: var(--text-2); line-height: 1.7; }
-    @media (max-width: 720px) { .faq-grid { grid-template-columns: 1fr; } .faq-item:nth-child(odd) { padding-right: 0; border-right: none; } .faq-item:nth-child(even) { padding-left: 0; } }
-
-    /* BOTTOM CTA */
-    .cta-bottom { margin: 0 24px 80px; border-radius: 24px; background: var(--surface-2); border: 1px solid var(--border); padding: 80px 40px; text-align: center; position: relative; overflow: hidden; }
-    .cta-bottom::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(255,92,0,0.10) 0%, transparent 70%); pointer-events: none; }
-    .cta-bottom-title { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: clamp(28px, 5vw, 54px); letter-spacing: -2px; line-height: 1.05; margin-bottom: 16px; position: relative; }
-    .cta-bottom-sub { font-size: 16px; color: var(--text-2); margin-bottom: 12px; position: relative; }
-    .cta-bottom-guarantee { font-size: 13px; color: #00C853; font-weight: 600; margin-bottom: 32px; position: relative; }
-    .cta-bottom-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; }
-
     /* FOOTER */
-    footer { border-top: 1px solid var(--border); padding: 40px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-    .footer-logo { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 18px; color: var(--brand); text-decoration: none; }
+    footer { border-top: 1px solid var(--border); padding: 48px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; max-width: var(--max); margin: 0 auto; }
+    .footer-logo { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 18px; color: var(--brand); text-decoration: none; }
     .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
     .footer-links a { color: var(--text-2); text-decoration: none; font-size: 13px; transition: color 0.2s; }
     .footer-links a:hover { color: var(--text); }
-    .footer-copy { color: var(--text-3); font-size: 12px; }
+    .footer-copy { font-size: 12px; color: var(--text-3); }
+
+    /* SKELETON LOADER */
+    .skeleton { background: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-4) 50%, var(--surface-3) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   </style>
 
   <!-- NAV -->
   <nav class="nav" id="nav">
-    <a href="/landing" class="nav-logo">Trained<span style="color:#fff">By</span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:2px;vertical-align:middle;margin-bottom:3px"></span></a>
+    <a href="/landing" class="nav-logo" data-i18n="brand">{brandName}</a>
     <div class="nav-links">
-      <a href="#how">How it works</a>
-      <a href="#income">Income calculator</a>
-      <a href="#pricing">Pricing</a>
-      <a href="/sarah">See a Profile</a>
+      <a href="/find" data-i18n="nav_find">Find a Trainer</a>
+      <a href="/blog" data-i18n="nav_blog">Stories</a>
+      <a href="/community" data-i18n="nav_community">Community</a>
+      <a href="/for-trainers" class="for-trainers" data-i18n="nav_for_trainers">For Trainers</a>
     </div>
-    <a href="/join" class="nav-cta">Get Your OS →</a>
+    <a href="/find" class="nav-cta" data-i18n="nav_cta_find">Find Your Trainer →</a>
   </nav>
 
   <!-- HERO -->
-  {market.market === 'in' && (
-    <div style="background:linear-gradient(135deg,#012169,#C8102E);padding:10px 24px;text-align:center;font-size:13px;font-weight:600;letter-spacing:0.03em;color:#fff">
-      🇬🇧 Built in Britain &nbsp;·&nbsp; UK-Standard Verification &nbsp;·&nbsp; Now Available in India
-    </div>
-  )}
   <section class="hero">
     <div class="hero-eyebrow">
-      {market.market === 'in' ? '🇮🇳 India Early Access — UK-Standard Verified Profiles' :
-       market.market === 'uk' ? '🇬🇧 The UK Trainer\'s Operating System' :
-       market.market === 'com' ? '🌍 The Global Trainer Platform' :
-       '🇦🇪 The UAE Trainer\'s Operating System'}
-      &nbsp;·&nbsp; <span id="spots-counter" style="color:#fff">87/100</span> Early Access Spots Claimed
+      <div style="width:6px;height:6px;border-radius:50%;background:#00C853;flex-shrink:0"></div>
+      {market.certificationBody} Verified Trainers · {market.cityName || market.market.toUpperCase()}
     </div>
-    <h1 class="hero-headline">
-      {market.market === 'in' ? <Fragment>UK-Standard<br>Verification.<br><em>Now in</em><br>India.</Fragment> :
-       <Fragment>Stop trading<br>time for money.<br><em>Start building</em><br>an empire.</Fragment>}
+    <h1 class="hero-headline" data-i18n="hero_headline">
+      Find a trainer<br>who <em>actually</em><br>gets results.
     </h1>
-    <p class="hero-sub">
-      {market.market === 'in'
-        ? 'The same verification standard trusted by personal trainers in London — now available to India\'s best fitness professionals. Digital products, affiliate income, and a Grand Slam Offer builder built in.'
-        : 'The only platform that turns your fitness expertise into a high-ticket business — with digital products, affiliate income, and a Grand Slam Offer builder built in.'}
+    <p class="hero-sub" data-i18n="hero_sub">
+      Every trainer on {brandName} is {market.certificationBody}-certified and verified. Browse real profiles, read real stories, and book the right person for you.
     </p>
-    <div class="hero-guarantee">
-      {market.market === 'in'
-        ? <Fragment><span style="font-size:14px">🛡</span> ROI Guarantee: ₹10,000 in 30 days or your money back</Fragment>
-        : <Fragment><span style="font-size:14px">🛡</span> ROI Guarantee: 1,000 AED in 30 days or your money back</Fragment>}
+
+    <!-- SEARCH -->
+    <div class="search-wrap">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input
+        class="search-bar"
+        id="hero-search"
+        type="text"
+        placeholder={market.market === 'fr' ? 'Rechercher par spécialité, lieu...' :
+                     market.market === 'it' ? 'Cerca per specialità, zona...' :
+                     market.market === 'es' || market.market === 'mx' ? 'Buscar por especialidad, zona...' :
+                     'Search by specialty, area, or name...'}
+        autocomplete="off"
+      />
+      <button class="search-btn" onclick="doSearch()" data-i18n="search_btn">Search</button>
     </div>
-    <div class="hero-actions">
-      <a href="/join" class="btn-primary">{market.ctaText} →</a>
-      <a href="/sarah" class="btn-ghost">See a Live Profile ⊙</a>
+
+    <!-- QUICK FILTERS -->
+    <div class="quick-filters">
+      <a href="/find?specialty=weight-loss" class="qf-pill" data-i18n="filter_weight_loss">Weight Loss</a>
+      <a href="/find?specialty=strength" class="qf-pill" data-i18n="filter_strength">Strength</a>
+      <a href="/find?specialty=hiit" class="qf-pill">HIIT</a>
+      <a href="/find?specialty=nutrition" class="qf-pill" data-i18n="filter_nutrition">Nutrition</a>
+      <a href="/find?specialty=yoga" class="qf-pill">Yoga</a>
+      <a href="/find?specialty=running" class="qf-pill" data-i18n="filter_running">Running</a>
+      <a href="/find?specialty=boxing" class="qf-pill">Boxing</a>
     </div>
-    <div class="hero-income-wrap">
-      <div class="income-card">
-        <div class="income-label">Sessions (Today)</div>
-        <div class="income-value">{market.market === 'in' ? '52,000' : market.market === 'uk' ? '3,200' : '8,400'}</div>
-        <div class="income-desc">
-          {market.market === 'in' ? '₹/month from 6 clients × ₹8,500 packages' :
-           market.market === 'uk' ? '£/month from 6 clients × £530 packages' :
-           'AED/month from 6 clients × 1,400 AED packages'}
-        </div>
-      </div>
-      <div class="income-card highlight">
-        <div class="income-label">With TrainedBy Pro</div>
-        <div class="income-value brand">{market.market === 'in' ? '1,52,000' : market.market === 'uk' ? '9,400' : '24,600'}</div>
-        <div class="income-desc">Sessions + digital products + affiliate commissions</div>
-        <div class="income-badge"><span style="width:5px;height:5px;border-radius:50%;background:#00C853;display:inline-block"></span> +193% income</div>
-      </div>
-      <div class="income-card">
-        <div class="income-label">Passive (Monthly)</div>
-        <div class="income-value">{market.market === 'in' ? '38,000' : market.market === 'uk' ? '2,300' : '6,200'}</div>
-        <div class="income-desc">
-          {market.market === 'in' ? '₹ while you sleep — digital products & affiliate deals' :
-           market.market === 'uk' ? '£ while you sleep — digital products & affiliate deals' :
-           'AED while you sleep — digital products & affiliate deals'}
-        </div>
-      </div>
+
+    <!-- TRUST STRIP -->
+    <div class="trust-strip">
+      <div class="trust-item"><div class="trust-dot"></div>{market.certificationBody} Verified Only</div>
+      <div class="trust-item"><div class="trust-dot"></div>Real Trainer Profiles</div>
+      <div class="trust-item"><div class="trust-dot"></div>No Fake Reviews</div>
+      <div class="trust-item"><div class="trust-dot"></div>Free to Browse</div>
     </div>
   </section>
 
-  <!-- PROOF BAR -->
-  <div class="proof-bar">
-    <div class="proof-item"><div class="proof-num" style="color:var(--brand)">AED 0</div><div class="proof-label">To Get Started</div></div>
-    <div class="proof-item"><div class="proof-num">{market.certificationBody}</div><div class="proof-label">Official Verification</div></div>
-    <div class="proof-item"><div class="proof-num">60 sec</div><div class="proof-label">To Go Live</div></div>
-    <div class="proof-item"><div class="proof-num">30 day</div><div class="proof-label">ROI Guarantee</div></div>
-  </div>
-
-  <!-- PROBLEM / SOLUTION -->
-  <div style="max-width:var(--max);margin:0 auto;padding:80px 24px 0">
-    <p class="section-eyebrow">The real problem</p>
-    <h2 class="section-title" style="margin-bottom:40px">Most trainers are<br>leaving 20k AED on<br>the table every month.</h2>
-    <div class="split-grid">
-      <div class="split-col problem">
-        <div class="split-label red">Without TrainedBy</div>
-        <div class="split-item"><div class="split-icon x">✕</div>Income is capped by hours in the day — 8 clients is the ceiling</div>
-        <div class="split-item"><div class="split-icon x">✕</div>Selling in the DMs is awkward, inconsistent, and exhausting</div>
-        <div class="split-item"><div class="split-icon x">✕</div>No leverage with supplement or meal prep brands — you can't negotiate alone</div>
-        <div class="split-item"><div class="split-icon x">✕</div>Workout PDFs and programmes sit on your phone, unsold</div>
-        <div class="split-item"><div class="split-icon x">✕</div>Every client you lose is income gone — no recurring digital revenue</div>
-      </div>
-      <div class="split-col solution">
-        <div class="split-label orange">With TrainedBy Pro</div>
-        <div class="split-item"><div class="split-icon check">✓</div>Digital products sell while you sleep — upload once, earn forever</div>
-        <div class="split-item"><div class="split-icon check">✓</div>AI-built Grand Slam Offers close clients at 3× your current rate</div>
-        <div class="split-item"><div class="split-icon check">✓</div>Instant 25% affiliate commissions on UAE's top meal prep and supplement brands</div>
-        <div class="split-item"><div class="split-icon check">✓</div>Your clients become your sales team — they earn 30% reselling your PDFs</div>
-        <div class="split-item"><div class="split-icon check">✓</div>REPs-verified profile that builds trust before the first message</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- FEATURES -->
-  <div style="max-width:var(--max);margin:0 auto;padding:80px 24px 0">
-    <p class="section-eyebrow">The Operating System</p>
-    <h2 class="section-title">Four tools.<br>One platform.<br>Infinite leverage.</h2>
-  </div>
-  <div style="max-width:var(--max);margin:0 auto;padding:40px 24px 80px">
-    <div class="features-grid">
-      <div class="feature-row">
-        <div class="feature-text">
-          <span class="feature-tag">Grand Slam Offer Builder</span>
-          <h3 class="feature-title">Stop selling sessions.<br>Start selling outcomes.</h3>
-          <p class="feature-desc">Our AI-powered offer builder packages your expertise into high-ticket, outcome-based programmes with a defined timeline and a results guarantee. Clients don't compare you on price — they compare you on value.</p>
-          <p class="feature-proof">→ "The 8-Week Executive Reboot: Lose 10kg, guaranteed — or session 17 is free."</p>
-        </div>
-        <div class="feature-visual">
-          <div class="mockup-box">
-            <div class="m-avatar-row">
-              <div class="m-avatar">S</div>
-              <div><div class="m-name">Sarah Al Mansoori</div><div class="m-sub">Strength Coach · Dubai</div></div>
-            </div>
-            <div class="m-reps"><div style="width:5px;height:5px;border-radius:50%;background:#00C853;flex-shrink:0"></div> {market.certificationBody} Verified</div>
-            <div class="m-pkg">
-              <div class="m-pkg-row"><span class="m-pkg-name">8-Week Reboot</span><span class="m-pkg-price">AED 4,800</span></div>
-              <div class="m-pkg-meta">16 sessions · Lose 10kg · Meal plan included</div>
-            </div>
-            <div class="m-guarantee">🛡 Results guaranteed or session 17 is free</div>
-            <div class="m-pkg">
-              <div class="m-pkg-row"><span class="m-pkg-name">Trial Session</span><span class="m-pkg-price">AED 150</span></div>
-              <div class="m-pkg-meta">1 session · 60min · No commitment</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="feature-row reverse">
-        <div class="feature-text">
-          <span class="feature-tag">Digital Product Hub</span>
-          <h3 class="feature-title">Upload once.<br>Earn forever.</h3>
-          <p class="feature-desc">Host and sell your workout PDFs, nutrition guides, and paid communities directly from your TrainedBy profile. Stripe handles the payout automatically. No tech setup. Near 100% margin.</p>
-          <p class="feature-proof">→ A 12-week hypertrophy programme at 199 AED, sold to 50 clients = 9,950 AED passive income.</p>
-        </div>
-        <div class="feature-visual">
-          <div class="mockup-box">
-            <div style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;margin-bottom:12px;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px">Digital Products</div>
-            <div class="m-product"><div><div class="m-product-name">12-Week Hypertrophy</div><div class="m-product-badge">PDF · 47 sold this month</div></div><div class="m-product-price">AED 199</div></div>
-            <div class="m-product"><div><div class="m-product-name">Dubai Run Club</div><div class="m-product-badge">Community · 23 members</div></div><div class="m-product-price">AED 79/mo</div></div>
-            <div class="m-product"><div><div class="m-product-name">Nutrition Masterclass</div><div class="m-product-badge">Video · 31 sold</div></div><div class="m-product-price">AED 149</div></div>
-            <div style="margin-top:10px;padding:8px 10px;background:var(--brand-dim);border:1px solid var(--brand-border);border-radius:8px;font-size:10px;font-weight:700;color:var(--brand);text-align:center">This month: AED 14,620 passive</div>
-          </div>
-        </div>
-      </div>
-      <div class="feature-row">
-        <div class="feature-text">
-          <span class="feature-tag">Master Affiliate Vault</span>
-          <h3 class="feature-title">Earn 25% on every<br>meal prep order<br>your clients place.</h3>
-          <p class="feature-desc">We negotiate master affiliate deals with UAE's top brands so you don't have to. One click to activate. Your clients buy through your link. You earn every month, passively, without lifting a finger.</p>
-          <p class="feature-proof">→ 50 clients × 800 AED/month meal prep × 25% = 10,000 AED/month passive.</p>
-        </div>
-        <div class="feature-visual">
-          <div class="mockup-box">
-            <div style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;margin-bottom:12px;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px">Affiliate Vault</div>
-            <div class="m-affiliate-row"><div class="m-affiliate-dot"></div><div class="m-affiliate-name">Fuel Meals UAE</div><div class="m-affiliate-pct">25% recurring</div></div>
-            <div class="m-affiliate-row"><div class="m-affiliate-dot"></div><div class="m-affiliate-name">MyProtein MENA</div><div class="m-affiliate-pct">8% per order</div></div>
-            <div class="m-affiliate-row"><div class="m-affiliate-dot"></div><div class="m-affiliate-name">Gymshark UAE</div><div class="m-affiliate-pct">6% per sale</div></div>
-            <div class="m-affiliate-row"><div class="m-affiliate-dot"></div><div class="m-affiliate-name">Life Fitness ME</div><div class="m-affiliate-pct">12% per unit</div></div>
-            <div style="margin-top:10px;padding:8px 10px;background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.2);border-radius:8px;font-size:10px;font-weight:700;color:var(--gold);text-align:center">This month: AED 6,240 earned</div>
-          </div>
-        </div>
-      </div>
-      <div class="feature-row reverse">
-        <div class="feature-text">
-          <span class="feature-tag">Lead CRM & Analytics</span>
-          <h3 class="feature-title">Know exactly who's<br>ready to buy.</h3>
-          <p class="feature-desc">Every profile view, WhatsApp tap, and lead submission is tracked. Your dashboard shows which offers convert, which packages get the most interest, and sends you a WhatsApp notification the moment a new lead arrives.</p>
-          <p class="feature-proof">→ One-click WhatsApp follow-up templates built on Hormozi's lead nurture framework.</p>
-        </div>
-        <div class="feature-visual">
-          <div class="mockup-box">
-            <div class="m-chart">
-              <div class="m-bar" style="height:30%"></div><div class="m-bar" style="height:55%"></div>
-              <div class="m-bar" style="height:40%"></div><div class="m-bar hi" style="height:80%"></div>
-              <div class="m-bar" style="height:65%"></div><div class="m-bar hi" style="height:90%"></div>
-              <div class="m-bar" style="height:70%"></div>
-            </div>
-            <div class="m-stat-row" style="margin-bottom:12px">
-              <div><div class="m-stat-v">47</div><div class="m-stat-l">Views</div></div>
-              <div><div class="m-stat-v">12</div><div class="m-stat-l">WA Taps</div></div>
-              <div><div class="m-stat-v">6</div><div class="m-stat-l">Leads</div></div>
-            </div>
-            <div class="m-result"><div class="m-result-label">Hottest Lead</div><div class="m-result-val" style="font-size:14px">Ahmed K.</div><div class="m-result-desc">Viewed 8-Week Reboot · 3× this week</div></div>
-            <button class="m-cta">Send Follow-up via WhatsApp →</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- INCOME CALCULATOR -->
-  <div style="border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-    <div class="section" id="income">
-      <div style="text-align:center;margin-bottom:48px">
-        <p class="section-eyebrow">Income Calculator</p>
-        <h2 class="section-title">See your number.</h2>
-        <p class="section-sub" style="margin:0 auto;text-align:center">Enter your current situation and see what TrainedBy Pro unlocks.</p>
-      </div>
-      <div class="calc-wrap">
-        <div class="calc-row">
-          <div class="calc-field"><label class="calc-label" for="c-clients">Active clients</label><input class="calc-input" id="c-clients" type="number" value="8" min="1" max="100"></div>
-          <div class="calc-field"><label class="calc-label" for="c-pkg">Avg package price (AED)</label><input class="calc-input" id="c-pkg" type="number" value="1400" min="100" max="20000"></div>
-        </div>
-        <div class="calc-row">
-          <div class="calc-field"><label class="calc-label" for="c-digital">Digital product price (AED)</label><input class="calc-input" id="c-digital" type="number" value="199" min="0" max="5000"></div>
-          <div class="calc-field"><label class="calc-label" for="c-affiliate">Meal prep spend per client (AED/mo)</label><input class="calc-input" id="c-affiliate" type="number" value="600" min="0" max="5000"></div>
-        </div>
-        <div class="calc-divider"></div>
-        <div class="calc-results">
-          <div class="calc-result"><div class="calc-result-label">Sessions Income</div><div class="calc-result-value" id="r-sessions">AED 11,200</div></div>
-          <div class="calc-result"><div class="calc-result-label">Digital + Affiliate</div><div class="calc-result-value" id="r-passive">AED 7,190</div></div>
-          <div class="calc-result total"><div class="calc-result-label">Total Monthly</div><div class="calc-result-value" id="r-total">AED 18,390</div></div>
-        </div>
-        <div id="r-uplift" style="text-align:center;font-size:13px;font-weight:600;margin-top:16px;color:#00C853">+64% passive income on top of sessions</div>
-        <div style="text-align:center;margin-top:20px">
-          <a href="/join" class="btn-primary" style="font-size:14px;padding:12px 24px">Unlock This Income →</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- THE STACK -->
-  <div style="max-width:var(--max);margin:0 auto;padding:80px 24px">
-    <p class="section-eyebrow">What's in the box</p>
-    <h2 class="section-title" style="margin-bottom:12px">The Dubai Trainer's<br>Operating System.</h2>
-    <p class="section-sub" style="margin-bottom:48px">Everything a trainer needs to build a business that runs without them.</p>
-    <div class="stack-grid">
-      <div class="stack-card"><div class="stack-icon orange">🎯</div><div class="stack-card-title">Grand Slam Offer Builder</div><div class="stack-card-desc">AI-powered tool that packages your expertise into high-ticket, outcome-based offers with a built-in guarantee. Compete on value, not price.</div><div class="stack-card-value">→ Closes clients at 3× your current rate</div></div>
-      <div class="stack-card"><div class="stack-icon green">📦</div><div class="stack-card-title">Digital Product Hub</div><div class="stack-card-desc">Host PDFs, video courses, and paid communities. Stripe handles payouts automatically. Upload once, earn forever with near 100% margin.</div><div class="stack-card-value">→ Avg trainer earns 6,200 AED/month passively</div></div>
-      <div class="stack-card gold"><div class="stack-icon gold-bg">💰</div><div class="stack-card-title">Master Affiliate Vault</div><div class="stack-card-desc">Instant access to pre-negotiated 25% commissions on UAE meal prep, supplements, and apparel brands. No cold emails. No negotiations. Just activate and earn.</div><div class="stack-card-value">→ 50 clients = up to 10,000 AED/month passive</div></div>
-      <div class="stack-card"><div class="stack-icon blue">🔗</div><div class="stack-card-title">Whop Affiliate Engine</div><div class="stack-card-desc">Turn your clients into a sales team. They earn 30% for every person they refer to your digital products. Your customer acquisition cost drops to zero.</div><div class="stack-card-value">→ Every client becomes a distributor</div></div>
-    </div>
-  </div>
-
-  <!-- HOW IT WORKS -->
-  <div style="border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-    <div class="section" id="how">
-      <div class="how-wrap">
-        <div>
-          <p class="section-eyebrow">How it works</p>
-          <h2 class="section-title">Live in under<br>two minutes.</h2>
-          <p class="section-sub" style="margin-bottom:32px">No technical setup. No waiting. Your profile and operating system are live the moment you submit.</p>
-          <div class="how-steps">
-            <div class="how-step"><div class="how-num">01</div><div><div class="how-title">Create your profile</div><div class="how-desc">Name, specialties, and REPs number. Takes under 2 minutes. You're live immediately at <span style="color:var(--brand)">trainedby.ae/yourname</span>.</div></div></div>
-            <div class="how-step"><div class="how-num">02</div><div><div class="how-title">Build your Grand Slam Offer</div><div class="how-desc">Our AI walks you through packaging your services into a high-ticket, outcome-based programme with a guarantee. Takes 5 minutes.</div></div></div>
-            <div class="how-step"><div class="how-num">03</div><div><div class="how-title">Activate your passive income</div><div class="how-desc">Upload a digital product and activate your affiliate vault. Both start earning within 24 hours of setup.</div></div></div>
-            <div class="how-step"><div class="how-num">04</div><div><div class="how-title">Share your link everywhere</div><div class="how-desc">Put it in your Instagram bio, WhatsApp status, and TikTok. Every visitor sees your verified profile, your Grand Slam Offer, and your digital products.</div></div></div>
-          </div>
-        </div>
-        <div class="how-visual">
-          <div style="text-align:center">
-            <div style="font-family:'Manrope',sans-serif;font-weight:900;font-size:52px;color:var(--brand);letter-spacing:-2px;line-height:1">2 min</div>
-            <div style="font-size:13px;color:var(--text-2);margin-top:4px">to go live</div>
-            <div style="margin:28px auto;width:1px;height:48px;background:var(--border)"></div>
-            <div style="font-family:'Manrope',sans-serif;font-weight:900;font-size:52px;color:var(--text);letter-spacing:-2px;line-height:1">30 day</div>
-            <div style="font-size:13px;color:var(--text-2);margin-top:4px">ROI guarantee</div>
-            <div style="margin:28px auto;width:1px;height:48px;background:var(--border)"></div>
-            <div style="font-family:'Manrope',sans-serif;font-weight:900;font-size:52px;color:var(--text);letter-spacing:-2px;line-height:1">∞</div>
-            <div style="font-size:13px;color:var(--text-2);margin-top:4px">passive income</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TESTIMONIALS -->
-  <div style="max-width:var(--max);margin:0 auto;padding:80px 24px">
-    <p class="section-eyebrow">Trainers say</p>
-    <h2 class="section-title" style="margin-bottom:40px">Built for trainers<br>who take it seriously.</h2>
-    <div class="testimonials-grid">
-      <div class="testimonial-card">
-        <p class="testimonial-quote">"I put my Grand Slam Offer live on a Monday — 4,800 AED for my 8-week programme. By Wednesday I had two clients sign up. The guarantee was what closed them."</p>
-        <div class="testimonial-author"><div class="t-avatar" style="background:linear-gradient(135deg,#1a1a1a,#2a1500);border:2px solid rgba(255,92,0,0.4);font-size:16px">SA</div><div><div class="t-name">Sarah Al Mansoori</div><div class="t-role">Strength Coach, Dubai</div><div class="t-reps"><div style="width:5px;height:5px;border-radius:50%;background:#00C853;flex-shrink:0"></div> REPs Level 3</div></div></div>
-      </div>
-      <div class="testimonial-card">
-        <p class="testimonial-quote">"The affiliate vault is insane. I activated Fuel Meals, sent my clients the link, and I'm now earning 3,200 AED a month without doing anything. That's my rent."</p>
-        <div class="testimonial-author"><div class="t-avatar" style="background:linear-gradient(135deg,#0a1a2a,#001a2a);border:2px solid rgba(0,120,255,0.3);font-size:16px">KR</div><div><div class="t-name">Khalid Rashid</div><div class="t-role">HIIT & Functional, Abu Dhabi</div><div class="t-reps"><div style="width:5px;height:5px;border-radius:50%;background:#00C853;flex-shrink:0"></div> REPs Level 4</div></div></div>
-      </div>
-      <div class="testimonial-card">
-        <p class="testimonial-quote">"I uploaded my 12-week programme PDF in 10 minutes. It's sold 34 times this month. That's 6,766 AED I made while I was training other clients. This is the model."</p>
-        <div class="testimonial-author"><div class="t-avatar" style="background:linear-gradient(135deg,#1a0a1a,#2a002a);border:2px solid rgba(180,0,255,0.3);font-size:16px">NH</div><div><div class="t-name">Nour Haddad</div><div class="t-role">Nutrition & Wellness, Dubai</div><div class="t-reps"><div style="width:5px;height:5px;border-radius:50%;background:#00C853;flex-shrink:0"></div> REPs Level 3</div></div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- WAITLIST SECTION (shown for markets without payment enabled) -->
-  {isWaitlist && (
-    <div id="waitlist-section" style="background:linear-gradient(135deg,rgba(255,92,0,0.10),rgba(255,92,0,0.03));border-top:1px solid rgba(255,92,0,0.2);border-bottom:1px solid rgba(255,92,0,0.2);padding:72px 24px;text-align:center;">
-      <div style="max-width:520px;margin:0 auto;">
-        <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;border:1px solid rgba(255,92,0,0.3);background:rgba(255,92,0,0.08);font-size:11px;font-weight:700;color:var(--brand);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:24px;">
-          {market.flag} Coming Soon
-        </div>
-        <h2 style="font-family:'Manrope',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:900;letter-spacing:-1px;line-height:1.15;margin-bottom:16px;">
-          {market.i18nLocale === 'fr' ? 'Soyez le premier. Bloquez le prix de lancement.' :
-           market.i18nLocale === 'it' ? 'Sii il primo. Blocca il prezzo di lancio.' :
-           market.i18nLocale === 'es' ? 'Sé el primero. Bloquea el precio de lanzamiento.' :
-           'Be first. Lock in the launch price.'}
-        </h2>
-        <p style="font-size:15px;color:var(--text-2);line-height:1.7;margin-bottom:32px;">{market.paymentNote}</p>
-        <form id="waitlist-form" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-          <input id="wl-name" type="text"
-            placeholder={market.i18nLocale === 'fr' ? 'Votre prénom' : market.i18nLocale === 'it' ? 'Il tuo nome' : market.i18nLocale === 'es' ? 'Tu nombre' : 'Your name'}
-            style="flex:1;min-width:150px;padding:12px 18px;border-radius:100px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--text);font-size:14px;outline:none;" />
-          <input id="wl-email" type="email" required
-            placeholder={market.i18nLocale === 'fr' ? 'Votre email' : market.i18nLocale === 'it' ? 'La tua email' : market.i18nLocale === 'es' ? 'Tu email' : 'Your email'}
-            style="flex:1;min-width:200px;padding:12px 18px;border-radius:100px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--text);font-size:14px;outline:none;" />
-          <button type="button" onclick="submitWaitlist()" class="btn-primary" style="white-space:nowrap;padding:12px 24px;font-size:14px;">
-            {market.i18nLocale === 'fr' ? 'Rejoindre la liste →' : market.i18nLocale === 'it' ? 'Unisciti alla lista →' : market.i18nLocale === 'es' ? 'Unirse a la lista →' : 'Join the Waitlist →'}
-          </button>
-        </form>
-        <div id="wl-success" style="display:none;margin-top:20px;padding:12px 24px;border-radius:100px;background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.2);color:#00C853;font-size:14px;font-weight:600;">
-          {market.i18nLocale === 'fr' ? '✓ Vous êtes sur la liste !' : market.i18nLocale === 'it' ? '✓ Sei nella lista!' : market.i18nLocale === 'es' ? '✓ ¡Estás en la lista!' : '✓ You\'re on the list! We\'ll email you when we launch.'}
-        </div>
-      </div>
-    </div>
-  )}
-
-  <!-- PRICING -->
-  <div style="border-top:1px solid var(--border)">
-    <div class="section" id="pricing">
-      <div class="pricing-header">
-        <p class="section-eyebrow">Simple pricing</p>
-        <h2 class="section-title">Start free.<br>Upgrade when<br>you're ready to scale.</h2>
-      </div>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-tier">Free</div>
-          <div class="pricing-price">{market.currencySymbol} 0 <span>/ month</span></div>
-          <p class="pricing-desc">Your verified profile, live in 60 seconds. The foundation.</p>
-          <ul class="pricing-features">
-            <li>Public {market.certificationBody}-verified profile</li>
-            <li>1 session package</li>
-            <li>WhatsApp CTA button</li>
-            <li>Lead capture form</li>
-            <li class="muted">Grand Slam Offer Builder</li>
-            <li class="muted">Digital Product Hub</li>
-            <li class="muted">Affiliate Vault</li>
-            <li class="muted">Analytics dashboard</li>
-          </ul>
-          <a href="/join" class="pricing-btn pricing-btn-ghost">Get started →</a>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-popular">The Operating System</div>
-          <div class="pricing-tier">Pro</div>
-          <div class="pricing-price">{market.proPriceLabel}</div>
-          <p class="pricing-desc">The complete business in a box. Everything you need to double your income.</p>
-          <div class="pricing-guarantee">🛡 ROI in 30 days or full refund</div>
-          <ul class="pricing-features">
-            <li>Everything in Free</li>
-            <li>Grand Slam Offer Builder (AI)</li>
-            <li>Digital Product Hub (unlimited)</li>
-            <li>Master Affiliate Vault (25% commissions)</li>
-            <li>Whop Affiliate Engine for your products</li>
-            <li>Analytics dashboard + weekly report</li>
-            <li>WhatsApp lead notifications</li>
-            <li>Priority in search results</li>
-            <li>Trainer referral programme (20% recurring)</li>
-          </ul>
-          {isPaid ? (
-            <a href="/join" class="pricing-btn pricing-btn-primary">Get the OS →</a>
-          ) : (
-            <a href="#waitlist-section" class="pricing-btn pricing-btn-primary">Join the Waitlist →</a>
-          )}
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-tier">Agency</div>
-          <div class="pricing-price">AED 499 <span>/ month</span></div>
-          <p class="pricing-desc">For gym brands, PT studios, and multi-trainer operations.</p>
-          <ul class="pricing-features">
-            <li>Everything in Pro</li>
-            <li>Up to 10 trainer profiles</li>
-            <li>Agency / gym landing page</li>
-            <li>Centralised lead inbox</li>
-            <li>Custom profile URL</li>
-            <li>Verified top placement</li>
-            <li>Dedicated account manager</li>
-          </ul>
-          <a href="/join" class="pricing-btn pricing-btn-ghost">Contact us →</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- FAQ -->
+  <!-- FEATURED TRAINERS -->
   <div style="border-top:1px solid var(--border)">
     <div class="section">
-      <p class="section-eyebrow">Before you decide</p>
-      <h2 class="section-title" style="margin-bottom:48px">Common questions.</h2>
-      <div class="faq-grid">
-        <div class="faq-item"><div class="faq-q">What is the ROI Guarantee?</div><div class="faq-a">If your TrainedBy Pro profile doesn't generate at least 1,000 AED in new client bookings or passive affiliate income within your first 30 days, we refund your subscription in full and give you the next month free. No questions asked.</div></div>
-        <div class="faq-item"><div class="faq-q">How does the Digital Product Hub work?</div><div class="faq-a">Upload any file (PDF, video, Notion link) and set a price. When a client buys it, Stripe automatically routes the payment to your bank account minus our 5% platform fee. You get paid within 2 business days.</div></div>
-        <div class="faq-item"><div class="faq-q">Do I need to be REPs registered?</div><div class="faq-a">No. You can create a profile and go live immediately. The REPs badge is added once we verify your registration number — usually within 24 hours. Non-verified profiles still get full access to Pro features.</div></div>
-        <div class="faq-item"><div class="faq-q">How does the Affiliate Vault work?</div><div class="faq-a">We negotiate master affiliate deals with UAE brands on your behalf. You activate the brands you want, share your unique link with clients, and earn a commission on every purchase they make — automatically, every month.</div></div>
-        <div class="faq-item"><div class="faq-q">Can I cancel anytime?</div><div class="faq-a">Yes. No contracts, no lock-in. Cancel from your dashboard and your profile reverts to the Free tier — it stays live, just without the Pro tools. Your digital products and affiliate earnings are yours to keep.</div></div>
-        <div class="faq-item"><div class="faq-q">What is the trainer referral programme?</div><div class="faq-a">Every Pro trainer gets a unique referral link. When another trainer signs up to Pro through your link, you earn 20% of their monthly subscription — recurring, for as long as they stay. Refer 4 trainers and your Pro subscription is free forever.</div></div>
+      <p class="section-eyebrow">Verified Trainers</p>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
+        <h2 class="section-title" style="margin-bottom:0">Top trainers<br>near you.</h2>
+        <a href="/find" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">See all trainers →</a>
+      </div>
+      <p class="section-sub">Hand-picked, {market.certificationBody}-verified trainers with proven track records.</p>
+      <div class="trainers-grid" id="featured-trainers">
+        <!-- Skeleton loaders -->
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+          <div class="skeleton" style="height:195px"></div>
+          <div style="padding:16px"><div class="skeleton" style="height:14px;width:60%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:80%"></div></div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+          <div class="skeleton" style="height:195px"></div>
+          <div style="padding:16px"><div class="skeleton" style="height:14px;width:55%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:45%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:70%"></div></div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+          <div class="skeleton" style="height:195px"></div>
+          <div style="padding:16px"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:35%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:75%"></div></div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+          <div class="skeleton" style="height:195px"></div>
+          <div style="padding:16px"><div class="skeleton" style="height:14px;width:50%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:42%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:85%"></div></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- BOTTOM CTA -->
-  <div class="cta-bottom">
-    <h2 class="cta-bottom-title">Your expertise.<br>Your empire.<br><em style="color:var(--brand);font-style:normal">Your operating system.</em></h2>
-    <p class="cta-bottom-sub">Join UAE personal trainers already building passive income on TrainedBy. Free to start, live in 2 minutes.</p>
-    <p class="cta-bottom-guarantee">🛡 ROI Guarantee: 1,000 AED in 30 days or your money back.</p>
-    <div class="cta-bottom-actions">
-      {isPaid ? (
-        <a href="/join" class="btn-primary" style="font-size:16px;padding:16px 32px">Get Your OS Free →</a>
-      ) : (
-        <a href="#waitlist-section" class="btn-primary" style="font-size:16px;padding:16px 32px">Join the Waitlist →</a>
-      )}
-      <a href="/sarah" class="btn-ghost" style="font-size:16px;padding:16px 32px">See a Live Profile ⊙</a>
+  <!-- TRANSFORMATIONS -->
+  <div style="border-top:1px solid var(--border);background:var(--surface-2)">
+    <div class="section">
+      <p class="section-eyebrow">Real Results</p>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
+        <h2 class="section-title" style="margin-bottom:0">Transformations<br>that speak for themselves.</h2>
+        <a href="/community?category=transformations" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">See all →</a>
+      </div>
+      <p class="section-sub">Documented by the trainers who made them happen. No filters, no stock photos.</p>
+      <div class="transforms-grid" id="transformations-grid">
+        <!-- Static seed cards — replaced by live data when available -->
+        <div class="transform-card">
+          <div class="transform-header">
+            <div class="transform-trainer">
+              <div class="transform-avatar">S</div>
+              <div>
+                <div class="transform-trainer-name">Sarah Al Mansoori</div>
+                <div class="transform-trainer-cert">{market.certificationBody} Level 3 · Strength Coach</div>
+              </div>
+            </div>
+            <div class="transform-title">From sedentary to running her first 10k in 14 weeks</div>
+            <p class="transform-body">My client came to me post-pregnancy, hadn't exercised in 3 years. We started with 20-minute walks and built from there. The key was making every session feel achievable — never overwhelming.</p>
+          </div>
+          <div class="transform-stats">
+            <div class="transform-stat"><div class="transform-stat-val">14</div><div class="transform-stat-label">Weeks</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">8kg</div><div class="transform-stat-label">Lost</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">10k</div><div class="transform-stat-label">First Race</div></div>
+          </div>
+        </div>
+        <div class="transform-card">
+          <div class="transform-header">
+            <div class="transform-trainer">
+              <div class="transform-avatar">K</div>
+              <div>
+                <div class="transform-trainer-name">Khalid Rashid</div>
+                <div class="transform-trainer-cert">{market.certificationBody} Level 4 · HIIT Specialist</div>
+              </div>
+            </div>
+            <div class="transform-title">Corporate burnout to competing in his first obstacle race</div>
+            <p class="transform-body">He was working 70-hour weeks and using food as stress relief. We didn't talk about diet for the first month — just built the habit of showing up. Everything else followed naturally.</p>
+          </div>
+          <div class="transform-stats">
+            <div class="transform-stat"><div class="transform-stat-val">20</div><div class="transform-stat-label">Weeks</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">14kg</div><div class="transform-stat-label">Lost</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">1st</div><div class="transform-stat-label">Race Done</div></div>
+          </div>
+        </div>
+        <div class="transform-card">
+          <div class="transform-header">
+            <div class="transform-trainer">
+              <div class="transform-avatar">N</div>
+              <div>
+                <div class="transform-trainer-name">Nour Haddad</div>
+                <div class="transform-trainer-cert">{market.certificationBody} Level 3 · Nutrition & Wellness</div>
+              </div>
+            </div>
+            <div class="transform-title">Rebuilding strength after a back injury — without surgery</div>
+            <p class="transform-body">Her physio cleared her for light exercise but she was terrified to move. We worked with her physiotherapist from day one. Six months later she's deadlifting bodyweight and pain-free.</p>
+          </div>
+          <div class="transform-stats">
+            <div class="transform-stat"><div class="transform-stat-val">24</div><div class="transform-stat-label">Weeks</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">0</div><div class="transform-stat-label">Pain Days</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">BW</div><div class="transform-stat-label">Deadlift</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOG PREVIEW -->
+  <div style="border-top:1px solid var(--border)">
+    <div class="section">
+      <p class="section-eyebrow">From the Community</p>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
+        <h2 class="section-title" style="margin-bottom:0">Advice from trainers<br>who actually train.</h2>
+        <a href="/blog" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">Read all articles →</a>
+      </div>
+      <p class="section-sub">No sponsored content. No generic listicles. Written by verified trainers from their own practice.</p>
+      <div class="blog-grid" id="blog-preview">
+        <a href="/blog" class="blog-card featured">
+          <div>
+            <span class="blog-cat">Training Science</span>
+            <div class="blog-title">Why most people plateau after 3 months — and what actually breaks it</div>
+            <p class="blog-excerpt">The first three months of training are almost always productive. Then something stops working. Here's the physiology behind the plateau and the four interventions that consistently restart progress.</p>
+            <div class="blog-author">
+              <div class="blog-author-dot"></div>
+              <span>By a {market.certificationBody} Level 4 Trainer · 6 min read</span>
+            </div>
+          </div>
+          <div class="blog-visual">🏋️</div>
+        </a>
+        <a href="/blog" class="blog-card">
+          <span class="blog-cat">Nutrition</span>
+          <div class="blog-title">The only meal timing advice that actually matters</div>
+          <p class="blog-excerpt">Forget the 6-meal-a-day myth. Here's what the research says about when to eat — and why most of it is irrelevant if you're not getting the basics right first.</p>
+          <div class="blog-author">
+            <div class="blog-author-dot"></div>
+            <span>Nutrition Coach · 4 min read</span>
+          </div>
+        </a>
+        <a href="/blog" class="blog-card">
+          <span class="blog-cat">Mindset</span>
+          <div class="blog-title">What I tell every new client in the first session</div>
+          <p class="blog-excerpt">After hundreds of first sessions, I've learned that the conversation that happens before the first rep is the one that determines everything. Here's what I say — and why.</p>
+          <div class="blog-author">
+            <div class="blog-author-dot"></div>
+            <span>Strength Coach · 5 min read</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOR TRAINERS BANNER -->
+  <div style="padding:60px 0;border-top:1px solid var(--border)">
+    <div class="trainer-banner" style="max-width:calc(var(--max) - 48px);margin:0 auto">
+      <div class="trainer-banner-text">
+        <div class="trainer-banner-eyebrow">For Trainers</div>
+        <div class="trainer-banner-title">Build your practice<br>on a platform that<br>works as hard as you do.</div>
+        <p class="trainer-banner-sub">Verified profile, digital products, lead management, and an AI assistant — all in one place. Free to start.</p>
+      </div>
+      <div class="trainer-banner-actions">
+        <a href="/for-trainers" class="btn-primary">See how it works →</a>
+        <a href="/join" class="btn-ghost">Create your profile</a>
+      </div>
     </div>
   </div>
 
   <!-- FOOTER -->
   <footer>
-    <a href="/landing" class="footer-logo">TrainedBy</a>
+    <a href="/landing" class="footer-logo">{brandName}</a>
     <div class="footer-links">
-      <a href="#how">How it works</a>
-      <a href="#income">Calculator</a>
-      <a href="#pricing">Pricing</a>
-      <a href="/join">Join</a>
-      <a href="/sarah">Example Profile</a>
+      <a href="/find">Find a Trainer</a>
+      <a href="/blog">Stories</a>
+      <a href="/community">Community</a>
+      <a href="/for-trainers">For Trainers</a>
+      <a href="/join">Join as Trainer</a>
     </div>
-    <div class="footer-copy">© {new Date().getFullYear()} TrainedBy.ae · UAE</div>
+    <div class="footer-copy">© {new Date().getFullYear()} {brandName}</div>
   </footer>
 
-  <script define:vars={{ market: { market: market.market, waitlistEnabled: market.waitlistEnabled } }}>
-    // Waitlist form submission
-    async function submitWaitlist() {
-      const email = document.getElementById('wl-email').value;
-      const name = document.getElementById('wl-name').value;
-      if (!email) return;
-      const btn = document.querySelector('#waitlist-form button');
-      if (btn) { btn.textContent = '...'; btn.disabled = true; }
-      try {
-        await fetch('https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1/join-waitlist', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, name, market: market.market, source_domain: window.location.hostname, role: 'trainer' })
-        });
-        document.getElementById('waitlist-form').style.display = 'none';
-        document.getElementById('wl-success').style.display = 'block';
-      } catch(e) {
-        if (btn) { btn.textContent = 'Try again'; btn.disabled = false; }
-      }
-    }
-
+  <script>
     // Nav scroll effect
     const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => { nav?.classList.toggle('scrolled', window.scrollY > 40); }, { passive: true });
+    window.addEventListener('scroll', () => {
+      nav?.classList.toggle('scrolled', window.scrollY > 40);
+    }, { passive: true });
 
-    // Income Calculator
-    function calcIncome() {
-      const clients = parseFloat((document.getElementById('c-clients') as HTMLInputElement).value) || 0;
-      const pkg = parseFloat((document.getElementById('c-pkg') as HTMLInputElement).value) || 0;
-      const digital = parseFloat((document.getElementById('c-digital') as HTMLInputElement).value) || 0;
-      const affiliate = parseFloat((document.getElementById('c-affiliate') as HTMLInputElement).value) || 0;
-      const sessions = clients * pkg;
-      const digitalIncome = clients * 0.3 * digital;
-      const affiliateIncome = clients * affiliate * 0.25;
-      const passive = digitalIncome + affiliateIncome;
-      const total = sessions + passive;
-      const uplift = sessions > 0 ? Math.round((passive / sessions) * 100) : 0;
-      const fmt = (n: number) => 'AED ' + Math.round(n).toLocaleString('en-AE');
-      (document.getElementById('r-sessions') as HTMLElement).textContent = fmt(sessions);
-      (document.getElementById('r-passive') as HTMLElement).textContent = fmt(passive);
-      (document.getElementById('r-total') as HTMLElement).textContent = fmt(total);
-      const badge = document.getElementById('r-uplift') as HTMLElement;
-      if (badge) {
-        badge.textContent = uplift > 0 ? `+${uplift}% passive income on top of sessions` : 'Enter your details to see your number';
-        badge.style.color = uplift > 0 ? '#00C853' : 'var(--text-2)';
-      }
-      const totalEl = document.getElementById('r-total') as HTMLElement;
-      if (totalEl) { totalEl.style.transform = 'scale(1.04)'; setTimeout(() => totalEl.style.transform = 'scale(1)', 200); }
-    }
-    ['c-clients','c-pkg','c-digital','c-affiliate'].forEach(id => {
-      document.getElementById(id)?.addEventListener('input', calcIncome);
+    // Hero search
+    window.doSearch = function() {
+      const q = (document.getElementById('hero-search') as HTMLInputElement).value.trim();
+      if (q) window.location.href = '/find?q=' + encodeURIComponent(q);
+      else window.location.href = '/find';
+    };
+    document.getElementById('hero-search')?.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Enter') window.doSearch();
     });
-    calcIncome();
 
-    // Dynamic scarcity counter
-    (function() {
-      const base = 87; const max = 100;
-      let current = Math.min(base + Math.floor(Math.random() * 3), max - 1);
-      const el = document.getElementById('spots-counter');
-      if (!el) return;
-      el.textContent = current + '/' + max;
-      setInterval(() => {
-        if (current < max - 1) {
-          current++;
-          el.textContent = current + '/' + max;
-          el.style.color = '#FF5C00';
-          setTimeout(() => el.style.color = '#fff', 800);
-        }
-      }, 45000 + Math.random() * 60000);
+    // Load featured trainers from Supabase
+    (async function() {
+      const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
+      const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
+
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/trainers?select=slug,full_name,specialty,location,profile_photo_url,reps_verified,packages&plan=eq.pro&is_active=eq.true&order=created_at.desc&limit=8`,
+          { headers: { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY } }
+        );
+        const trainers = await res.json();
+        if (!Array.isArray(trainers) || trainers.length === 0) return;
+
+        const grid = document.getElementById('featured-trainers');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        trainers.forEach((t: any) => {
+          const initials = (t.full_name || 'T').split(' ').map((n: string) => n[0]).join('').slice(0,2).toUpperCase();
+          const specialty = Array.isArray(t.specialty) ? t.specialty[0] : (t.specialty || 'Personal Training');
+          const location = t.location || '';
+          const packages = Array.isArray(t.packages) ? t.packages : [];
+          const lowestPrice = packages.length > 0
+            ? Math.min(...packages.map((p: any) => p.price || 0).filter((p: number) => p > 0))
+            : null;
+
+          const card = document.createElement('a');
+          card.href = '/' + t.slug;
+          card.className = 'trainer-card';
+          card.innerHTML = `
+            <div class="trainer-card-img">
+              ${t.profile_photo_url
+                ? `<img src="${t.profile_photo_url}" alt="${t.full_name}" style="width:100%;height:100%;object-fit:cover">`
+                : `<span>${initials}</span>`}
+              ${t.reps_verified ? '<span class="verified-badge">✓ Verified</span>' : ''}
+            </div>
+            <div class="trainer-card-body">
+              <div class="trainer-card-name">${t.full_name || 'Trainer'}</div>
+              <div class="trainer-card-meta">${specialty}${location ? ' · ' + location : ''}</div>
+              <div class="trainer-card-price">${lowestPrice ? 'From ' + lowestPrice : 'Contact for pricing'} <span>/ session</span></div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      } catch(e) {
+        // Silently fail — skeleton loaders remain
+      }
     })();
   </script>
 </Base>
-

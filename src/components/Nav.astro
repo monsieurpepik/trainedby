@@ -1,25 +1,42 @@
 ---
 interface Props {
-  variant?: 'landing' | 'app';
+  variant?: 'landing' | 'app' | 'consumer';
   activePage?: string;
 }
 const { variant = 'landing', activePage = '' } = Astro.props;
 ---
 
-{variant === 'landing' ? (
+{variant === 'consumer' ? (
+  <!-- Consumer homepage nav: Find a Trainer focus -->
   <nav class="nav" id="nav">
-    <a href="/landing" class="nav-logo">
-      <span data-brand-name>Trained<span style="color:#fff">By</span></span><span
+    <a href="/landing" class="nav-logo" data-brand-name>
+      <span>Trained<span style="color:#fff">By</span></span><span
         style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:2px;vertical-align:middle;margin-bottom:3px"
       ></span>
     </a>
     <div class="nav-links">
-      <a href="#how" data-i18n="nav.how_it_works">How it works</a>
-      <a href="#income" data-i18n="nav.income">Income calculator</a>
-      <a href="#pricing" data-i18n="nav.pricing">Pricing</a>
-      <a href="/sarah" data-i18n="nav.see_profile">See a Profile</a>
+      <a href="/find" data-i18n="nav_find">Find a Trainer</a>
+      <a href="/blog" data-i18n="nav_blog">Stories</a>
+      <a href="/community" data-i18n="nav_community">Community</a>
+      <a href="/for-trainers" class="nav-for-trainers" data-i18n="nav_for_trainers">For Trainers</a>
     </div>
-    <a href="/join" class="nav-cta" data-i18n="nav.get_os">Get Your OS →</a>
+    <a href="/find" class="nav-cta" data-i18n="nav_cta_find">Find Your Trainer →</a>
+  </nav>
+) : variant === 'landing' ? (
+  <!-- For-trainers / SaaS nav -->
+  <nav class="nav" id="nav">
+    <a href="/landing" class="nav-logo" data-brand-name>
+      <span>Trained<span style="color:#fff">By</span></span><span
+        style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:2px;vertical-align:middle;margin-bottom:3px"
+      ></span>
+    </a>
+    <div class="nav-links">
+      <a href="/find" data-i18n="nav_find">Find a Trainer</a>
+      <a href="/blog" data-i18n="nav_blog">Stories</a>
+      <a href="/community" data-i18n="nav_community">Community</a>
+      <a href="/for-trainers" class="nav-for-trainers" data-i18n="nav_for_trainers">For Trainers</a>
+    </div>
+    <a href="/join" class="nav-cta" data-i18n="nav.get_os">Create your profile →</a>
   </nav>
 ) : (
   <header class="app-header">
@@ -33,8 +50,12 @@ const { variant = 'landing', activePage = '' } = Astro.props;
   </header>
 )}
 
+<style>
+  .nav-for-trainers { color: var(--brand) !important; font-weight: 700 !important; }
+  .nav-for-trainers:hover { opacity: 0.8; }
+</style>
+
 <script>
-  // Scroll-based nav background for landing variant
   const nav = document.getElementById('nav');
   if (nav) {
     window.addEventListener('scroll', () => {
