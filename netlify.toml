@@ -58,6 +58,12 @@
   to = "/academy/index.html"
   status = 200
 
+# ── Root: / → landing page ──────────────────────────────────────────────────
+[[redirects]]
+  from = "/"
+  to = "/landing/index.html"
+  status = 200
+
 # ── Catch-all: /:slug → profile page (reads slug from URL at runtime) ───────
 [[redirects]]
   from = "/:trainer"
