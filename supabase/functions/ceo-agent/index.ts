@@ -148,6 +148,26 @@ async function handleTelegramUpdate(req: Request): Promise<Response> {
       case '/help':
         await handleHelp(chatId);
         break;
+      case '/learn':
+        if (!args) {
+          await sendMessage(chatId, '📚 Usage: `/learn <topic>`\n\nExamples:\n`/learn hormozi` — show all Hormozi frameworks\n`/learn growth` — show all growth frameworks\n`/learn pricing` — show pricing frameworks');
+        } else {
+          await handleLearn(chatId, args);
+        }
+        break;
+      case '/directive':
+        if (!args) {
+          await sendMessage(chatId, '🎯 Usage: `/directive <goal>`\n\nExample: `/directive increase pro conversion`\n\nI will apply relevant frameworks from the knowledge base to your current business data and produce an action plan.');
+        } else {
+          await handleDirective(chatId, args);
+        }
+        break;
+      case '/kb':
+        await handleKnowledgeBase(chatId, args);
+        break;
+      case '/context':
+        await handleBusinessContext(chatId);
+        break;
       default:
         // Treat any non-command message as a free-form question
         if (!text.startsWith('/')) {
@@ -199,7 +219,13 @@ async function handleHelp(chatId: number): Promise<void> {
 /memo — Show latest meta-agent memo
 /ask <question> — Ask me anything about the business
 
-Or just type any message — I'll answer it directly.`);
+Or just type any message — I'll answer it directly.
+
+*Strategic commands:*
+/learn <topic> — browse knowledge base by topic or source
+/directive <goal> — apply frameworks to a business goal
+/kb — show knowledge base summary
+/context — show current business context snapshot`);
 }
 
 async function handleStatus(chatId: number): Promise<void> {
@@ -457,6 +483,244 @@ ${context}`;
   } catch (err) {
     log.warn('Claude call failed in /ask', { error: String(err) });
     await sendMessage(chatId, `I couldn't process that right now. Try /status for live metrics or /help for available commands.`);
+  }
+}
+
+// ── Knowledge base commands ─────────────────────────────────────────────────
+
+async function handleLearn(chatId: number, query: string): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+
+  // Search by source name or category or tags
+  const q = query.toLowerCase().trim();
+  const { data } = await sb
+    .from('knowledge_base')
+    .select('source, category, title, content, tags')
+    .or(`source.ilike.%${q}%,category.ilike.%${q}%,title.ilike.%${q}%,tags.cs.{${q}}`)
+    .limit(5);
+
+  if (!data || data.length === 0) {
+    await sendMessage(chatId, `📚 No knowledge base entries found for "${query}".\n\nTry: hormozi, growth, pricing, retention, metrics, market, offer, content`);
+    return;
+  }
+
+  const entries = data.map((e: { source: string; category: string; title: string; content: string }, i: number) =>
+    `*${i + 1}. ${e.title}*\n_[${e.source} / ${e.category}]_\n${e.content.substring(0, 300)}${e.content.length > 300 ? '...' : ''}`
+  ).join('\n\n─────\n\n');
+
+  await sendMessage(chatId, `📚 *Knowledge Base: "${query}"* (${data.length} results)\n\n${entries}`);
+}
+
+async function handleKnowledgeBase(chatId: number, filter: string): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+
+  const { data } = await sb
+    .from('knowledge_base')
+    .select('source, category, title')
+    .order('source')
+    .order('category');
+
+  if (!data || data.length === 0) {
+    await sendMessage(chatId, '📚 Knowledge base is empty. It will be populated automatically.');
+    return;
+  }
+
+  // Group by source
+  const grouped: Record<string, string[]> = {};
+  for (const e of data as { source: string; category: string; title: string }[]) {
+    if (!grouped[e.source]) grouped[e.source] = [];
+    grouped[e.source].push(`  • ${e.title}`);
+  }
+
+  const summary = Object.entries(grouped)
+    .map(([src, titles]) => `*${src}* (${titles.length})\n${titles.join('\n')}`)
+    .join('\n\n');
+
+  await sendMessage(chatId, `📚 *Knowledge Base* (${data.length} entries)\n\n${summary}\n\nUse /learn <topic> to read any entry.`);
+}
+
+async function handleBusinessContext(chatId: number): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+
+  const { data } = await sb
+    .from('business_context')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (!data) {
+    // Generate a fresh context snapshot
+    await sendMessage(chatId, '📊 No business context snapshot yet. Generating one now...');
+    await updateBusinessContext(sb);
+    await sendMessage(chatId, '✅ Business context updated. Run /context again to view it.');
+    return;
+  }
+
+  const ctx = data as Record<string, unknown>;
+  const problems = (ctx.open_problems as string[] ?? []).map((p: string, i: number) => `  ${i + 1}. ${p}`).join('\n');
+
+  await sendMessage(chatId, `📊 *Business Context Snapshot*
+_Week of ${ctx.week_start}_
+
+💰 MRR: *${ctx.mrr_aed} AED*
+👥 Trainers: *${ctx.trainer_count}* (${ctx.pro_count} Pro, ${ctx.free_count} Free)
+📈 New this week: *${ctx.new_signups_week}*
+📉 Churn: *${ctx.churn_week}*
+🔄 Funnel conversion: *${ctx.funnel_conversion}%*
+
+🎯 *Strategic Priority:*
+${ctx.strategic_priority ?? 'Not set'}
+
+⚠️ *Open Problems:*
+${problems || '  None logged'}
+
+💡 *Hormozi Diagnosis:*
+${ctx.hormozi_diagnosis ?? 'Not generated yet — run /directive to get one'}`);
+}
+
+async function updateBusinessContext(sb: ReturnType<typeof createClient>): Promise<void> {
+  const [trainers, funnel] = await Promise.all([
+    sb.from('trainers').select('plan, created_at'),
+    sb.from('funnel_events').select('event_name').gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+  ]);
+
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const allTrainers = trainers.data ?? [];
+  const proCount = allTrainers.filter((t: { plan: string }) => t.plan === 'pro').length;
+  const newThisWeek = allTrainers.filter((t: { created_at: string }) => new Date(t.created_at) > weekAgo).length;
+  const mrr = proCount * 149;
+
+  const events = funnel.data ?? [];
+  const landingViews = events.filter((e: { event_name: string }) => e.event_name === 'join_landing_view').length;
+  const signups = events.filter((e: { event_name: string }) => e.event_name === 'join_signup_complete').length;
+  const conversion = landingViews > 0 ? Math.round((signups / landingViews) * 100) : 0;
+
+  const weekStart = new Date();
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+
+  await sb.from('business_context').upsert({
+    week_start: weekStart.toISOString().split('T')[0],
+    mrr_aed: mrr,
+    trainer_count: allTrainers.length,
+    pro_count: proCount,
+    free_count: allTrainers.length - proCount,
+    new_signups_week: newThisWeek,
+    churn_week: 0,
+    funnel_conversion: conversion,
+    strategic_priority: proCount < 10 ? 'Get to 10 Pro trainers before running paid ads' : 'Scale to 50 Pro trainers',
+    open_problems: JSON.stringify([
+      landingViews === 0 ? 'No funnel tracking data yet — frontend events not firing' : null,
+      proCount === 0 ? 'Zero Pro subscribers — pricing or value proposition may need work' : null,
+      allTrainers.length < 5 ? 'Less than 5 trainers — cold start problem, need manual outreach' : null,
+    ].filter(Boolean)),
+  }, { onConflict: 'week_start' });
+}
+
+// ── Directive handler ─────────────────────────────────────────────────────────
+
+async function handleDirective(chatId: number, directive: string): Promise<void> {
+  await sendTyping(chatId);
+  await sendMessage(chatId, `🎯 Processing directive: "${directive}"\n\nSearching knowledge base and analysing business data...`);
+
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+
+  // Extract keywords from directive for KB search
+  const keywords = directive.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+  const searchTerms = keywords.slice(0, 3);
+
+  // Search knowledge base for relevant frameworks
+  const kbResults = await Promise.all(
+    searchTerms.map(term =>
+      sb.from('knowledge_base')
+        .select('source, title, content, category')
+        .or(`title.ilike.%${term}%,content.ilike.%${term}%,tags.cs.{${term}},category.ilike.%${term}%`)
+        .limit(3)
+    )
+  );
+
+  const allKb: Array<{ source: string; title: string; content: string; category: string }> = [];
+  const seen = new Set<string>();
+  for (const r of kbResults) {
+    for (const e of (r.data ?? []) as Array<{ source: string; title: string; content: string; category: string }>) {
+      if (!seen.has(e.title)) {
+        seen.add(e.title);
+        allKb.push(e);
+      }
+    }
+  }
+
+  // Get current business context
+  const [trainers, funnel, ctx] = await Promise.all([
+    sb.from('trainers').select('plan, created_at').limit(200),
+    sb.from('funnel_events').select('event_name').gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+    sb.from('business_context').select('*').order('created_at', { ascending: false }).limit(1).single(),
+  ]);
+
+  const allTrainers = trainers.data ?? [];
+  const proCount = allTrainers.filter((t: { plan: string }) => t.plan === 'pro').length;
+  const events = funnel.data ?? [];
+  const landingViews = events.filter((e: { event_name: string }) => e.event_name === 'join_landing_view').length;
+  const signups = events.filter((e: { event_name: string }) => e.event_name === 'join_signup_complete').length;
+  const conversion = landingViews > 0 ? ((signups / landingViews) * 100).toFixed(1) : 'unknown';
+
+  const businessData = `
+Current business state:
+- Trainers: ${allTrainers.length} total, ${proCount} Pro
+- MRR: ${proCount * 149} AED
+- Funnel (last 30 days): ${landingViews} landing views → ${signups} signups = ${conversion}% conversion
+- Strategic priority: ${(ctx.data as Record<string, unknown>)?.strategic_priority ?? 'not set'}
+`;
+
+  const kbContext = allKb.length > 0
+    ? `\nRelevant frameworks from knowledge base:\n${allKb.map(e => `[${e.source} / ${e.category}] ${e.title}:\n${e.content.substring(0, 400)}`).join('\n\n')}`
+    : '\nNo directly relevant frameworks found in knowledge base.';
+
+  const systemPrompt = `You are the AI CEO of TrainedBy.ae, a UAE platform for verified personal trainers. You have deep knowledge of Alex Hormozi's frameworks (Grand Slam Offer, Value Equation, Success Gate), Andrew Chen's cold start problem, Lenny Rachitsky's growth loops, and SaaS metrics.
+
+The founder has issued a strategic directive. Your job is to:
+1. Identify the most relevant framework(s) from the knowledge base
+2. Apply them to the current business data
+3. Produce a specific, ranked action plan with clear owners (which agent or human)
+4. Name the exact metric that will move if the plan works
+
+Be direct. No fluff. Every action must be specific and executable this week.`;
+
+  const userMessage = `Directive: "${directive}"
+
+${businessData}
+${kbContext}
+
+Produce a strategic action plan. Format as:
+1. Framework applied: [name]
+2. Diagnosis: [what the data tells us]
+3. Action plan (3-5 steps, each with: action, owner, timeline, success metric)
+4. The one metric to watch this week`;
+
+  try {
+    const response = await callClaude(ANTHROPIC_KEY(), {
+      model: 'claude-sonnet-4-5',
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }],
+      max_tokens: 800,
+      temperature: 0.3,
+    });
+
+    // Save directive to DB
+    await sb.from('directives').insert({
+      directive,
+      status: 'in_progress',
+      framework: allKb[0]?.source ?? 'general',
+      action_plan: { raw_response: response.text },
+    });
+
+    await sendMessage(chatId, `🎯 *Directive: "${directive}"*\n\n${response.text}\n\n_Saved to directives log. Use /context to see open problems._`);
+  } catch (err) {
+    log.warn('Claude call failed in /directive', { error: String(err) });
+    await sendMessage(chatId, `⚠️ Could not generate action plan. Here are the relevant frameworks I found:\n\n${allKb.map(e => `*${e.title}* (${e.source})`).join('\n')}`);
   }
 }
 

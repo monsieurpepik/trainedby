@@ -32,10 +32,17 @@ const defaultStructuredData = {
 };
 
 const jsonLd = structuredData ?? defaultStructuredData;
+
+import { getMarket } from '../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
+
+// Market-aware canonical URL
+const marketCanonicalBase = canonical ?? `https://${market.domain}${Astro.url.pathname}`;
+const marketOgLocale = market.locale.replace('-', '_');
 ---
 
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang={market.locale.split('-')[0]} dir="ltr" data-market={market.market}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -43,7 +50,7 @@ const jsonLd = structuredData ?? defaultStructuredData;
     <!-- ── Critical meta ─────────────────────────────────────────────── -->
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonicalURL} />
+    <link rel="canonical" href={marketCanonicalBase} />
     {noIndex && <meta name="robots" content="noindex,nofollow" />}
     <meta name="theme-color" content="#0a0a0a" />
     <meta name="color-scheme" content="dark" />
@@ -57,7 +64,7 @@ const jsonLd = structuredData ?? defaultStructuredData;
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="TrainedBy" />
-    <meta property="og:locale" content="en_AE" />
+    <meta property="og:locale" content={marketOgLocale} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

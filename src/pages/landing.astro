@@ -1,10 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getMarket } from '../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
 ---
 
 <Base
-  title="TrainedBy.ae — Stop Trading Time for Money"
-  description="The UAE's only operating system for personal trainers. REPs-verified profiles, digital products, affiliate income, and a Grand Slam Offer builder — all in one place."
+  title={`TrainedBy.${market.market} — Stop Trading Time for Money`}
+  description={`${market.heroSubline} Digital products, affiliate income, and a Grand Slam Offer builder — all in one place.`}
 >
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -289,7 +291,7 @@ import Base from '../layouts/Base.astro';
   <!-- PROOF BAR -->
   <div class="proof-bar">
     <div class="proof-item"><div class="proof-num" style="color:var(--brand)">AED 0</div><div class="proof-label">To Get Started</div></div>
-    <div class="proof-item"><div class="proof-num">REPs UAE</div><div class="proof-label">Official Verification</div></div>
+    <div class="proof-item"><div class="proof-num">{market.certificationBody}</div><div class="proof-label">Official Verification</div></div>
     <div class="proof-item"><div class="proof-num">60 sec</div><div class="proof-label">To Go Live</div></div>
     <div class="proof-item"><div class="proof-num">30 day</div><div class="proof-label">ROI Guarantee</div></div>
   </div>
@@ -338,7 +340,7 @@ import Base from '../layouts/Base.astro';
               <div class="m-avatar">S</div>
               <div><div class="m-name">Sarah Al Mansoori</div><div class="m-sub">Strength Coach · Dubai</div></div>
             </div>
-            <div class="m-reps"><div style="width:5px;height:5px;border-radius:50%;background:#00C853;flex-shrink:0"></div> REPs UAE Verified</div>
+            <div class="m-reps"><div style="width:5px;height:5px;border-radius:50%;background:#00C853;flex-shrink:0"></div> {market.certificationBody} Verified</div>
             <div class="m-pkg">
               <div class="m-pkg-row"><span class="m-pkg-name">8-Week Reboot</span><span class="m-pkg-price">AED 4,800</span></div>
               <div class="m-pkg-meta">16 sessions · Lose 10kg · Meal plan included</div>
@@ -519,10 +521,10 @@ import Base from '../layouts/Base.astro';
       <div class="pricing-grid">
         <div class="pricing-card">
           <div class="pricing-tier">Free</div>
-          <div class="pricing-price">AED 0 <span>/ month</span></div>
+          <div class="pricing-price">{market.currencySymbol} 0 <span>/ month</span></div>
           <p class="pricing-desc">Your verified profile, live in 60 seconds. The foundation.</p>
           <ul class="pricing-features">
-            <li>Public REPs-verified profile</li>
+            <li>Public {market.certificationBody}-verified profile</li>
             <li>1 session package</li>
             <li>WhatsApp CTA button</li>
             <li>Lead capture form</li>
@@ -536,9 +538,9 @@ import Base from '../layouts/Base.astro';
         <div class="pricing-card featured">
           <div class="pricing-popular">The Operating System</div>
           <div class="pricing-tier">Pro</div>
-          <div class="pricing-price">AED 199 <span>/ month</span></div>
+          <div class="pricing-price">{market.proPriceLabel}</div>
           <p class="pricing-desc">The complete business in a box. Everything you need to double your income.</p>
-          <div class="pricing-guarantee">🛡 1,000 AED in 30 days or full refund</div>
+          <div class="pricing-guarantee">🛡 ROI in 30 days or full refund</div>
           <ul class="pricing-features">
             <li>Everything in Free</li>
             <li>Grand Slam Offer Builder (AI)</li>
