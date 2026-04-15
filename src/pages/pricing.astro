@@ -1,10 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getMarket } from '../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
+const brandName = market.brandName;
 ---
 
 <Base
-  title="Pricing — TrainedBy"
-  description="Simple, transparent pricing for UAE personal trainers. Free to start. Pro from AED 199/month with a 30-day ROI guarantee."
+  title={`Pricing — ${brandName}`}
+  description={`Simple, transparent pricing for ${brandName}. Free to start. Pro plan with a 30-day ROI guarantee.`}
 >
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -182,7 +185,7 @@ footer {
   <div class="nav-inner">
     <a href="/" class="nav-logo">
       <svg width="30" height="30" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
-      TrainedBy
+      {brandName}
     </a>
     <a href="/join" class="nav-cta">Get Your Page →</a>
   </div>
@@ -395,9 +398,9 @@ footer {
   <div class="footer-inner">
     <a href="/" class="footer-logo">
       <svg width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
-      TrainedBy
+      {brandName}
     </a>
-    <div class="footer-copy">© 2025 TrainedBy. UAE Personal Trainer Profiles.</div>
+    <div class="footer-copy">© {new Date().getFullYear()} {brandName}.</div>
   </div>
 </footer>
 

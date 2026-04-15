@@ -1,9 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getMarket } from '../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
+const brandName = market.brandName;
 ---
 <Base
-  title="TrainedBy Community — Trainer Tips, Transformations & Insights"
-  description="Real advice from verified personal trainers. Workout tips, client transformations, nutrition insights, and training knowledge from the TrainedBy community."
+  title={`${brandName} Community — Trainer Tips, Transformations & Insights`}
+  description={`Real advice from verified personal trainers on ${brandName}. Workout tips, client transformations, nutrition insights, and training knowledge.`}
 >
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -246,7 +249,7 @@ body { background: var(--surface); color: var(--text); font-family: 'Inter', san
     <!-- Join CTA -->
     <div class="join-cta">
       <h3>Are you a trainer?</h3>
-      <p>Join TrainedBy, get verified, and share your expertise with thousands of clients.</p>
+      <p>Join {brandName}, get verified, and share your expertise with thousands of clients.</p>
       <a href="/join">Create Your Profile →</a>
     </div>
   </aside>

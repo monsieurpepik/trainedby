@@ -2,8 +2,8 @@
 import Base from "../../layouts/Base.astro";
 ---
 <Base
-  title="Academy — TrainedBy"
-  description="Sports academy profile on TrainedBy"
+  title={`Academy — ${brandName}`}
+  description={`Sports academy profile on ${brandName}`}
 >
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -235,7 +235,7 @@ body{font-family:var(--font);background:#0a0a0a;color:var(--white);-webkit-font-
 
 <!-- TOPBAR -->
 <div id="topbar">
-  <a href="/" class="tb-logo">TrainedBy</a>
+  <a href="/" class="tb-logo" data-brand-name>TrainedBy</a>
   <a href="/find" class="tb-cta">Find Trainers</a>
 </div>
 
@@ -365,7 +365,7 @@ async function loadAcademy() {
 
 function renderAcademy({ academy, programs, coaches }) {
   // Update page title
-  document.title = `${academy.name} — TrainedBy`;
+  document.title = `${academy.name} — ${window.__BRAND__?.name || "TrainedBy"}`;
 
   // Hero
   if (academy.cover_url) {

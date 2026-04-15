@@ -1,11 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
 import ProfileCompleteness from '../components/ProfileCompleteness.astro';
+import { getMarket } from '../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
 ---
 
 <Base
-  title="Dashboard — TrainedBy"
-  description="Your TrainedBy trainer dashboard. Manage leads, analytics, digital products, and affiliate income."
+  title={`Dashboard — ${market.brandName}`}
+  description={`Your ${market.brandName} trainer dashboard. Manage leads, analytics, digital products, and affiliate income.`}
 >
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -526,7 +528,7 @@ body {
         <img id="dash-avatar" class="greeting-avatar" src="" alt="Avatar">
         <div>
           <div class="greeting-name" id="dash-name">Loading...</div>
-          <div class="greeting-sub" id="dash-sub">TrainedBy.ae</div>
+          <div class="greeting-sub" id="dash-sub">{market.brandName}</div>
         </div>
       </div>
       <div class="url-bar">
@@ -869,7 +871,7 @@ function populateDash(t) {
   // Referral flywheel
   const refUrl = 'https://' + _domain + '/join?ref=' + t.slug;
   document.getElementById('referral-url-text').textContent = _domain + '/join?ref=' + t.slug;
-  const waMsg = encodeURIComponent('Hey! I\'m using TrainedBy to manage my PT business and earn passive income from affiliates. Get your free profile here: ' + refUrl);
+  const waMsg = encodeURIComponent('Hey! I\'m using ' + (window.__BRAND__?.name || 'TrainedBy') + ' to manage my PT business and earn passive income from affiliates. Get your free profile here: ' + refUrl);
   document.getElementById('referral-wa-share').href = 'https://wa.me/?text=' + waMsg;
   const refCount = t.referral_count || 0;
   const refTarget = 4;
@@ -965,7 +967,7 @@ async function loadLeads() {
       const timeAgo = formatTimeAgo(lead.created_at);
       const typeTag = lead.type === 'assessment' ? 'assessment' : lead.type === 'package' ? 'package' : 'booking';
       const typeLabel = lead.type === 'assessment' ? 'Assessment' : lead.type === 'package' ? 'Package' : 'Booking';
-      const waMsg = encodeURIComponent(`Hi ${lead.name}, I'm ${trainer.name} from TrainedBy.ae. I saw your enquiry and would love to help you reach your fitness goals!`);
+      const waMsg = encodeURIComponent(`Hi ${lead.name}, I'm ${trainer.name} from ${window.__BRAND__?.name || 'TrainedBy'}. I saw your enquiry and would love to help you reach your fitness goals!`);
       const waUrl = `https://wa.me/${(lead.phone || '').replace(/\D/g,'')}?text=${waMsg}`;
       list.innerHTML += `
         <div class="lead-item">
@@ -1104,7 +1106,8 @@ init();
 
   const win = document.createElement('div');
   win.className = 'tb-chat-window';
-  win.innerHTML = '<div class="tb-chat-header"><div><div class="tb-chat-header-title">TrainedBy Support</div><div class="tb-chat-header-sub">Ask me anything about your account</div></div><button class="tb-chat-close" id="tb-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div><div class="tb-chat-messages" id="tb-msgs"><div class="tb-msg bot">Hey! Ask me anything about TrainedBy \u2014 pricing, REPs verification, referrals, or how features work.</div></div><div class="tb-chat-input-row"><input class="tb-chat-input" id="tb-input" placeholder="Ask a question..." maxlength="300"/><button class="tb-chat-send" id="tb-send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div>';
+  const _bn = window.__BRAND__?.name || 'TrainedBy';
+  win.innerHTML = '<div class="tb-chat-header"><div><div class="tb-chat-header-title">' + _bn + ' Support</div><div class="tb-chat-header-sub">Ask me anything about your account</div></div><button class="tb-chat-close" id="tb-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div><div class="tb-chat-messages" id="tb-msgs"><div class="tb-msg bot">Hey! Ask me anything about ' + _bn + ' — pricing, verification, referrals, or how features work.</div></div><div class="tb-chat-input-row"><input class="tb-chat-input" id="tb-input" placeholder="Ask a question..." maxlength="300"/><button class="tb-chat-send" id="tb-send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div>';
 
   document.body.appendChild(btn);
   document.body.appendChild(win);

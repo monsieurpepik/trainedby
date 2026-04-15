@@ -5,8 +5,8 @@ const market = getMarket(Astro.url.hostname);
 ---
 
 <Base
-  title="Get Your Verified Trainer Page — TrainedBy"
-  description={`Create your verified personal trainer profile on TrainedBy. ${market.certificationBody} verified. Free to set up in 2 minutes.`}
+  title={`Get Your Verified Trainer Profile — ${market.brandName}`}
+  description={`Create your verified personal trainer profile on ${market.brandName}. ${market.certificationBody} verified. Free to set up in 2 minutes.`}
 >
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

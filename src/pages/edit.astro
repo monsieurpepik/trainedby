@@ -1,10 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getMarket } from '../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
+const brandName = market.brandName;
 ---
 
 <Base
-  title="Edit Profile — TrainedBy"
-  description="Edit your TrainedBy trainer profile, packages, and settings."
+  title={`Edit Profile — ${brandName}`}
+  description={`Edit your ${brandName} trainer profile, packages, and settings.`}
 >
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

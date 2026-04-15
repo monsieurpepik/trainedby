@@ -1,8 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getMarket } from '../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
+const brandName = market.brandName;
 ---
 <Base
-  title="Admin CRM — TrainedBy"
+  title={`Admin CRM — ${brandName}`}
   description="Internal trainer CRM dashboard."
 >
 <style>

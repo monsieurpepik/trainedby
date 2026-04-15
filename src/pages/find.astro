@@ -1,10 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getMarket } from '../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
+const brandName = market.brandName;
 ---
 
 <Base
-  title="Find a Verified Personal Trainer in UAE | TrainedBy.ae"
-  description="Browse REPs UAE verified personal trainers in Dubai, Abu Dhabi and across the UAE. Filter by speciality, location and training mode."
+  title={`Find a Verified Trainer | ${brandName}`}
+  description={`Browse verified personal trainers on ${brandName}. Filter by speciality, location and training mode.`}
 >
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}

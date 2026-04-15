@@ -1,9 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getMarket } from '../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
+const brandName = market.brandName;
 ---
 
 <Base
-  title="TrainedBy Blog — Expert Fitness Advice from UAE's Top Trainers"
+  title={`${brandName} Blog — Expert Fitness Advice from Verified Trainers`}
   description="Evidence-based fitness, nutrition, and training articles from UAE's REPs-verified personal trainers."
 >
   <style>
@@ -287,7 +290,7 @@ body {
   <div class="nav-inner">
     <a href="/landing.html" class="nav-logo">
       <svg width="28" height="28" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
-      TrainedBy
+      {brandName}
     </a>
     <div class="nav-links">
       <a href="/find.html">Find a Trainer</a>
@@ -301,7 +304,7 @@ body {
 <div class="blog-hero">
   <div class="blog-hero-eyebrow">Expert Knowledge</div>
   <h1 class="blog-hero-title">Fitness advice from<br>trainers who actually train.</h1>
-  <p class="blog-hero-sub">Every article on TrainedBy is written by a REPs UAE verified personal trainer. No generic content. No AI fluff. Real expertise, cited sources.</p>
+  <p class="blog-hero-sub">Every article on {brandName} is written by a verified personal trainer. No generic content. No AI fluff. Real expertise, cited sources.</p>
   <div class="blog-hero-stats">
     <div class="blog-stat"><strong id="article-count">—</strong> articles published</div>
     <div class="blog-stat"><strong id="trainer-count">—</strong> verified trainers contributing</div>
@@ -328,8 +331,8 @@ body {
     <!-- Write for us banner -->
     <div class="write-banner">
       <div class="write-banner-title">Are you a REPs UAE verified trainer?</div>
-      <div class="write-banner-sub">Publish an article on TrainedBy and get your profile in front of thousands of potential clients searching for expertise in your specialty.</div>
-      <a href="/edit.html" class="write-banner-btn">Write for TrainedBy →</a>
+      <div class="write-banner-sub">Publish an article on {brandName} and get your profile in front of thousands of potential clients searching for expertise in your specialty.</div>
+      <a href="/edit.html" class="write-banner-btn">Write for {brandName} →</a>
     </div>
 
     <!-- Featured article -->
@@ -368,7 +371,7 @@ body {
 
 <!-- Footer -->
 <footer class="blog-footer">
-  <p>© 2025 TrainedBy.ae · <a href="/landing.html">For Trainers</a> · <a href="/find.html">Find a Trainer</a> · <a href="/blog.html">Blog</a></p>
+  <p>© {new Date().getFullYear()} {brandName} · <a href="/landing.html">For Trainers</a> · <a href="/find.html">Find a Trainer</a> · <a href="/blog.html">Blog</a></p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
@@ -455,7 +458,7 @@ function buildFeaturedCard(a) {
         <div class="featured-excerpt">${a.excerpt || ''}</div>
         <div class="article-meta">
           ${avatarHtml}
-          <span class="article-meta-name">${trainer.name || 'TrainedBy Trainer'}</span>
+          <span class="article-meta-name">${trainer.name || `${window.__BRAND__?.name || 'TrainedBy'} Trainer`}</span>
           ${trainer.reps_verified ? '<span class="reps-badge-sm">REPs</span>' : ''}
           <span>·</span>
           <span>${a.read_time_mins || 5} min read</span>
