@@ -161,7 +161,7 @@ function proWelcomeEmail(t: Trainer): { subject: string; html: string } {
         <li>Add your session packages with clear outcomes and prices</li>
         <li>Upload a profile photo and write a 2-sentence bio</li>
         <li>Share your profile link in your Instagram bio and WhatsApp status</li>
-        <li>Turn on WhatsApp lead notifications so you never miss an enquiry</li>
+        <li>Open your AI assistant and ask it to write your first client welcome message</li>
       </ul>
       <a href="https://trainedby.ae/dashboard" class="btn">Go to Dashboard →</a>
     `)
@@ -186,7 +186,7 @@ function sevenDayEmail(t: Trainer): { subject: string; html: string } {
 
       ${t.plan === 'free' ? `
       <hr class="divider">
-      <p>You're on the free plan. Pro gives you priority placement in search, WhatsApp lead notifications, unlimited session packages, and advanced analytics. <span class="highlight">99 AED/month.</span></p>
+      <p>You're on the free plan. Pro gives you an AI assistant, priority placement in search, unlimited session packages, and advanced analytics. <span class="highlight">99 AED/month.</span></p>
       <a href="https://trainedby.ae/pricing" class="btn" style="background:#1c1c1c;border:1px solid rgba(255,92,0,0.3)">See What Pro Includes →</a>
       ` : ''}
     `)

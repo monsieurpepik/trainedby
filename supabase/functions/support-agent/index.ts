@@ -26,12 +26,12 @@ function buildFallbackKB(market: { brandName: string; domain: string; pricingTie
   const isIt = market.languageCode === 'it';
   return {
     pricing: isEs
-      ? `${market.brandName} tiene dos planes: Gratis (perfil verificado, listado público, analíticas básicas) y Pro (${market.pricingTier} — paquetes ilimitados, notificaciones WhatsApp, posicionamiento prioritario, analíticas avanzadas). Cambia de plan cuando quieras desde tu panel.`
+      ? `${market.brandName} tiene dos planes: Gratis (perfil verificado, listado público, analíticas básicas) y Pro (${market.pricingTier} — asistente de IA personal, paquetes ilimitados, posicionamiento prioritario, analíticas avanzadas). Cambia de plan cuando quieras desde tu panel.`
       : isFr
-      ? `${market.brandName} propose deux offres : Gratuit (profil vérifié, liste publique, analytics de base) et Pro (${market.pricingTier} — forfaits illimités, notifications WhatsApp, placement prioritaire, analytics avancés). Changez d'offre à tout moment depuis votre tableau de bord.`
+      ? `${market.brandName} propose deux offres : Gratuit (profil vérifié, liste publique, analytics de base) et Pro (${market.pricingTier} — assistant IA personnel, forfaits illimités, placement prioritaire, analytics avancés). Changez d'offre à tout moment depuis votre tableau de bord.`
       : isIt
-      ? `${market.brandName} ha due piani: Gratuito (profilo verificato, lista pubblica, analisi di base) e Pro (${market.pricingTier} — pacchetti illimitati, notifiche WhatsApp, posizionamento prioritario, analisi avanzate). Cambia piano quando vuoi dalla tua dashboard.`
-      : `${market.brandName} has two tiers: Free (verified profile, public listing, basic analytics — no card needed) and Pro (${market.pricingTier} — unlimited packages, WhatsApp lead notifications, priority listing, advanced analytics). Upgrade or downgrade any time from your dashboard.`,
+      ? `${market.brandName} ha due piani: Gratuito (profilo verificato, lista pubblica, analisi di base) e Pro (${market.pricingTier} — assistente AI personale, pacchetti illimitati, posizionamento prioritario, analisi avanzate). Cambia piano quando vuoi dalla tua dashboard.`
+      : `${market.brandName} has two tiers: Free (verified profile, public listing, basic analytics — no card needed) and Pro (${market.pricingTier} — AI personal assistant, unlimited packages, priority listing, advanced analytics). Upgrade or downgrade any time from your dashboard.`,
     certification: isEs
       ? `${market.certBody} es el registro oficial de entrenadores en ${market.country}. ${market.brandName} verifica tu estado automáticamente al registrarte. Tu insignia aparece en tu perfil público y se actualiza en 24 horas.`
       : isFr
