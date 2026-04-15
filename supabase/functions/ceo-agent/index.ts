@@ -306,6 +306,9 @@ async function handleTelegramUpdate(req: Request): Promise<Response> {
         case '/skill':
           await handleSkill(chatId, args);
           break;
+        case '/gsd':
+          await handleGSD(chatId, args);
+          break;
         // Legacy commands
         case '/growth':
           await handleRunAgent(chatId, 'growth');
@@ -857,7 +860,8 @@ Or just *type anything* — I'll respond as your CEO.
 /plan <feature> — TDD implementation plan with exact tasks
 /brainstorm <idea> — Socratic design refinement
 /review [context] — Pre-merge code review checklist
-/skill — All development skills`);
+/skill — All development skills
+/gsd [command] — Get Shit Done framework reference`);
 }
 
 // ── Skills handlers (Superpowers integration) ───────────────────────────────
@@ -936,9 +940,91 @@ async function handleReview(chatId: number, context: string): Promise<void> {
   }
 }
 
+async function handleGSD(chatId: number, args: string): Promise<void> {
+  await sendTyping(chatId);
+
+  if (!args) {
+    await sendMessage(chatId, `*Get Shit Done (GSD) — Command Reference*
+
+🚀 *Primary workflow commands:*
+\`/gsd-do <description>\` — Smart dispatcher, routes to the right command
+\`/gsd-quick <task>\` — Small task with quality guarantees
+\`/gsd-fast <task>\` — Trivial task, no planning overhead
+\`/gsd-debug <issue>\` — Systematic debugging with persistent state
+
+📋 *Phase lifecycle:*
+\`/gsd-discuss-phase N\` — Lock in preferences before planning
+\`/gsd-plan-phase N\` — 4 parallel researchers → planner → plan-checker
+\`/gsd-execute-phase N\` — Wave-based parallel execution
+\`/gsd-verify-work\` — UAT + automated verification
+\`/gsd-ship\` — Create PR / merge
+
+📊 *Status & recovery:*
+\`/gsd-progress\` — Current project status
+\`/gsd-resume-work\` — Resume after context reset
+\`/gsd-code-review\` — Two-stage code review
+
+*All 73 GSD commands live in \`commands/gsd/\` in the repo.*
+
+Use /gsd <command-name> for details on any specific command.
+Or use /plan, /debug, /brainstorm, /review for quick access.`);
+    return;
+  }
+
+  // Describe a specific GSD command
+  const gsdCommands: Record<string, string> = {
+    'do': '*gsd-do*\nSmart dispatcher. Describe what you want in plain English — GSD routes it to the right command automatically. Never need to remember command names.\n\nExample: `/gsd-do fix the stripe webhook not firing`',
+    'quick': '*gsd-quick*\nExecute a small, self-contained task with full GSD quality guarantees (atomic commits, STATE.md tracking). Skips research and discussion by default. Add `--full` for the complete pipeline.\n\nExample: `/gsd-quick add a "verified" badge to trainer profiles`',
+    'fast': '*gsd-fast*\nExecute a trivial task directly — no subagents, no planning. For tasks under 2 minutes: typo fixes, config changes, forgotten commits.\n\nExample: `/gsd-fast fix typo in the UAE landing page headline`',
+    'debug': '*gsd-debug*\nSystematic debugging using the scientific method. Spawns an isolated subagent (fresh 200k context) to investigate. Maintains state across context resets so debugging sessions survive.\n\nAdd `--diagnose` to find root cause without applying a fix.\n\nExample: `/gsd-debug stripe webhook returning 401 in production`',
+    'plan-phase': '*gsd-plan-phase*\nResearch and plan a specific phase. Spawns 4 parallel researchers (stack, features, architecture, pitfalls), synthesises findings, generates a plan, and runs a plan-checker. Plans where tasks lack verification commands are rejected.\n\nExample: `/gsd-plan-phase 1`',
+    'execute-phase': '*gsd-execute-phase*\nExecute all plans in a phase using wave-based parallel execution. Each subagent gets a fresh 200k context. Supports `--tdd` flag for test-driven execution.\n\nExample: `/gsd-execute-phase 1`',
+    'verify-work': '*gsd-verify-work*\nManual UAT + automated verification. Checks that the implementation matches the plan. Creates fix plans for any gaps found.\n\nRun after every execute-phase before shipping.',
+    'code-review': '*gsd-code-review*\nTwo-stage review: spec compliance (does it do what was planned?) then code quality (is it well-structured, secure, maintainable?). Dispatches a gsd-code-reviewer subagent with precisely crafted context.',
+    'progress': '*gsd-progress*\nCheck current project status: which phase you are in, what is complete, what is next, any blockers. Essential after a context reset.',
+    'resume-work': '*gsd-resume-work*\nRestore session context after a reset. Reads STATE.md, ROADMAP.md, and the current phase plan to reconstruct exactly where you left off.',
+  };
+
+  const cmdKey = args.toLowerCase().replace('/gsd-', '').replace('gsd-', '');
+  const desc = gsdCommands[cmdKey];
+  if (desc) {
+    await sendMessage(chatId, desc);
+  } else {
+    await sendMessage(chatId, `GSD command \`${args}\` not found.\n\nUse /gsd to see all available commands.`);
+  }
+}
+
 async function handleSkill(chatId: number, skillName: string): Promise<void> {
   if (!skillName) {
-    await sendMessage(chatId, `*Available Development Skills*\n\nThese are the Superpowers workflows integrated into our development process:\n\n🔍 */debug <issue>* — Systematic 4-phase debugging (reproduce → isolate → root cause → fix)\n📋 */plan <feature>* — Structured TDD implementation plan with exact file paths and tasks\n💡 */brainstorm <idea>* — Socratic design refinement before writing any code\n✅ */review [context]* — Pre-merge code review checklist (spec + quality)\n\n*Full skills library:*\n• brainstorming\n• writing-plans\n• test-driven-development\n• systematic-debugging\n• verification-before-completion\n• requesting-code-review\n• receiving-code-review\n• executing-plans\n• subagent-driven-development\n• dispatching-parallel-agents\n• using-git-worktrees\n• finishing-a-development-branch\n• writing-skills\n• trainedby-edge-functions (custom)\n\nAll skills live in \`skills/\` in the repo. Use /skill <name> for details on any skill.`);
+    await sendMessage(chatId, `*Development Skills & Frameworks*
+
+🏗️ *Primary Framework:*
+/gsd — Get Shit Done: full lifecycle from idea to shipped code
+
+🔍 *Quick Skills Commands:*
+/debug <issue> — 4-phase systematic debugging
+/plan <feature> — TDD implementation plan
+/brainstorm <idea> — Socratic design refinement
+/review [context] — Pre-merge code review checklist
+
+📚 *Full Superpowers Skills Library:*
+• get-shit-done (primary framework)
+• brainstorming
+• writing-plans
+• test-driven-development
+• systematic-debugging
+• verification-before-completion
+• requesting-code-review
+• receiving-code-review
+• executing-plans
+• subagent-driven-development
+• dispatching-parallel-agents
+• using-git-worktrees
+• finishing-a-development-branch
+• writing-skills
+• trainedby-edge-functions (custom)
+
+All skills in \`skills/\`, GSD commands in \`commands/gsd/\`. Use /skill <name> for details.`);
     return;
   }
 

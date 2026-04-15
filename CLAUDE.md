@@ -17,15 +17,38 @@ TrainedBy is a global multi-market personal trainer discovery platform with a Sa
 
 ## Mandatory Workflows
 
-**Before writing any code, check for a relevant skill:**
+### Primary Framework: Get Shit Done (GSD)
+
+GSD is the primary execution framework. Use it for any task that takes more than 5 minutes.
+
+```
+/gsd-do <description>       — Smart dispatcher: describe what you want, GSD routes it
+/gsd-quick <task>           — Small task with quality guarantees (commits, state tracking)
+/gsd-fast <task>            — Trivial task (typo, config change) — no overhead
+/gsd-debug <issue>          — Systematic debugging with persistent state
+/gsd-plan-phase N           — Research + plan a phase (4 parallel researchers)
+/gsd-execute-phase N        — Build with wave-based parallel execution
+/gsd-verify-work            — UAT + automated verification
+/gsd-code-review            — Two-stage review (spec compliance + code quality)
+/gsd-progress               — Check status and what's next
+/gsd-resume-work            — Resume after context reset
+```
+
+All GSD commands live in `commands/gsd/`. See `skills/get-shit-done/SKILL.md` for full reference.
+
+### Supporting Skills (Superpowers)
+
+Use these within a GSD workflow for specific techniques:
 
 ```
 skills/brainstorming              — Before designing anything new
 skills/writing-plans              — Before implementing a feature
-skills/test-driven-development    — Before writing implementation code
-skills/systematic-debugging       — Before guessing at a bug fix
-skills/verification-before-completion — Before claiming anything is done
+skills/test-driven-development    — During execute-phase for TDD enforcement
+skills/systematic-debugging       — When /gsd-debug needs deeper root cause analysis
+skills/verification-before-completion — Before any /gsd-ship or PR creation
 skills/requesting-code-review     — After completing any task
+skills/trainedby-edge-functions   — When touching any Supabase edge function
+skills/get-shit-done              — Full GSD reference
 ```
 
 These are not suggestions. They are the process.
