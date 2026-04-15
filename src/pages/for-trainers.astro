@@ -9,7 +9,7 @@ const isWaitlist = market.waitlistEnabled === true;
 
 <Base
   title={`For Trainers — ${brandName}`}
-  description={`Build your personal training practice on ${brandName}. Verified profile, digital products, lead management, and an AI assistant. Free to start.`}
+  description={`Build your personal training practice on ${brandName}. Verified profile, lead management, and an AI assistant. Free to start.`}
 >
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -138,7 +138,6 @@ const isWaitlist = market.waitlistEnabled === true;
     <div class="nav-links">
       <a href="/find">Find a Trainer</a>
       <a href="/blog">Stories</a>
-      <a href="/community">Community</a>
       <a href="/for-trainers" style="color:var(--brand);font-weight:700">For Trainers</a>
     </div>
     <a href="/join" class="nav-cta">Create your profile →</a>
@@ -154,7 +153,7 @@ const isWaitlist = market.waitlistEnabled === true;
       Your profile.<br>Your clients.<br><em>Your business.</em>
     </h1>
     <p class="hero-sub">
-      {brandName} gives you a verified public profile, tools to manage leads, sell digital products, and an AI assistant that works around the clock. Free to start.
+      {brandName} gives you a verified public profile, tools to manage leads, and an AI assistant that works around the clock. Free to start.
     </p>
     <div class="hero-actions">
       {isPaid ? (
@@ -203,18 +202,7 @@ const isWaitlist = market.waitlistEnabled === true;
           <p class="feature-desc">Your own AI that knows your profile, your clients, and your market. Ask it to write a programme, draft a client email, build a nutrition plan, or explain your next steps.</p>
           <span class="feature-badge">Pro feature</span>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">📦</div>
-          <div class="feature-title">Digital Product Hub</div>
-          <p class="feature-desc">Upload a PDF programme, a video course, or a meal plan. Set a price. Clients buy it directly from your profile. You get paid automatically.</p>
-          <span class="feature-badge">Pro feature</span>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🔗</div>
-          <div class="feature-title">Affiliate Vault</div>
-          <p class="feature-desc">We negotiate affiliate deals with fitness brands on your behalf. Activate the ones you use, share your link with clients, earn commission on every purchase — automatically.</p>
-          <span class="feature-badge">Pro feature</span>
-        </div>
+
         <div class="feature-card">
           <div class="feature-icon">📊</div>
           <div class="feature-title">Lead Management</div>
@@ -223,8 +211,8 @@ const isWaitlist = market.waitlistEnabled === true;
         </div>
         <div class="feature-card">
           <div class="feature-icon">✍️</div>
-          <div class="feature-title">Community & Blog</div>
-          <p class="feature-desc">Publish your expertise on the {brandName} blog and community feed. Build your reputation, get discovered by new clients, and establish yourself as the authority in your niche.</p>
+          <div class="feature-title">Blog</div>
+          <p class="feature-desc">Publish your expertise on the {brandName} blog. Build your reputation, get discovered by new clients searching Google, and establish yourself as the authority in your niche.</p>
           <span class="feature-badge">Free forever</span>
         </div>
       </div>
@@ -256,8 +244,8 @@ const isWaitlist = market.waitlistEnabled === true;
         <div class="step">
           <div class="step-num">03</div>
           <div>
-            <div class="step-title">Add your packages and products</div>
-            <p class="step-desc">Set up your session packages with prices. If you have a digital product — a programme PDF, a video, a nutrition plan — upload it and set a price. Clients can buy it directly from your profile.</p>
+            <div class="step-title">Add your session packages</div>
+            <p class="step-desc">Set up your session packages with prices and descriptions. Clients see exactly what they’re getting before they contact you.</p>
             <span class="step-time">~3 minutes</span>
           </div>
         </div>
@@ -289,12 +277,10 @@ const isWaitlist = market.waitlistEnabled === true;
             <li>1 session package</li>
             <li>Contact / lead form</li>
             <li>WhatsApp CTA button</li>
-            <li>Community & blog access</li>
+            <li>Blog access</li>
             <li class="muted">AI personal assistant</li>
-            <li class="muted">Digital Product Hub</li>
-            <li class="muted">Affiliate Vault</li>
             <li class="muted">Lead management dashboard</li>
-            <li class="muted">Analytics & weekly report</li>
+            <li class="muted">Analytics &amp; weekly report</li>
           </ul>
           <a href="/join" class="pricing-btn pricing-btn-ghost">Get started free →</a>
         </div>
@@ -306,13 +292,10 @@ const isWaitlist = market.waitlistEnabled === true;
           <ul class="pricing-features">
             <li>Everything in Free</li>
             <li>AI personal assistant (unlimited)</li>
-            <li>Digital Product Hub (unlimited products)</li>
-            <li>Affiliate Vault (25% commissions)</li>
             <li>Lead management dashboard</li>
             <li>Analytics + weekly email report</li>
             <li>WhatsApp lead notifications</li>
             <li>Priority placement in search</li>
-            <li>Trainer referral programme (20% recurring)</li>
             <li>Unlimited session packages</li>
           </ul>
           {isPaid ? (
@@ -321,22 +304,7 @@ const isWaitlist = market.waitlistEnabled === true;
             <a href="#waitlist" class="pricing-btn pricing-btn-primary">Join the waitlist →</a>
           )}
         </div>
-        <div class="pricing-card">
-          <div class="pricing-tier">Academy</div>
-          <div class="pricing-price" style="font-size:24px;letter-spacing:-1px">Talk to us</div>
-          <p class="pricing-desc">For gyms, academies, and multi-trainer operations.</p>
-          <ul class="pricing-features">
-            <li>Everything in Pro</li>
-            <li>Academy profile page</li>
-            <li>Multiple trainer profiles under one brand</li>
-            <li>Programme & term booking system</li>
-            <li>Parent-facing booking portal</li>
-            <li>Coach payout management</li>
-            <li>Centralised lead inbox</li>
-            <li>Dedicated account manager</li>
-          </ul>
-          <a href="mailto:hello@trainedby.ae" class="pricing-btn pricing-btn-ghost">Contact us →</a>
-        </div>
+
       </div>
     </div>
   </div>
@@ -351,22 +319,12 @@ const isWaitlist = market.waitlistEnabled === true;
           <div class="faq-q">Do I need to be {market.certificationBody} registered?</div>
           <div class="faq-a">You can create a profile and go live immediately without verification. The {market.certificationBody} badge is added once we verify your registration — usually within 24 hours. Non-verified profiles still get full access to all features.</div>
         </div>
-        <div class="faq-item">
-          <div class="faq-q">How does the Digital Product Hub work?</div>
-          <div class="faq-a">Upload any file (PDF, video link, Notion document) and set a price. When a client buys it, the payment goes directly to your account minus a small platform fee. You get paid within 2 business days.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q">What is the Affiliate Vault?</div>
-          <div class="faq-a">We negotiate affiliate agreements with fitness brands on behalf of all {brandName} trainers. You activate the brands you already recommend, share your unique link with clients, and earn commission on every purchase they make — automatically, every month.</div>
-        </div>
+
         <div class="faq-item">
           <div class="faq-q">Can I cancel anytime?</div>
-          <div class="faq-a">Yes. No contracts, no lock-in. Cancel from your dashboard and your profile reverts to the Free tier — it stays live, just without the Pro tools. Your digital products and affiliate earnings are yours to keep.</div>
+          <div class="faq-a">Yes. No contracts, no lock-in. Cancel from your dashboard and your profile reverts to the Free tier — it stays live, just without the Pro tools.</div>
         </div>
-        <div class="faq-item">
-          <div class="faq-q">What is the trainer referral programme?</div>
-          <div class="faq-a">Every Pro trainer gets a unique referral link. When another trainer signs up to Pro through your link, you earn 20% of their monthly subscription — recurring, for as long as they stay subscribed.</div>
-        </div>
+
         <div class="faq-item">
           <div class="faq-q">How does the AI assistant work?</div>
           <div class="faq-a">Your AI assistant knows your full profile, your specialties, your market, and your clients. Ask it anything — write a 12-week programme, draft a follow-up email to a lead, explain a nutrition concept, or help you price your packages. It responds in your language.</div>
@@ -419,7 +377,6 @@ const isWaitlist = market.waitlistEnabled === true;
       <a href="/landing">Home</a>
       <a href="/find">Find a Trainer</a>
       <a href="/blog">Stories</a>
-      <a href="/community">Community</a>
       <a href="/join">Join as Trainer</a>
     </div>
     <div class="footer-copy">© {new Date().getFullYear()} {brandName}</div>

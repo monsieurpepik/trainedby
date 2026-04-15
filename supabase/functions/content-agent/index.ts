@@ -13,36 +13,85 @@ import { jsonResponse, errorResponse, CORS_HEADERS } from '../_shared/errors.ts'
 import { createLogger } from '../_shared/logger.ts';
 import { buildSystemPrompt, calculateSlopScore } from '../_shared/voice.ts';
 import { callClaudeJSON } from '../_shared/claude.ts';
+import { getLocale, getMarket, type Locale } from '../_shared/locale.ts';
 
 const log = createLogger('content-agent');
 
-const KEYWORD_POOL = [
-  'personal trainer Dubai',
-  'personal trainer Abu Dhabi',
-  'certified personal trainer UAE',
-  'REPs certified trainer Dubai',
-  'online personal trainer UAE',
-  'female personal trainer Dubai',
-  'weight loss trainer Dubai',
-  'strength training Dubai',
-  'home personal trainer Dubai',
-  'gym trainer salary UAE',
-  'how to become a personal trainer UAE',
-  'personal training rates Dubai',
-  'nutrition coach Dubai',
-  'HIIT trainer Dubai',
-  'CrossFit coach Dubai',
-  'postnatal fitness trainer Dubai',
-  'corporate wellness trainer UAE',
-  'marathon training coach Dubai',
-  'mobility coach Dubai',
-  'sports performance trainer UAE',
-];
+// Per-locale keyword pools — each brand gets its own SEO context
+const KEYWORD_POOLS: Record<string, string[]> = {
+  'en-ae': [
+    'personal trainer Dubai', 'personal trainer Abu Dhabi', 'certified personal trainer UAE',
+    'REPs certified trainer Dubai', 'online personal trainer UAE', 'female personal trainer Dubai',
+    'weight loss trainer Dubai', 'strength training Dubai', 'home personal trainer Dubai',
+    'gym trainer salary UAE', 'how to become a personal trainer UAE', 'personal training rates Dubai',
+    'nutrition coach Dubai', 'HIIT trainer Dubai', 'CrossFit coach Dubai',
+    'postnatal fitness trainer Dubai', 'corporate wellness trainer UAE',
+    'marathon training coach Dubai', 'mobility coach Dubai', 'sports performance trainer UAE',
+  ],
+  'en-uk': [
+    'personal trainer London', 'personal trainer Manchester', 'certified personal trainer UK',
+    'REPs UK certified trainer', 'online personal trainer UK', 'female personal trainer London',
+    'weight loss trainer London', 'strength training London', 'home personal trainer UK',
+    'personal training rates London', 'nutrition coach London', 'HIIT trainer London',
+    'CrossFit coach UK', 'postnatal fitness trainer UK', 'corporate wellness trainer London',
+    'marathon training coach UK', 'mobility coach London', 'sports performance trainer UK',
+    'CIMSPA certified trainer', 'personal trainer near me UK',
+  ],
+  'en-us': [
+    'personal trainer New York', 'personal trainer Los Angeles', 'NASM certified personal trainer',
+    'ACE certified trainer', 'online personal trainer USA', 'female personal trainer NYC',
+    'weight loss trainer New York', 'strength training coach USA', 'home personal trainer NYC',
+    'personal training rates New York', 'nutrition coach New York', 'HIIT trainer NYC',
+    'CrossFit coach New York', 'postnatal fitness trainer USA', 'corporate wellness trainer NYC',
+    'marathon training coach USA', 'mobility coach New York', 'sports performance trainer USA',
+    'NSCA certified trainer', 'personal trainer near me USA',
+  ],
+  'en-in': [
+    'personal trainer Mumbai', 'personal trainer Delhi', 'certified personal trainer India',
+    'online personal trainer India', 'female personal trainer Mumbai', 'weight loss trainer Delhi',
+    'strength training coach India', 'home personal trainer Mumbai', 'nutrition coach India',
+    'HIIT trainer Mumbai', 'CrossFit coach Delhi', 'postnatal fitness trainer India',
+    'corporate wellness trainer Mumbai', 'marathon training coach India', 'mobility coach Delhi',
+    'sports performance trainer India', 'personal training rates Mumbai', 'gym trainer India',
+    'yoga trainer Mumbai', 'functional fitness trainer India',
+  ],
+  'es': [
+    'entrenador personal Madrid', 'entrenador personal Barcelona', 'entrenador personal certificado España',
+    'entrenador personal online España', 'entrenadora personal Madrid', 'pérdida de peso entrenador Madrid',
+    'entrenamiento de fuerza Madrid', 'entrenador personal a domicilio Madrid',
+    'tarifas entrenador personal Madrid', 'nutricionista deportivo Madrid', 'entrenador HIIT Barcelona',
+    'CrossFit coach España', 'entrenador postnatal España', 'bienestar corporativo Madrid',
+    'preparador físico maratón España', 'coach movilidad Madrid', 'rendimiento deportivo España',
+    'entrenador personal Valencia', 'coach fitness Sevilla', 'personal trainer certificado España',
+  ],
+  'fr': [
+    'coach sportif Paris', 'coach sportif Lyon', 'coach sportif certifié France',
+    'coach sportif en ligne France', 'coach sportive Paris', 'coach perte de poids Paris',
+    'entraînement musculation Paris', 'coach sportif à domicile Paris',
+    'tarifs coach sportif Paris', 'coach nutrition Paris', 'coach HIIT Lyon',
+    'coach CrossFit France', 'coach postnatal France', 'bien-être en entreprise Paris',
+    'préparateur physique marathon France', 'coach mobilité Paris', 'performance sportive France',
+    'coach fitness Marseille', 'coach personnel Bordeaux', 'coach certifié BPJEPS',
+  ],
+  'it': [
+    'personal trainer Milano', 'personal trainer Roma', 'personal trainer certificato Italia',
+    'personal trainer online Italia', 'personal trainer donna Milano', 'allenatore dimagrimento Roma',
+    'allenamento forza Milano', 'personal trainer a domicilio Italia',
+    'tariffe personal trainer Milano', 'nutrizionista sportivo Roma', 'allenatore HIIT Milano',
+    'coach CrossFit Italia', 'personal trainer postnatale Italia', 'wellness aziendale Milano',
+    'preparatore atletico maratona Italia', 'coach mobilità Roma', 'performance sportiva Italia',
+    'personal trainer Torino', 'coach fitness Napoli', 'personal trainer certificato CONI',
+  ],
+};
+
+function getKeywordPool(locale: string): string[] {
+  return KEYWORD_POOLS[locale] ?? KEYWORD_POOLS['en-ae'];
+}
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: CORS_HEADERS });
   if (req.method === 'GET') return handleListPosts();
-  if (req.method === 'POST') return handleGeneratePost();
+  if (req.method === 'POST') return handleGeneratePost(req);
   return errorResponse('Method not allowed', 405);
 });
 
@@ -57,41 +106,65 @@ async function handleListPosts(): Promise<Response> {
   return jsonResponse({ posts: data });
 }
 
-async function handleGeneratePost(): Promise<Response> {
+async function handleGeneratePost(req: Request): Promise<Response> {
   const start = Date.now();
-  log.info('Content agent v3 (Claude) started');
+
+  // Detect locale from body param or origin header
+  let locale = 'en-ae';
+  try {
+    const body = await req.clone().json().catch(() => ({}));
+    const rawLocale = body.locale || getLocale(req.headers.get('origin'));
+    locale = rawLocale || 'en-ae';
+  } catch { /* default to en-ae */ }
+
+  const market = getMarket(locale as Locale);
+  log.info('Content agent started', { locale, brand: market.brandName });
 
   const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
   if (!anthropicKey) return errorResponse('ANTHROPIC_API_KEY not configured', 500);
 
   const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
-  // ── 1. Pick unused keyword ─────────────────────────────────────────────────
+  // ── 1. Pick unused keyword for this locale ───────────────────────────────────────────────────────────────────────────
+  const keywordPool = getKeywordPool(locale);
   const { data: existingPosts } = await sb
-    .from('blog_posts').select('keyword').order('published_at', { ascending: false }).limit(50);
+    .from('blog_posts')
+    .select('keyword')
+    .eq('locale', locale)
+    .order('published_at', { ascending: false })
+    .limit(50);
   const usedKeywords = new Set((existingPosts ?? []).map((p: { keyword: string }) => p.keyword));
-  const keyword = KEYWORD_POOL.find(k => !usedKeywords.has(k)) ?? KEYWORD_POOL[0];
-  log.info('Selected keyword', { keyword });
+  const keyword = keywordPool.find(k => !usedKeywords.has(k)) ?? keywordPool[0];
+  log.info('Selected keyword', { keyword, locale });
 
-  // ── 2. Build system prompt with persona ───────────────────────────────────
+  // ── 2. Build locale-aware system prompt ───────────────────────────────────────────────────────────────────────────
+  const isEnglish = market.languageCode === 'en';
+  const languageRule = isEnglish
+    ? ''
+    : `CRITICAL: Write the ENTIRE post in ${market.language}. Do not use English anywhere in the post.`;
+
   const systemPrompt = buildSystemPrompt(`
-You are writing a blog post for TrainedBy.ae — the UAE platform for verified personal trainers.
+You are writing a blog post for ${market.brandName} (${market.domain}) — the ${market.country} platform for verified personal trainers.
 Target keyword: "${keyword}"
 
-This post will be read by UAE-based personal trainers and potential clients searching for trainers.
+This post will be read by ${market.country}-based personal trainers and potential clients searching for trainers.
+The certification body in this market is: ${market.certBody}.
+${languageRule}
 `);
 
+  const cityRef = market.localContext.slice(0, 2).join(' or ');
   const userPrompt = `Write a blog post targeting: "${keyword}"
 
 Requirements:
 - 900-1100 words total
-- Mention Dubai or Abu Dhabi naturally at least twice (not forced)
+- Language: ${market.language} (ONLY)
+- Mention ${cityRef} naturally at least twice (not forced)
 - Include one specific, concrete scenario (a real situation a trainer faces, not a vague hypothetical)
-- Reference REPs UAE certification where it fits naturally
-- End with a single direct CTA: create a free TrainedBy profile at trainedby.ae
+- Reference ${market.certBody} certification where it fits naturally
+- End with a single direct CTA: create a free ${market.brandName} profile at ${market.domain}
 - Write in paragraphs — no bullet points in the main body
 - Structure: punchy 2-3 sentence intro, 3-4 H2 sections of UNEQUAL length, short direct conclusion
-- At least one sentence must start with "But" or "Here's the thing"
+- At least one sentence must start with a strong contrasting opener
 
 Return valid JSON only (no markdown wrapping):
 {
@@ -151,11 +224,13 @@ Return valid JSON only (no markdown wrapping):
       excerpt: post.excerpt,
       content_markdown: post.content_markdown,
       keyword,
+      locale,
+      brand: market.brandName,
       tags: post.tags ?? [],
       word_count: post.word_count ?? 0,
       published_at: now,
       status: 'published',
-      author: 'TrainedBy Content Agent',
+      author: `${market.brandName} Content Agent`,
     })
     .select('id, slug')
     .single();

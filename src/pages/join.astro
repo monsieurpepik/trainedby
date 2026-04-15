@@ -463,13 +463,6 @@ body {
       </div>
     </div>
 
-    <!-- Passive income teaser -->
-    <div class="income-teaser">
-      <div class="income-teaser-title">You're about to unlock passive income</div>
-      <div class="income-teaser-amount">+AED 1,200–3,500/mo</div>
-      <div class="income-teaser-sub">After you go live, connect affiliate links for ZEROFAT meal plans, Gymshark gear, and supplements — your clients buy, you earn automatically.</div>
-    </div>
-
     <div class="divider"><span class="divider-text">VERIFY YOUR EMAIL TO GO LIVE</span></div>
 
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">
@@ -517,7 +510,7 @@ body {
       </div>
 
       <a id="view-profile-btn" href="#" class="btn-primary" style="display:flex;text-align:center;text-decoration:none;margin-bottom:12px;">View My Profile →</a>
-      <a href="/dashboard" class="btn-secondary" style="display:flex;text-align:center;text-decoration:none;justify-content:center;">Complete Profile &amp; Unlock Earnings →</a>
+      <a href="/dashboard" class="btn-secondary" style="display:flex;text-align:center;text-decoration:none;justify-content:center;">Complete Profile &amp; Add Packages →</a>
 
       <div class="next-steps">
         <div class="next-steps-title">What happens next</div>
@@ -531,11 +524,7 @@ body {
         </div>
         <div class="next-step-item">
           <div class="next-step-num">3</div>
-          <div>Connect your affiliate links — earn passively from every client recommendation</div>
-        </div>
-        <div class="next-step-item">
-          <div class="next-step-num">4</div>
-          <div>REPs badge appears automatically once our team verifies your number (24h)</div>
+          <div>Verification badge appears on your profile once our team confirms your certification (24h)</div>
         </div>
       </div>
     </div>
@@ -812,9 +801,6 @@ async function verifyAndCreate() {
 
     const userId = authData?.user?.id;
 
-    // Get referral from URL
-    const refSlug = new URLSearchParams(location.search).get('ref') || null;
-
     // Create trainer record
     const trainerPayload = {
       name: state.name,
@@ -828,7 +814,6 @@ async function verifyAndCreate() {
       training_modes: state.training_modes,
       plan: 'free',
       accepting_clients: true,
-      referred_by: refSlug
     };
     if (userId) trainerPayload.user_id = userId;
 

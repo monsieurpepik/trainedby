@@ -17,18 +17,58 @@ import { getLocale, getMarket, getEmailCopy } from '../_shared/locale.ts';
 
 const log = createLogger('support-agent');
 
-const FALLBACK_KB: Record<string, string> = {
-  pricing: 'TrainedBy has two tiers: Free (verified profile, public listing, basic analytics — no card needed) and Pro (149 AED/month — digital product sales, Affiliate Vault, Grand Slam Offer builder, priority listing, advanced analytics, custom domain). Upgrade or downgrade any time from your dashboard.',
-  reps: 'REPs UAE is the official UAE fitness register. TrainedBy verifies your REPs status automatically at signup. Your badge appears on your public profile and updates within 24 hours if your status changes.',
-  digital_products: 'Pro trainers sell digital products (PDF plans, video programmes, nutrition guides) directly from their profile. Stripe handles payments. You keep 95% — 5% platform fee. Weekly payouts to your UAE bank account.',
-  affiliate: 'The Affiliate Vault gives Pro trainers pre-negotiated deals with UAE fitness brands. Activate the brands you want, share your link, earn commission automatically every month. No minimum payout threshold.',
-  referral: 'Every Pro trainer gets a referral link. Refer another trainer to Pro and earn 20% of their subscription — recurring, for as long as they stay. Refer 4 trainers and your Pro is free forever.',
-  plan_builder: 'The Grand Slam Offer Builder creates high-ticket packages combining sessions, digital products, and affiliate products. AI suggests pricing and positioning based on your speciality.',
-  magic_link: 'TrainedBy uses passwordless login. Enter your email, get a one-time link, click it. Links expire in 15 minutes. Not in your inbox? Check spam.',
-  profile: 'Your profile URL is trainedby.ae/yourname. Customise slug, bio, specialities, certifications, and social links from Edit Profile. REPs badge adds automatically after verification.',
-  cancel: 'Cancel Pro any time from Settings → Subscription. Profile reverts to Free at end of billing period. Your data, digital products, and affiliate earnings are preserved.',
-  support: 'Urgent issues: support@trainedby.ae. Response within 4 hours, Sun-Thu 9am-6pm GST.',
-};
+// FALLBACK_KB is now built per-locale at request time — see buildFallbackKB()
+function buildFallbackKB(market: { brandName: string; domain: string; pricingTier: string; certBody: string; language: string; languageCode: string; country: string }): Record<string, string> {
+  const supportEmail = `support@${market.domain}`;
+  const profileDomain = market.domain;
+  const isEs = market.languageCode === 'es';
+  const isFr = market.languageCode === 'fr';
+  const isIt = market.languageCode === 'it';
+  return {
+    pricing: isEs
+      ? `${market.brandName} tiene dos planes: Gratis (perfil verificado, listado público, analíticas básicas) y Pro (${market.pricingTier} — paquetes ilimitados, notificaciones WhatsApp, posicionamiento prioritario, analíticas avanzadas). Cambia de plan cuando quieras desde tu panel.`
+      : isFr
+      ? `${market.brandName} propose deux offres : Gratuit (profil vérifié, liste publique, analytics de base) et Pro (${market.pricingTier} — forfaits illimités, notifications WhatsApp, placement prioritaire, analytics avancés). Changez d'offre à tout moment depuis votre tableau de bord.`
+      : isIt
+      ? `${market.brandName} ha due piani: Gratuito (profilo verificato, lista pubblica, analisi di base) e Pro (${market.pricingTier} — pacchetti illimitati, notifiche WhatsApp, posizionamento prioritario, analisi avanzate). Cambia piano quando vuoi dalla tua dashboard.`
+      : `${market.brandName} has two tiers: Free (verified profile, public listing, basic analytics — no card needed) and Pro (${market.pricingTier} — unlimited packages, WhatsApp lead notifications, priority listing, advanced analytics). Upgrade or downgrade any time from your dashboard.`,
+    certification: isEs
+      ? `${market.certBody} es el registro oficial de entrenadores en ${market.country}. ${market.brandName} verifica tu estado automáticamente al registrarte. Tu insignia aparece en tu perfil público y se actualiza en 24 horas.`
+      : isFr
+      ? `${market.certBody} est le registre officiel des coachs en ${market.country}. ${market.brandName} vérifie votre statut automatiquement à l'inscription. Votre badge apparaît sur votre profil public et se met à jour sous 24 heures.`
+      : isIt
+      ? `${market.certBody} è il registro ufficiale degli allenatori in ${market.country}. ${market.brandName} verifica il tuo stato automaticamente all'iscrizione. Il tuo badge appare sul tuo profilo pubblico e si aggiorna entro 24 ore.`
+      : `${market.certBody} is the official fitness register in ${market.country}. ${market.brandName} verifies your status automatically at signup. Your badge appears on your public profile and updates within 24 hours.`,
+    magic_link: isEs
+      ? `${market.brandName} usa inicio de sesión sin contraseña. Introduce tu email, recibe un enlace único, haz clic. Los enlaces caducan en 15 minutos. ¿No está en tu bandeja de entrada? Revisa el spam.`
+      : isFr
+      ? `${market.brandName} utilise une connexion sans mot de passe. Entrez votre email, recevez un lien unique, cliquez dessus. Les liens expirent en 15 minutes. Pas dans votre boîte de réception ? Vérifiez les spams.`
+      : isIt
+      ? `${market.brandName} usa l'accesso senza password. Inserisci la tua email, ricevi un link unico, cliccaci sopra. I link scadono in 15 minuti. Non è nella tua casella di posta? Controlla lo spam.`
+      : `${market.brandName} uses passwordless login. Enter your email, get a one-time link, click it. Links expire in 15 minutes. Not in your inbox? Check spam.`,
+    profile: isEs
+      ? `Tu URL de perfil es ${profileDomain}/tunombre. Personaliza el slug, bio, especialidades, certificaciones y redes sociales desde Editar Perfil. La insignia de ${market.certBody} se añade automáticamente tras la verificación.`
+      : isFr
+      ? `Votre URL de profil est ${profileDomain}/votrenom. Personnalisez le slug, la bio, les spécialités, les certifications et les réseaux sociaux depuis Modifier le profil. Le badge ${market.certBody} s'ajoute automatiquement après vérification.`
+      : isIt
+      ? `Il tuo URL del profilo è ${profileDomain}/tuonome. Personalizza slug, bio, specialità, certificazioni e social da Modifica Profilo. Il badge ${market.certBody} viene aggiunto automaticamente dopo la verifica.`
+      : `Your profile URL is ${profileDomain}/yourname. Customise slug, bio, specialities, certifications, and social links from Edit Profile. ${market.certBody} badge adds automatically after verification.`,
+    cancel: isEs
+      ? `Cancela Pro en cualquier momento desde Configuración → Suscripción. El perfil vuelve al plan Gratis al final del período de facturación. Tus datos se conservan.`
+      : isFr
+      ? `Annulez Pro à tout moment depuis Paramètres → Abonnement. Le profil revient au niveau Gratuit à la fin de la période de facturation. Vos données sont conservées.`
+      : isIt
+      ? `Annulla Pro in qualsiasi momento da Impostazioni → Abbonamento. Il profilo torna al livello Gratuito alla fine del periodo di fatturazione. I tuoi dati vengono conservati.`
+      : `Cancel Pro any time from Settings → Subscription. Profile reverts to Free at end of billing period. Your data is preserved.`,
+    support: isEs
+      ? `Problemas urgentes: ${supportEmail}. Respuesta en 4 horas, lun-vie 9:00-18:00.`
+      : isFr
+      ? `Problèmes urgents : ${supportEmail}. Réponse sous 4 heures, lun-ven 9h-18h.`
+      : isIt
+      ? `Problemi urgenti: ${supportEmail}. Risposta entro 4 ore, lun-ven 9:00-18:00.`
+      : `Urgent issues: ${supportEmail}. Response within 4 hours, Mon-Fri 9am-6pm.`,
+  };
+}
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: CORS_HEADERS });
@@ -105,16 +145,17 @@ async function handleQuestion(req: Request): Promise<Response> {
       // Fall through to fallback KB
     }
 
-    // Fallback KB
+    // Fallback KB — built per-locale
     if (!context) {
+      const fallbackKB = buildFallbackKB(market);
       const q = trimmedQuestion.toLowerCase();
-      const matched = Object.entries(FALLBACK_KB)
+      const matched = Object.entries(fallbackKB)
         .filter(([key]) => q.includes(key.replace(/_/g, ' ')) || q.includes(key))
         .map(([, val]) => val);
 
       if (matched.length === 0) {
         const qWords = new Set(q.split(/\s+/));
-        const scored = Object.entries(FALLBACK_KB).map(([key, val]) => {
+        const scored = Object.entries(fallbackKB).map(([key, val]) => {
           const overlap = val.toLowerCase().split(/\s+/).filter(w => qWords.has(w)).length;
           return { key, val, overlap };
         });

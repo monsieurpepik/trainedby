@@ -19,9 +19,9 @@ if (!slug || !/^[a-z0-9-]+$/i.test(slug)) {
 
 // Reserved routes — never treat these as trainer slugs
 const RESERVED = new Set([
-  'find', 'join', 'pricing', 'blog', 'community', 'dashboard', 'edit',
-  'admin', 'superadmin', 'for-trainers', 'plan-builder', 'privacy',
-  'terms', 'cookie-policy', 'landing', 'academy', 'index', 'profile',
+  'find', 'join', 'pricing', 'blog', 'dashboard', 'edit',
+  'admin', 'superadmin', 'for-trainers', 'privacy',
+  'terms', 'cookie-policy', 'landing', 'index', 'profile',
   'sitemap.xml', 'robots.txt', 'favicon.ico', 'manifest.webmanifest',
 ]);
 if (RESERVED.has(slug.toLowerCase())) {

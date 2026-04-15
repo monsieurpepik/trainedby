@@ -145,7 +145,7 @@ function firstLeadEmail(t: Trainer, leadName: string): { subject: string; html: 
       <p>Reply within the hour. The trainers who convert leads are the ones who respond fast — not the ones with the best credentials.</p>
       <a href="https://trainedby.ae/dashboard" class="btn">View Your Leads →</a>
       <hr class="divider">
-      <p style="font-size:12px">Pro tip: Upgrade to Pro to see all your leads, track conversions, and sell digital products directly from your profile.</p>
+      <p style="font-size:12px">Pro tip: Upgrade to Pro to see all your leads, track conversions, and get priority placement in search results.</p>
     `)
   };
 }
@@ -158,10 +158,10 @@ function proWelcomeEmail(t: Trainer): { subject: string; html: string } {
       <p>Most trainers upgrade and then do nothing different. Don't be that trainer.</p>
       <p>Here's what to set up in the next 30 minutes:</p>
       <ul class="checklist">
-        <li>Create your first digital product (a PDF nutrition guide, a 4-week plan, anything)</li>
-        <li>Set up your Grand Slam Offer — bundle sessions + a digital product</li>
-        <li>Copy your referral link and put it in your Instagram bio</li>
-        <li>Refer 4 trainers and your Pro subscription is free forever</li>
+        <li>Add your session packages with clear outcomes and prices</li>
+        <li>Upload a profile photo and write a 2-sentence bio</li>
+        <li>Share your profile link in your Instagram bio and WhatsApp status</li>
+        <li>Turn on WhatsApp lead notifications so you never miss an enquiry</li>
       </ul>
       <a href="https://trainedby.ae/dashboard" class="btn">Go to Dashboard →</a>
     `)
@@ -186,7 +186,7 @@ function sevenDayEmail(t: Trainer): { subject: string; html: string } {
 
       ${t.plan === 'free' ? `
       <hr class="divider">
-      <p>You're on the free plan. If you're serious about building a client base, Pro gives you digital product sales, the Affiliate Vault, and priority listing. <span class="highlight">149 AED/month.</span></p>
+      <p>You're on the free plan. Pro gives you priority placement in search, WhatsApp lead notifications, unlimited session packages, and advanced analytics. <span class="highlight">99 AED/month.</span></p>
       <a href="https://trainedby.ae/pricing" class="btn" style="background:#1c1c1c;border:1px solid rgba(255,92,0,0.3)">See What Pro Includes →</a>
       ` : ''}
     `)

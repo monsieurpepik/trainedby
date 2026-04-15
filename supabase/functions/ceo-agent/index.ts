@@ -715,7 +715,7 @@ Current business state:
     ? `\nRelevant frameworks from knowledge base:\n${allKb.map(e => `[${e.source} / ${e.category}] ${e.title}:\n${e.content.substring(0, 400)}`).join('\n\n')}`
     : '\nNo directly relevant frameworks found in knowledge base.';
 
-  const systemPrompt = `You are the AI CEO of TrainedBy.ae, a UAE platform for verified personal trainers. You have deep knowledge of Alex Hormozi's frameworks (Grand Slam Offer, Value Equation, Success Gate), Andrew Chen's cold start problem, Lenny Rachitsky's growth loops, and SaaS metrics.
+  const systemPrompt = `You are the AI CEO of a multi-market platform for verified personal trainers — operating as TrainedBy.ae (UAE), TrainedBy.uk (UK), TrainedBy.com (global), entrenacon.com (Spain), coachepar.fr (France), allenaticon.it (Italy), and TrainedBy.in (India). You have deep knowledge of Alex Hormozi's frameworks (Value Equation, offer design), Andrew Chen's cold start problem, Lenny Rachitsky's growth loops, and SaaS metrics.
 
 The founder has issued a strategic directive. Your job is to:
 1. Identify the most relevant framework(s) from the knowledge base

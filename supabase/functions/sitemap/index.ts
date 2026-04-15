@@ -41,8 +41,6 @@ Disallow: /dashboard
 Disallow: /edit
 Disallow: /admin
 Disallow: /superadmin
-Disallow: /academy/*/admin
-
 Sitemap: ${domain}/sitemap.xml
 `;
     return new Response(robots, {
@@ -65,14 +63,6 @@ Sitemap: ${domain}/sitemap.xml
     .order('updated_at', { ascending: false })
     .limit(10000);
 
-  // Get all academies for this market
-  const { data: academies } = await sb
-    .from('academies')
-    .select('slug, updated_at')
-    .eq('market', market)
-    .eq('verified', true)
-    .limit(1000);
-
   const now = new Date().toISOString().split('T')[0];
 
   const staticUrls = STATIC_PAGES.map(page => `
@@ -91,20 +81,11 @@ Sitemap: ${domain}/sitemap.xml
     <priority>0.7</priority>
   </url>`).join('');
 
-  const academyUrls = (academies ?? []).map(a => `
-  <url>
-    <loc>${domain}/academy/${a.slug}</loc>
-    <lastmod>${a.updated_at?.split('T')[0] ?? now}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>`).join('');
-
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${staticUrls}
 ${trainerUrls}
-${academyUrls}
 </urlset>`;
 
   return new Response(sitemap, {
