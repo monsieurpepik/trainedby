@@ -28,6 +28,13 @@
  *   /hire      — What roles the business needs next
  *   /ask <q>   — Free-form question
  *   /help      — All commands
+ *
+ * Skills Commands (Superpowers integration):
+ *   /debug <issue>     — Systematic 4-phase debugging protocol
+ *   /plan <feature>    — Structured implementation plan with TDD tasks
+ *   /brainstorm <idea> — Socratic design refinement before building
+ *   /review            — Pre-merge code review checklist
+ *   /skill             — List all available development skills
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -270,6 +277,34 @@ async function handleTelegramUpdate(req: Request): Promise<Response> {
           break;
         case '/help':
           await handleHelp(chatId);
+          break;
+        // Skills commands (Superpowers integration)
+        case '/debug':
+          if (!args) {
+            await sendMessage(chatId, 'Usage: `/debug <issue>`\n\nExample: `/debug stripe webhook not firing in UAE`');
+          } else {
+            await handleDebug(chatId, args);
+          }
+          break;
+        case '/plan':
+          if (!args) {
+            await sendMessage(chatId, 'Usage: `/plan <feature>`\n\nExample: `/plan add Google Calendar sync to academy bookings`');
+          } else {
+            await handlePlan(chatId, args);
+          }
+          break;
+        case '/brainstorm':
+          if (!args) {
+            await sendMessage(chatId, 'Usage: `/brainstorm <idea>`\n\nExample: `/brainstorm referral programme for trainers`');
+          } else {
+            await handleBrainstorm(chatId, args);
+          }
+          break;
+        case '/review':
+          await handleReview(chatId, args);
+          break;
+        case '/skill':
+          await handleSkill(chatId, args);
           break;
         // Legacy commands
         case '/growth':
@@ -815,7 +850,115 @@ async function handleHelp(chatId: number): Promise<void> {
 /directive <goal> — I assign tasks to agents
 /hire — Hiring advice based on current stage
 
-Or just *type anything* — I'll respond as your CEO.`);
+Or just *type anything* — I'll respond as your CEO.
+
+*Skills & Development*
+/debug <issue> — Systematic 4-phase debugging protocol
+/plan <feature> — TDD implementation plan with exact tasks
+/brainstorm <idea> — Socratic design refinement
+/review [context] — Pre-merge code review checklist
+/skill — All development skills`);
+}
+
+// ── Skills handlers (Superpowers integration) ───────────────────────────────
+
+async function handleDebug(chatId: number, issue: string): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
+
+  try {
+    const response = await callClaude(ANTHROPIC_KEY(), {
+      model: 'claude-haiku-4-5',
+      system: CEO_SYSTEM_PROMPT + `\n\nYou are now activating the *Systematic Debugging* skill. This is a 4-phase protocol:\n\n**Phase 1 — Reproduce:** Identify the exact failure with evidence. What is the symptom? When did it start? What changed?\n**Phase 2 — Isolate:** Narrow to the smallest failing case. What is the minimal reproduction?\n**Phase 3 — Root Cause:** Find the actual cause, not a symptom. Ask "why" 5 times.\n**Phase 4 — Fix & Verify:** Propose the fix. Specify how to verify it worked with evidence.\n\nFormat your response with these four phases clearly labelled. End with one concrete next action the developer should take RIGHT NOW.\n\nContext about the TrainedBy platform:\n- Stack: Astro frontend, Supabase (Deno edge functions + PostgreSQL), Stripe, Telegram bot\n- ${snap.totalTrainers} trainers, ${snap.proCount} Pro subscribers\n- 34 edge functions deployed\n- Key rule: webhook functions must have verify_jwt=false`,
+      messages: [{ role: 'user', content: `Debug this issue: ${issue}` }],
+      max_tokens: 700,
+      temperature: 0.1,
+    });
+    await sendMessage(chatId, `🔍 *Systematic Debug: ${issue}*\n\n${response.text}`);
+  } catch {
+    await sendMessage(chatId, `Couldn't run debug protocol right now. Try again.`);
+  }
+}
+
+async function handlePlan(chatId: number, feature: string): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
+
+  try {
+    const response = await callClaude(ANTHROPIC_KEY(), {
+      model: 'claude-haiku-4-5',
+      system: CEO_SYSTEM_PROMPT + `\n\nYou are now activating the *Writing Plans* skill. Generate a structured implementation plan.\n\nRules:\n- Break work into bite-sized tasks (2-5 minutes each)\n- Every task must have: exact file paths, what to write/change, verification step\n- Follow TDD: write failing test first, then implementation\n- Start with the plan header:\n  # [Feature] Implementation Plan\n  Goal: [one sentence]\n  Architecture: [2-3 sentences]\n  Tech Stack: Deno/TypeScript, Supabase, Astro\n\n- Use checkbox syntax: - [ ] Step\n- Group into numbered Tasks\n- End with: Verification — how to confirm the whole feature works\n\nPlatform context:\n- ${snap.totalTrainers} trainers on platform\n- Stack: Astro + Supabase edge functions (Deno) + PostgreSQL\n- All functions in supabase/functions/, shared utils in _shared/\n- Frontend in src/pages/ and src/lib/`,
+      messages: [{ role: 'user', content: `Write an implementation plan for: ${feature}` }],
+      max_tokens: 900,
+      temperature: 0.2,
+    });
+    await sendMessage(chatId, `📋 *Implementation Plan: ${feature}*\n\n${response.text}`);
+  } catch {
+    await sendMessage(chatId, `Couldn't generate plan right now. Try again.`);
+  }
+}
+
+async function handleBrainstorm(chatId: number, idea: string): Promise<void> {
+  await sendTyping(chatId);
+  const sb = createClient(SUPABASE_URL(), SUPABASE_KEY());
+  const snap = await getPlatformSnapshot(sb);
+
+  try {
+    const response = await callClaude(ANTHROPIC_KEY(), {
+      model: 'claude-haiku-4-5',
+      system: CEO_SYSTEM_PROMPT + `\n\nYou are now activating the *Brainstorming* skill. Refine this idea through Socratic questioning before any code is written.\n\nProcess:\n1. Restate the idea in one sentence to confirm understanding\n2. Ask 3 clarifying questions that would change the design if answered differently\n3. Present 2-3 design alternatives with tradeoffs\n4. Recommend one approach with clear reasoning\n5. Identify the one biggest risk\n\nBe direct. Don't pad. The goal is to surface hidden assumptions and prevent building the wrong thing.\n\nPlatform context: ${snap.totalTrainers} trainers, ${snap.proCount} Pro, operating in AE/UK/FR/IT/ES/MX/IN markets.`,
+      messages: [{ role: 'user', content: `Brainstorm: ${idea}` }],
+      max_tokens: 700,
+      temperature: 0.4,
+    });
+    await sendMessage(chatId, `💡 *Brainstorm: ${idea}*\n\n${response.text}`);
+  } catch {
+    await sendMessage(chatId, `Couldn't run brainstorm right now. Try again.`);
+  }
+}
+
+async function handleReview(chatId: number, context: string): Promise<void> {
+  await sendTyping(chatId);
+
+  try {
+    const response = await callClaude(ANTHROPIC_KEY(), {
+      model: 'claude-haiku-4-5',
+      system: CEO_SYSTEM_PROMPT + `\n\nYou are now activating the *Requesting Code Review* skill. Generate a pre-merge review checklist.\n\nThe review has two stages:\n**Stage 1 — Spec compliance:** Does the code do what was planned?\n**Stage 2 — Code quality:** Is it well-structured, secure, and maintainable?\n\nFor each stage, provide a checklist of specific things to verify. Flag any common failure patterns for TrainedBy:\n- JWT misconfiguration on webhook functions\n- Missing CORS OPTIONS handler\n- Hardcoded secrets or market-specific logic\n- Missing migration file for schema changes\n- Telegram functions returning non-200 on error\n- Fabricated metrics or placeholder data left in`,
+      messages: [{ role: 'user', content: context ? `Review context: ${context}` : 'Generate a general pre-merge review checklist for the latest changes.' }],
+      max_tokens: 600,
+      temperature: 0.1,
+    });
+    await sendMessage(chatId, `✅ *Code Review Checklist*\n\n${response.text}`);
+  } catch {
+    await sendMessage(chatId, `Couldn't generate review checklist right now. Try again.`);
+  }
+}
+
+async function handleSkill(chatId: number, skillName: string): Promise<void> {
+  if (!skillName) {
+    await sendMessage(chatId, `*Available Development Skills*\n\nThese are the Superpowers workflows integrated into our development process:\n\n🔍 */debug <issue>* — Systematic 4-phase debugging (reproduce → isolate → root cause → fix)\n📋 */plan <feature>* — Structured TDD implementation plan with exact file paths and tasks\n💡 */brainstorm <idea>* — Socratic design refinement before writing any code\n✅ */review [context]* — Pre-merge code review checklist (spec + quality)\n\n*Full skills library:*\n• brainstorming\n• writing-plans\n• test-driven-development\n• systematic-debugging\n• verification-before-completion\n• requesting-code-review\n• receiving-code-review\n• executing-plans\n• subagent-driven-development\n• dispatching-parallel-agents\n• using-git-worktrees\n• finishing-a-development-branch\n• writing-skills\n• trainedby-edge-functions (custom)\n\nAll skills live in \`skills/\` in the repo. Use /skill <name> for details on any skill.`);
+    return;
+  }
+
+  // Map skill names to brief descriptions
+  const skillDescriptions: Record<string, string> = {
+    'brainstorming': '*Brainstorming*\nActivate before designing anything new. Refines rough ideas through Socratic questions, explores alternatives, validates design before a single line of code is written.\n\nUse: `/brainstorm <idea>`',
+    'writing-plans': '*Writing Plans*\nActivate before implementing a feature. Breaks work into 2-5 minute bite-sized tasks with exact file paths, complete code snippets, and verification steps. Every task is TDD-first.\n\nUse: `/plan <feature>`',
+    'test-driven-development': '*Test-Driven Development*\nIron law: no production code without a failing test first. RED (write failing test) → GREEN (minimal code to pass) → REFACTOR (clean up). If you wrote code before the test, delete it.\n\nActivated automatically by the /plan command.',
+    'systematic-debugging': '*Systematic Debugging*\n4-phase protocol: Reproduce → Isolate → Root Cause → Fix & Verify. Never guess. The JWT incident (April 2026) is a canonical example of what happens without this process.\n\nUse: `/debug <issue>`',
+    'verification-before-completion': '*Verification Before Completion*\nIron law: no completion claims without fresh verification evidence. Run the command. Read the output. THEN claim the result. "Should work" is not evidence.\n\nActivated automatically before any deployment.',
+    'requesting-code-review': '*Requesting Code Review*\nTwo-stage review: spec compliance first, then code quality. Dispatch after each task in subagent-driven development and before any merge to main.\n\nUse: `/review [context]`',
+    'trainedby-edge-functions': '*TrainedBy Edge Functions (Custom)*\nTrainedBy-specific patterns: JWT classification, webhook handling, Telegram alerts, deployment verification. The canonical reference for all edge function work.\n\nSee: `skills/trainedby-edge-functions/SKILL.md`',
+  };
+
+  const desc = skillDescriptions[skillName.toLowerCase()];
+  if (desc) {
+    await sendMessage(chatId, desc);
+  } else {
+    await sendMessage(chatId, `Skill \`${skillName}\` not found.\n\nUse /skill to see all available skills.`);
+  }
 }
 
 // ── Legacy handlers ───────────────────────────────────────────────────────────
