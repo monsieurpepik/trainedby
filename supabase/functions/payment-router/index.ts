@@ -88,11 +88,13 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    // Verify magic link token
+    // Verify magic link token — must be unused and not expired
     const { data: link } = await sb
       .from('magic_links')
-      .select('trainer_id')
+      .select('trainer_id, expires_at, used')
       .eq('token', token)
+      .eq('used', false)
+      .gt('expires_at', new Date().toISOString())
       .single();
 
     if (!link?.trainer_id) {

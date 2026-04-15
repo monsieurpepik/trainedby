@@ -15,7 +15,13 @@ serve(async (req) => {
 
     const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    const { data: link } = await sb.from("magic_links").select("trainer_id").eq("token", token).single();
+    const { data: link } = await sb
+      .from("magic_links")
+      .select("trainer_id, expires_at, used")
+      .eq("token", token)
+      .eq("used", false)
+      .gt("expires_at", new Date().toISOString())
+      .single();
     if (!link?.trainer_id) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
 
     const trainer_id = link.trainer_id;
