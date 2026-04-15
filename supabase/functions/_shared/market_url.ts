@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Market-Aware URL Builder
+ * TrainedBy  -  Market-Aware URL Builder
  * ─────────────────────────────────────────────────────────────────────────────
  * Replaces all hardcoded trainedby.ae URLs in edge functions with
  * dynamic, market-aware equivalents.

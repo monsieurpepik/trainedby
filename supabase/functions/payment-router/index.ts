@@ -1,5 +1,5 @@
 /**
- * payment-router — Unified Payment Gateway Router
+ * payment-router  -  Unified Payment Gateway Router
  * ─────────────────────────────────────────────────────────────────────────────
  * Routes payment requests to the correct provider based on market:
  *   - Stripe: AE, UK, COM, FR, IT, ES, MX
@@ -62,8 +62,8 @@ const STRIPE_PRICES: Record<string, Record<string, Record<string, string>>> = {
 
 // Razorpay plan amounts (in paise)
 const RAZORPAY_PLANS: Record<string, { amount: number; label: string }> = {
-  pro_monthly: { amount: 49900, label: 'TrainedBy Pro — ₹499/month' },
-  pro_annual:  { amount: 499900, label: 'TrainedBy Pro — ₹4,999/year' },
+  pro_monthly: { amount: 49900, label: 'TrainedBy Pro  -  ₹499/month' },
+  pro_annual:  { amount: 499900, label: 'TrainedBy Pro  -  ₹4,999/year' },
 };
 
 Deno.serve(async (req) => {
@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    // Verify magic link token — must be unused and not expired
+    // Verify magic link token  -  must be unused and not expired
     const { data: link } = await sb
       .from('magic_links')
       .select('trainer_id, expires_at, used')
@@ -145,7 +145,7 @@ Deno.serve(async (req) => {
         await sb.from('trainers').update({ stripe_customer_id: customerId }).eq('id', trainer_id);
       }
 
-      // Get price ID — use market-specific if available, fall back to AE
+      // Get price ID  -  use market-specific if available, fall back to AE
       const marketPrices = STRIPE_PRICES[market] ?? STRIPE_PRICES['ae'];
       const priceId = marketPrices?.[plan]?.[billing];
       if (!priceId) {

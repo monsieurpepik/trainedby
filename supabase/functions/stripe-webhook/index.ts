@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
     .single();
 
   if (existing) {
-    logger.info("Duplicate webhook event — skipping", { event_id: eventId, type: event.type });
+    logger.info("Duplicate webhook event  -  skipping", { event_id: eventId, type: event.type });
     return new Response(JSON.stringify({ received: true, duplicate: true }), { status: 200 });
   }
 
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
               body: JSON.stringify({ type: "pro_upgrade", data: { name: trainer.name, email: trainer.email, market } }),
             }).catch(() => {});
 
-            // Pro welcome lifecycle email — market-aware
+            // Pro welcome lifecycle email  -  market-aware
             fetch(`${SELF_BASE}/lifecycle-email`, {
               method: "POST",
               headers: { "Content-Type": "application/json", "Authorization": `Bearer ${svcKey}` },
@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
             }).catch(() => {});
           }
 
-          logger.info("Checkout completed — trainer upgraded", { trainer_id, plan, market });
+          logger.info("Checkout completed  -  trainer upgraded", { trainer_id, plan, market });
         }
         break;
       }

@@ -15,7 +15,7 @@ serve(async (req) => {
 
     const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    // Verify token — must be unused and not expired
+    // Verify token  -  must be unused and not expired
     const { data: link } = await sb
       .from("magic_links")
       .select("trainer_id, expires_at, used")

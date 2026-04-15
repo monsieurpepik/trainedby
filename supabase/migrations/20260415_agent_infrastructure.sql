@@ -1,7 +1,7 @@
--- TrainedBy — Autonomous Agent Infrastructure
+-- TrainedBy  -  Autonomous Agent Infrastructure
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Adds:
---   1. trainer_notifications table — dashboard fallback for agent messages
+--   1. trainer_notifications table  -  dashboard fallback for agent messages
 --   2. Calendar columns on trainers (calendly_url, google_calendar_token)
 --   3. pg_cron schedules for all 4 cron-triggered agents
 --   4. Database webhook triggers for Lead Responder and Booking Prep agents

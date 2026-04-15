@@ -1,9 +1,9 @@
 -- ─────────────────────────────────────────────────────────────────────────────
--- TrainedBy Agent OS — Database Tables
+-- TrainedBy Agent OS  -  Database Tables
 -- Migration: 20260414_agent_os.sql
 -- ─────────────────────────────────────────────────────────────────────────────
 
--- ── 1. funnel_events — raw event stream from the frontend ────────────────────
+-- ── 1. funnel_events  -  raw event stream from the frontend ────────────────────
 CREATE TABLE IF NOT EXISTS funnel_events (
   id           BIGSERIAL PRIMARY KEY,
   event        TEXT        NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS funnel_events (
 CREATE INDEX IF NOT EXISTS idx_funnel_events_event       ON funnel_events (event);
 CREATE INDEX IF NOT EXISTS idx_funnel_events_created_at  ON funnel_events (created_at);
 
--- ── 2. agent_memos — output store for all agents ─────────────────────────────
+-- ── 2. agent_memos  -  output store for all agents ─────────────────────────────
 CREATE TABLE IF NOT EXISTS agent_memos (
   id         BIGSERIAL PRIMARY KEY,
   agent      TEXT        NOT NULL,  -- 'growth-agent' | 'content-agent' | 'support-agent' | 'meta-agent'
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS agent_memos (
 CREATE INDEX IF NOT EXISTS idx_agent_memos_agent       ON agent_memos (agent);
 CREATE INDEX IF NOT EXISTS idx_agent_memos_created_at  ON agent_memos (created_at);
 
--- ── 3. blog_posts — content agent output ─────────────────────────────────────
+-- ── 3. blog_posts  -  content agent output ─────────────────────────────────────
 CREATE TABLE IF NOT EXISTS blog_posts (
   id                BIGSERIAL PRIMARY KEY,
   slug              TEXT        NOT NULL UNIQUE,
@@ -51,7 +51,7 @@ CREATE INDEX IF NOT EXISTS idx_blog_posts_status       ON blog_posts (status);
 CREATE INDEX IF NOT EXISTS idx_blog_posts_fts ON blog_posts
   USING GIN (to_tsvector('english', title || ' ' || COALESCE(content_markdown, '')));
 
--- ── 4. support_docs — RAG knowledge base for support agent ───────────────────
+-- ── 4. support_docs  -  RAG knowledge base for support agent ───────────────────
 CREATE TABLE IF NOT EXISTS support_docs (
   id         BIGSERIAL PRIMARY KEY,
   title      TEXT        NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS support_docs (
 CREATE INDEX IF NOT EXISTS idx_support_docs_fts ON support_docs
   USING GIN (to_tsvector('english', title || ' ' || content));
 
--- ── 5. support_conversations — log of all support agent interactions ──────────
+-- ── 5. support_conversations  -  log of all support agent interactions ──────────
 CREATE TABLE IF NOT EXISTS support_conversations (
   id              BIGSERIAL PRIMARY KEY,
   conversation_id UUID        NOT NULL DEFAULT gen_random_uuid(),
@@ -83,8 +83,8 @@ CREATE INDEX IF NOT EXISTS idx_support_convs_created_at ON support_conversations
 -- ── 6. Seed support_docs with initial knowledge base ─────────────────────────
 INSERT INTO support_docs (title, content, category) VALUES
 (
-  'Pricing — Free vs Pro',
-  'TrainedBy has two tiers: Free (verified profile, public listing, basic analytics, no credit card needed) and Pro (149 AED/month — digital product sales, Affiliate Vault, Grand Slam Offer builder, priority listing, advanced analytics, custom domain). You can upgrade or downgrade at any time from your dashboard.',
+  'Pricing  -  Free vs Pro',
+  'TrainedBy has two tiers: Free (verified profile, public listing, basic analytics, no credit card needed) and Pro (149 AED/month  -  digital product sales, Affiliate Vault, Grand Slam Offer builder, priority listing, advanced analytics, custom domain). You can upgrade or downgrade at any time from your dashboard.',
   'pricing'
 ),
 (
@@ -99,12 +99,12 @@ INSERT INTO support_docs (title, content, category) VALUES
 ),
 (
   'Affiliate Vault',
-  'The Affiliate Vault gives Pro trainers access to pre-negotiated affiliate deals with UAE fitness brands (supplements, equipment, apparel). You activate the brands you want, share your unique link, and earn commission on every purchase — automatically, every month. No minimum threshold for payouts.',
+  'The Affiliate Vault gives Pro trainers access to pre-negotiated affiliate deals with UAE fitness brands (supplements, equipment, apparel). You activate the brands you want, share your unique link, and earn commission on every purchase  -  automatically, every month. No minimum threshold for payouts.',
   'monetisation'
 ),
 (
   'Referral Programme',
-  'Every Pro trainer gets a unique referral link. When another trainer signs up to Pro through your link, you earn 20% of their monthly subscription — recurring, for as long as they stay. Refer 4 trainers and your Pro subscription is free forever.',
+  'Every Pro trainer gets a unique referral link. When another trainer signs up to Pro through your link, you earn 20% of their monthly subscription  -  recurring, for as long as they stay. Refer 4 trainers and your Pro subscription is free forever.',
   'referral'
 ),
 (

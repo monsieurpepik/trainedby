@@ -1,5 +1,5 @@
 /**
- * Client-side UI helpers — imported by page scripts.
+ * Client-side UI helpers  -  imported by page scripts.
  * All functions are side-effect-free except showToast which mutates the DOM.
  */
 

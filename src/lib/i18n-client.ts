@@ -19,7 +19,7 @@ declare global {
 
 export function initI18n() {
   const locale: Locale = window.__LOCALE__ || 'en';
-  if (locale === 'en') return; // English is the default — no DOM changes needed
+  if (locale === 'en') return; // English is the default  -  no DOM changes needed
 
   const strings = window.__I18N__;
   if (!strings) return;

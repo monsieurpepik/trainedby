@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Stats Reporter Agent
+ * TrainedBy  -  Stats Reporter Agent
  * ─────────────────────────────────────────────────────────────────────────────
  * Triggered by: pg_cron every Sunday at 19:00
  *
@@ -86,8 +86,8 @@ async function generateInsight(
         content: `Trainer: ${trainerName}. This week: ${stats.views} views, ${stats.leads} leads, ${stats.waTaps} WhatsApp taps, ${stats.conversionRate}% conversion. Previous week: ${stats.prevViews} views, ${stats.prevLeads} leads.
 
 Write exactly:
-INSIGHT: [one sentence about what the data means — specific, not generic]
-ACTION: [one specific thing they should do this week to improve — under 20 words]`,
+INSIGHT: [one sentence about what the data means  -  specific, not generic]
+ACTION: [one specific thing they should do this week to improve  -  under 20 words]`,
       }],
     }),
   });
@@ -99,7 +99,7 @@ ACTION: [one specific thing they should do this week to improve — under 20 wor
   const actionMatch = raw.match(/ACTION:\s*(.+?)$/is);
 
   return {
-    insight: insightMatch?.[1]?.trim() ?? 'Keep building — consistency compounds.',
+    insight: insightMatch?.[1]?.trim() ?? 'Keep building  -  consistency compounds.',
     action: actionMatch?.[1]?.trim() ?? 'Share your profile link with one person today.',
   };
 }
@@ -142,7 +142,7 @@ Deno.serve(async (_req: Request) => {
       });
 
       const message = [
-        `📊 *Weekly Report — w/e ${weekLabel}*`,
+        `📊 *Weekly Report  -  w/e ${weekLabel}*`,
         '',
         `👁 Views: *${stats.views}*${trend(stats.views, stats.prevViews)}`,
         `📩 Leads: *${stats.leads}*${trend(stats.leads, stats.prevLeads)}`,

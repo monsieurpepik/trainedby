@@ -1,5 +1,5 @@
 /**
- * TrainedBy — WhatsApp Webhook Handler
+ * TrainedBy  -  WhatsApp Webhook Handler
  * ─────────────────────────────────────────────────────────────────────────────
  * Receives inbound WhatsApp messages via the WhatsApp Business Cloud API
  * (Meta) and routes them to the trainer-assistant.
@@ -142,7 +142,7 @@ Deno.serve(async (req: Request) => {
   const messages = value?.messages as Array<Record<string, unknown>>;
 
   if (!messages || messages.length === 0) {
-    // Status update or other non-message event — acknowledge and ignore
+    // Status update or other non-message event  -  acknowledge and ignore
     return new Response('OK', { status: 200 });
   }
 
@@ -168,7 +168,7 @@ Deno.serve(async (req: Request) => {
   const trainer = await findTrainerByWhatsApp(sb, fromNumber);
 
   if (!trainer) {
-    // Unknown number — send onboarding message
+    // Unknown number  -  send onboarding message
     await sendWhatsApp(
       fromNumber,
       "Hi! I don't recognise this number as a registered trainer. To connect your WhatsApp to your AI assistant, go to your dashboard → Settings → AI Assistant and select WhatsApp as your channel.",

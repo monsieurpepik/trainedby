@@ -104,7 +104,7 @@ serve(async (req) => {
         status: "pending",
       });
     } else {
-      // Split net evenly among coaches (simplistic — can be customised per coach rate)
+      // Split net evenly among coaches (simplistic  -  can be customised per coach rate)
       const perCoachNet = totals.net / academyCoaches.length;
       const perCoachFee = totals.fee / academyCoaches.length;
       const perCoachGross = totals.gross / academyCoaches.length;

@@ -9,7 +9,7 @@ const brand = getBrand(locale);
 ---
 
 <Base
-  title={`Dashboard — ${market.brandName}`}
+  title={`Dashboard  -  ${market.brandName}`}
   description={`Your ${market.brandName} trainer dashboard. Manage leads, analytics, and your profile.`}
 >
   <style>
@@ -568,7 +568,7 @@ body {
           <div class="stat-card-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
           </div>
-          <div class="stat-card-value" id="stat-leads">—</div>
+          <div class="stat-card-value" id="stat-leads"> - </div>
           <div class="stat-card-label">{t(locale, 'dash.stats_leads')}</div>
           <div class="stat-card-change up" id="stat-leads-change"></div>
         </div>
@@ -576,7 +576,7 @@ body {
           <div class="stat-card-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </div>
-          <div class="stat-card-value" id="stat-views">—</div>
+          <div class="stat-card-value" id="stat-views"> - </div>
           <div class="stat-card-label">{t(locale, 'dash.stats_views')}</div>
           <div class="stat-card-change up" id="stat-views-change"></div>
         </div>
@@ -584,7 +584,7 @@ body {
           <div class="stat-card-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
           </div>
-          <div class="stat-card-value" id="stat-wa-taps">—</div>
+          <div class="stat-card-value" id="stat-wa-taps"> - </div>
           <div class="stat-card-label">{t(locale, 'dash.stats_wa')}</div>
           <div class="stat-card-change up" id="stat-wa-change"></div>
         </div>
@@ -592,7 +592,7 @@ body {
           <div class="stat-card-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </div>
-          <div class="stat-card-value" id="stat-assess">—</div>
+          <div class="stat-card-value" id="stat-assess"> - </div>
           <div class="stat-card-label">Assessments</div>
           <div class="stat-card-change up" id="stat-assess-change"></div>
         </div>
@@ -640,7 +640,7 @@ body {
           <div class="empty-state-icon">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
           </div>
-          <div class="empty-state-text">No leads yet — share your profile link to get started.</div>
+          <div class="empty-state-text">No leads yet  -  share your profile link to get started.</div>
         </div>
       </div>
     </div>
@@ -666,7 +666,7 @@ body {
 
 
 
-    <!-- Generate Training Plan — Pro Feature Card -->
+    <!-- Generate Training Plan  -  Pro Feature Card -->
     <div class="checklist-section" id="generate-plan-section" style="display:none">
       <div class="checklist-title" style="display:flex;align-items:center;gap:8px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -782,7 +782,7 @@ body {
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
       </div>
       <div class="ai-welcome-title">Hey, I'm your AI coach</div>
-      <div class="ai-welcome-sub">I know your profile, your market, and your goals. Ask me anything — from writing your bio to building a 12-week programme.</div>
+      <div class="ai-welcome-sub">I know your profile, your market, and your goals. Ask me anything  -  from writing your bio to building a 12-week programme.</div>
     </div>
   </div>
   <div class="ai-quick-prompts" id="ai-chips">
@@ -913,7 +913,7 @@ function populateDash(t) {
     document.getElementById('flywheel-reward-text').textContent = '🎉 You\'ve earned free Pro forever!';
   }
 
-  // Income stream cards — unlock for Pro/Premium
+  // Income stream cards  -  unlock for Pro/Premium
   const isPro = t.plan === 'pro' || t.plan === 'premium';
   if (isPro) {
     document.getElementById('upgrade-banner').style.display = 'none';
@@ -932,13 +932,13 @@ function populateDash(t) {
   // Profile completeness widget
   if (typeof window.renderPC === 'function') window.renderPC(t);
 
-  // Generate Plan — show for Pro trainers
+  // Generate Plan  -  show for Pro trainers
   if (isPro) {
     const planSection = document.getElementById('generate-plan-section');
     if (planSection) planSection.style.display = 'block';
   }
 
-  // AI Assistant settings — show for Pro trainers
+  // AI Assistant settings  -  show for Pro trainers
   if (isPro) {
     const aiSection = document.getElementById('ai-settings-section');
     if (aiSection) {
@@ -948,7 +948,7 @@ function populateDash(t) {
       selectChannel(ch, false); // false = don't save to DB
       // Show WhatsApp number
       const waEl = document.getElementById('wa-registered-number');
-      if (waEl) waEl.textContent = t.whatsapp || 'Not set — add in Edit Profile';
+      if (waEl) waEl.textContent = t.whatsapp || 'Not set  -  add in Edit Profile';
       // Show Telegram linked state
       if (t.telegram_chat_id) {
         document.getElementById('tg-linked-state').style.display = 'block';
@@ -1016,7 +1016,7 @@ window.generatePlan = async function() {
         result.innerHTML += '<a href="' + data.share_url + '" target="_blank" style="display:inline-block;margin-top:12px;color:var(--brand);font-size:12px;font-weight:700;">Share plan link →</a>';
       }
     } else {
-      showToast('Could not generate plan — try again');
+      showToast('Could not generate plan  -  try again');
     }
   } catch {
     showToast('Error generating plan');
@@ -1060,7 +1060,7 @@ function generateInsight(data) {
     text = `You got <strong>${leads} lead${leads>1?'s':''}</strong> but no WhatsApp taps. Clients filled the form but didn't message you directly.`;
     action = `<a href="/edit" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Make sure your WhatsApp number is visible on your profile</a>`;
   } else if (views > 0 && convRate > 0) {
-    text = `Your conversion rate is <strong>${convRate}%</strong> this week (${leads} lead${leads>1?'s':''} from ${views} views). ${convRate >= 5 ? 'That\'s above average — great work.' : 'Industry average is 5–8%. A results guarantee could double this.'}`;
+    text = `Your conversion rate is <strong>${convRate}%</strong> this week (${leads} lead${leads>1?'s':''} from ${views} views). ${convRate >= 5 ? 'That\'s above average  -  great work.' : 'Industry average is 5-8%. A results guarantee could double this.'}`;
     action = convRate < 5 ? `<a href="/edit" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Add a money-back guarantee to your packages</a>` : '';
   } else if (views === 0) {
     text = 'Your profile has no views yet this week. Share your profile link to start getting traffic.';
@@ -1227,7 +1227,7 @@ init();
   const win = document.createElement('div');
   win.className = 'tb-chat-window';
   const _bn = window.__BRAND__?.name || 'TrainedBy';
-  win.innerHTML = '<div class="tb-chat-header"><div><div class="tb-chat-header-title">' + _bn + ' Support</div><div class="tb-chat-header-sub">Ask me anything about your account</div></div><button class="tb-chat-close" id="tb-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div><div class="tb-chat-messages" id="tb-msgs"><div class="tb-msg bot">Hey! Ask me anything about ' + _bn + ' — pricing, verification, referrals, or how features work.</div></div><div class="tb-chat-input-row"><input class="tb-chat-input" id="tb-input" placeholder="Ask a question..." maxlength="300"/><button class="tb-chat-send" id="tb-send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div>';
+  win.innerHTML = '<div class="tb-chat-header"><div><div class="tb-chat-header-title">' + _bn + ' Support</div><div class="tb-chat-header-sub">Ask me anything about your account</div></div><button class="tb-chat-close" id="tb-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div><div class="tb-chat-messages" id="tb-msgs"><div class="tb-msg bot">Hey! Ask me anything about ' + _bn + '  -  pricing, verification, referrals, or how features work.</div></div><div class="tb-chat-input-row"><input class="tb-chat-input" id="tb-input" placeholder="Ask a question..." maxlength="300"/><button class="tb-chat-send" id="tb-send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div>';
 
   document.body.appendChild(btn);
   document.body.appendChild(win);

@@ -19,23 +19,23 @@ const FROM_EMAILS: Record<string, string> = {
 
 const CONFIRMATION_COPY: Record<string, { subject: string; body: string }> = {
   en: {
-    subject: "You're on the list — we'll notify you when we launch",
-    body: `<p>Thanks for joining the waitlist. You'll be the first to know when we launch in your market — and you'll get the early-bird price locked in.</p>
+    subject: "You're on the list  -  we'll notify you when we launch",
+    body: `<p>Thanks for joining the waitlist. You'll be the first to know when we launch in your market  -  and you'll get the early-bird price locked in.</p>
 <p>In the meantime, feel free to check out what's already live on <a href="https://trainedby.ae">trainedby.ae</a>.</p>`,
   },
   fr: {
-    subject: "Vous êtes sur la liste — nous vous préviendrons au lancement",
-    body: `<p>Merci de rejoindre la liste d'attente. Vous serez le premier informé du lancement en France — avec le prix de lancement bloqué.</p>
+    subject: "Vous êtes sur la liste  -  nous vous préviendrons au lancement",
+    body: `<p>Merci de rejoindre la liste d'attente. Vous serez le premier informé du lancement en France  -  avec le prix de lancement bloqué.</p>
 <p>En attendant, découvrez ce qui est déjà en ligne sur <a href="https://trainedby.ae">trainedby.ae</a>.</p>`,
   },
   it: {
-    subject: "Sei nella lista — ti avviseremo al lancio",
-    body: `<p>Grazie per esserti unito alla lista d'attesa. Sarai il primo a sapere quando lanceremo in Italia — con il prezzo di lancio bloccato.</p>
+    subject: "Sei nella lista  -  ti avviseremo al lancio",
+    body: `<p>Grazie per esserti unito alla lista d'attesa. Sarai il primo a sapere quando lanceremo in Italia  -  con il prezzo di lancio bloccato.</p>
 <p>Nel frattempo, scopri cosa è già online su <a href="https://trainedby.ae">trainedby.ae</a>.</p>`,
   },
   es: {
-    subject: "Estás en la lista — te avisaremos cuando lancemos",
-    body: `<p>Gracias por unirte a la lista de espera. Serás el primero en saber cuando lancemos en tu mercado — con el precio de lanzamiento bloqueado.</p>
+    subject: "Estás en la lista  -  te avisaremos cuando lancemos",
+    body: `<p>Gracias por unirte a la lista de espera. Serás el primero en saber cuando lancemos en tu mercado  -  con el precio de lanzamiento bloqueado.</p>
 <p>Mientras tanto, descubre lo que ya está en línea en <a href="https://trainedby.ae">trainedby.ae</a>.</p>`,
   },
 };

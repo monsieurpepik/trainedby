@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Sentry Error Monitoring
+ * TrainedBy  -  Sentry Error Monitoring
  * ─────────────────────────────────────────────────────────────────────────────
  * Lightweight Sentry integration for Deno edge functions.
  * Uses the Sentry HTTP API directly (no SDK dependency).

@@ -7,7 +7,7 @@ const brandName = market.brandName;
 ---
 
 <Base
-  title={`Trainer Profile — ${brandName}`}
+  title={`Trainer Profile  -  ${brandName}`}
   description={`Verified personal trainer profile on ${brandName}`}
 >
   <style>
@@ -341,7 +341,7 @@ const brandName = market.brandName;
     border:1px solid var(--glass-border);
   }
 
-  /* Packages — Grand Slam Offer cards */
+  /* Packages  -  Grand Slam Offer cards */
   .pkg-list{display:flex;flex-direction:column;gap:10px}
   .pkg-card{
     background:var(--white-06);border:1px solid var(--glass-border);
@@ -515,7 +515,7 @@ const brandName = market.brandName;
     color:var(--orange);padding:2px 7px;border-radius:20px;flex-shrink:0;
   }
 
-  /* ── GALLERY — primary visual surface ── */
+  /* ── GALLERY  -  primary visual surface ── */
   .gallery-hero{
     width:100%;aspect-ratio:16/9;
     border-radius:14px;overflow:hidden;
@@ -624,7 +624,7 @@ const brandName = market.brandName;
   }
 
   /* ═══════════════════════════════════════════════
-     DESKTOP LAYOUT — 768px and above
+     DESKTOP LAYOUT  -  768px and above
      Two-column: hero/CTAs left, sections right
   ═══════════════════════════════════════════════ */
   @media (min-width: 768px) {
@@ -801,7 +801,7 @@ const brandName = market.brandName;
   </div>
 </div>
 
-<!-- Main page — two-column on desktop via JS-injected wrappers -->
+<!-- Main page  -  two-column on desktop via JS-injected wrappers -->
 <div id="page" style="display:none">
 
   <!-- Left column wrapper (desktop) / inline (mobile) -->
@@ -830,14 +830,14 @@ const brandName = market.brandName;
 
       <!-- Name row -->
       <div class="name-row">
-        <span id="trainerName" class="trainer-name">—</span>
+        <span id="trainerName" class="trainer-name"> - </span>
         <span id="verifiedIcon" class="verified-badge" style="display:none">
           <svg viewBox="0 0 24 24" fill="white"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </span>
       </div>
 
       <!-- Title -->
-      <div id="trainerTitle" class="trainer-title">—</div>
+      <div id="trainerTitle" class="trainer-title"> - </div>
 
       <!-- Badge row -->
       <div class="badge-row">
@@ -854,15 +854,15 @@ const brandName = market.brandName;
       <!-- Stats -->
       <div class="stats-pill" id="statsPill">
         <div class="stat-item">
-          <div class="stat-val" id="sYrs">—</div>
+          <div class="stat-val" id="sYrs"> - </div>
           <div class="stat-lbl">Yrs Exp</div>
         </div>
         <div class="stat-item">
-          <div class="stat-val" id="sClients">—</div>
+          <div class="stat-val" id="sClients"> - </div>
           <div class="stat-lbl">Clients</div>
         </div>
         <div class="stat-item">
-          <div class="stat-val" id="sSessions">—</div>
+          <div class="stat-val" id="sSessions"> - </div>
           <div class="stat-lbl">Sessions</div>
         </div>
         <div class="stat-item">
@@ -1000,8 +1000,8 @@ const brandName = market.brandName;
               <label>Activity Level</label>
               <select id="aActivity">
                 <option value="sedentary">Sedentary (desk job)</option>
-                <option value="light">Light (1–2x/week)</option>
-                <option value="moderate" selected>Moderate (3–4x/week)</option>
+                <option value="light">Light (1-2x/week)</option>
+                <option value="moderate" selected>Moderate (3-4x/week)</option>
                 <option value="active">Active (5+x/week)</option>
               </select>
             </div>
@@ -1041,7 +1041,7 @@ const brandName = market.brandName;
         </div>
         <div id="affiliateBody" class="sec-body open">
           <div class="affiliate-editorial-intro">
-            <strong>What I actually use.</strong> These are the products, supplements, and gear I personally train with and recommend to my clients — with exclusive discount codes.
+            <strong>What I actually use.</strong> These are the products, supplements, and gear I personally train with and recommend to my clients  -  with exclusive discount codes.
           </div>
           <div id="affiliateList" class="affiliate-list"></div>
         </div>
@@ -1063,7 +1063,7 @@ const brandName = market.brandName;
     <!-- Socials (mobile: below sections) -->
     <div id="socials" style="display:flex;gap:10px;padding:0 20px 20px;flex-wrap:wrap"></div>
 
-    <!-- Nearby Trainers — Strava-style discovery -->
+    <!-- Nearby Trainers  -  Strava-style discovery -->
     <div id="nearbySection" style="display:none;padding:0 20px 20px;">
       <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;">Also in this gym</div>
       <div id="nearbyList" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -1138,7 +1138,7 @@ async function loadTrainer() {
 
 function render(t) {
   // Page title
-  document.title = `${t.name} — ${t.title || 'Personal Trainer'} | ${window.__BRAND__?.name || 'TrainedBy'}`;
+  document.title = `${t.name}  -  ${t.title || 'Personal Trainer'} | ${window.__BRAND__?.name || 'TrainedBy'}`;
 
   // OG meta
   const ogTitle = document.querySelector('meta[property="og:title"]') || Object.assign(document.createElement('meta'), {property:'og:title'});
@@ -1188,7 +1188,7 @@ function render(t) {
   }
   ldScript.textContent = JSON.stringify(cleanSchema);
 
-  // Background — use trainer cover or avatar or default gym
+  // Background  -  use trainer cover or avatar or default gym
   const bgPhoto = t.cover_url || t.photo_url || t.avatar_url;
   if (bgPhoto) {
     document.getElementById('bg').style.backgroundImage = `url('${bgPhoto}')`;
@@ -1207,7 +1207,7 @@ function render(t) {
     document.getElementById('avatarInitials').textContent = initials;
   }
 
-  // Rating row — only show if we have real verified reviews (loaded later)
+  // Rating row  -  only show if we have real verified reviews (loaded later)
   // We defer this to loadReviews()
 
   // Video intro badge
@@ -1230,7 +1230,7 @@ function render(t) {
   // Name
   document.getElementById('trainerName').textContent = t.name || t.full_name || '';
 
-  // Verified — check both reps_verified and verification_status
+  // Verified  -  check both reps_verified and verification_status
   if (t.reps_verified || t.verification_status === 'verified') {
     document.getElementById('verifiedIcon').style.display = 'flex';
     document.getElementById('repsBadge').style.display = 'flex';
@@ -1266,7 +1266,7 @@ function render(t) {
     document.getElementById('gymTag').style.display = 'inline-flex';
   }
 
-  // WhatsApp — always show
+  // WhatsApp  -  always show
   const waBtn = document.getElementById('waBtn');
   if (t.whatsapp) {
     const wn = t.whatsapp.replace(/\D/g, '');
@@ -1287,11 +1287,11 @@ function render(t) {
     document.getElementById('philosophyContent').innerHTML = `
       <div class="philosophy-block">
         <div class="philosophy-quote">${philosophy}</div>
-        <div class="philosophy-author">— ${t.name || 'Trainer'}</div>
+        <div class="philosophy-author"> -  ${t.name || 'Trainer'}</div>
       </div>`;
   }
 
-  // Trust Module — group all trust signals into one visual block
+  // Trust Module  -  group all trust signals into one visual block
   const trustContainer = document.createElement('div');
   trustContainer.className = 'trust-module';
   trustContainer.id = 'trustModule';
@@ -1402,7 +1402,7 @@ function render(t) {
     });
   }
 
-  // Gallery — hero image first, then grid
+  // Gallery  -  hero image first, then grid
   const gallery = t.gallery_urls || t.gallery || [];
   if (gallery.length) {
     document.getElementById('galleryCard').style.display = 'block';
@@ -1425,7 +1425,7 @@ function render(t) {
     });
   }
 
-  // Socials — on desktop show in left col, on mobile show below sections
+  // Socials  -  on desktop show in left col, on mobile show below sections
   const socialLinks = [];
   if (t.instagram) {
     socialLinks.push(`<a class="tag cert-tag" href="https://instagram.com/${t.instagram.replace('@','')}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>${t.instagram}</a>`);
@@ -1473,11 +1473,11 @@ async function loadReviews(trainerId) {
     });
     const reviews = await r.json();
 
-    // Always show the reviews card — either with real reviews or an honest empty state
+    // Always show the reviews card  -  either with real reviews or an honest empty state
     document.getElementById('reviewsCard').style.display = 'block';
 
     if (!Array.isArray(reviews) || reviews.length === 0) {
-      // Honest empty state — no fake reviews
+      // Honest empty state  -  no fake reviews
       document.getElementById('reviewsContent').innerHTML = `
         <div class="reviews-empty">
           <div class="reviews-empty-icon">⭐</div>
@@ -1651,8 +1651,8 @@ function runAssessment() {
   const actMult = {sedentary:1.2, light:1.375, moderate:1.55, active:1.725}[activity] || 1.55;
   const bmr = gender === 'male' ? 10*weight + 6.25*height - 5*age + 5 : 10*weight + 6.25*height - 5*age - 161;
   const tdee = Math.round(bmr * actMult);
-  const goalMap = {fat_loss:'Fat Loss — aim for a 300–500 kcal daily deficit', muscle_gain:'Muscle Gain — aim for a 200–300 kcal daily surplus', endurance:'Endurance — focus on zone 2 cardio + mobility', general:'General Fitness — balanced strength + cardio split'};
-  const sessMap = {fat_loss:'4–5x/week (3 strength + 2 cardio)', muscle_gain:'4x/week progressive overload', endurance:'5x/week (3 cardio + 2 strength)', general:'3–4x/week full-body'};
+  const goalMap = {fat_loss:'Fat Loss  -  aim for a 300-500 kcal daily deficit', muscle_gain:'Muscle Gain  -  aim for a 200-300 kcal daily surplus', endurance:'Endurance  -  focus on zone 2 cardio + mobility', general:'General Fitness  -  balanced strength + cardio split'};
+  const sessMap = {fat_loss:'4-5x/week (3 strength + 2 cardio)', muscle_gain:'4x/week progressive overload', endurance:'5x/week (3 cardio + 2 strength)', general:'3-4x/week full-body'};
 
   const result = document.getElementById('assessResult');
   result.style.display = 'block';

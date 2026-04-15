@@ -1,9 +1,9 @@
 /**
- * TrainedBy — Anthropic Claude API Client
+ * TrainedBy  -  Anthropic Claude API Client
  * ─────────────────────────────────────────────────────────────────────────────
  * Thin wrapper around the Anthropic Messages API.
- * Supports claude-3-5-haiku (fast, cheap — support/growth agents)
- * and claude-3-5-sonnet (better writing — content/meta agents).
+ * Supports claude-3-5-haiku (fast, cheap  -  support/growth agents)
+ * and claude-3-5-sonnet (better writing  -  content/meta agents).
  *
  * Anthropic API differs from OpenAI:
  *   - Endpoint: https://api.anthropic.com/v1/messages
@@ -14,8 +14,8 @@
  */
 
 export type ClaudeModel =
-  | 'claude-haiku-4-5'    // Fast, cheap — support & growth agents
-  | 'claude-sonnet-4-5'   // Better prose — content & meta agents
+  | 'claude-haiku-4-5'    // Fast, cheap  -  support & growth agents
+  | 'claude-sonnet-4-5'   // Better prose  -  content & meta agents
 
 export interface ClaudeMessage {
   role: 'user' | 'assistant';

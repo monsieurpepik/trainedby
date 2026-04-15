@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Lead Responder Agent
+ * TrainedBy  -  Lead Responder Agent
  * ─────────────────────────────────────────────────────────────────────────────
  * Triggered by: Supabase database webhook on INSERT to `leads` table.
  *
@@ -8,7 +8,7 @@
  *   2. Drafts a personalised WhatsApp reply the trainer can send to the lead
  *   3. Builds a calendar scheduling link (Calendly / Google Calendar)
  *   4. Sends the trainer a message via their preferred channel:
- *      "New lead from Ahmed. Here's a draft reply — copy and send it."
+ *      "New lead from Ahmed. Here's a draft reply  -  copy and send it."
  *
  * Only runs for Pro trainers.
  */
@@ -81,7 +81,7 @@ Deno.serve(async (req: Request) => {
 
   // Pro gate
   if (trainer.plan !== 'pro' && trainer.plan !== 'premium') {
-    return new Response('Free plan — skipping', { status: 200 });
+    return new Response('Free plan  -  skipping', { status: 200 });
   }
 
   const market = getMarket(trainer.locale as Locale);
@@ -111,7 +111,7 @@ Deno.serve(async (req: Request) => {
     {
       clientName: lead.name || 'New Client',
       clientEmail: lead.email,
-      title: `Initial Consultation — ${lead.name || 'New Client'} & ${trainerName}`,
+      title: `Initial Consultation  -  ${lead.name || 'New Client'} & ${trainerName}`,
       durationMinutes: 30,
     },
   );

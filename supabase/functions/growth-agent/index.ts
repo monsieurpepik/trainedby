@@ -1,10 +1,10 @@
 /**
- * TrainedBy — Growth Agent v2
+ * TrainedBy  -  Growth Agent v2
  * ─────────────────────────────────────────────────────────────────────────────
  * Funnel event tracking + weekly owner digest with human-sounding analysis.
  *
- * POST /functions/v1/growth-agent          — track a funnel event
- * POST /functions/v1/growth-agent/digest   — generate weekly digest (cron)
+ * POST /functions/v1/growth-agent           -  track a funnel event
+ * POST /functions/v1/growth-agent/digest    -  generate weekly digest (cron)
  *
  * Anti-slop measures:
  *   1. Persona injection: the LLM writes as a blunt growth analyst
@@ -150,7 +150,7 @@ async function handleDigest(): Promise<Response> {
     const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
 
     if (anthropicKey && biggestDropStep) {
-      const prompt = `You are a blunt, no-nonsense growth analyst reviewing funnel data for TrainedBy.ae — a UAE platform for verified personal trainers.
+      const prompt = `You are a blunt, no-nonsense growth analyst reviewing funnel data for TrainedBy.ae  -  a UAE platform for verified personal trainers.
 
 Funnel data (this week):
 ${funnelThis.map(f => `  ${f.step}: ${f.count} events`).join('\n')}
@@ -185,12 +185,12 @@ Return JSON only: { "hypothesis": "...", "suggestions": ["...", "...", "..."], "
         if (score > 20) log.warn('Slop detected in growth hypothesis', { score, found });
       } catch (aiErr) {
         log.warn('Claude hypothesis generation failed', { error: String(aiErr) });
-        hypothesis = `${biggestDropStep.replace(/_/g, ' ')} has a ${biggestDropPct.toFixed(0)}% drop — check the UX on that step.`;
+        hypothesis = `${biggestDropStep.replace(/_/g, ' ')} has a ${biggestDropPct.toFixed(0)}% drop  -  check the UX on that step.`;
         suggestions = ['Review the UX at the drop-off step on mobile', 'Reduce the number of required fields', 'Add social proof near the CTA'];
       }
     } else {
       hypothesis = biggestDropStep
-        ? `${biggestDropStep.replace(/_/g, ' ')} is losing ${biggestDropPct.toFixed(0)}% of users — needs manual review.`
+        ? `${biggestDropStep.replace(/_/g, ' ')} is losing ${biggestDropPct.toFixed(0)}% of users  -  needs manual review.`
         : 'Not enough funnel data this week.';
       suggestions = ['Add funnel tracking events to the frontend', 'Drive more top-of-funnel traffic', 'Review join flow on mobile'];
     }

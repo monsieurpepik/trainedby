@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Booking Prep Agent
+ * TrainedBy  -  Booking Prep Agent
  * ─────────────────────────────────────────────────────────────────────────────
  * Triggered by: Supabase database webhook on UPDATE to `leads` table
  *               where new.status = 'booked'
@@ -54,7 +54,7 @@ WARM_UP: [2-sentence warm-up suggestion based on likely client goal]
 Q1: [first question to ask the client]
 Q2: [second question]
 Q3: [third question]
-NOTES: [one tactical note for the trainer — e.g. what to watch for, how to set expectations]`,
+NOTES: [one tactical note for the trainer  -  e.g. what to watch for, how to set expectations]`,
       }],
     }),
   });
@@ -75,7 +75,7 @@ NOTES: [one tactical note for the trainer — e.g. what to watch for, how to set
       q2Match?.[1]?.trim() ?? 'Have you trained with a PT before? What worked and what didn\'t?',
       q3Match?.[1]?.trim() ?? 'Are there any injuries or limitations I should know about?',
     ],
-    notes: notesMatch?.[1]?.trim() ?? 'Focus on building rapport in this first session — results come later.',
+    notes: notesMatch?.[1]?.trim() ?? 'Focus on building rapport in this first session  -  results come later.',
   };
 }
 
@@ -137,7 +137,7 @@ Deno.serve(async (req: Request) => {
     {
       clientName: lead.name || 'New Client',
       clientEmail: lead.email,
-      title: `First Session — ${lead.name || 'New Client'} & ${trainerName}`,
+      title: `First Session  -  ${lead.name || 'New Client'} & ${trainerName}`,
       durationMinutes: 60,
       notes: `Client goal from enquiry: ${lead.message || 'Not specified'}`,
     },

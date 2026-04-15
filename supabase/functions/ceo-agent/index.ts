@@ -1,5 +1,5 @@
 /**
- * TrainedBy — CEO Agent (Telegram Orchestrator)
+ * TrainedBy  -  CEO Agent (Telegram Orchestrator)
  * ─────────────────────────────────────────────────────────────────────────────
  * The AI CEO that orchestrates all agents and communicates with the founder
  * via Telegram. Acts as the single point of control for the entire Agent OS.
@@ -7,15 +7,15 @@
  * Telegram webhook: POST /functions/v1/ceo-agent
  *
  * Commands:
- *   /start        — Welcome message + status overview
- *   /status       — Live health check of all agents + DB metrics
- *   /growth       — Trigger growth agent digest now
- *   /content      — Generate a new blog post now
- *   /meta         — Run meta-agent product improvement memo now
- *   /posts        — List recent blog posts
- *   /memo         — Show latest meta-agent memo
- *   /ask <text>   — Ask the CEO agent a free-form question about the business
- *   /help         — Show all commands
+ *   /start         -  Welcome message + status overview
+ *   /status        -  Live health check of all agents + DB metrics
+ *   /growth        -  Trigger growth agent digest now
+ *   /content       -  Generate a new blog post now
+ *   /meta          -  Run meta-agent product improvement memo now
+ *   /posts         -  List recent blog posts
+ *   /memo          -  Show latest meta-agent memo
+ *   /ask <text>    -  Ask the CEO agent a free-form question about the business
+ *   /help          -  Show all commands
  *
  * Proactive reports (triggered by other agents):
  *   - Weekly growth digest (Monday 9am GST)
@@ -157,7 +157,7 @@ async function handleTelegramUpdate(req: Request): Promise<Response> {
         break;
       case '/learn':
         if (!args) {
-          await sendMessage(chatId, '📚 Usage: `/learn <topic>`\n\nExamples:\n`/learn hormozi` — show all Hormozi frameworks\n`/learn growth` — show all growth frameworks\n`/learn pricing` — show pricing frameworks');
+          await sendMessage(chatId, '📚 Usage: `/learn <topic>`\n\nExamples:\n`/learn hormozi`  -  show all Hormozi frameworks\n`/learn growth`  -  show all growth frameworks\n`/learn pricing`  -  show pricing frameworks');
         } else {
           await handleLearn(chatId, args);
         }
@@ -200,40 +200,40 @@ async function handleStart(chatId: number, from: Record<string, unknown>): Promi
 I'm your AI CEO for TrainedBy. I run the business while you focus on growth.
 
 Here's what I manage:
-📈 *Growth Agent* — tracks your funnel, spots drop-offs, emails you weekly
-✍️ *Content Agent* — publishes one SEO blog post per week automatically
-💬 *Support Agent* — answers trainer questions 24/7
-🧠 *Meta Agent* — synthesises everything into weekly product improvement memos
+📈 *Growth Agent*  -  tracks your funnel, spots drop-offs, emails you weekly
+✍️ *Content Agent*  -  publishes one SEO blog post per week automatically
+💬 *Support Agent*  -  answers trainer questions 24/7
+🧠 *Meta Agent*  -  synthesises everything into weekly product improvement memos
 
 *Quick commands:*
-/status — live metrics right now
-/growth — trigger weekly growth digest
-/content — publish a new blog post
-/meta — run product improvement analysis
-/ask — ask me anything about the business
+/status  -  live metrics right now
+/growth  -  trigger weekly growth digest
+/content  -  publish a new blog post
+/meta  -  run product improvement analysis
+/ask  -  ask me anything about the business
 
 What do you want to know?`);
 }
 
 async function handleHelp(chatId: number): Promise<void> {
-  await sendMessage(chatId, `*TrainedBy CEO Agent — Commands*
+  await sendMessage(chatId, `*TrainedBy CEO Agent  -  Commands*
 
-/status — Live health check + key metrics
-/growth — Trigger growth agent digest now
-/content — Generate + publish a new blog post
-/draft-blog <trainer>, <specialty>, <city> — Draft a blog post for a trainer
-/meta — Run product improvement memo now
-/posts — List recent blog posts
-/memo — Show latest meta-agent memo
-/ask <question> — Ask me anything about the business
+/status  -  Live health check + key metrics
+/growth  -  Trigger growth agent digest now
+/content  -  Generate + publish a new blog post
+/draft-blog <trainer>, <specialty>, <city>  -  Draft a blog post for a trainer
+/meta  -  Run product improvement memo now
+/posts  -  List recent blog posts
+/memo  -  Show latest meta-agent memo
+/ask <question>  -  Ask me anything about the business
 
-Or just type any message — I'll answer it directly.
+Or just type any message  -  I'll answer it directly.
 
 *Strategic commands:*
-/learn <topic> — browse knowledge base by topic or source
-/directive <goal> — apply frameworks to a business goal
-/kb — show knowledge base summary
-/context — show current business context snapshot`);
+/learn <topic>  -  browse knowledge base by topic or source
+/directive <goal>  -  apply frameworks to a business goal
+/kb  -  show knowledge base summary
+/context  -  show current business context snapshot`);
 }
 
 async function handleStatus(chatId: number): Promise<void> {
@@ -306,7 +306,7 @@ async function handleTriggerGrowth(chatId: number): Promise<void> {
 📊 Overall conversion: *${memo.overall_conversion_pct ?? 0}%*${drops}${hyp}
 
 *Suggestions:*
-${suggs || '  No data yet — add funnel tracking to the frontend'}`);
+${suggs || '  No data yet  -  add funnel tracking to the frontend'}`);
   } catch (err) {
     await sendMessage(chatId, `❌ Error: ${String(err)}`);
   }
@@ -367,7 +367,7 @@ async function handleTriggerContent(chatId: number): Promise<void> {
 📊 ${post.word_count} words | Slop score: ${quality.slop_score ?? 0}/100
 🔗 trainedby.ae/blog/${post.slug}
 
-${quality.slop_score > 20 ? '⚠️ Slop score is high — review before promoting' : '✅ Quality check passed'}`);
+${quality.slop_score > 20 ? '⚠️ Slop score is high  -  review before promoting' : '✅ Quality check passed'}`);
   } catch (err) {
     await sendMessage(chatId, `❌ Error: ${String(err)}`);
   }
@@ -500,7 +500,7 @@ Current business metrics:
 - Recent support questions: ${(convs.data ?? []).map((c: { question: string }) => c.question).join(' | ')}
 `;
 
-  const systemPrompt = `You are the AI CEO of TrainedBy.ae — a UAE platform for verified personal trainers. You have full visibility into the business metrics, agent outputs, and product roadmap.
+  const systemPrompt = `You are the AI CEO of TrainedBy.ae  -  a UAE platform for verified personal trainers. You have full visibility into the business metrics, agent outputs, and product roadmap.
 
 You communicate via Telegram with the founder. Be direct, specific, and actionable. No fluff. If you don't know something, say so.
 
@@ -615,7 +615,7 @@ ${ctx.strategic_priority ?? 'Not set'}
 ${problems || '  None logged'}
 
 💡 *Hormozi Diagnosis:*
-${ctx.hormozi_diagnosis ?? 'Not generated yet — run /directive to get one'}`);
+${ctx.hormozi_diagnosis ?? 'Not generated yet  -  run /directive to get one'}`);
 }
 
 async function updateBusinessContext(sb: ReturnType<typeof createClient>): Promise<void> {
@@ -649,9 +649,9 @@ async function updateBusinessContext(sb: ReturnType<typeof createClient>): Promi
     funnel_conversion: conversion,
     strategic_priority: proCount < 10 ? 'Get to 10 Pro trainers before running paid ads' : 'Scale to 50 Pro trainers',
     open_problems: JSON.stringify([
-      landingViews === 0 ? 'No funnel tracking data yet — frontend events not firing' : null,
-      proCount === 0 ? 'Zero Pro subscribers — pricing or value proposition may need work' : null,
-      allTrainers.length < 5 ? 'Less than 5 trainers — cold start problem, need manual outreach' : null,
+      landingViews === 0 ? 'No funnel tracking data yet  -  frontend events not firing' : null,
+      proCount === 0 ? 'Zero Pro subscribers  -  pricing or value proposition may need work' : null,
+      allTrainers.length < 5 ? 'Less than 5 trainers  -  cold start problem, need manual outreach' : null,
     ].filter(Boolean)),
   }, { onConflict: 'week_start' });
 }
@@ -715,7 +715,7 @@ Current business state:
     ? `\nRelevant frameworks from knowledge base:\n${allKb.map(e => `[${e.source} / ${e.category}] ${e.title}:\n${e.content.substring(0, 400)}`).join('\n\n')}`
     : '\nNo directly relevant frameworks found in knowledge base.';
 
-  const systemPrompt = `You are the AI CEO of a multi-market platform for verified personal trainers — operating as TrainedBy.ae (UAE), TrainedBy.uk (UK), TrainedBy.com (global), entrenacon.com (Spain), coachepar.fr (France), allenaticon.it (Italy), and TrainedBy.in (India). You have deep knowledge of Alex Hormozi's frameworks (Value Equation, offer design), Andrew Chen's cold start problem, Lenny Rachitsky's growth loops, and SaaS metrics.
+  const systemPrompt = `You are the AI CEO of a multi-market platform for verified personal trainers  -  operating as TrainedBy.ae (UAE), TrainedBy.uk (UK), TrainedBy.com (global), entrenacon.com (Spain), coachepar.fr (France), allenaticon.it (Italy), and TrainedBy.in (India). You have deep knowledge of Alex Hormozi's frameworks (Value Equation, offer design), Andrew Chen's cold start problem, Lenny Rachitsky's growth loops, and SaaS metrics.
 
 The founder has issued a strategic directive. Your job is to:
 1. Identify the most relevant framework(s) from the knowledge base

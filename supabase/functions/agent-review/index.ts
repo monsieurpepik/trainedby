@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Review Harvester Agent
+ * TrainedBy  -  Review Harvester Agent
  * ─────────────────────────────────────────────────────────────────────────────
  * Trigger: DB webhook on sessions table UPDATE where status changes to 'complete'
  *          Delayed 2 hours via pg_cron or Supabase scheduled function.
@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
 
       if (data) sessions = [data];
     } else {
-      // Cron sweep: sessions completed 1.5–3h ago with no review request sent
+      // Cron sweep: sessions completed 1.5-3h ago with no review request sent
       const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
       const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
 
@@ -114,10 +114,10 @@ Deno.serve(async (req) => {
 
       // Locale-aware review request message
       const messages: Record<string, string> = {
-        en: `Hey ${session.client_name}! How was your session with ${trainerFirstName} today?\n\nLeave them a quick review — it takes 30 seconds and means everything to them:\n${profileUrl}`,
-        es: `¡Hola ${session.client_name}! ¿Qué tal tu sesión con ${trainerFirstName} hoy?\n\nDéjales una reseña rápida — tarda 30 segundos y significa mucho para ellos:\n${profileUrl}`,
-        fr: `Bonjour ${session.client_name} ! Comment s'est passée votre séance avec ${trainerFirstName} aujourd'hui ?\n\nLaissez-leur un avis rapide — ça prend 30 secondes et ça compte énormément pour eux :\n${profileUrl}`,
-        it: `Ciao ${session.client_name}! Com'è andata la sessione con ${trainerFirstName} oggi?\n\nLascia una recensione veloce — ci vogliono 30 secondi e significa tutto per loro:\n${profileUrl}`,
+        en: `Hey ${session.client_name}! How was your session with ${trainerFirstName} today?\n\nLeave them a quick review  -  it takes 30 seconds and means everything to them:\n${profileUrl}`,
+        es: `¡Hola ${session.client_name}! ¿Qué tal tu sesión con ${trainerFirstName} hoy?\n\nDéjales una reseña rápida  -  tarda 30 segundos y significa mucho para ellos:\n${profileUrl}`,
+        fr: `Bonjour ${session.client_name} ! Comment s'est passée votre séance avec ${trainerFirstName} aujourd'hui ?\n\nLaissez-leur un avis rapide  -  ça prend 30 secondes et ça compte énormément pour eux :\n${profileUrl}`,
+        it: `Ciao ${session.client_name}! Com'è andata la sessione con ${trainerFirstName} oggi?\n\nLascia una recensione veloce  -  ci vogliono 30 secondi e significa tutto per loro:\n${profileUrl}`,
       };
 
       const locale = String(trainer.locale ?? 'en');

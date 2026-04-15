@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Trainer Telegram Bot
+ * TrainedBy  -  Trainer Telegram Bot
  * ─────────────────────────────────────────────────────────────────────────────
  * A per-brand Telegram bot that gives Pro trainers access to their AI
  * assistant directly from Telegram.
@@ -20,11 +20,11 @@
  *   - On first message, we send a /start flow to link the account
  *
  * Commands:
- *   /start — link account or show welcome
- *   /leads — show recent leads
- *   /stats — show 30-day stats
- *   /help  — show available commands
- *   (anything else) — routed to AI assistant
+ *   /start  -  link account or show welcome
+ *   /leads  -  show recent leads
+ *   /stats  -  show 30-day stats
+ *   /help   -  show available commands
+ *   (anything else)  -  routed to AI assistant
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -157,11 +157,11 @@ async function handleStart(
   args: string,
 ): Promise<void> {
   if (args) {
-    // /start <link_token> — account linking flow
+    // /start <link_token>  -  account linking flow
     const linked = await linkAccount(sb, chatId, username, args);
     if (linked) {
       await sendMessage(chatId,
-        `✅ *Account linked!*\n\nHey ${linked.name} 👋 Your AI assistant is ready.\n\nJust send me a message — ask about your leads, get a WhatsApp draft, or request an Instagram caption.\n\nType /help to see what I can do.`
+        `✅ *Account linked!*\n\nHey ${linked.name} 👋 Your AI assistant is ready.\n\nJust send me a message  -  ask about your leads, get a WhatsApp draft, or request an Instagram caption.\n\nType /help to see what I can do.`
       );
     } else {
       await sendMessage(chatId,
@@ -186,10 +186,10 @@ async function handleStart(
 
 async function handleHelp(chatId: number, trainerName: string): Promise<void> {
   await sendMessage(chatId,
-    `*Your AI Assistant — Commands*\n\n` +
-    `/leads — Show your recent leads\n` +
-    `/stats — Show your 30-day stats\n` +
-    `/help — Show this message\n\n` +
+    `*Your AI Assistant  -  Commands*\n\n` +
+    `/leads  -  Show your recent leads\n` +
+    `/stats  -  Show your 30-day stats\n` +
+    `/help  -  Show this message\n\n` +
     `*Or just talk to me:*\n` +
     `"Draft a WhatsApp reply to Ahmed"\n` +
     `"Write an Instagram caption about leg day"\n` +
@@ -217,7 +217,7 @@ async function handleLeads(
   }
 
   const lines = data.map((l: { name: string; status: string; created_at: string; message: string }) =>
-    `• *${l.name}* — ${l.status} (${new Date(l.created_at).toLocaleDateString()})\n  ${l.message ? `"${l.message.substring(0, 60)}${l.message.length > 60 ? '…' : ''}"` : '(no message)'}`
+    `• *${l.name}*  -  ${l.status} (${new Date(l.created_at).toLocaleDateString()})\n  ${l.message ? `"${l.message.substring(0, 60)}${l.message.length > 60 ? '…' : ''}"` : '(no message)'}`
   );
 
   await sendMessage(chatId, `*Your last ${data.length} leads:*\n\n${lines.join('\n\n')}`);

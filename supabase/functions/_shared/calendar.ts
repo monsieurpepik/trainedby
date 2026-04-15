@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Calendar Helper
+ * TrainedBy  -  Calendar Helper
  * ─────────────────────────────────────────────────────────────────────────────
  * Creates calendar events and scheduling links for trainer sessions.
  *
@@ -20,7 +20,7 @@ export interface SessionDetails {
   trainerName: string;
   clientName: string;
   clientEmail?: string;
-  title?: string;           // e.g. "Initial Consultation — Ahmed & Sarah"
+  title?: string;           // e.g. "Initial Consultation  -  Ahmed & Sarah"
   durationMinutes?: number; // default 60
   proposedDate?: Date;      // if known; otherwise omit for open scheduling
   location?: string;        // e.g. "JLT Gym" or "Online (Zoom)"
@@ -165,7 +165,7 @@ export async function buildCalendarLink(
 ): Promise<CalendarResult> {
   const fullDetails: SessionDetails = { ...details, trainerName: trainer.name };
 
-  // 1. Google Calendar API (best — creates event automatically)
+  // 1. Google Calendar API (best  -  creates event automatically)
   if (trainer.google_calendar_token) {
     try {
       return await createGoogleCalendarEvent(trainer.google_calendar_token, fullDetails);
@@ -174,11 +174,11 @@ export async function buildCalendarLink(
     }
   }
 
-  // 2. Calendly (good — trainer's existing booking page)
+  // 2. Calendly (good  -  trainer's existing booking page)
   if (trainer.calendly_url) {
     return buildCalendlyUrl(trainer.calendly_url, fullDetails);
   }
 
-  // 3. Google Quick Add (always works — no setup)
+  // 3. Google Quick Add (always works  -  no setup)
   return buildGoogleQuickAddUrl(fullDetails);
 }

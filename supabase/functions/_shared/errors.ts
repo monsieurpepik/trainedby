@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Standardised Error Responses
+ * TrainedBy  -  Standardised Error Responses
  * Ensures all edge functions return consistent error shapes.
  */
 

@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Multilingual Locale & Market System
+ * TrainedBy  -  Multilingual Locale & Market System
  * ─────────────────────────────────────────────────────────────────────────────
  * Provides locale-aware AI personas, email copy, and market context for all
  * edge functions. Detects market from trainer's domain or explicit locale param.
@@ -45,7 +45,7 @@ export const MARKETS: Record<Locale, MarketConfig> = {
     localContext: [
       'summer in Dubai', 'SZR traffic', 'REPs UAE registration',
       'JBR beach', 'Dubai Marina', 'JLT gyms', 'DIFC crowd',
-      'Ramadan training', 'outdoor training in October–April',
+      'Ramadan training', 'outdoor training in October-April',
     ],
   },
   'en-uk': {
@@ -249,7 +249,7 @@ export function getEmailCopy(locale: Locale) {
       welcome_body: "Your verified trainer profile is now live. Clients in Dubai can find you right now.",
       verify_subject: "Verify your REPs UAE number",
       verify_cta: "Verify My REPs Number",
-      pro_subject: "Go Pro — unlock everything",
+      pro_subject: "Go Pro  -  unlock everything",
       pro_headline: "Unlock TrainedBy Pro",
       nudge_subject: "Your profile is 60% complete",
       from_name: "TrainedBy",
@@ -262,7 +262,7 @@ export function getEmailCopy(locale: Locale) {
       welcome_body: "Your verified trainer profile is now live. Clients across the UK can find you right now.",
       verify_subject: "Verify your REPs UK / CIMSPA number",
       verify_cta: "Verify My REPs Number",
-      pro_subject: "Go Pro — unlock everything",
+      pro_subject: "Go Pro  -  unlock everything",
       pro_headline: "Unlock TrainedBy Pro",
       nudge_subject: "Your profile is 60% complete",
       from_name: "TrainedBy",
@@ -275,7 +275,7 @@ export function getEmailCopy(locale: Locale) {
       welcome_body: "Your verified trainer profile is now live. Clients can find you right now.",
       verify_subject: "Verify your NASM / ACE certification",
       verify_cta: "Verify My Certification",
-      pro_subject: "Go Pro — unlock everything",
+      pro_subject: "Go Pro  -  unlock everything",
       pro_headline: "Unlock TrainedBy Pro",
       nudge_subject: "Your profile is 60% complete",
       from_name: "TrainedBy",
@@ -288,7 +288,7 @@ export function getEmailCopy(locale: Locale) {
       welcome_body: "Your verified trainer profile is now live. Clients across India can find you right now.",
       verify_subject: "Verify your ACE / NASM certification",
       verify_cta: "Verify My Certification",
-      pro_subject: "Go Pro — unlock everything",
+      pro_subject: "Go Pro  -  unlock everything",
       pro_headline: "Unlock TrainedBy Pro",
       nudge_subject: "Your profile is 60% complete",
       from_name: "TrainedBy",
@@ -301,7 +301,7 @@ export function getEmailCopy(locale: Locale) {
       welcome_body: "Votre profil de coach certifié est maintenant en ligne. Les clients en France peuvent vous trouver dès maintenant.",
       verify_subject: "Vérifiez votre certification BPJEPS / STAPS",
       verify_cta: "Vérifier ma certification",
-      pro_subject: "Passez Pro — débloquez tout",
+      pro_subject: "Passez Pro  -  débloquez tout",
       pro_headline: "Débloquez CoachéPar Pro",
       nudge_subject: "Votre profil est complété à 60 %",
       from_name: "CoachéPar",
@@ -314,7 +314,7 @@ export function getEmailCopy(locale: Locale) {
       welcome_body: "Il tuo profilo di personal trainer certificato è ora online. I clienti in Italia possono trovarti adesso.",
       verify_subject: "Verifica la tua certificazione EQF / CONI / FIPE",
       verify_cta: "Verifica la mia certificazione",
-      pro_subject: "Passa a Pro — sblocca tutto",
+      pro_subject: "Passa a Pro  -  sblocca tutto",
       pro_headline: "Sblocca AllenatoCon Pro",
       nudge_subject: "Il tuo profilo è completo al 60%",
       from_name: "AllenatoCon",
@@ -327,7 +327,7 @@ export function getEmailCopy(locale: Locale) {
       welcome_body: "Tu perfil de entrenador personal certificado ya está en línea. Los clientes pueden encontrarte ahora mismo.",
       verify_subject: "Verifica tu certificación NSCA / ISSA",
       verify_cta: "Verificar mi certificación",
-      pro_subject: "Hazte Pro — desbloquea todo",
+      pro_subject: "Hazte Pro  -  desbloquea todo",
       pro_headline: "Desbloquea EntrenaCon Pro",
       nudge_subject: "Tu perfil está completo al 60%",
       from_name: "EntrenaCon",

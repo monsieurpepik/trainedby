@@ -1,5 +1,5 @@
 /**
- * sitemap — Per-Domain Dynamic Sitemap Generator
+ * sitemap  -  Per-Domain Dynamic Sitemap Generator
  * ─────────────────────────────────────────────────────────────────────────────
  * Generates a market-specific sitemap.xml for each domain.
  * Called by Netlify's edge rewrite: /sitemap.xml → this function.

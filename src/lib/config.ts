@@ -1,5 +1,5 @@
 /**
- * Central config — single source of truth for Supabase URLs and keys.
+ * Central config  -  single source of truth for Supabase URLs and keys.
  * All pages import from here; no more copy-pasted constants.
  */
 

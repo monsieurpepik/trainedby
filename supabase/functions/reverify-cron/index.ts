@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Monthly Re-verification Cron
+ * TrainedBy  -  Monthly Re-verification Cron
  * ─────────────────────────────────────────────────────────────────────────────
  * Thin cron wrapper that triggers the reverify-agent on the 1st of each month.
  * Scheduled via pg_cron in the DB migration (20260415_verification_system.sql).

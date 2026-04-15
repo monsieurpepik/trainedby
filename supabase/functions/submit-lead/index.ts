@@ -97,7 +97,7 @@ serve(async (req) => {
     const cleanActivityLevel = sanitize(activity_level, 50);
     const cleanLocationPref = sanitize(location_pref, 100);
 
-    // Validate numeric fields — reject if non-numeric values are passed
+    // Validate numeric fields  -  reject if non-numeric values are passed
     const cleanAge = Number.isFinite(Number(age)) && age > 0 && age < 120 ? Number(age) : null;
     const cleanWeightKg = Number.isFinite(Number(weight_kg)) && weight_kg > 0 ? Number(weight_kg) : null;
     const cleanHeightCm = Number.isFinite(Number(height_cm)) && height_cm > 0 ? Number(height_cm) : null;

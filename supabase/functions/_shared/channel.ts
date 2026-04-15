@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Channel Delivery Helper
+ * TrainedBy  -  Channel Delivery Helper
  * ─────────────────────────────────────────────────────────────────────────────
  * Sends a message to a trainer via their preferred channel.
  * Used by all autonomous background agents.
@@ -125,7 +125,7 @@ export async function sendToTrainer(
     try {
       await sendDashboardNotification(trainer_id, message.text, agentName);
     } catch {
-      // Silently fail — we don't want agent errors to bubble up
+      // Silently fail  -  we don't want agent errors to bubble up
     }
     throw err;
   }

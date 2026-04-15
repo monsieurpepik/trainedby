@@ -1,5 +1,5 @@
 /**
- * razorpay-webhook — Verifies Razorpay payment and upgrades trainer to Pro
+ * razorpay-webhook  -  Verifies Razorpay payment and upgrades trainer to Pro
  * ─────────────────────────────────────────────────────────────────────────────
  * Razorpay sends a POST to this endpoint after payment.payment.captured event.
  *
@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
     .single();
 
   if (existing) {
-    logger.info('Duplicate Razorpay payment — skipping', { payment_id: paymentId });
+    logger.info('Duplicate Razorpay payment  -  skipping', { payment_id: paymentId });
     return new Response(JSON.stringify({ received: true, duplicate: true }),
       { headers: { 'Content-Type': 'application/json' } });
   }
@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
     const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
     const market = trainer?.market ?? 'in';
 
-    // Fire Pro welcome email — market-aware
+    // Fire Pro welcome email  -  market-aware
     fetch(`${EDGE_BASE}/lifecycle-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': ANON_KEY },

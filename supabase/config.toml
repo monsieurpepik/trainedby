@@ -357,8 +357,8 @@ allow_dynamic_registration = false
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.
-# `per_worker` (default) — enables hot reload during local development.
-# `oneshot` — fallback mode if hot reload causes issues (e.g. in large repos or with symlinks).
+# `per_worker` (default)  -  enables hot reload during local development.
+# `oneshot`  -  fallback mode if hot reload causes issues (e.g. in large repos or with symlinks).
 policy = "per_worker"
 # Port to attach the Chrome inspector for debugging edge functions.
 inspector_port = 8083
@@ -405,17 +405,17 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 # All other functions default to verify_jwt = true (secure by default).
 
 [functions.ceo-agent]
-# Receives Telegram webhook POSTs — no JWT, secured by chat ID allowlist
+# Receives Telegram webhook POSTs  -  no JWT, secured by chat ID allowlist
 verify_jwt = false
 
 [functions.stripe-webhook]
-# Receives Stripe webhook POSTs — no JWT, secured by Stripe-Signature header
+# Receives Stripe webhook POSTs  -  no JWT, secured by Stripe-Signature header
 verify_jwt = false
 
 [functions.razorpay-webhook]
-# Receives Razorpay webhook POSTs — no JWT, secured by Razorpay-Signature header
+# Receives Razorpay webhook POSTs  -  no JWT, secured by Razorpay-Signature header
 verify_jwt = false
 
 [functions.academy-booking-webhook]
-# Receives Stripe webhook POSTs for academy bookings — no JWT, secured by Stripe-Signature header
+# Receives Stripe webhook POSTs for academy bookings  -  no JWT, secured by Stripe-Signature header
 verify_jwt = false

@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Trainer AI Assistant
+ * TrainedBy  -  Trainer AI Assistant
  * ─────────────────────────────────────────────────────────────────────────────
  * Context-aware AI assistant for Pro trainers.
  * Accessible via:
@@ -230,7 +230,7 @@ async function executeTool(
     case 'draft_instagram_caption': {
       const { topic, tone = 'motivational' } = toolInput as Record<string, string>;
       return await callClaudeText(
-        `${persona} You are a personal trainer writing Instagram content. Write a ${tone} caption about "${topic}". Include 3–5 relevant hashtags at the end. Keep it authentic and under 150 words.`,
+        `${persona} You are a personal trainer writing Instagram content. Write a ${tone} caption about "${topic}". Include 3-5 relevant hashtags at the end. Keep it authentic and under 150 words.`,
         `Write an Instagram caption for ${trainer.name}, a ${trainer.specialties.join(' & ')} trainer in ${trainer.city || market.country}.`,
       );
     }
@@ -276,7 +276,7 @@ Trainer context:
 - Certifications: ${trainer.certifications.join(', ') || 'not set'}
 - Current packages: ${trainer.packages.length > 0
     ? trainer.packages.map(p => `${p.name} (${p.sessions} sessions, ${market.currency} ${p.price})`).join('; ')
-    : 'none yet — suggest adding some'}
+    : 'none yet  -  suggest adding some'}
 - Bio: ${trainer.bio || '(not written yet)'}
 - Plan: ${trainer.plan}
 
@@ -284,14 +284,14 @@ You have tools to fetch live data (leads, stats) and generate content (WhatsApp 
 
 Be direct, practical, and specific. When a trainer asks for a draft or suggestion, use the relevant tool immediately and return the result. When they ask about their business performance, fetch the data first.
 
-Keep responses concise — this is a chat interface. Use line breaks for readability. No markdown headers in chat responses.`;
+Keep responses concise  -  this is a chat interface. Use line breaks for readability. No markdown headers in chat responses.`;
 
   const messages: Array<{ role: string; content: unknown }> = [
     ...history,
     { role: 'user', content: userMessage },
   ];
 
-  // Agentic loop — max 5 iterations to prevent runaway
+  // Agentic loop  -  max 5 iterations to prevent runaway
   for (let i = 0; i < 5; i++) {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',

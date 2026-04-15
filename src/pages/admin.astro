@@ -5,7 +5,7 @@ const market = getMarket(Astro.url.hostname);
 const brandName = market.brandName;
 ---
 <Base
-  title={`Admin CRM — ${brandName}`}
+  title={`Admin CRM  -  ${brandName}`}
   description="Internal trainer CRM dashboard."
 >
 <style>
@@ -273,12 +273,12 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   <!-- All Trainers panel -->
   <div id="panel-trainers">
   <div class="kpi-row" id="kpi-row">
-    <div class="kpi-card"><div class="kpi-value" id="kpi-total">—</div><div class="kpi-label">Total Trainers</div></div>
-    <div class="kpi-card brand"><div class="kpi-value" id="kpi-pro">—</div><div class="kpi-label">Pro Subscribers</div></div>
-    <div class="kpi-card green"><div class="kpi-value" id="kpi-reps">—</div><div class="kpi-label">REPs Verified</div></div>
-    <div class="kpi-card warn"><div class="kpi-value" id="kpi-pending">—</div><div class="kpi-label">Pending Review</div></div>
-    <div class="kpi-card"><div class="kpi-value" id="kpi-complete">—</div><div class="kpi-label">Profile ≥80%</div></div>
-    <div class="kpi-card"><div class="kpi-value" id="kpi-week">—</div><div class="kpi-label">New This Week</div></div>
+    <div class="kpi-card"><div class="kpi-value" id="kpi-total"> - </div><div class="kpi-label">Total Trainers</div></div>
+    <div class="kpi-card brand"><div class="kpi-value" id="kpi-pro"> - </div><div class="kpi-label">Pro Subscribers</div></div>
+    <div class="kpi-card green"><div class="kpi-value" id="kpi-reps"> - </div><div class="kpi-label">REPs Verified</div></div>
+    <div class="kpi-card warn"><div class="kpi-value" id="kpi-pending"> - </div><div class="kpi-label">Pending Review</div></div>
+    <div class="kpi-card"><div class="kpi-value" id="kpi-complete"> - </div><div class="kpi-label">Profile ≥80%</div></div>
+    <div class="kpi-card"><div class="kpi-value" id="kpi-week"> - </div><div class="kpi-label">New This Week</div></div>
   </div>
 
   <div class="filters">
@@ -334,7 +334,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   <!-- Verification Queue panel -->
   <div id="panel-queue" style="display:none">
     <div class="kpi-row">
-      <div class="kpi-card warn"><div class="kpi-value" id="q-kpi-pending">—</div><div class="kpi-label">Pending Review</div></div>
+      <div class="kpi-card warn"><div class="kpi-value" id="q-kpi-pending"> - </div><div class="kpi-label">Pending Review</div></div>
       <div class="kpi-card green"><div class="kpi-value" id="q-kpi-approved">0</div><div class="kpi-label">Approved Today</div></div>
       <div class="kpi-card"><div class="kpi-value" id="q-kpi-rejected">0</div><div class="kpi-label">Rejected Today</div></div>
     </div>
@@ -535,7 +535,7 @@ function renderTable() {
             : `<div class="trainer-avatar">${initials}</div>`}
           <div>
             <div class="trainer-name">${sanitize(t.name || 'Unknown')} ${isTest ? '<span class="badge badge-test">TEST</span>' : ''}</div>
-            <div class="trainer-email">${sanitize(t.email || '—')}</div>
+            <div class="trainer-email">${sanitize(t.email || ' - ')}</div>
           </div>
         </div>
       </td>
@@ -553,7 +553,7 @@ function renderTable() {
           <span class="completion-pct" style="color:${color}">${pct}%</span>
         </div>
       </td>
-      <td style="color:var(--text-muted)">${sanitize(t.city || '—')}</td>
+      <td style="color:var(--text-muted)">${sanitize(t.city || ' - ')}</td>
       <td style="color:var(--text-faint);font-size:11px;font-weight:700">${market}</td>
       <td style="color:var(--text-muted);white-space:nowrap">${joined}</td>
       <td>
@@ -585,7 +585,7 @@ function openDetail(id) {
   document.getElementById('modal-email-btn').onclick = () => sendEmail(t.id, t.email, t.name);
 
   document.getElementById('modal-body').innerHTML = `
-    <div class="modal-field"><div class="modal-label">Email</div><div class="modal-value">${sanitize(t.email || '—')}</div></div>
+    <div class="modal-field"><div class="modal-label">Email</div><div class="modal-value">${sanitize(t.email || ' - ')}</div></div>
     <div class="modal-field"><div class="modal-label">Phone</div><div class="modal-value ${t.phone ? '' : 'muted'}">${sanitize(t.phone || 'Not provided')}</div></div>
     <div class="modal-field"><div class="modal-label">Plan</div><div class="modal-value">${t.plan === 'pro' ? '★ Pro' : 'Free'}</div></div>
     <div class="modal-field"><div class="modal-label">REPs Status</div><div class="modal-value">${t.reps_verified ? '✓ Verified (Level ' + (t.reps_level || '?') + ')' : 'Not verified'}</div></div>
@@ -712,7 +712,7 @@ function renderQueue(reviews) {
   listEl.innerHTML = reviews.map(r => {
     const trainer = r.trainers || {};
     const trainerName = sanitize(trainer.name || 'Unknown Trainer');
-    const trainerEmail = sanitize(trainer.email || '—');
+    const trainerEmail = sanitize(trainer.email || ' - ');
     const market = (trainer.market || 'ae').toUpperCase();
     const submitted = new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
     const confidenceBadge = r.claude_confidence ? `<span class="badge badge-${r.claude_confidence}">${r.claude_confidence}</span>` : '';

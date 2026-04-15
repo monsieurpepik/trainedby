@@ -1,5 +1,5 @@
 -- ============================================================
--- TrainedBy — Idempotency & Monitoring Migration
+-- TrainedBy  -  Idempotency & Monitoring Migration
 -- 2026-04-15
 -- ============================================================
 -- Prevents double-processing of Stripe and Razorpay webhooks

@@ -1,11 +1,11 @@
 /**
- * TrainedBy — Meta-Agent v2 (Recursive Self-Improvement Engine)
+ * TrainedBy  -  Meta-Agent v2 (Recursive Self-Improvement Engine)
  * ─────────────────────────────────────────────────────────────────────────────
  * Synthesises all agent outputs into a weekly product memo.
  * Uses the TrainedBy Voice System for direct, opinionated recommendations.
  *
- * POST /functions/v1/meta-agent   — run meta-analysis (weekly cron)
- * GET  /functions/v1/meta-agent   — return latest memo
+ * POST /functions/v1/meta-agent    -  run meta-analysis (weekly cron)
+ * GET  /functions/v1/meta-agent    -  return latest memo
  *
  * Anti-slop measures:
  *   1. Persona: writes as a founder/product lead, not a consultant
@@ -292,7 +292,7 @@ async function sendMetaMemoEmail(to: string, memo: Record<string, unknown>): Pro
       body: JSON.stringify({
         from: 'TrainedBy Meta-Agent <meta@trainedby.ae>',
         to: [to],
-        subject: `TrainedBy Product Memo — ${improvements[0]?.title ?? 'Weekly review'}`,
+        subject: `TrainedBy Product Memo  -  ${improvements[0]?.title ?? 'Weekly review'}`,
         html,
       }),
     });

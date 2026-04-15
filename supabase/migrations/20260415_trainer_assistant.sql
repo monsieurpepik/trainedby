@@ -1,8 +1,8 @@
--- TrainedBy — Trainer AI Assistant Schema
+-- TrainedBy  -  Trainer AI Assistant Schema
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Adds:
---   1. assistant_conversations table — persists chat history per trainer per channel
---   2. trainer channel preference columns — assistant_channel, telegram_chat_id,
+--   1. assistant_conversations table  -  persists chat history per trainer per channel
+--   2. trainer channel preference columns  -  assistant_channel, telegram_chat_id,
 --      telegram_username, telegram_link_token
 
 -- ── 1. Conversation history ───────────────────────────────────────────────────

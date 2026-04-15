@@ -98,9 +98,9 @@ serve(async (req) => {
     });
 
     // ── Build response with HttpOnly cookie ───────────────────────────────────
-    // HttpOnly: JavaScript cannot read this cookie — eliminates XSS token theft.
+    // HttpOnly: JavaScript cannot read this cookie  -  eliminates XSS token theft.
     // Secure: Only sent over HTTPS.
-    // SameSite=Strict: Not sent on cross-site requests — prevents CSRF.
+    // SameSite=Strict: Not sent on cross-site requests  -  prevents CSRF.
     const cookieValue = [
       `tb_session=${sessionToken}`,
       `Expires=${sessionExpiry.toUTCString()}`,

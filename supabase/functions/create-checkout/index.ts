@@ -7,7 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Stripe price IDs — set these in your Stripe dashboard and add to env
+// Stripe price IDs  -  set these in your Stripe dashboard and add to env
 const PRICE_IDS: Record<string, Record<string, string>> = {
   pro: {
     monthly: Deno.env.get("STRIPE_PRICE_PRO_MONTHLY") || "price_pro_monthly",
@@ -29,7 +29,7 @@ serve(async (req) => {
     const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2023-10-16" });
 
-    // Verify token — must be unused and not expired
+    // Verify token  -  must be unused and not expired
     const { data: link } = await sb
       .from("magic_links")
       .select("trainer_id, expires_at, used")

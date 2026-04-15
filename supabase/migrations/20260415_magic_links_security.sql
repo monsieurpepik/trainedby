@@ -1,4 +1,4 @@
--- TrainedBy — Magic Links Security Hardening
+-- TrainedBy  -  Magic Links Security Hardening
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Ensures the magic_links table enforces single-use and expiry.
 -- Safe to run even if columns already exist (uses IF NOT EXISTS / DO NOTHING).
@@ -25,7 +25,7 @@ CREATE INDEX IF NOT EXISTS idx_magic_links_token_active
   ON magic_links (token, used, expires_at)
   WHERE used = false;
 
--- Expire old tokens automatically (optional cleanup — keeps the table lean)
+-- Expire old tokens automatically (optional cleanup  -  keeps the table lean)
 -- Runs via pg_cron every hour, deletes tokens older than 24h
 SELECT cron.schedule(
   'magic-links-cleanup',

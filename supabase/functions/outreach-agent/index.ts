@@ -1,17 +1,17 @@
 /**
- * TrainedBy — Outreach Agent
+ * TrainedBy  -  Outreach Agent
  * ─────────────────────────────────────────────────────────────────────────────
  * Identifies expert trainers on the platform and sends personalised outreach
  * emails asking for their expert thoughts on a topic. Trainer-authored content
- * is the only content strategy — the platform never publishes AI-only blog posts
+ * is the only content strategy  -  the platform never publishes AI-only blog posts
  * as "from a trainer".
  *
  * Actions:
- *   POST { action: 'identify' }           — find best trainers to approach
- *   POST { action: 'draft', trainer_id, topic } — draft personalised outreach
- *   POST { action: 'send', request_id }   — send the outreach email
- *   POST { action: 'run' }                — full weekly run (identify + draft + send)
- *   GET                                   — health check
+ *   POST { action: 'identify' }            -  find best trainers to approach
+ *   POST { action: 'draft', trainer_id, topic }  -  draft personalised outreach
+ *   POST { action: 'send', request_id }    -  send the outreach email
+ *   POST { action: 'run' }                 -  full weekly run (identify + draft + send)
+ *   GET                                    -  health check
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -27,7 +27,7 @@ const ANTHROPIC_KEY = () => Deno.env.get('ANTHROPIC_API_KEY')!;
 const RESEND_KEY = () => Deno.env.get('RESEND_API_KEY') ?? '';
 const FROM_EMAIL = 'TrainedBy <hello@trainedby.ae>';
 
-// ── Blog topics pool — rotated weekly ─────────────────────────────────────────
+// ── Blog topics pool  -  rotated weekly ─────────────────────────────────────────
 
 const TOPIC_POOL = [
   { topic: 'The biggest mistake clients make in their first 30 days', category: 'client-education' },
@@ -152,9 +152,9 @@ async function draftOutreach(
 
   const t = trainer as { name: string; email: string; city: string; specialties: string[]; bio: string; plan: string };
 
-  const systemPrompt = `You are writing a personalised outreach email on behalf of TrainedBy.ae — a platform for verified personal trainers in the UAE. 
+  const systemPrompt = `You are writing a personalised outreach email on behalf of TrainedBy.ae  -  a platform for verified personal trainers in the UAE. 
 
-The email asks the trainer to share their expert thoughts on a topic for a blog post. The tone is collegial, direct, and respectful of their expertise. You are not asking them to write a full article — just to share their perspective in a few paragraphs, which the platform will format and publish under their name with their profile linked.
+The email asks the trainer to share their expert thoughts on a topic for a blog post. The tone is collegial, direct, and respectful of their expertise. You are not asking them to write a full article  -  just to share their perspective in a few paragraphs, which the platform will format and publish under their name with their profile linked.
 
 Rules:
 - Address them by first name only
@@ -251,7 +251,7 @@ async function sendOutreach(sb: ReturnType<typeof createClient>, requestId: stri
   </div>
   <div style="white-space: pre-wrap; line-height: 1.7; font-size: 15px;">${r.outreach_body}</div>
   <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #e5e5e5; font-size: 13px; color: #666;">
-    <p>TrainedBy.ae — The Verified Trainer Platform for the UAE</p>
+    <p>TrainedBy.ae  -  The Verified Trainer Platform for the UAE</p>
     <p><a href="https://trainedby-ae.netlify.app/dashboard" style="color: #FF5C00;">Your dashboard</a></p>
   </div>
 </div>`;

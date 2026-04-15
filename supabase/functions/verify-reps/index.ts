@@ -161,7 +161,7 @@ async function checkNASM(certNumber: string, trainerName: string): Promise<{
 function detectCertMarket(certNumber: string): "ae" | "uk" | "us" | "in" | "unknown" {
   const n = certNumber.toUpperCase().trim();
   if (n.startsWith("REP-") || n.startsWith("REP") || /^\d{5,8}$/.test(n)) {
-    // Could be UAE or UK — check prefix
+    // Could be UAE or UK  -  check prefix
     if (n.startsWith("R0") || n.startsWith("REP-UK")) return "uk";
     return "ae"; // Default REPs format to UAE
   }
@@ -217,7 +217,7 @@ serve(async (req) => {
     } else if (certMarket === "us") {
       result = await checkNASM(certNum, trainer_name || "");
     } else {
-      // India / other — no automated register, set to pending for document review
+      // India / other  -  no automated register, set to pending for document review
       result = { found: false, nameMatch: false, status: "manual_review_required" };
     }
 
@@ -235,10 +235,10 @@ serve(async (req) => {
     } else if (result.status === "manual_review_required") {
       verificationStatus = "pending";
     } else if (result.status?.startsWith("cert_")) {
-      // NASM cert found but expired/suspended — flag for human review
+      // NASM cert found but expired/suspended  -  flag for human review
       verificationStatus = "pending";
     } else {
-      // scrape_error or register_unavailable — set to pending, don't penalise
+      // scrape_error or register_unavailable  -  set to pending, don't penalise
       verificationStatus = "pending";
     }
 

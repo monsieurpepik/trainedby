@@ -57,7 +57,7 @@ async function checkRateLimit(
     .single();
 
   if (!existing) {
-    // First request in this window — create entry
+    // First request in this window  -  create entry
     await sb.from("rate_limits").insert({ key, count: 1 });
     return true; // allowed
   }
@@ -147,7 +147,7 @@ serve(async (req) => {
       });
     }
 
-    // ── Generate unique slug (bounded — max 10 attempts) ──────────────────────
+    // ── Generate unique slug (bounded  -  max 10 attempts) ──────────────────────
     // Using a bounded loop prevents infinite hang if DB is slow or under load.
     // On collision after 10 attempts, we append a UUID fragment to guarantee uniqueness.
     let baseSlug = slugify(cleanName) || "trainer";
@@ -155,7 +155,7 @@ serve(async (req) => {
 
     for (let attempt = 0; attempt <= 10; attempt++) {
       if (attempt === 10) {
-        // Guaranteed unique fallback — append 6 random hex chars
+        // Guaranteed unique fallback  -  append 6 random hex chars
         slug = `${baseSlug}-${crypto.randomUUID().slice(0, 6)}`;
         break;
       }

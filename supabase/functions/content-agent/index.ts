@@ -1,11 +1,11 @@
 /**
- * TrainedBy — Content Agent v3 (Claude)
+ * TrainedBy  -  Content Agent v3 (Claude)
  * ─────────────────────────────────────────────────────────────────────────────
  * Generates one SEO blog post per week using Claude 3.5 Sonnet.
  * Claude writes more naturally than GPT for long-form content.
  *
- * POST /functions/v1/content-agent   — generate + publish a new post (cron)
- * GET  /functions/v1/content-agent   — return list of recent posts
+ * POST /functions/v1/content-agent    -  generate + publish a new post (cron)
+ * GET  /functions/v1/content-agent    -  return list of recent posts
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -17,7 +17,7 @@ import { getLocale, getMarket, type Locale } from '../_shared/locale.ts';
 
 const log = createLogger('content-agent');
 
-// Per-locale keyword pools — each brand gets its own SEO context
+// Per-locale keyword pools  -  each brand gets its own SEO context
 const KEYWORD_POOLS: Record<string, string[]> = {
   'en-ae': [
     'personal trainer Dubai', 'personal trainer Abu Dhabi', 'certified personal trainer UAE',
@@ -144,7 +144,7 @@ async function handleGeneratePost(req: Request): Promise<Response> {
     : `CRITICAL: Write the ENTIRE post in ${market.language}. Do not use English anywhere in the post.`;
 
   const systemPrompt = buildSystemPrompt(`
-You are writing a blog post for ${market.brandName} (${market.domain}) — the ${market.country} platform for verified personal trainers.
+You are writing a blog post for ${market.brandName} (${market.domain})  -  the ${market.country} platform for verified personal trainers.
 Target keyword: "${keyword}"
 
 This post will be read by ${market.country}-based personal trainers and potential clients searching for trainers.
@@ -162,7 +162,7 @@ Requirements:
 - Include one specific, concrete scenario (a real situation a trainer faces, not a vague hypothetical)
 - Reference ${market.certBody} certification where it fits naturally
 - End with a single direct CTA: create a free ${market.brandName} profile at ${market.domain}
-- Write in paragraphs — no bullet points in the main body
+- Write in paragraphs  -  no bullet points in the main body
 - Structure: punchy 2-3 sentence intro, 3-4 H2 sections of UNEQUAL length, short direct conclusion
 - At least one sentence must start with a strong contrasting opener
 
@@ -210,7 +210,7 @@ Return valid JSON only (no markdown wrapping):
     log.info('Slop check', { attempt: attempts, score: slopScore, found: slopFound });
 
     if (slopScore <= 20) break;
-    log.warn('High slop score — regenerating', { score: slopScore });
+    log.warn('High slop score  -  regenerating', { score: slopScore });
   }
 
   // ── 4. Save to DB ──────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Follow-up Agent
+ * TrainedBy  -  Follow-up Agent
  * ─────────────────────────────────────────────────────────────────────────────
  * Triggered by: pg_cron daily at 09:00 trainer local time (approximated per timezone)
  *
@@ -10,7 +10,7 @@
  *   2. For each such trainer, drafts a follow-up message per lead
  *   3. Sends the trainer one consolidated nudge via their preferred channel
  *
- * One message per trainer per day — not one per lead.
+ * One message per trainer per day  -  not one per lead.
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -90,7 +90,7 @@ Deno.serve(async (_req: Request) => {
     const market = getMarket(trainer.locale as Locale);
     const trainerName = (trainer.name || trainer.full_name || 'Trainer') as string;
 
-    // Build follow-up drafts — max 3 per message to avoid overwhelming
+    // Build follow-up drafts  -  max 3 per message to avoid overwhelming
     const topLeads = leads.slice(0, 3);
     const sections: string[] = [];
 

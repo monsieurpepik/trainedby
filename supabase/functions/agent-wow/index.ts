@@ -1,5 +1,5 @@
 /**
- * TrainedBy — WOW Moment Agent
+ * TrainedBy  -  WOW Moment Agent
  * ─────────────────────────────────────────────────────────────────────────────
  * Trigger: DB webhook on trainers table UPDATE where profile_complete changes
  *          to true (or photo + bio + specialties all non-null for the first time)
@@ -55,11 +55,11 @@ async function scoreProfile(trainer: Record<string, unknown>): Promise<{ score: 
   ];
   const score = fields.reduce((a, b) => a + b, 0);
 
-  let fix = 'Add your session packages — trainers with packages get 3× more leads.';
-  if (!trainer.photo_url) fix = 'Add a professional photo — profiles with photos get 5× more views.';
+  let fix = 'Add your session packages  -  trainers with packages get 3× more leads.';
+  if (!trainer.photo_url) fix = 'Add a professional photo  -  profiles with photos get 5× more views.';
   else if (!trainer.bio || String(trainer.bio).length < 80) fix = 'Write a 2-sentence bio focused on client results, not your credentials.';
-  else if (!trainer.reps_number) fix = 'Add your certification number — the verified badge doubles conversion.';
-  else if (!trainer.packages || !Array.isArray(trainer.packages) || trainer.packages.length === 0) fix = 'Add your session packages — trainers with packages get 3× more leads.';
+  else if (!trainer.reps_number) fix = 'Add your certification number  -  the verified badge doubles conversion.';
+  else if (!trainer.packages || !Array.isArray(trainer.packages) || trainer.packages.length === 0) fix = 'Add your session packages  -  trainers with packages get 3× more leads.';
 
   return { score, fix };
 }
@@ -95,13 +95,13 @@ One thing to fix right now: ${fix}
 
 2. [Write a motivational caption about transformation/results. Personal, specific, ends with a question to drive comments. 3 hashtags.]
 
-3. [Write a story-style caption: "The most common mistake I see with ${specialties.split(',')[0].trim()}..." — give the mistake, the fix, the result. 3 hashtags.]
+3. [Write a story-style caption: "The most common mistake I see with ${specialties.split(',')[0].trim()}..."  -  give the mistake, the fix, the result. 3 hashtags.]
 
 ---
 
 *Sample reply for your first lead:*
 
-[Write a WhatsApp reply a trainer named ${name} would send to a new lead. Warm, specific to ${specialties}, mentions ${city}, asks one qualifying question about their goal. 3–4 sentences max. No emojis.]
+[Write a WhatsApp reply a trainer named ${name} would send to a new lead. Warm, specific to ${specialties}, mentions ${city}, asks one qualifying question about their goal. 3-4 sentences max. No emojis.]
 
 ---
 

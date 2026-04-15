@@ -64,7 +64,7 @@ serve(async (req) => {
       });
     }
 
-    // Validate redirect URL — only allow known TrainedBy domains
+    // Validate redirect URL  -  only allow known TrainedBy domains
     const allowedRedirects = [
       "https://trainedby.ae/edit",
       "https://trainedby-ae.netlify.app/edit",
@@ -109,7 +109,7 @@ serve(async (req) => {
     // ── Send email via Resend ─────────────────────────────────────────────────
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!resendKey) {
-      // Dev environment — log the magic URL instead of failing
+      // Dev environment  -  log the magic URL instead of failing
       console.log("DEV: Magic link URL:", magicUrl);
       return new Response(JSON.stringify({ ok: true, dev_url: magicUrl }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

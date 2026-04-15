@@ -136,7 +136,7 @@ You are creating professional, personalised ${market.language}-language fitness 
 You produce structured, actionable plans that trainers can deliver to their clients with their own branding.
 ${!isEnglish ? `CRITICAL: Your ENTIRE response including all JSON string values must be in ${market.language}. Translate all labels, descriptions, meal names, exercise names, and tips into ${market.language}.` : ''}
 Always include specific foods common in ${market.country} (${localFoodStr}) when relevant.
-Format your response as valid JSON only — no markdown, no explanation outside the JSON.`;
+Format your response as valid JSON only  -  no markdown, no explanation outside the JSON.`;
 
     const userPrompt = `Create a ${type === "both" ? "combined diet and workout" : type} plan for:
 - Name: ${name}

@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Voice & Persona System
+ * TrainedBy  -  Voice & Persona System
  * ─────────────────────────────────────────────────────────────────────────────
  * This module enforces a strict, human-sounding persona across all AI agents.
  * It prevents "AI slop" (generic, hedged, corporate-speak) by injecting

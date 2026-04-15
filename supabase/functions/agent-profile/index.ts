@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Profile Agent
+ * TrainedBy  -  Profile Agent
  * ─────────────────────────────────────────────────────────────────────────────
  * Triggered by: pg_cron every Sunday at 10:00
  *
@@ -7,7 +7,7 @@
  *   For each Pro trainer with an incomplete or underperforming profile:
  *   1. Scores the profile across 6 dimensions
  *   2. Picks the single highest-impact improvement
- *   3. Sends one specific, actionable suggestion — not a list, not a lecture
+ *   3. Sends one specific, actionable suggestion  -  not a list, not a lecture
  *
  * One suggestion per week. Specific. Actionable. Done in 5 minutes.
  */
@@ -35,7 +35,7 @@ function scoreProfile(trainer: Record<string, unknown>): ProfileScore | null {
     issues.push({
       issue: 'no_photo',
       priority: 1,
-      suggestion: 'Add a professional photo. Profiles with photos get 3x more leads. Use a clear headshot — gym background, good lighting.',
+      suggestion: 'Add a professional photo. Profiles with photos get 3x more leads. Use a clear headshot  -  gym background, good lighting.',
     });
   }
 
@@ -133,7 +133,7 @@ Deno.serve(async (_req: Request) => {
   let sent = 0;
   for (const trainer of trainers) {
     const issue = scoreProfile(trainer as Record<string, unknown>);
-    if (!issue) continue; // Profile is complete — nothing to suggest
+    if (!issue) continue; // Profile is complete  -  nothing to suggest
 
     const market = getMarket(trainer.locale as Locale);
     const trainerName = trainer.name || trainer.full_name || 'Trainer';

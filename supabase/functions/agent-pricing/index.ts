@@ -1,7 +1,7 @@
 /**
- * TrainedBy — Price Benchmarking Agent
+ * TrainedBy  -  Price Benchmarking Agent
  * ─────────────────────────────────────────────────────────────────────────────
- * Trigger: Cron — first Monday of each month at 9am
+ * Trigger: Cron  -  first Monday of each month at 9am
  *
  * What it does:
  *   Pulls pricing data from trainers in the same city with similar verification
@@ -173,7 +173,7 @@ Deno.serve(async (req) => {
           ? '🟢 At market rate'
           : '⭐ Premium tier';
 
-        let message = `📊 *${city} market rates — ${specialties.slice(0, 2).join(' & ')}*
+        let message = `📊 *${city} market rates  -  ${specialties.slice(0, 2).join(' & ')}*
 
 ${stats.count} verified trainers in your city charge:
 • Low: *${market.currency}${stats.min}*

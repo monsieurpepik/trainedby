@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Content Agent
+ * TrainedBy  -  Content Agent
  * ─────────────────────────────────────────────────────────────────────────────
  * Triggered by: pg_cron every Monday at 08:00 (per market timezone)
  *

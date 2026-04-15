@@ -1,11 +1,11 @@
 /**
- * TrainedBy — Support Agent v3 (Claude)
+ * TrainedBy  -  Support Agent v3 (Claude)
  * ─────────────────────────────────────────────────────────────────────────────
  * RAG chatbot powered by Claude 3.5 Haiku.
  * Answers trainer questions like a knowledgeable colleague, not a corporate bot.
  *
- * POST /functions/v1/support-agent   — answer a trainer question
- * GET  /functions/v1/support-agent   — health check
+ * POST /functions/v1/support-agent    -  answer a trainer question
+ * GET  /functions/v1/support-agent    -  health check
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -17,7 +17,7 @@ import { getLocale, getMarket, getEmailCopy } from '../_shared/locale.ts';
 
 const log = createLogger('support-agent');
 
-// FALLBACK_KB is now built per-locale at request time — see buildFallbackKB()
+// FALLBACK_KB is now built per-locale at request time  -  see buildFallbackKB()
 function buildFallbackKB(market: { brandName: string; domain: string; pricingTier: string; certBody: string; language: string; languageCode: string; country: string }): Record<string, string> {
   const supportEmail = `support@${market.domain}`;
   const profileDomain = market.domain;
@@ -26,12 +26,12 @@ function buildFallbackKB(market: { brandName: string; domain: string; pricingTie
   const isIt = market.languageCode === 'it';
   return {
     pricing: isEs
-      ? `${market.brandName} tiene dos planes: Gratis (perfil verificado, listado público, analíticas básicas) y Pro (${market.pricingTier} — asistente de IA personal, paquetes ilimitados, posicionamiento prioritario, analíticas avanzadas). Cambia de plan cuando quieras desde tu panel.`
+      ? `${market.brandName} tiene dos planes: Gratis (perfil verificado, listado público, analíticas básicas) y Pro (${market.pricingTier}  -  asistente de IA personal, paquetes ilimitados, posicionamiento prioritario, analíticas avanzadas). Cambia de plan cuando quieras desde tu panel.`
       : isFr
-      ? `${market.brandName} propose deux offres : Gratuit (profil vérifié, liste publique, analytics de base) et Pro (${market.pricingTier} — assistant IA personnel, forfaits illimités, placement prioritaire, analytics avancés). Changez d'offre à tout moment depuis votre tableau de bord.`
+      ? `${market.brandName} propose deux offres : Gratuit (profil vérifié, liste publique, analytics de base) et Pro (${market.pricingTier}  -  assistant IA personnel, forfaits illimités, placement prioritaire, analytics avancés). Changez d'offre à tout moment depuis votre tableau de bord.`
       : isIt
-      ? `${market.brandName} ha due piani: Gratuito (profilo verificato, lista pubblica, analisi di base) e Pro (${market.pricingTier} — assistente AI personale, pacchetti illimitati, posizionamento prioritario, analisi avanzate). Cambia piano quando vuoi dalla tua dashboard.`
-      : `${market.brandName} has two tiers: Free (verified profile, public listing, basic analytics — no card needed) and Pro (${market.pricingTier} — AI personal assistant, unlimited packages, priority listing, advanced analytics). Upgrade or downgrade any time from your dashboard.`,
+      ? `${market.brandName} ha due piani: Gratuito (profilo verificato, lista pubblica, analisi di base) e Pro (${market.pricingTier}  -  assistente AI personale, pacchetti illimitati, posizionamento prioritario, analisi avanzate). Cambia piano quando vuoi dalla tua dashboard.`
+      : `${market.brandName} has two tiers: Free (verified profile, public listing, basic analytics  -  no card needed) and Pro (${market.pricingTier}  -  AI personal assistant, unlimited packages, priority listing, advanced analytics). Upgrade or downgrade any time from your dashboard.`,
     certification: isEs
       ? `${market.certBody} es el registro oficial de entrenadores en ${market.country}. ${market.brandName} verifica tu estado automáticamente al registrarte. Tu insignia aparece en tu perfil público y se actualiza en 24 horas.`
       : isFr
@@ -145,7 +145,7 @@ async function handleQuestion(req: Request): Promise<Response> {
       // Fall through to fallback KB
     }
 
-    // Fallback KB — built per-locale
+    // Fallback KB  -  built per-locale
     if (!context) {
       const fallbackKB = buildFallbackKB(market);
       const q = trimmedQuestion.toLowerCase();
@@ -172,7 +172,7 @@ async function handleQuestion(req: Request): Promise<Response> {
       ? ''
       : `IMPORTANT: You MUST respond entirely in ${market.language}. Do not use English.`;
 
-    const systemPrompt = `You are the ${platformName} support assistant. You know this platform inside out — you've helped hundreds of personal trainers in ${market.country} get set up.
+    const systemPrompt = `You are the ${platformName} support assistant. You know this platform inside out  -  you've helped hundreds of personal trainers in ${market.country} get set up.
 
 Your tone: Direct, warm, no-nonsense. Answer like a knowledgeable colleague, not a customer service bot.
 ${languageInstruction}
@@ -181,7 +181,7 @@ Hard rules:
 - Answer in 2-4 sentences MAX unless a short list genuinely helps clarity
 - Never start with "Great question!", "Certainly!", "I'd be happy to help", or any filler
 - Never hedge with "it might be worth considering" or "you may want to"
-- If the answer isn't in the context, say exactly: "I don't have that info — email ${supportEmail} and they'll sort you out."
+- If the answer isn't in the context, say exactly: "I don't have that info  -  email ${supportEmail} and they'll sort you out."
 - Use bold only for key prices or numbers (e.g. **${market.pricingTier}**)
 - Never invent features or prices
 
@@ -200,7 +200,7 @@ ${context}`;
       answer = response.text;
       log.info('Claude response', { input_tokens: response.input_tokens, output_tokens: response.output_tokens });
     } catch (llmErr) {
-      log.warn('Claude call failed — using KB fallback', { error: String(llmErr) });
+      log.warn('Claude call failed  -  using KB fallback', { error: String(llmErr) });
     }
 
     // KB-only fallback
@@ -209,9 +209,9 @@ ${context}`;
         const firstChunk = context.split('\n\n')[0].replace(/^[^:]+:\s*/, '').trim();
         answer = firstChunk.length > 20
           ? firstChunk
-          : "I don't have that info — email support@trainedby.ae and they'll sort you out.";
+          : "I don't have that info  -  email support@trainedby.ae and they'll sort you out.";
       } else {
-        answer = "I don't have that info — email support@trainedby.ae and they'll sort you out.";
+        answer = "I don't have that info  -  email support@trainedby.ae and they'll sort you out.";
       }
     }
 

@@ -1,7 +1,7 @@
 /**
- * TrainedBy — Package Renewal Alert Agent
+ * TrainedBy  -  Package Renewal Alert Agent
  * ─────────────────────────────────────────────────────────────────────────────
- * Trigger: Cron — daily at 8am, OR DB webhook on sessions table UPDATE
+ * Trigger: Cron  -  daily at 8am, OR DB webhook on sessions table UPDATE
  *          where sessions_remaining changes to 2
  *
  * What it does:
@@ -64,10 +64,10 @@ Context:
 
 Requirements:
 - Warm, personal, not salesy
-- Acknowledge the client's progress (keep it generic but specific-feeling — "your consistency has been incredible", "the results are showing")
+- Acknowledge the client's progress (keep it generic but specific-feeling  -  "your consistency has been incredible", "the results are showing")
 - Create mild urgency (trainer opening new spots, rate may change)
 - End with a clear, easy yes/no question
-- 3–4 sentences max
+- 3-4 sentences max
 - No emojis
 - Sound like a human trainer, not a marketing email
 
@@ -151,7 +151,7 @@ Deno.serve(async (req) => {
         specialties,
       );
 
-      const message = `💰 *Renewal opportunity — ${pkg.client_name}*
+      const message = `💰 *Renewal opportunity  -  ${pkg.client_name}*
 
 ${pkg.client_name} has *${pkg.sessions_remaining} sessions left* in their "${pkg.package_name}" package.
 

@@ -105,7 +105,7 @@ function welcomeEmail(t: Trainer): { subject: string; html: string } {
       <p>Your TrainedBy profile is live at <a href="${profileUrl}" style="color:#FF5C00">${profileUrl}</a>.</p>
       <p>Trainers with complete profiles get <span class="highlight">5× more leads</span> than those with empty ones. Here's what to do in the next 10 minutes:</p>
       <ul class="checklist">
-        <li>Add a clear profile photo (not a gym selfie — face forward, good lighting)</li>
+        <li>Add a clear profile photo (not a gym selfie  -  face forward, good lighting)</li>
         <li>Write a 2-sentence bio that says who you help and how</li>
         <li>Add your REPs UAE number to get the verified badge</li>
         <li>Set your session packages so clients know your rates</li>
@@ -124,7 +124,7 @@ function nudgeEmail(t: Trainer): { subject: string; html: string } {
     subject: `${t.name.split(' ')[0]}, your profile is ${pct}% complete`,
     html: emailBase(`
       <h1>You're ${pct}% there.</h1>
-      <p>Your TrainedBy profile is live but not yet working hard for you. Clients who find you right now see an incomplete profile — and they move on.</p>
+      <p>Your TrainedBy profile is live but not yet working hard for you. Clients who find you right now see an incomplete profile  -  and they move on.</p>
       ${missing.length > 0 ? `
       <p>You're still missing:</p>
       <ul class="checklist">
@@ -142,7 +142,7 @@ function firstLeadEmail(t: Trainer, leadName: string): { subject: string; html: 
     html: emailBase(`
       <h1>First lead. That's how it starts.</h1>
       <p><span class="highlight">${leadName}</span> just reached out through your TrainedBy profile. They're interested in working with you.</p>
-      <p>Reply within the hour. The trainers who convert leads are the ones who respond fast — not the ones with the best credentials.</p>
+      <p>Reply within the hour. The trainers who convert leads are the ones who respond fast  -  not the ones with the best credentials.</p>
       <a href="https://trainedby.ae/dashboard" class="btn">View Your Leads →</a>
       <hr class="divider">
       <p style="font-size:12px">Pro tip: Upgrade to Pro to see all your leads, track conversions, and get priority placement in search results.</p>
@@ -171,7 +171,7 @@ function proWelcomeEmail(t: Trainer): { subject: string; html: string } {
 function sevenDayEmail(t: Trainer): { subject: string; html: string } {
   const pct = completionScore(t);
   return {
-    subject: `One week in — here's where you stand`,
+    subject: `One week in  -  here's where you stand`,
     html: emailBase(`
       <h1>You've been on TrainedBy for a week.</h1>
       <p>Your profile is <span class="highlight">${pct}% complete</span>. ${pct >= 80 ? 'That\\'s solid.' : 'There\\'s still room to improve.'}</p>
@@ -213,7 +213,7 @@ function monthlyReportEmail(t: Trainer, stats: { views: number; leads: number; }
 // ── Send email via Resend ─────────────────────────────────────────────────────
 async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
   if (!RESEND_API_KEY) {
-    console.log(`[lifecycle-email] No Resend key — would send to ${to}: ${subject}`);
+    console.log(`[lifecycle-email] No Resend key  -  would send to ${to}: ${subject}`);
     return true; // Graceful no-op when key not set
   }
 

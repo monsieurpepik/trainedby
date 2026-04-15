@@ -1,14 +1,14 @@
 /**
- * TrainedBy — Dead Lead Reactivation Agent
+ * TrainedBy  -  Dead Lead Reactivation Agent
  * ─────────────────────────────────────────────────────────────────────────────
- * Trigger: Cron — 1st of each month at 10am
+ * Trigger: Cron  -  1st of each month at 10am
  *
  * What it does:
- *   Sweeps leads that are 14–45 days old with status 'new' or 'contacted'
+ *   Sweeps leads that are 14-45 days old with status 'new' or 'contacted'
  *   (i.e., never converted and gone cold). For each, drafts one final
  *   low-pressure reactivation message and sends it to the trainer.
  *
- * Converts 5–10% of dead leads. Trainers who see even one converted dead
+ * Converts 5-10% of dead leads. Trainers who see even one converted dead
  * lead will never cancel their Pro subscription.
  */
 
@@ -60,14 +60,14 @@ async function draftReactivation(
 Context:
 - The lead originally messaged about: "${originalMessage.slice(0, 120)}"
 - Trainer specialises in: ${specialties.slice(0, 2).join(', ')}
-- It has been 2–4 weeks since their last contact
-- This is the LAST message — low pressure, no follow-up after this
+- It has been 2-4 weeks since their last contact
+- This is the LAST message  -  low pressure, no follow-up after this
 
 Requirements:
 - Acknowledge that life gets busy, no guilt
 - Keep a slot open for them
 - Offer one free trial session or a no-commitment first call
-- 2–3 sentences max
+- 2-3 sentences max
 - Warm but not desperate
 - No emojis
 - ${langInstructions[locale] ?? langInstructions['en']}
@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
     const fourtyFiveDaysAgo = new Date(now.getTime() - 45 * 24 * 60 * 60 * 1000).toISOString();
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString();
 
-    // Fetch cold leads in the 14–45 day window
+    // Fetch cold leads in the 14-45 day window
     let leadsQuery = sb
       .from('leads')
       .select(`
@@ -157,11 +157,11 @@ Deno.serve(async (req) => {
           await new Promise(r => setTimeout(r, 100));
         }
 
-        const message = `🔄 *${trainerLeads.length} cold lead${trainerLeads.length > 1 ? 's' : ''} — one last try*
+        const message = `🔄 *${trainerLeads.length} cold lead${trainerLeads.length > 1 ? 's' : ''}  -  one last try*
 
-These leads went quiet 2–4 weeks ago. Send each one this message today:\n\n${leadBlocks.join('\n\n')}
+These leads went quiet 2-4 weeks ago. Send each one this message today:\n\n${leadBlocks.join('\n\n')}
 
-5–10% will reply. One converted lead pays for your Pro subscription for months.`;
+5-10% will reply. One converted lead pays for your Pro subscription for months.`;
 
         await sendToTrainer(
           {
