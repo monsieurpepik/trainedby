@@ -8,3 +8,4 @@ scripts/run_schema.py
 supabase/.temp/
 .DS_Store
 *.log
+.github/workflows/
