@@ -51,11 +51,14 @@ Deno.serve(async (req) => {
         const session = event.data.object as Stripe.Checkout.Session;
         const trainer_id = session.metadata?.trainer_id;
         const plan = session.metadata?.plan;
-        if (trainer_id && plan) {
+        if (trainer_id && plan && session.subscription) {
+          const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+
           await sb.from("trainers").update({
             plan,
             subscription_status: "active",
             stripe_subscription_id: session.subscription as string,
+            subscription_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
           }).eq("id", trainer_id);
 
           const { data: trainer } = await sb
