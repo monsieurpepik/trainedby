@@ -1,0 +1,102 @@
+---
+import Base from '../layouts/Base.astro';
+import { getMarket } from '../lib/market.ts';
+
+const market = getMarket(Astro.url.hostname);
+const brand = market.brandName;
+const domain = market.domain;
+const isGDPR = ['uk', 'fr', 'it', 'es', 'mx'].includes(market.market);
+const isUAE = market.market === 'ae';
+const isCCPA = ['com', 'uk'].includes(market.market); // US + global
+const effectiveDate = 'April 15, 2026';
+const contactEmail = `legal@${domain}`;
+
+// Localised strings
+const t = {
+  fr: {
+    title: 'Politique de Confidentialité',
+    intro: `Cette Politique de Confidentialité décrit comment ${brand} collecte, utilise et protège vos données personnelles.`,
+    contact: 'Pour toute question relative à vos données personnelles, contactez-nous à',
+  },
+  it: {
+    title: 'Informativa sulla Privacy',
+    intro: `Questa Informativa sulla Privacy descrive come ${brand} raccoglie, utilizza e protegge i tuoi dati personali.`,
+    contact: 'Per qualsiasi domanda relativa ai tuoi dati personali, contattaci a',
+  },
+  es: {
+    title: 'Política de Privacidad',
+    intro: `Esta Política de Privacidad describe cómo ${brand} recopila, usa y protege sus datos personales.`,
+    contact: 'Para cualquier consulta sobre sus datos personales, contáctenos en',
+  },
+}[market.i18nLocale] ?? {
+  title: 'Privacy Policy',
+  intro: `This Privacy Policy describes how ${brand} collects, uses, and protects your personal data.`,
+  contact: 'For any questions about your personal data, contact us at',
+};
+---
+<Base title={`${t.title} — ${brand}`} description={t.intro} canonical={`https://${domain}/privacy`}>
+  <main style="max-width:760px;margin:0 auto;padding:48px 24px;color:var(--text-1);">
+    <h1 style="font-size:28px;font-weight:700;margin-bottom:8px;">{t.title}</h1>
+    <p style="color:var(--text-3);font-size:13px;margin-bottom:40px;">Effective date: {effectiveDate}</p>
+
+    <p style="margin-bottom:24px;">{t.intro}</p>
+
+    <h2>1. Who We Are</h2>
+    <p>{brand} is operated by TrainedBy Inc., a Delaware LLC. Our platform connects certified fitness professionals with clients seeking personal training services. References to "we", "us", or "our" refer to TrainedBy Inc.</p>
+
+    <h2>2. Data We Collect</h2>
+    <p>We collect the following categories of personal data:</p>
+    <ul>
+      <li><strong>Trainer data:</strong> name, email address, phone number, certification number, city, profile photo, Instagram handle, and billing information.</li>
+      <li><strong>Consumer (lead) data:</strong> name, email address, phone number, and fitness goals submitted via trainer profile contact forms.</li>
+      <li><strong>Usage data:</strong> pages visited, browser type, IP address, and device type, collected via server logs and analytics tools.</li>
+    </ul>
+
+    <h2>3. How We Use Your Data</h2>
+    <p>We use your data to operate the platform, verify trainer certifications, process payments, send transactional emails (welcome, lead notifications, billing receipts), and improve the service. We do not sell your personal data to third parties.</p>
+
+    <h2>4. Data Sharing</h2>
+    <p>We share data only with trusted service providers necessary to operate the platform: Supabase (database and authentication), Stripe (payment processing), Resend (transactional email), and Sentry (error monitoring). All processors are bound by data processing agreements.</p>
+
+    {isGDPR && (
+      <div>
+        <h2>5. Your Rights Under UK/EU GDPR</h2>
+        <p>If you are located in the UK or European Economic Area, you have the right to access, correct, delete, restrict, or port your personal data. You also have the right to object to processing and to withdraw consent at any time. To exercise these rights, contact us at <a href={`mailto:${contactEmail}`}>{contactEmail}</a>. You also have the right to lodge a complaint with your local supervisory authority (e.g., the ICO in the UK).</p>
+        <h2>6. Legal Basis for Processing</h2>
+        <p>We process your data on the following legal bases: performance of a contract (to provide the platform service), legitimate interests (to improve the platform and prevent fraud), and consent (for marketing communications, which you may withdraw at any time).</p>
+        <h2>7. Data Retention</h2>
+        <p>We retain trainer account data for as long as the account is active, plus 90 days after deletion. Lead data is retained for 12 months unless deleted earlier by the trainer. Payment records are retained for 7 years as required by law.</p>
+        <h2>8. International Transfers</h2>
+        <p>Your data is stored on Supabase infrastructure hosted in the EU. Where data is transferred outside the EEA (e.g., to Stripe's US servers), we ensure appropriate safeguards are in place, including Standard Contractual Clauses.</p>
+      </div>
+    )}
+
+    {isCCPA && (
+      <div>
+        <h2>{isGDPR ? '9' : '5'}. California Privacy Rights (CCPA/CPRA)</h2>
+        <p>If you are a California resident, you have the right to know what personal information we collect, to delete your personal information, to opt out of the sale of personal information (we do not sell personal information), and to non-discrimination for exercising your rights. To submit a request, contact us at <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.</p>
+      </div>
+    )}
+
+    {isUAE && (
+      <div>
+        <h2>5. UAE Personal Data Protection Law (PDPL)</h2>
+        <p>We comply with the UAE Federal Decree-Law No. 45 of 2021 on Personal Data Protection. You have the right to access, correct, and request deletion of your personal data. To exercise these rights, contact us at <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.</p>
+      </div>
+    )}
+
+    <h2>{isGDPR && isCCPA ? '10' : isGDPR || isCCPA || isUAE ? '6' : '5'}. Cookies</h2>
+    <p>We use essential cookies to maintain your login session. We use analytics cookies (with your consent) to understand how the platform is used. You can manage your cookie preferences at any time via the cookie banner or by contacting us.</p>
+
+    <h2>Contact</h2>
+    <p>{t.contact} <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.</p>
+    <p style="margin-top:8px;">TrainedBy Inc., 2093 Philadelphia Pike #5888, Claymont, DE 19703, USA.</p>
+  </main>
+</Base>
+
+<style>
+  h2 { font-size: 18px; font-weight: 700; margin: 32px 0 12px; color: var(--text-1); }
+  p, li { font-size: 15px; line-height: 1.7; color: var(--text-2); margin-bottom: 12px; }
+  ul { padding-left: 20px; margin-bottom: 16px; }
+  a { color: var(--brand); text-decoration: underline; }
+</style>

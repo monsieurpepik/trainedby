@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
+import netlify from '@astrojs/netlify';
 
 export default defineConfig({
   // Primary site — used for canonical URLs and sitemap base
@@ -12,7 +13,7 @@ export default defineConfig({
       customPages: [
         'https://trainedby.ae/',
         'https://trainedby.com/',
-        'https://trainedby.uk/',
+        'https://trainedby.co.uk/',
         'https://trainedby.in/',
         'https://coachepar.fr/',
         'https://coachepar.com/',
@@ -23,7 +24,10 @@ export default defineConfig({
       ],
     }),
   ],
-  output: 'static',
+  // SSR mode — renders per-request so market/brand detection works correctly
+  // on all domains (entrenacon.com → EntrenaCon, coachepar.fr → CoachéPar, etc.)
+  output: 'server',
+  adapter: netlify(),
   build: {
     assets: '_astro',
   },

@@ -1,0 +1,473 @@
+---
+import Base from '../layouts/Base.astro';
+import { getMarket } from '../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
+const brandName = market.brandName || 'TrainedBy';
+const isPaid = market.paymentEnabled !== false;
+const isWaitlist = market.waitlistEnabled === true;
+---
+
+<Base
+  title={`For Trainers — ${brandName}`}
+  description={`Build your personal training practice on ${brandName}. Verified profile, digital products, lead management, and an AI assistant. Free to start.`}
+>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand: #FF5C00;
+      --brand-dim: rgba(255,92,0,0.10);
+      --brand-border: rgba(255,92,0,0.25);
+      --reps: #00C853;
+      --surface: #0a0a0a;
+      --surface-2: #111111;
+      --surface-3: #1a1a1a;
+      --surface-4: #222222;
+      --border: rgba(255,255,255,0.07);
+      --border-2: rgba(255,255,255,0.12);
+      --text: #f2f2f2;
+      --text-2: #888888;
+      --text-3: #555555;
+      --max: 1100px;
+    }
+    body { background: var(--surface); color: var(--text); font-family: 'Manrope', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+    /* NAV */
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 32px; height: 64px; display: flex; align-items: center; gap: 32px; transition: background 0.3s, border-color 0.3s; border-bottom: 1px solid transparent; }
+    .nav.scrolled { background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); border-color: var(--border); }
+    .nav-logo { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 20px; color: var(--brand); text-decoration: none; letter-spacing: -0.5px; margin-right: auto; }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a { color: var(--text-2); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { display: inline-flex; align-items: center; gap: 6px; padding: 9px 20px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; white-space: nowrap; }
+    .nav-cta:hover { background: #e05200; transform: translateY(-1px); }
+    @media (max-width: 640px) { .nav-links { display: none; } .nav { padding: 0 20px; } }
+
+    /* HERO */
+    .hero { min-height: 88vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255,92,0,0.07) 0%, transparent 65%); pointer-events: none; }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 100px; border: 1px solid var(--brand-border); background: var(--brand-dim); font-size: 12px; font-weight: 700; color: var(--brand); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 28px; }
+    .hero-headline { font-family: 'Manrope', sans-serif; font-size: clamp(36px, 6.5vw, 76px); font-weight: 900; line-height: 1.0; letter-spacing: -3px; max-width: 800px; margin-bottom: 20px; }
+    .hero-headline em { font-style: normal; color: var(--brand); }
+    .hero-sub { font-size: clamp(15px, 2vw, 17px); color: var(--text-2); max-width: 480px; line-height: 1.7; margin-bottom: 40px; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 56px; }
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
+    .btn-primary:hover { background: #e05200; transform: translateY(-2px); }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--border-2); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-2px); }
+
+    /* PROOF STRIP */
+    .proof-strip { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
+    .proof-item { text-align: center; }
+    .proof-val { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 28px; letter-spacing: -1px; color: var(--text); }
+    .proof-label { font-size: 12px; color: var(--text-2); margin-top: 2px; font-weight: 600; }
+
+    /* SECTION */
+    .section { padding: 80px 24px; max-width: var(--max); margin: 0 auto; }
+    .section-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+    .section-title { font-family: 'Manrope', sans-serif; font-size: clamp(26px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+    .section-sub { font-size: 15px; color: var(--text-2); line-height: 1.7; max-width: 480px; }
+
+    /* FEATURES GRID */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 48px; }
+    .feature-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; }
+    .feature-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--brand-dim); border: 1px solid var(--brand-border); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 18px; }
+    .feature-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 17px; margin-bottom: 8px; }
+    .feature-desc { font-size: 14px; color: var(--text-2); line-height: 1.65; }
+    .feature-badge { display: inline-block; margin-top: 12px; padding: 3px 10px; border-radius: 20px; background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.2); color: #00C853; font-size: 11px; font-weight: 700; }
+
+    /* HOW IT WORKS */
+    .steps { display: flex; flex-direction: column; gap: 0; margin-top: 48px; }
+    .step { display: grid; grid-template-columns: 64px 1fr; gap: 24px; padding: 32px 0; border-bottom: 1px solid var(--border); }
+    .step:last-child { border-bottom: none; }
+    .step-num { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 36px; color: var(--brand); opacity: 0.5; letter-spacing: -1px; line-height: 1; padding-top: 4px; }
+    .step-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 20px; margin-bottom: 8px; }
+    .step-desc { font-size: 14px; color: var(--text-2); line-height: 1.65; max-width: 520px; }
+    .step-time { display: inline-block; margin-top: 10px; padding: 3px 10px; border-radius: 20px; background: var(--brand-dim); border: 1px solid var(--brand-border); color: var(--brand); font-size: 11px; font-weight: 700; }
+
+    /* PRICING */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 48px; }
+    .pricing-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px; padding: 32px; position: relative; }
+    .pricing-card.featured { border-color: rgba(255,92,0,0.3); background: linear-gradient(135deg, rgba(255,92,0,0.06), var(--surface-2)); }
+    .pricing-popular { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); padding: 4px 16px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .pricing-tier { font-size: 12px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .pricing-price { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 40px; letter-spacing: -2px; margin-bottom: 4px; }
+    .pricing-price span { font-size: 14px; font-weight: 500; color: var(--text-2); letter-spacing: 0; }
+    .pricing-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .pricing-features li { font-size: 13px; color: var(--text-2); display: flex; align-items: flex-start; gap: 8px; }
+    .pricing-features li::before { content: '✓'; color: #00C853; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .pricing-features li.muted { color: var(--text-3); }
+    .pricing-features li.muted::before { color: var(--text-3); }
+    .pricing-btn { display: block; text-align: center; padding: 13px 24px; border-radius: 100px; font-size: 14px; font-weight: 700; text-decoration: none; transition: all 0.2s; }
+    .pricing-btn-primary { background: var(--brand); color: #fff; }
+    .pricing-btn-primary:hover { background: #e05200; transform: translateY(-1px); }
+    .pricing-btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border-2); }
+    .pricing-btn-ghost:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-1px); }
+
+    /* FAQ */
+    .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
+    .faq-item { padding: 24px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; }
+    .faq-q { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 10px; }
+    .faq-a { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+    @media (max-width: 640px) { .faq-grid { grid-template-columns: 1fr; } }
+
+    /* BOTTOM CTA */
+    .cta-bottom { padding: 100px 24px; text-align: center; border-top: 1px solid var(--border); background: linear-gradient(180deg, transparent, rgba(255,92,0,0.03)); }
+    .cta-bottom-title { font-family: 'Manrope', sans-serif; font-size: clamp(32px, 5vw, 60px); font-weight: 900; letter-spacing: -2px; line-height: 1.05; margin-bottom: 16px; }
+    .cta-bottom-sub { font-size: 16px; color: var(--text-2); max-width: 400px; margin: 0 auto 40px; line-height: 1.7; }
+
+    /* WAITLIST */
+    .waitlist-section { background: linear-gradient(135deg, rgba(255,92,0,0.10), rgba(255,92,0,0.03)); border-top: 1px solid rgba(255,92,0,0.2); border-bottom: 1px solid rgba(255,92,0,0.2); padding: 72px 24px; text-align: center; }
+    .waitlist-inner { max-width: 520px; margin: 0 auto; }
+    .waitlist-form { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 28px; }
+    .waitlist-input { flex: 1; min-width: 200px; padding: 12px 18px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text); font-size: 14px; outline: none; font-family: inherit; }
+    .waitlist-input:focus { border-color: rgba(255,92,0,0.4); }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 48px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; max-width: var(--max); margin: 0 auto; }
+    .footer-logo { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 18px; color: var(--brand); text-decoration: none; }
+    .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-2); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: 12px; color: var(--text-3); }
+  </style>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="/landing" class="nav-logo">{brandName}</a>
+    <div class="nav-links">
+      <a href="/find">Find a Trainer</a>
+      <a href="/blog">Stories</a>
+      <a href="/community">Community</a>
+      <a href="/for-trainers" style="color:var(--brand);font-weight:700">For Trainers</a>
+    </div>
+    <a href="/join" class="nav-cta">Create your profile →</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <div style="width:6px;height:6px;border-radius:50%;background:#00C853;flex-shrink:0"></div>
+      For Personal Trainers · {market.certificationBody} Verified Platform
+    </div>
+    <h1 class="hero-headline">
+      Your profile.<br>Your clients.<br><em>Your business.</em>
+    </h1>
+    <p class="hero-sub">
+      {brandName} gives you a verified public profile, tools to manage leads, sell digital products, and an AI assistant that works around the clock. Free to start.
+    </p>
+    <div class="hero-actions">
+      {isPaid ? (
+        <a href="/join" class="btn-primary">Create your free profile →</a>
+      ) : (
+        <a href="#waitlist" class="btn-primary">Join the waitlist →</a>
+      )}
+      <a href="/find" class="btn-ghost">See live profiles ⊙</a>
+    </div>
+    <div class="proof-strip">
+      <div class="proof-item">
+        <div class="proof-val" id="trainer-count">—</div>
+        <div class="proof-label">Trainers on platform</div>
+      </div>
+      <div class="proof-item">
+        <div class="proof-val">{market.certificationBody}</div>
+        <div class="proof-label">Verification standard</div>
+      </div>
+      <div class="proof-item">
+        <div class="proof-val">Free</div>
+        <div class="proof-label">To get started</div>
+      </div>
+      <div class="proof-item">
+        <div class="proof-val">2 min</div>
+        <div class="proof-label">To go live</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT YOU GET -->
+  <div style="border-top:1px solid var(--border)">
+    <div class="section">
+      <p class="section-eyebrow">The Platform</p>
+      <h2 class="section-title">Everything you need.<br>Nothing you don't.</h2>
+      <p class="section-sub">Built specifically for personal trainers. Not adapted from a generic SaaS tool.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">✓</div>
+          <div class="feature-title">Verified Public Profile</div>
+          <p class="feature-desc">Your profile lives at {brandName.toLowerCase()}.ae/yourname. {market.certificationBody} verification badge, specialties, packages, and a contact form — all in one clean page.</p>
+          <span class="feature-badge">Free forever</span>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <div class="feature-title">AI Personal Assistant</div>
+          <p class="feature-desc">Your own AI that knows your profile, your clients, and your market. Ask it to write a programme, draft a client email, build a nutrition plan, or explain your next steps.</p>
+          <span class="feature-badge">Pro feature</span>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <div class="feature-title">Digital Product Hub</div>
+          <p class="feature-desc">Upload a PDF programme, a video course, or a meal plan. Set a price. Clients buy it directly from your profile. You get paid automatically.</p>
+          <span class="feature-badge">Pro feature</span>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔗</div>
+          <div class="feature-title">Affiliate Vault</div>
+          <p class="feature-desc">We negotiate affiliate deals with fitness brands on your behalf. Activate the ones you use, share your link with clients, earn commission on every purchase — automatically.</p>
+          <span class="feature-badge">Pro feature</span>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <div class="feature-title">Lead Management</div>
+          <p class="feature-desc">Every enquiry from your profile lands in your dashboard. See who's interested, when they contacted you, and follow up with one tap. No leads lost to a generic inbox.</p>
+          <span class="feature-badge">Pro feature</span>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">✍️</div>
+          <div class="feature-title">Community & Blog</div>
+          <p class="feature-desc">Publish your expertise on the {brandName} blog and community feed. Build your reputation, get discovered by new clients, and establish yourself as the authority in your niche.</p>
+          <span class="feature-badge">Free forever</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div style="border-top:1px solid var(--border);background:var(--surface-2)">
+    <div class="section">
+      <p class="section-eyebrow">Getting Started</p>
+      <h2 class="section-title">Live in under<br>5 minutes.</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div>
+            <div class="step-title">Create your profile</div>
+            <p class="step-desc">Name, specialties, your {market.certificationBody} registration number, and a short bio. Your profile is live the moment you submit — no waiting, no approval queue.</p>
+            <span class="step-time">~2 minutes</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div>
+            <div class="step-title">Get verified</div>
+            <p class="step-desc">Upload your certificate or enter your registration number. We cross-check it against the {market.certificationBody} register. Your verified badge appears on your profile within 24 hours.</p>
+            <span class="step-time">~1 minute to submit</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div>
+            <div class="step-title">Add your packages and products</div>
+            <p class="step-desc">Set up your session packages with prices. If you have a digital product — a programme PDF, a video, a nutrition plan — upload it and set a price. Clients can buy it directly from your profile.</p>
+            <span class="step-time">~3 minutes</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div>
+            <div class="step-title">Share your link</div>
+            <p class="step-desc">Put your {brandName} link in your Instagram bio, WhatsApp status, and anywhere else you're active. Every visitor sees your verified profile, your packages, and your work.</p>
+            <span class="step-time">30 seconds</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICING -->
+  <div style="border-top:1px solid var(--border)">
+    <div class="section">
+      <p class="section-eyebrow">Pricing</p>
+      <h2 class="section-title">Start free.<br>Upgrade when<br>you're ready.</h2>
+      <p class="section-sub">No lock-in. Cancel anytime. Your profile stays live on the Free tier forever.</p>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-tier">Free</div>
+          <div class="pricing-price">{market.currencySymbol}0 <span>/ month</span></div>
+          <p class="pricing-desc">Your verified profile, live in minutes. The foundation.</p>
+          <ul class="pricing-features">
+            <li>Public {market.certificationBody}-verified profile</li>
+            <li>1 session package</li>
+            <li>Contact / lead form</li>
+            <li>WhatsApp CTA button</li>
+            <li>Community & blog access</li>
+            <li class="muted">AI personal assistant</li>
+            <li class="muted">Digital Product Hub</li>
+            <li class="muted">Affiliate Vault</li>
+            <li class="muted">Lead management dashboard</li>
+            <li class="muted">Analytics & weekly report</li>
+          </ul>
+          <a href="/join" class="pricing-btn pricing-btn-ghost">Get started free →</a>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-popular">Most popular</div>
+          <div class="pricing-tier">Pro</div>
+          <div class="pricing-price">{market.proPriceLabel}</div>
+          <p class="pricing-desc">The complete toolkit. Everything you need to grow your practice.</p>
+          <ul class="pricing-features">
+            <li>Everything in Free</li>
+            <li>AI personal assistant (unlimited)</li>
+            <li>Digital Product Hub (unlimited products)</li>
+            <li>Affiliate Vault (25% commissions)</li>
+            <li>Lead management dashboard</li>
+            <li>Analytics + weekly email report</li>
+            <li>WhatsApp lead notifications</li>
+            <li>Priority placement in search</li>
+            <li>Trainer referral programme (20% recurring)</li>
+            <li>Unlimited session packages</li>
+          </ul>
+          {isPaid ? (
+            <a href="/join" class="pricing-btn pricing-btn-primary">Get Pro →</a>
+          ) : (
+            <a href="#waitlist" class="pricing-btn pricing-btn-primary">Join the waitlist →</a>
+          )}
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-tier">Academy</div>
+          <div class="pricing-price" style="font-size:24px;letter-spacing:-1px">Talk to us</div>
+          <p class="pricing-desc">For gyms, academies, and multi-trainer operations.</p>
+          <ul class="pricing-features">
+            <li>Everything in Pro</li>
+            <li>Academy profile page</li>
+            <li>Multiple trainer profiles under one brand</li>
+            <li>Programme & term booking system</li>
+            <li>Parent-facing booking portal</li>
+            <li>Coach payout management</li>
+            <li>Centralised lead inbox</li>
+            <li>Dedicated account manager</li>
+          </ul>
+          <a href="mailto:hello@trainedby.ae" class="pricing-btn pricing-btn-ghost">Contact us →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div style="border-top:1px solid var(--border);background:var(--surface-2)">
+    <div class="section">
+      <p class="section-eyebrow">Questions</p>
+      <h2 class="section-title">Common questions.</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <div class="faq-q">Do I need to be {market.certificationBody} registered?</div>
+          <div class="faq-a">You can create a profile and go live immediately without verification. The {market.certificationBody} badge is added once we verify your registration — usually within 24 hours. Non-verified profiles still get full access to all features.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">How does the Digital Product Hub work?</div>
+          <div class="faq-a">Upload any file (PDF, video link, Notion document) and set a price. When a client buys it, the payment goes directly to your account minus a small platform fee. You get paid within 2 business days.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">What is the Affiliate Vault?</div>
+          <div class="faq-a">We negotiate affiliate agreements with fitness brands on behalf of all {brandName} trainers. You activate the brands you already recommend, share your unique link with clients, and earn commission on every purchase they make — automatically, every month.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Can I cancel anytime?</div>
+          <div class="faq-a">Yes. No contracts, no lock-in. Cancel from your dashboard and your profile reverts to the Free tier — it stays live, just without the Pro tools. Your digital products and affiliate earnings are yours to keep.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">What is the trainer referral programme?</div>
+          <div class="faq-a">Every Pro trainer gets a unique referral link. When another trainer signs up to Pro through your link, you earn 20% of their monthly subscription — recurring, for as long as they stay subscribed.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">How does the AI assistant work?</div>
+          <div class="faq-a">Your AI assistant knows your full profile, your specialties, your market, and your clients. Ask it anything — write a 12-week programme, draft a follow-up email to a lead, explain a nutrition concept, or help you price your packages. It responds in your language.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAITLIST (for markets without payments) -->
+  {isWaitlist && (
+    <div class="waitlist-section" id="waitlist">
+      <div class="waitlist-inner">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;border:1px solid rgba(255,92,0,0.3);background:rgba(255,92,0,0.08);font-size:11px;font-weight:700;color:var(--brand);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:24px;">
+          {market.flag} Coming Soon to {market.cityName || market.market.toUpperCase()}
+        </div>
+        <h2 style="font-family:'Manrope',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:900;letter-spacing:-1px;line-height:1.15;margin-bottom:16px;">
+          Be first. Lock in the launch price.
+        </h2>
+        <p style="font-size:15px;color:var(--text-2);line-height:1.7;">{market.paymentNote}</p>
+        <div class="waitlist-form" id="waitlist-form">
+          <input id="wl-name" type="text" placeholder="Your name" class="waitlist-input" />
+          <input id="wl-email" type="email" required placeholder="Your email" class="waitlist-input" />
+          <button type="button" onclick="submitWaitlist()" class="btn-primary" style="padding:12px 24px;font-size:14px;">Join the Waitlist →</button>
+        </div>
+        <div id="wl-success" style="display:none;margin-top:20px;padding:12px 24px;border-radius:100px;background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.2);color:#00C853;font-size:14px;font-weight:600;">
+          ✓ You're on the list! We'll email you when we launch.
+        </div>
+      </div>
+    </div>
+  )}
+
+  <!-- BOTTOM CTA -->
+  <div class="cta-bottom">
+    <h2 class="cta-bottom-title">Your expertise.<br>Your profile.<br><em style="color:var(--brand);font-style:normal">Your practice.</em></h2>
+    <p class="cta-bottom-sub">Free to start. Live in minutes. No credit card required.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      {isPaid ? (
+        <a href="/join" class="btn-primary" style="font-size:16px;padding:16px 32px">Create your free profile →</a>
+      ) : (
+        <a href="#waitlist" class="btn-primary" style="font-size:16px;padding:16px 32px">Join the waitlist →</a>
+      )}
+      <a href="/find" class="btn-ghost" style="font-size:16px;padding:16px 32px">See live profiles ⊙</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="/landing" class="footer-logo">{brandName}</a>
+    <div class="footer-links">
+      <a href="/landing">Home</a>
+      <a href="/find">Find a Trainer</a>
+      <a href="/blog">Stories</a>
+      <a href="/community">Community</a>
+      <a href="/join">Join as Trainer</a>
+    </div>
+    <div class="footer-copy">© {new Date().getFullYear()} {brandName}</div>
+  </footer>
+
+  <script define:vars={{ marketData: { market: market.market, waitlistEnabled: market.waitlistEnabled } }}>
+    // Nav scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav?.classList.toggle('scrolled', window.scrollY > 40);
+    }, { passive: true });
+
+    // Live trainer count
+    (async function() {
+      try {
+        const res = await fetch(
+          'https://mezhtdbfyvkshpuplqqw.supabase.co/rest/v1/trainers?select=id&is_active=eq.true',
+          {
+            headers: {
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo',
+              'Prefer': 'count=exact'
+            }
+          }
+        );
+        const count = res.headers.get('content-range')?.split('/')[1];
+        const el = document.getElementById('trainer-count');
+        if (el && count) el.textContent = parseInt(count).toLocaleString();
+      } catch(e) {}
+    })();
+
+    // Waitlist
+    window.submitWaitlist = async function() {
+      const email = document.getElementById('wl-email').value;
+      const name = document.getElementById('wl-name').value;
+      if (!email) return;
+      const btn = document.querySelector('#waitlist-form button');
+      if (btn) { btn.textContent = '...'; btn.disabled = true; }
+      try {
+        await fetch('https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1/join-waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, name, market: marketData.market, source_domain: window.location.hostname, role: 'trainer' })
+        });
+        document.getElementById('waitlist-form').style.display = 'none';
+        document.getElementById('wl-success').style.display = 'block';
+      } catch(e) {
+        if (btn) { btn.textContent = 'Try again'; btn.disabled = false; }
+      }
+    };
+  </script>
+</Base>
