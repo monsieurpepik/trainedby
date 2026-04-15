@@ -1,0 +1,41 @@
+---
+import Base from "../layouts/Base.astro";
+import { getMarket } from "../lib/market.ts";
+const market = getMarket(Astro.url.hostname);
+const brandName = market.brandName;
+---
+<Base title={`Page Not Found — ${brandName}`} description={`The page you're looking for doesn't exist on ${brandName}.`}>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Manrope',sans-serif;background:#0a0a0a;color:#fff;-webkit-font-smoothing:antialiased}
+    .container{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      min-height:100vh;padding:32px;text-align:center;gap:24px;
+    }
+    .code{font-size:96px;font-weight:900;line-height:1;background:linear-gradient(135deg,#FF5C00,#ff8c42);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    h1{font-size:28px;font-weight:800}
+    p{color:rgba(255,255,255,0.55);max-width:380px;line-height:1.6;font-size:16px}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+    .btn-primary{
+      background:#FF5C00;color:#fff;padding:14px 28px;border-radius:12px;
+      text-decoration:none;font-weight:700;font-size:15px;transition:opacity 0.2s;
+    }
+    .btn-primary:hover{opacity:0.85}
+    .btn-ghost{
+      background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+      color:rgba(255,255,255,0.8);padding:14px 28px;border-radius:12px;
+      text-decoration:none;font-weight:600;font-size:15px;transition:background 0.2s;
+    }
+    .btn-ghost:hover{background:rgba(255,255,255,0.1)}
+  </style>
+
+  <div class="container">
+    <div class="code">404</div>
+    <h1>Page not found</h1>
+    <p>The page you're looking for doesn't exist, or the trainer profile may have been removed.</p>
+    <div class="actions">
+      <a href="/find" class="btn-primary">Find a Trainer</a>
+      <a href="/" class="btn-ghost">Go Home</a>
+    </div>
+  </div>
+</Base>

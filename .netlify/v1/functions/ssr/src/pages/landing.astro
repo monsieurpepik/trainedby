@@ -200,22 +200,22 @@ const brandName = market.brandName || 'TrainedBy';
 
     <!-- TRUST STRIP -->
     <div class="trust-strip">
-      <div class="trust-item"><div class="trust-dot"></div>{market.certificationBody} Verified Only</div>
-      <div class="trust-item"><div class="trust-dot"></div>Real Trainer Profiles</div>
-      <div class="trust-item"><div class="trust-dot"></div>No Fake Reviews</div>
-      <div class="trust-item"><div class="trust-dot"></div>Free to Browse</div>
+      <div class="trust-item"><div class="trust-dot"></div><span data-i18n="trust_verified">Verified Trainers</span></div>
+      <div class="trust-item"><div class="trust-dot"></div><span data-i18n="trust_profiles">Real Trainer Profiles</span></div>
+      <div class="trust-item"><div class="trust-dot"></div><span data-i18n="trust_reviews">No Fake Reviews</span></div>
+      <div class="trust-item"><div class="trust-dot"></div><span data-i18n="trust_free">Free to Browse</span></div>
     </div>
   </section>
 
   <!-- FEATURED TRAINERS -->
   <div style="border-top:1px solid var(--border)">
     <div class="section">
-      <p class="section-eyebrow">Verified Trainers</p>
+      <p class="section-eyebrow" data-i18n="featured_eyebrow">Top trainers near you.</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
-        <h2 class="section-title" style="margin-bottom:0">Top trainers<br>near you.</h2>
-        <a href="/find" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">See all trainers →</a>
+        <h2 class="section-title" style="margin-bottom:0" data-i18n="featured_title">Top trainers<br>near you.</h2>
+        <a href="/find" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none" data-i18n="featured_cta">See all trainers →</a>
       </div>
-      <p class="section-sub">Hand-picked, {market.certificationBody}-verified trainers with proven track records.</p>
+      <p class="section-sub" data-i18n="trust_verified_sub">Every trainer is certified and verified.</p>
       <div class="trainers-grid" id="featured-trainers">
         <!-- Skeleton loaders -->
         <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
@@ -241,12 +241,12 @@ const brandName = market.brandName || 'TrainedBy';
   <!-- TRANSFORMATIONS -->
   <div style="border-top:1px solid var(--border);background:var(--surface-2)">
     <div class="section">
-      <p class="section-eyebrow">Real Results</p>
+      <p class="section-eyebrow" data-i18n="transform_eyebrow">Real Results</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
-        <h2 class="section-title" style="margin-bottom:0">Transformations<br>that speak for themselves.</h2>
+        <h2 class="section-title" style="margin-bottom:0" data-i18n="transform_title">Transformations<br>that speak for themselves.</h2>
         <a href="/community?category=transformations" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">See all →</a>
       </div>
-      <p class="section-sub">Documented by the trainers who made them happen. No filters, no stock photos.</p>
+      <p class="section-sub" data-i18n="blog_sub">No sponsored content. No generic listicles. Written by verified trainers from their own practice.</p>
       <div class="transforms-grid" id="transformations-grid">
         <!-- Static seed cards — replaced by live data when available -->
         <div class="transform-card">
@@ -258,13 +258,13 @@ const brandName = market.brandName || 'TrainedBy';
                 <div class="transform-trainer-cert">{market.certificationBody} Level 3 · Strength Coach</div>
               </div>
             </div>
-            <div class="transform-title">From sedentary to running her first 10k in 14 weeks</div>
-            <p class="transform-body">My client came to me post-pregnancy, hadn't exercised in 3 years. We started with 20-minute walks and built from there. The key was making every session feel achievable — never overwhelming.</p>
+            <div class="transform-title" data-i18n="transform_story1_title">From sedentary to running her first 10k in 14 weeks</div>
+            <p class="transform-body" data-i18n="transform_story1_body">My client came to me post-pregnancy, hadn't exercised in 3 years. We started with 20-minute walks and built from there. The key was making every session feel achievable — never overwhelming.</p>
           </div>
           <div class="transform-stats">
-            <div class="transform-stat"><div class="transform-stat-val">14</div><div class="transform-stat-label">Weeks</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">8kg</div><div class="transform-stat-label">Lost</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">10k</div><div class="transform-stat-label">First Race</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">14</div><div class="transform-stat-label" data-i18n="transform_stat_weeks">Weeks</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">8kg</div><div class="transform-stat-label" data-i18n="transform_stat_lost">Lost</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">10k</div><div class="transform-stat-label" data-i18n="transform_stat_race">First Race</div></div>
           </div>
         </div>
         <div class="transform-card">
@@ -276,13 +276,13 @@ const brandName = market.brandName || 'TrainedBy';
                 <div class="transform-trainer-cert">{market.certificationBody} Level 4 · HIIT Specialist</div>
               </div>
             </div>
-            <div class="transform-title">Corporate burnout to competing in his first obstacle race</div>
-            <p class="transform-body">He was working 70-hour weeks and using food as stress relief. We didn't talk about diet for the first month — just built the habit of showing up. Everything else followed naturally.</p>
+            <div class="transform-title" data-i18n="transform_story2_title">Corporate burnout to competing in his first obstacle race</div>
+            <p class="transform-body" data-i18n="transform_story2_body">He was working 70-hour weeks and using food as stress relief. We didn't talk about diet for the first month — just built the habit of showing up. Everything else followed naturally.</p>
           </div>
           <div class="transform-stats">
-            <div class="transform-stat"><div class="transform-stat-val">20</div><div class="transform-stat-label">Weeks</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">14kg</div><div class="transform-stat-label">Lost</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">1st</div><div class="transform-stat-label">Race Done</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">20</div><div class="transform-stat-label" data-i18n="transform_stat_weeks">Weeks</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">14kg</div><div class="transform-stat-label" data-i18n="transform_stat_lost">Lost</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">1st</div><div class="transform-stat-label" data-i18n="transform_stat_race">Race Done</div></div>
           </div>
         </div>
         <div class="transform-card">
@@ -294,13 +294,13 @@ const brandName = market.brandName || 'TrainedBy';
                 <div class="transform-trainer-cert">{market.certificationBody} Level 3 · Nutrition & Wellness</div>
               </div>
             </div>
-            <div class="transform-title">Rebuilding strength after a back injury — without surgery</div>
-            <p class="transform-body">Her physio cleared her for light exercise but she was terrified to move. We worked with her physiotherapist from day one. Six months later she's deadlifting bodyweight and pain-free.</p>
+            <div class="transform-title" data-i18n="transform_story3_title">Rebuilding strength after a back injury — without surgery</div>
+            <p class="transform-body" data-i18n="transform_story3_body">Her physio cleared her for light exercise but she was terrified to move. We worked with her physiotherapist from day one. Six months later she's deadlifting bodyweight and pain-free.</p>
           </div>
           <div class="transform-stats">
-            <div class="transform-stat"><div class="transform-stat-val">24</div><div class="transform-stat-label">Weeks</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">0</div><div class="transform-stat-label">Pain Days</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">BW</div><div class="transform-stat-label">Deadlift</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">24</div><div class="transform-stat-label" data-i18n="transform_stat_weeks">Weeks</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">0</div><div class="transform-stat-label" data-i18n="transform_stat_pain">Pain Days</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">BW</div><div class="transform-stat-label" data-i18n="transform_stat_deadlift">Deadlift</div></div>
           </div>
         </div>
       </div>
@@ -310,41 +310,41 @@ const brandName = market.brandName || 'TrainedBy';
   <!-- BLOG PREVIEW -->
   <div style="border-top:1px solid var(--border)">
     <div class="section">
-      <p class="section-eyebrow">From the Community</p>
+      <p class="section-eyebrow" data-i18n="blog_eyebrow">From the Community</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
-        <h2 class="section-title" style="margin-bottom:0">Advice from trainers<br>who actually train.</h2>
-        <a href="/blog" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">Read all articles →</a>
+        <h2 class="section-title" style="margin-bottom:0" data-i18n="blog_title">Advice from trainers<br>who actually train.</h2>
+        <a href="/blog" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none" data-i18n="blog_cta">Read all articles →</a>
       </div>
-      <p class="section-sub">No sponsored content. No generic listicles. Written by verified trainers from their own practice.</p>
+      <p class="section-sub" data-i18n="blog_sub">No sponsored content. No generic listicles. Written by verified trainers from their own practice.</p>
       <div class="blog-grid" id="blog-preview">
         <a href="/blog" class="blog-card featured">
           <div>
-            <span class="blog-cat">Training Science</span>
-            <div class="blog-title">Why most people plateau after 3 months — and what actually breaks it</div>
-            <p class="blog-excerpt">The first three months of training are almost always productive. Then something stops working. Here's the physiology behind the plateau and the four interventions that consistently restart progress.</p>
+            <span class="blog-cat" data-i18n="blog_cat_science">Training Science</span>
+            <div class="blog-title" data-i18n="blog_post1_title">Why most people plateau after 3 months — and what actually breaks it</div>
+            <p class="blog-excerpt" data-i18n="blog_post1_excerpt">The first three months of training are almost always productive. Then something stops working. Here's the physiology behind the plateau and the four interventions that consistently restart progress.</p>
             <div class="blog-author">
               <div class="blog-author-dot"></div>
-              <span>By a {market.certificationBody} Level 4 Trainer · 6 min read</span>
+              <span data-i18n="blog_post1_author">Level 4 Trainer · 6 min read</span>
             </div>
           </div>
           <div class="blog-visual">🏋️</div>
         </a>
         <a href="/blog" class="blog-card">
-          <span class="blog-cat">Nutrition</span>
-          <div class="blog-title">The only meal timing advice that actually matters</div>
-          <p class="blog-excerpt">Forget the 6-meal-a-day myth. Here's what the research says about when to eat — and why most of it is irrelevant if you're not getting the basics right first.</p>
+          <span class="blog-cat" data-i18n="blog_cat_nutrition">Nutrition</span>
+          <div class="blog-title" data-i18n="blog_post2_title">The only meal timing advice that actually matters</div>
+          <p class="blog-excerpt" data-i18n="blog_post2_excerpt">Forget the 6-meal-a-day myth. Here's what the research says about when to eat — and why most of it is irrelevant if you're not getting the basics right first.</p>
           <div class="blog-author">
             <div class="blog-author-dot"></div>
-            <span>Nutrition Coach · 4 min read</span>
+            <span data-i18n="blog_post2_author">Nutrition Coach · 4 min read</span>
           </div>
         </a>
         <a href="/blog" class="blog-card">
-          <span class="blog-cat">Mindset</span>
-          <div class="blog-title">What I tell every new client in the first session</div>
-          <p class="blog-excerpt">After hundreds of first sessions, I've learned that the conversation that happens before the first rep is the one that determines everything. Here's what I say — and why.</p>
+          <span class="blog-cat" data-i18n="blog_cat_mindset">Mindset</span>
+          <div class="blog-title" data-i18n="blog_post3_title">What I tell every new client in the first session</div>
+          <p class="blog-excerpt" data-i18n="blog_post3_excerpt">After hundreds of first sessions, I've learned that the conversation that happens before the first rep is the one that determines everything. Here's what I say — and why.</p>
           <div class="blog-author">
             <div class="blog-author-dot"></div>
-            <span>Strength Coach · 5 min read</span>
+            <span data-i18n="blog_post3_author">Strength Coach · 5 min read</span>
           </div>
         </a>
       </div>
@@ -354,14 +354,14 @@ const brandName = market.brandName || 'TrainedBy';
   <!-- FOR TRAINERS BANNER -->
   <div style="padding:60px 0;border-top:1px solid var(--border)">
     <div class="trainer-banner" style="max-width:calc(var(--max) - 48px);margin:0 auto">
-      <div class="trainer-banner-text">
-        <div class="trainer-banner-eyebrow">For Trainers</div>
-        <div class="trainer-banner-title">Build your practice<br>on a platform that<br>works as hard as you do.</div>
-        <p class="trainer-banner-sub">Verified profile, digital products, lead management, and an AI assistant — all in one place. Free to start.</p>
+        <div class="trainer-banner-text">
+        <div class="trainer-banner-eyebrow" data-i18n="banner_eyebrow">For Trainers</div>
+        <div class="trainer-banner-title" data-i18n="banner_title">Build your practice<br>on a platform that<br>works as hard as you do.</div>
+        <p class="trainer-banner-sub" data-i18n="banner_sub">Verified profile, digital products, lead management, and an AI assistant — all in one place. Free to start.</p>
       </div>
       <div class="trainer-banner-actions">
-        <a href="/for-trainers" class="btn-primary">See how it works →</a>
-        <a href="/join" class="btn-ghost">Create your profile</a>
+        <a href="/for-trainers" class="btn-primary" data-i18n="banner_cta_primary">See how it works →</a>
+        <a href="/join" class="btn-ghost" data-i18n="banner_cta_ghost">Create your profile</a>
       </div>
     </div>
   </div>
@@ -370,11 +370,11 @@ const brandName = market.brandName || 'TrainedBy';
   <footer>
     <a href="/landing" class="footer-logo">{brandName}</a>
     <div class="footer-links">
-      <a href="/find">Find a Trainer</a>
-      <a href="/blog">Stories</a>
-      <a href="/community">Community</a>
-      <a href="/for-trainers">For Trainers</a>
-      <a href="/join">Join as Trainer</a>
+      <a href="/find" data-i18n="footer_find">Find a Trainer</a>
+      <a href="/blog" data-i18n="footer_stories">Stories</a>
+      <a href="/community" data-i18n="footer_community">Community</a>
+      <a href="/for-trainers" data-i18n="footer_for_trainers">For Trainers</a>
+      <a href="/join" data-i18n="footer_join">Join as Trainer</a>
     </div>
     <div class="footer-copy">© {new Date().getFullYear()} {brandName}</div>
   </footer>

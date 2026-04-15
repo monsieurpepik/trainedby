@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { getMarket } from '../lib/market.ts';
 const market = getMarket(Astro.url.hostname);
-const brandName = market.brandName || 'TrainedBy';
+const brandName = market.brandName || 'window.__BRAND__||"TrainedBy"';
 const isPaid = market.paymentEnabled !== false;
 const isWaitlist = market.waitlistEnabled === true;
 ---
