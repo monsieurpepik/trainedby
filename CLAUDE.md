@@ -53,6 +53,29 @@ skills/get-shit-done              — Full GSD reference
 
 These are not suggestions. They are the process.
 
+## Branching Strategy
+
+This project uses a **Simplified GitFlow** model. **NEVER push directly to `main`.**
+
+| Branch | Purpose | Deploys to |
+|---|---|---|
+| `main` | Production — protected | trainedby.ae, coachepar.fr, etc. |
+| `staging` | Pre-production UAT | Netlify staging environment |
+| `feat/*` | New features | Netlify preview URL |
+| `fix/*` | Bug fixes | Netlify preview URL |
+| `hotfix/*` | Critical production fixes | Merges to `main` then `staging` |
+
+**Standard workflow for all new work:**
+1. Branch from `staging`: `git checkout staging && git checkout -b feat/your-feature`
+2. Build and test using GSD + Superpowers workflows
+3. Open PR against `staging` when done — Netlify will build a preview URL
+4. After staging UAT passes, open PR from `staging` → `main` to release to production
+
+**Hotfix workflow (production is broken):**
+1. Branch from `main`: `git checkout main && git checkout -b hotfix/description`
+2. Fix, test, open PR against `main`
+3. After merge, immediately cherry-pick to `staging` to keep them in sync
+
 ## Core Rules
 
 ### 1. Never deploy without verification
@@ -107,4 +130,4 @@ Never run `supabase functions deploy` directly without the wrapper.
 - **CEO Bot:** @TrainedByCEO_bot (Telegram) — Founder's executive AI
 - **Admin dashboard:** trainedby.ae/superadmin (password: trainedby-admin-2026)
 - **Supabase project:** mezhtdbfyvkshpuplqqw
-- **Netlify:** Auto-deploys on push to `main`
+- **Netlify:** Auto-deploys `main` to production. `staging` branch deploys to staging environment.
