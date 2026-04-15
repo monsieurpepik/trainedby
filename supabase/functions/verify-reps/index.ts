@@ -95,16 +95,78 @@ async function checkCIMSPA(certNumber: string, trainerName: string): Promise<{
   }
 }
 
+// ─── US: NASM / ACE / NSCA GraphQL verification ─────────────────────────────
+async function checkNASM(certNumber: string, trainerName: string): Promise<{
+  found: boolean; nameMatch: boolean; status: string; rawName?: string; certName?: string; certStatus?: string;
+}> {
+  try {
+    const NASM_GRAPHQL = "https://edge-graph.adobe.io/api/de7b6266-9abd-41e1-9c34-15384fab7ee9/graphql";
+
+    const query = `query ValidateByCert($certNumber: String!) {
+      validateByCert(certNumber: $certNumber) {
+        data {
+          certName certNumber country expirationDate firstName lastName state status
+        }
+      }
+    }`;
+
+    const res = await fetch(NASM_GRAPHQL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query, variables: { certNumber: certNumber.replace(/^NASM-?/i, "") } }),
+      signal: AbortSignal.timeout(10000),
+    });
+
+    if (!res.ok) return { found: false, nameMatch: false, status: "register_unavailable" };
+
+    const json = await res.json();
+    const records: Array<{
+      certName: string; certNumber: string; country: string;
+      expirationDate: string; firstName: string; lastName: string;
+      state: string; status: string;
+    }> = json?.data?.validateByCert?.data ?? [];
+
+    if (!records.length) return { found: false, nameMatch: false, status: "not_found" };
+
+    // Use the first matching record
+    const record = records[0];
+    const rawName = `${record.firstName} ${record.lastName}`.trim();
+    const certStatus = record.status?.toLowerCase(); // 'active', 'expired', 'suspended'
+
+    // Name match: check first name at minimum
+    const nameMatch = trainerName
+      ? rawName.toLowerCase().includes(trainerName.split(" ")[0].toLowerCase())
+      : true;
+
+    // Only 'Active' certs get verified status
+    if (certStatus !== "active") {
+      return { found: true, nameMatch, status: `cert_${certStatus}`, rawName, certName: record.certName, certStatus };
+    }
+
+    return {
+      found: true,
+      nameMatch,
+      status: nameMatch ? "verified" : "name_mismatch",
+      rawName,
+      certName: record.certName,
+      certStatus,
+    };
+  } catch (e) {
+    console.error("NASM verification error:", e);
+    return { found: false, nameMatch: false, status: "scrape_error" };
+  }
+}
+
 // ─── Determine market from cert number format ─────────────────────────────────
-function detectCertMarket(certNumber: string): "ae" | "uk" | "in" | "unknown" {
+function detectCertMarket(certNumber: string): "ae" | "uk" | "us" | "in" | "unknown" {
   const n = certNumber.toUpperCase().trim();
   if (n.startsWith("REP-") || n.startsWith("REP") || /^\d{5,8}$/.test(n)) {
     // Could be UAE or UK — check prefix
     if (n.startsWith("R0") || n.startsWith("REP-UK")) return "uk";
     return "ae"; // Default REPs format to UAE
   }
-  if (n.startsWith("NSCA") || n.startsWith("ACE") || n.startsWith("ACSM") ||
-    n.startsWith("NASM") || n.startsWith("CIMSPA")) return "in"; // India/global certs
+  if (n.startsWith("NASM") || n.startsWith("ACE") || n.startsWith("NSCA") || n.startsWith("ACSM")) return "us";
+  if (n.startsWith("CIMSPA")) return "uk";
   return "unknown";
 }
 
@@ -146,14 +208,16 @@ serve(async (req) => {
     // Determine which register to check
     const certMarket = market || detectCertMarket(certNum);
 
-    let result: { found: boolean; nameMatch: boolean; status: string; rawName?: string };
+    let result: { found: boolean; nameMatch: boolean; status: string; rawName?: string; certName?: string; certStatus?: string };
 
     if (certMarket === "uk") {
       result = await checkRepsUK(certNum, trainer_name || "");
     } else if (certMarket === "ae") {
       result = await checkRepsUAE(certNum, trainer_name || "");
+    } else if (certMarket === "us") {
+      result = await checkNASM(certNum, trainer_name || "");
     } else {
-      // India / global certs — no automated register, set to pending for document review
+      // India / other — no automated register, set to pending for document review
       result = { found: false, nameMatch: false, status: "manual_review_required" };
     }
 
@@ -165,10 +229,13 @@ serve(async (req) => {
       verificationStatus = "verified";
       repsVerified = true;
     } else if (result.status === "name_mismatch") {
-      verificationStatus = "name_mismatch"; // Cert found but name doesn't match
+      verificationStatus = "name_mismatch";
     } else if (result.status === "not_found") {
       verificationStatus = "not_found";
     } else if (result.status === "manual_review_required") {
+      verificationStatus = "pending";
+    } else if (result.status?.startsWith("cert_")) {
+      // NASM cert found but expired/suspended — flag for human review
       verificationStatus = "pending";
     } else {
       // scrape_error or register_unavailable — set to pending, don't penalise
@@ -207,6 +274,9 @@ serve(async (req) => {
       status: verificationStatus,
       verified: repsVerified,
       market: certMarket,
+      certName: (result as { certName?: string }).certName,
+      certStatus: (result as { certStatus?: string }).certStatus,
+      rawName: result.rawName,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

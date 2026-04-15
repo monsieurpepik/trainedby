@@ -401,7 +401,17 @@ body {
     <div class="field">
       <label>{market.certVerifyLabel} <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
       <input type="text" id="s1-reps" placeholder="{market.certVerifyPlaceholder}" autocomplete="off" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.05em;">
-      <div class="field-hint">Find yours at <a href="https://repsuae.com/searcht" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">repsuae.com/searcht</a> — leave blank to add later</div>
+      <div class="field-hint" id="cert-hint">
+        {locale === 'en-ae' ? (
+          <>Find yours at <a href="https://repsuae.com/searcht" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">repsuae.com/searcht</a> — leave blank to add later</>
+        ) : locale === 'en-uk' ? (
+          <>Find yours at <a href="https://www.reps-uk.org/find-a-trainer/" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">reps-uk.org</a> — leave blank to add later</>
+        ) : locale === 'en-us' ? (
+          <>Find yours at <a href="https://www.nasm.org/resources/validate-credentials" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">nasm.org/validate</a> — leave blank to add later</>
+        ) : (
+          <>Leave blank to add later</>
+        )}
+      </div>
     </div>
 
     <div class="field-error hidden" id="s1-error"></div>
@@ -536,6 +546,9 @@ body {
 </div><!-- /join-wrap -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+<script define:vars={{ __MARKET_KEY__: market.market }}>
+window.__MARKET__ = __MARKET_KEY__;
+</script>
 <script is:inline>
 // ===== CONFIG =====
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
@@ -812,6 +825,7 @@ async function verifyAndCreate() {
       whatsapp: (document.getElementById('phone-prefix-display')?.textContent ?? '{market.phonePrefix}') + state.phone,
       reps_number: state.reps_number || null,
       verification_status: state.reps_number ? 'pending' : 'unverified',
+      market: window.__MARKET__ || 'ae',
       specialties: state.specialties,
       title: state.title,
       training_modes: state.training_modes,
