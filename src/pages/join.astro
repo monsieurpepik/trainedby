@@ -487,6 +487,12 @@ body {
 
     <div class="field-error hidden" id="s2-error" style="text-align:center;margin-bottom:12px;"></div>
 
+    <!-- Consent checkbox — required before account creation (GDPR / CCPA / PDPL) -->
+    <label id="consent-label" style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;cursor:pointer;font-size:13px;color:var(--text-muted);line-height:1.5;">
+      <input type="checkbox" id="consent-checkbox" style="margin-top:2px;accent-color:var(--brand);width:16px;height:16px;flex-shrink:0;" />
+      <span>I agree to the <a href="/terms" target="_blank" style="color:var(--brand);text-decoration:underline;">Terms of Service</a> and <a href="/privacy" target="_blank" style="color:var(--brand);text-decoration:underline;">Privacy Policy</a>. I confirm my certification details are genuine and accurate.</span>
+    </label>
+
     <button class="btn-primary" id="verify-btn" onclick="verifyAndCreate()">
       Verify &amp; Go Live 🚀
     </button>
@@ -776,6 +782,14 @@ async function verifyAndCreate() {
 
   if (state.specialties.length === 0) { showErr(errEl, 'Please select at least one specialty.'); return; }
   if (!title) { showErr(errEl, 'Please enter your title/role.'); return; }
+
+  // Consent validation — required for GDPR / CCPA / PDPL compliance
+  const consentBox = document.getElementById('consent-checkbox');
+  if (consentBox && !consentBox.checked) {
+    showErr(errEl, 'Please agree to the Terms of Service and Privacy Policy to continue.');
+    document.getElementById('consent-label')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
 
   const code = Array.from({length:6}, (_,i) => document.getElementById('otp-'+i).value).join('');
   if (code.length < 6) { showErr(errEl, 'Please enter the 6-digit code from your email.'); return; }

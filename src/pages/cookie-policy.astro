@@ -1,0 +1,64 @@
+---
+import Base from '../layouts/Base.astro';
+import { getMarket } from '../lib/market.ts';
+
+const market = getMarket(Astro.url.hostname);
+const brand = market.brandName;
+const domain = market.domain;
+const effectiveDate = 'April 15, 2026';
+const contactEmail = `legal@${domain}`;
+
+const t = {
+  fr: { title: 'Politique de Cookies', intro: `${brand} utilise des cookies pour faire fonctionner la plateforme et améliorer votre expérience.` },
+  it: { title: 'Politica sui Cookie', intro: `${brand} utilizza i cookie per far funzionare la piattaforma e migliorare la tua esperienza.` },
+  es: { title: 'Política de Cookies', intro: `${brand} utiliza cookies para hacer funcionar la plataforma y mejorar tu experiencia.` },
+}[market.i18nLocale] ?? {
+  title: 'Cookie Policy',
+  intro: `${brand} uses cookies to operate the platform and improve your experience.`,
+};
+---
+<Base title={`${t.title} — ${brand}`} description={t.intro} canonical={`https://${domain}/cookie-policy`}>
+  <main style="max-width:760px;margin:0 auto;padding:48px 24px;color:var(--text-1);">
+    <h1 style="font-size:28px;font-weight:700;margin-bottom:8px;">{t.title}</h1>
+    <p style="color:var(--text-3);font-size:13px;margin-bottom:40px;">Effective date: {effectiveDate}</p>
+
+    <p style="margin-bottom:24px;">{t.intro}</p>
+
+    <h2>What Are Cookies</h2>
+    <p>Cookies are small text files stored on your device when you visit a website. They allow the website to remember your preferences and session state across page loads.</p>
+
+    <h2>Cookies We Use</h2>
+    <table>
+      <thead>
+        <tr><th>Cookie</th><th>Type</th><th>Purpose</th><th>Duration</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>tb_session</code></td><td>Essential</td><td>Maintains your login session as a Trainer</td><td>30 days</td></tr>
+        <tr><td><code>tb_cookie_consent</code></td><td>Essential</td><td>Stores your cookie consent preference</td><td>1 year</td></tr>
+        <tr><td><code>_plausible</code></td><td>Analytics (opt-in)</td><td>Anonymous page view analytics — no personal data, no cross-site tracking</td><td>Session</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Essential Cookies</h2>
+    <p>Essential cookies are required for the platform to function. They cannot be disabled. The <code>tb_session</code> cookie is set only when you log in as a Trainer and is deleted when you log out or after 30 days of inactivity.</p>
+
+    <h2>Analytics Cookies</h2>
+    <p>We use Plausible Analytics, a privacy-first analytics tool that does not use cookies by default and does not track individuals across sites. If you accept analytics cookies, a session cookie is set to count unique visits. No personal data is collected or shared with third parties for advertising purposes.</p>
+
+    <h2>Managing Your Preferences</h2>
+    <p>You can change your cookie preferences at any time by clicking the "Cookie Settings" link in the footer, or by clearing your browser cookies. Refusing analytics cookies does not affect your ability to use the platform.</p>
+
+    <h2>Contact</h2>
+    <p>For questions about our use of cookies, contact <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.</p>
+  </main>
+</Base>
+
+<style>
+  h2 { font-size: 18px; font-weight: 700; margin: 32px 0 12px; color: var(--text-1); }
+  p { font-size: 15px; line-height: 1.7; color: var(--text-2); margin-bottom: 12px; }
+  a { color: var(--brand); text-decoration: underline; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+  th { text-align: left; padding: 10px 12px; background: var(--surface-2); font-weight: 600; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text-2); vertical-align: top; }
+  code { font-family: monospace; background: var(--surface-2); padding: 2px 5px; border-radius: 3px; font-size: 12px; }
+</style>

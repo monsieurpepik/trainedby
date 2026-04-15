@@ -20,6 +20,7 @@ const {
 
 import { getMarket } from '../lib/market.ts';
 import { getLocale, TRANSLATIONS, BRAND, getLocaleScript } from '../lib/i18n.ts';
+import CookieConsent from '../components/CookieConsent.astro';
 const market = getMarket(Astro.url.hostname);
 const locale = getLocale(Astro.request);
 const brand = BRAND[locale];
@@ -274,6 +275,9 @@ const jsonLd = structuredData ?? defaultStructuredData;
         }
       })();
     </script>
+
+    <!-- ── Cookie Consent Banner ───────────────────────────────────────── -->
+    <CookieConsent />
 
     <!-- ── Error boundary: catch unhandled errors and log them ─────────── -->
     <script is:inline>

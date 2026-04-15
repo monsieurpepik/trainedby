@@ -1,27 +1,63 @@
 ---
+import { getMarket } from '../lib/market.ts';
+
 interface Props {
   variant?: 'landing' | 'minimal';
 }
 const { variant = 'landing' } = Astro.props;
+const market = getMarket(Astro.url.hostname);
+const brand = market.brandName;
+const domain = market.domain;
+
+// Localised footer labels per language
+const labels = {
+  fr: {
+    home: 'Accueil', pricing: 'Tarifs', blog: 'Blog',
+    find: 'Trouver un coach', privacy: 'Confidentialité',
+    terms: 'CGU', cookie: 'Cookies',
+    tagline: 'La plateforme des coachs certifiés',
+  },
+  it: {
+    home: 'Home', pricing: 'Prezzi', blog: 'Blog',
+    find: 'Trova un trainer', privacy: 'Privacy',
+    terms: 'Termini', cookie: 'Cookie',
+    tagline: 'La piattaforma dei personal trainer certificati',
+  },
+  es: {
+    home: 'Inicio', pricing: 'Precios', blog: 'Blog',
+    find: 'Encontrar entrenador', privacy: 'Privacidad',
+    terms: 'Términos', cookie: 'Cookies',
+    tagline: 'La plataforma para entrenadores certificados',
+  },
+}[market.i18nLocale] ?? {
+  home: 'Home', pricing: 'Pricing', blog: 'Blog',
+  find: 'Find a Trainer', privacy: 'Privacy',
+  terms: 'Terms', cookie: 'Cookies',
+  tagline: 'The verified trainer platform',
+};
 ---
 
 {variant === 'landing' ? (
   <footer>
-    <a href="/landing" class="footer-logo">
-      Trained<span style="color:#fff">By</span>
-    </a>
+    <a href="/" class="footer-logo">{brand}</a>
     <div class="footer-links">
-      <a href="/landing">Home</a>
-      <a href="/pricing">Pricing</a>
-      <a href="/blog">Blog</a>
-      <a href="/find">Find a Trainer</a>
-      <a href="/privacy">Privacy</a>
-      <a href="/terms">Terms</a>
+      <a href="/">{labels.home}</a>
+      <a href="/pricing">{labels.pricing}</a>
+      <a href="/blog">{labels.blog}</a>
+      <a href="/find">{labels.find}</a>
+      <a href="/privacy">{labels.privacy}</a>
+      <a href="/terms">{labels.terms}</a>
+      <a href="/cookie-policy">{labels.cookie}</a>
     </div>
-    <p class="footer-copy">© {new Date().getFullYear()} TrainedBy.ae — Built for UAE Fitness Professionals</p>
+    <p class="footer-copy">© {new Date().getFullYear()} {brand} ({domain}) — {labels.tagline}</p>
   </footer>
 ) : (
   <footer style="border-top:1px solid var(--border);padding:20px 24px;text-align:center;">
-    <p style="color:var(--text-3);font-size:12px;">© {new Date().getFullYear()} TrainedBy.ae</p>
+    <p style="color:var(--text-3);font-size:12px;">
+      © {new Date().getFullYear()} {brand} &middot;
+      <a href="/privacy" style="color:var(--text-3);text-decoration:underline;">{labels.privacy}</a> &middot;
+      <a href="/terms" style="color:var(--text-3);text-decoration:underline;">{labels.terms}</a> &middot;
+      <a href="/cookie-policy" style="color:var(--text-3);text-decoration:underline;">{labels.cookie}</a>
+    </p>
   </footer>
 )}

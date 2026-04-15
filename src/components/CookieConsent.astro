@@ -1,0 +1,146 @@
+---
+// CookieConsent.astro
+// GDPR/CCPA/PDPL compliant cookie consent banner.
+// Renders server-side; JS handles show/hide and preference storage.
+import { getMarket } from '../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
+
+const t = {
+  fr: {
+    message: 'Nous utilisons des cookies essentiels pour faire fonctionner la plateforme et des cookies analytiques (avec votre consentement) pour améliorer nos services.',
+    accept: 'Accepter tout',
+    essential: 'Essentiels uniquement',
+    manage: 'Paramètres des cookies',
+    learnMore: 'En savoir plus',
+  },
+  it: {
+    message: 'Utilizziamo cookie essenziali per il funzionamento della piattaforma e cookie analitici (con il tuo consenso) per migliorare i nostri servizi.',
+    accept: 'Accetta tutto',
+    essential: 'Solo essenziali',
+    manage: 'Impostazioni cookie',
+    learnMore: 'Scopri di più',
+  },
+  es: {
+    message: 'Usamos cookies esenciales para el funcionamiento de la plataforma y cookies analíticas (con su consentimiento) para mejorar nuestros servicios.',
+    accept: 'Aceptar todo',
+    essential: 'Solo esenciales',
+    manage: 'Configuración de cookies',
+    learnMore: 'Más información',
+  },
+}[market.i18nLocale] ?? {
+  message: 'We use essential cookies to operate the platform and analytics cookies (with your consent) to improve our services.',
+  accept: 'Accept all',
+  essential: 'Essential only',
+  manage: 'Cookie settings',
+  learnMore: 'Learn more',
+};
+---
+
+<div id="cookie-banner" style="display:none;" aria-live="polite" role="dialog" aria-label="Cookie consent">
+  <div class="cookie-inner">
+    <div class="cookie-text">
+      <p>{t.message} <a href="/cookie-policy">{t.learnMore}</a>.</p>
+    </div>
+    <div class="cookie-actions">
+      <button id="cookie-essential" class="btn-essential">{t.essential}</button>
+      <button id="cookie-accept" class="btn-accept">{t.accept}</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const CONSENT_KEY = 'tb_cookie_consent';
+    const banner = document.getElementById('cookie-banner');
+    if (!banner) return;
+
+    const existing = localStorage.getItem(CONSENT_KEY);
+    if (!existing) {
+      // Show after 500ms so it doesn't flash on first paint
+      setTimeout(() => { banner.style.display = 'block'; }, 500);
+    }
+
+    function setConsent(level: string) {
+      localStorage.setItem(CONSENT_KEY, level);
+      document.cookie = `${CONSENT_KEY}=${level};max-age=31536000;path=/;SameSite=Lax`;
+      banner.style.display = 'none';
+      if (level === 'all') {
+        // Activate analytics if consent given
+        window.dispatchEvent(new CustomEvent('cookie-consent-granted'));
+      }
+    }
+
+    document.getElementById('cookie-accept')?.addEventListener('click', () => setConsent('all'));
+    document.getElementById('cookie-essential')?.addEventListener('click', () => setConsent('essential'));
+  })();
+</script>
+
+<style>
+  #cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: var(--surface-1, #1a1a2e);
+    border-top: 1px solid var(--border, #2a2a3e);
+    padding: 16px 24px;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.3);
+  }
+  .cookie-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .cookie-text {
+    flex: 1;
+    min-width: 200px;
+  }
+  .cookie-text p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-2, #aaa);
+    line-height: 1.5;
+  }
+  .cookie-text a {
+    color: var(--brand, #6c63ff);
+    text-decoration: underline;
+  }
+  .cookie-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .btn-essential {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #2a2a3e);
+    background: transparent;
+    color: var(--text-2, #aaa);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-essential:hover { background: var(--surface-2, #2a2a3e); }
+  .btn-accept {
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: none;
+    background: var(--brand, #6c63ff);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-accept:hover { opacity: 0.88; }
+  @media (max-width: 600px) {
+    .cookie-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .cookie-actions { width: 100%; }
+    .btn-essential, .btn-accept { flex: 1; text-align: center; }
+  }
+</style>
