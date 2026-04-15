@@ -358,7 +358,7 @@ body {
     <div class="field">
       <label>Your Profile URL <span class="field-req">*</span></label>
       <div class="slug-field" id="slug-field-wrap">
-        <span class="slug-prefix">trainedby.ae/</span>
+        <span class="slug-prefix" id="slug-prefix">loading.../</span>
         <input type="text" id="s1-slug" placeholder="sarah" autocomplete="off"
           oninput="checkSlug(this.value)">
         <span class="slug-status" id="slug-status"></span>
@@ -506,7 +506,7 @@ body {
       <p class="success-sub">Your profile is up. Share your link now — clients can already view your page.</p>
 
       <div class="url-card">
-        <span class="url-card-text" id="success-url">trainedby.ae/you</span>
+        <span class="url-card-text" id="success-url">...</span>
         <button class="url-copy-btn" onclick="copyProfileUrl()">Copy</button>
       </div>
 
@@ -567,6 +567,12 @@ function trackEvent(event_name, metadata) {
 
 // Track landing view immediately
 trackEvent('join_landing_view');
+
+// Set domain-aware slug prefix
+(function() {
+  const el = document.getElementById('slug-prefix');
+  if (el) el.textContent = window.location.hostname + '/';
+})();
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -828,7 +834,7 @@ async function verifyAndCreate() {
     }
 
     // Success
-    const profileUrl = `trainedby.ae/${state.slug}`;
+    const profileUrl = window.location.hostname + '/' + state.slug;
     document.getElementById('success-url').textContent = profileUrl;
     document.getElementById('view-profile-btn').href = `/${state.slug}`;
     showStep('success');

@@ -1,4 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { getProfileUrl, getDashboardUrl, getPricingUrl, getJoinUrl, getMarketBrand, getMarketSupportEmail } from '../_shared/market_url.ts';
+import { captureException } from '../_shared/sentry.ts';
 import { callClaude } from '../_shared/claude.ts';
 import { TRAINEDBY_PERSONA } from '../_shared/voice.ts';
 import { getLocale, getEmailCopy, getPersona, getMarket } from '../_shared/locale.ts';
@@ -57,7 +59,10 @@ function getMissingItems(t: Trainer): string[] {
   return missing;
 }
 
-function emailBase(content: string): string {
+function emailBase(content: string, market = 'ae'): string {
+  const brand = getMarketBrand(market);
+  const supportEmail = getMarketSupportEmail(market);
+  const baseUrl = `https://${market === 'ae' ? 'trainedby.ae' : market === 'fr' ? 'coachepar.fr' : market === 'it' ? 'allenaticon.it' : market === 'es' || market === 'mx' ? 'entrenacon.com' : market === 'uk' ? 'trainedby.uk' : market === 'in' ? 'trainedby.in' : 'trainedby.com'}`;
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -83,24 +88,26 @@ function emailBase(content: string): string {
 </head>
 <body>
 <div class="wrap">
-  <div class="logo">Trained<span>By</span></div>
+  <div class="logo">${brand.replace('é', 'é')}</div>
   <div class="card">
     ${content}
   </div>
   <div class="footer">
-    TrainedBy · Dubai, UAE<br>
-    You're receiving this because you signed up at trainedby.ae<br>
-    <a href="https://trainedby.ae/unsubscribe" style="color:rgba(255,255,255,0.25)">Unsubscribe</a>
+    ${brand}<br>
+    You're receiving this because you signed up at ${baseUrl}<br>
+    <a href="${baseUrl}/unsubscribe" style="color:rgba(255,255,255,0.25)">Unsubscribe</a>
   </div>
 </div>
 </body>
 </html>`;
 }
 
-function welcomeEmail(t: Trainer): { subject: string; html: string } {
-  const profileUrl = `https://trainedby.ae/${t.slug}`;
+function welcomeEmail(t: Trainer, market = 'ae'): { subject: string; html: string } {
+  const profileUrl = getProfileUrl(market, t.slug);
+  const dashUrl = getDashboardUrl(market);
+  const brand = getMarketBrand(market);
   return {
-    subject: `Welcome to TrainedBy, ${t.name.split(' ')[0]}`,
+    subject: `Welcome to ${brand}, ${t.name.split(' ')[0]}`,
     html: emailBase(`
       <h1>You're in. Now let's get clients finding you.</h1>
       <p>Your TrainedBy profile is live at <a href="${profileUrl}" style="color:#FF5C00">${profileUrl}</a>.</p>
@@ -111,14 +118,15 @@ function welcomeEmail(t: Trainer): { subject: string; html: string } {
         <li>Add your REPs UAE number to get the verified badge</li>
         <li>Set your session packages so clients know your rates</li>
       </ul>
-      <a href="https://trainedby.ae/dashboard" class="btn">Complete Your Profile →</a>
+      <a href="${dashUrl}" class="btn">Complete Your Profile →</a>
       <hr class="divider">
       <p style="font-size:12px">Any questions? Just reply to this email. A real person reads every response.</p>
     `)
   };
 }
 
-function nudgeEmail(t: Trainer): { subject: string; html: string } {
+function nudgeEmail(t: Trainer, market = 'ae'): { subject: string; html: string } {
+  const dashUrl = getDashboardUrl(market);
   const missing = getMissingItems(t);
   const pct = completionScore(t);
   return {
@@ -132,26 +140,28 @@ function nudgeEmail(t: Trainer): { subject: string; html: string } {
         ${missing.map(m => `<li>${m}</li>`).join('')}
       </ul>` : ''}
       <p>Takes less than 5 minutes. Do it now while it's fresh.</p>
-      <a href="https://trainedby.ae/dashboard" class="btn">Finish Your Profile →</a>
+      <a href="${dashUrl}" class="btn">Finish Your Profile →</a>
     `)
   };
 }
 
-function firstLeadEmail(t: Trainer, leadName: string): { subject: string; html: string } {
+function firstLeadEmail(t: Trainer, leadName: string, market = 'ae'): { subject: string; html: string } {
+  const dashUrl = getDashboardUrl(market);
   return {
     subject: `You just got your first lead on TrainedBy`,
     html: emailBase(`
       <h1>First lead. That's how it starts.</h1>
       <p><span class="highlight">${leadName}</span> just reached out through your TrainedBy profile. They're interested in working with you.</p>
       <p>Reply within the hour. The trainers who convert leads are the ones who respond fast — not the ones with the best credentials.</p>
-      <a href="https://trainedby.ae/dashboard" class="btn">View Your Leads →</a>
+      <a href="${dashUrl}" class="btn">View Your Leads →</a>
       <hr class="divider">
       <p style="font-size:12px">Pro tip: Upgrade to Pro to see all your leads, track conversions, and sell digital products directly from your profile.</p>
     `)
   };
 }
 
-function proWelcomeEmail(t: Trainer): { subject: string; html: string } {
+function proWelcomeEmail(t: Trainer, market = 'ae'): { subject: string; html: string } {
+  const dashUrl = getDashboardUrl(market);
   return {
     subject: `Pro is live. Here's what to do first.`,
     html: emailBase(`
@@ -164,12 +174,14 @@ function proWelcomeEmail(t: Trainer): { subject: string; html: string } {
         <li>Copy your referral link and put it in your Instagram bio</li>
         <li>Refer 4 trainers and your Pro subscription is free forever</li>
       </ul>
-      <a href="https://trainedby.ae/dashboard" class="btn">Go to Dashboard →</a>
+      <a href="${dashUrl}" class="btn">Go to Dashboard →</a>
     `)
   };
 }
 
-function sevenDayEmail(t: Trainer): { subject: string; html: string } {
+function sevenDayEmail(t: Trainer, market = 'ae'): { subject: string; html: string } {
+  const dashUrl = getDashboardUrl(market);
+  const pricingUrl = getPricingUrl(market);
   const pct = completionScore(t);
   return {
     subject: `One week in — here's where you stand`,
@@ -177,17 +189,18 @@ function sevenDayEmail(t: Trainer): { subject: string; html: string } {
       <h1>You've been on TrainedBy for a week.</h1>
       <p>Your profile is <span class="highlight">${pct}% complete</span>. ${pct >= 80 ? 'That\'s solid.' : 'There\'s still room to improve.'}</p>
       ${pct < 80 ? `<p>Trainers with 80%+ complete profiles get significantly more views. A few more minutes on your profile could make a real difference.</p>
-      <a href="https://trainedby.ae/dashboard" class="btn">Finish Your Profile →</a>` : ''}
+      <a href="${dashUrl}" class="btn">Finish Your Profile →</a>` : ''}
       ${t.plan === 'free' ? `
       <hr class="divider">
       <p>You're on the free plan. If you're serious about building a client base in the UAE, Pro gives you digital product sales, the Affiliate Vault, and priority listing. <span class="highlight">149 AED/month.</span></p>
-      <a href="https://trainedby.ae/pricing" class="btn" style="background:#1c1c1c;border:1px solid rgba(255,92,0,0.3)">See What Pro Includes →</a>
+      <a href="${pricingUrl}" class="btn" style="background:#1c1c1c;border:1px solid rgba(255,92,0,0.3)">See What Pro Includes →</a>
       ` : ''}
     `)
   };
 }
 
-function monthlyReportEmail(t: Trainer, stats: { views: number; leads: number; }): { subject: string; html: string } {
+function monthlyReportEmail(t: Trainer, stats: { views: number; leads: number; }, market = 'ae'): { subject: string; html: string } {
+  const dashUrl = getDashboardUrl(market);
   const month = new Date().toLocaleDateString('en-AE', { month: 'long', year: 'numeric' });
   return {
     subject: `Your TrainedBy report for ${month}`,
@@ -199,7 +212,7 @@ function monthlyReportEmail(t: Trainer, stats: { views: number; leads: number; }
         <li>Leads received: <span class="highlight">${stats.leads}</span></li>
       </ul>
       ${stats.leads === 0 ? '<p>No leads this month. The most common reason: incomplete profile or no REPs badge. Both are fixable in under 10 minutes.</p>' : '<p>Keep the momentum going. Reply to every lead within the hour.</p>'}
-      <a href="https://trainedby.ae/dashboard" class="btn">View Dashboard →</a>
+      <a href="${dashUrl}" class="btn">View Dashboard →</a>
     `)
   };
 }
@@ -288,24 +301,26 @@ Deno.serve(async (req) => {
 
     let email: { subject: string; html: string } | null = null;
 
+    const market = body.market || trainer.market || 'ae';
+
     switch (type) {
       case 'welcome':
-        email = welcomeEmail(trainer);
+        email = welcomeEmail(trainer, market);
         break;
       case 'nudge':
-        email = nudgeEmail(trainer);
+        email = nudgeEmail(trainer, market);
         break;
       case 'first_lead':
-        email = firstLeadEmail(trainer, lead_name || 'A potential client');
+        email = firstLeadEmail(trainer, lead_name || 'A potential client', market);
         break;
       case 'pro_welcome':
-        email = proWelcomeEmail(trainer);
+        email = proWelcomeEmail(trainer, market);
         break;
       case 'seven_day':
-        email = sevenDayEmail(trainer);
+        email = sevenDayEmail(trainer, market);
         break;
       case 'monthly_report':
-        email = monthlyReportEmail(trainer, stats || { views: 0, leads: 0 });
+        email = monthlyReportEmail(trainer, stats || { views: 0, leads: 0 }, market);
         break;
       default:
         return new Response(JSON.stringify({ error: 'Unknown email type' }), {
@@ -335,6 +350,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (err) {
+    await captureException(err, { function: 'lifecycle-email' });
     return new Response(JSON.stringify({ error: String(err) }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });

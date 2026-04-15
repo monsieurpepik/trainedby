@@ -1141,6 +1141,49 @@ function render(t) {
   ogTitle.content = document.title;
   document.head.appendChild(ogTitle);
 
+  // ── schema.org JSON-LD (Person + LocalBusiness) ──────────────────────────
+  const profileUrl = window.location.origin + '/' + (t.slug || '');
+  const schemaLd = {
+    '@context': 'https://schema.org',
+    '@type': ['Person', 'LocalBusiness'],
+    name: t.name,
+    jobTitle: t.title || 'Personal Trainer',
+    description: t.bio || '',
+    url: profileUrl,
+    image: t.avatar_url || t.photo_url || '',
+    telephone: t.phone || undefined,
+    address: t.city ? {
+      '@type': 'PostalAddress',
+      addressLocality: t.city,
+      addressCountry: (t.market || 'ae').toUpperCase(),
+    } : undefined,
+    knowsAbout: Array.isArray(t.specialties) ? t.specialties : [],
+    hasCredential: t.reps_verified ? [{
+      '@type': 'EducationalOccupationalCredential',
+      credentialCategory: 'Professional Certification',
+      recognizedBy: { '@type': 'Organization', name: 'REPs UAE' },
+    }] : undefined,
+    aggregateRating: t.review_count > 0 ? {
+      '@type': 'AggregateRating',
+      ratingValue: t.avg_rating || 5,
+      reviewCount: t.review_count,
+      bestRating: 5,
+      worstRating: 1,
+    } : undefined,
+    priceRange: t.session_packages?.length > 0 ? '££' : undefined,
+    sameAs: [t.instagram ? `https://instagram.com/${t.instagram.replace('@','')}` : null].filter(Boolean),
+  };
+  // Remove undefined fields
+  const cleanSchema = JSON.parse(JSON.stringify(schemaLd));
+  let ldScript = document.querySelector('script[data-profile-ld]');
+  if (!ldScript) {
+    ldScript = document.createElement('script');
+    ldScript.type = 'application/ld+json';
+    ldScript.setAttribute('data-profile-ld', '1');
+    document.head.appendChild(ldScript);
+  }
+  ldScript.textContent = JSON.stringify(cleanSchema);
+
   // Background — use trainer cover or avatar or default gym
   const bgPhoto = t.cover_url || t.photo_url || t.avatar_url;
   if (bgPhoto) {

@@ -1,0 +1,275 @@
+---
+/**
+ * ProfileCompleteness — Gamified profile progress widget
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Shows profile completion score with Strava-style progress ring,
+ * missing items checklist, and contextual upgrade nudge.
+ *
+ * Usage: <ProfileCompleteness client:load />
+ * (Renders client-side after trainer data is loaded)
+ */
+---
+
+<div id="profile-completeness" class="pc-widget hidden">
+  <div class="pc-header">
+    <div class="pc-ring-wrap">
+      <svg class="pc-ring" viewBox="0 0 44 44" fill="none">
+        <circle cx="22" cy="22" r="18" stroke="rgba(255,255,255,0.08)" stroke-width="4"/>
+        <circle id="pc-ring-fill" cx="22" cy="22" r="18"
+          stroke="#FF5C00" stroke-width="4"
+          stroke-linecap="round"
+          stroke-dasharray="113.1"
+          stroke-dashoffset="113.1"
+          transform="rotate(-90 22 22)"
+          style="transition: stroke-dashoffset 0.8s cubic-bezier(0.4,0,0.2,1)"/>
+      </svg>
+      <span id="pc-pct" class="pc-pct-label">0%</span>
+    </div>
+    <div class="pc-title-block">
+      <div class="pc-title">Profile Strength</div>
+      <div id="pc-status" class="pc-status">Loading...</div>
+    </div>
+    <button class="pc-toggle" onclick="togglePCDetails()" aria-label="Toggle details">
+      <svg id="pc-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
+    </button>
+  </div>
+
+  <div id="pc-details" class="pc-details hidden">
+    <div id="pc-items" class="pc-items"></div>
+    <div id="pc-upgrade-nudge" class="pc-upgrade-nudge hidden">
+      <span class="pc-nudge-text">Upgrade to Pro to unlock digital product sales</span>
+      <a href="/pricing" class="pc-nudge-btn">Upgrade →</a>
+    </div>
+  </div>
+</div>
+
+<style>
+.pc-widget {
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.pc-widget.hidden { display: none; }
+.pc-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.pc-ring-wrap {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+.pc-ring { width: 44px; height: 44px; }
+.pc-pct-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: #FF5C00;
+  font-family: 'Manrope', sans-serif;
+}
+.pc-title-block { flex: 1; }
+.pc-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 2px;
+}
+.pc-status {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+}
+.pc-toggle {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  padding: 4px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.pc-toggle:hover { color: rgba(255,255,255,0.8); }
+.pc-details {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.pc-details.hidden { display: none; }
+.pc-items { display: flex; flex-direction: column; gap: 8px; }
+.pc-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+  color: inherit;
+}
+.pc-item:hover { background: rgba(255,255,255,0.06); }
+.pc-item.done { opacity: 0.45; cursor: default; }
+.pc-item.done:hover { background: rgba(255,255,255,0.03); }
+.pc-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.pc-item.done .pc-check {
+  background: #00C853;
+  border-color: #00C853;
+}
+.pc-check-icon { display: none; }
+.pc-item.done .pc-check-icon { display: block; }
+.pc-check-empty { display: block; }
+.pc-item.done .pc-check-empty { display: none; }
+.pc-item-label {
+  font-size: 12px;
+  font-weight: 600;
+  flex: 1;
+}
+.pc-item-pts {
+  font-size: 10px;
+  font-weight: 700;
+  color: #FF5C00;
+  background: rgba(255,92,0,0.1);
+  border: 1px solid rgba(255,92,0,0.2);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.pc-item.done .pc-item-pts {
+  color: #00C853;
+  background: rgba(0,200,83,0.08);
+  border-color: rgba(0,200,83,0.2);
+}
+.pc-upgrade-nudge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(255,92,0,0.08);
+  border: 1px solid rgba(255,92,0,0.2);
+  border-radius: 10px;
+}
+.pc-upgrade-nudge.hidden { display: none; }
+.pc-nudge-text { font-size: 11px; color: rgba(255,255,255,0.6); }
+.pc-nudge-btn {
+  font-size: 11px;
+  font-weight: 700;
+  color: #FF5C00;
+  text-decoration: none;
+  white-space: nowrap;
+}
+</style>
+
+<script is:inline>
+const PC_ITEMS = [
+  { key: 'avatar_url',    label: 'Profile photo',           pts: 20, action: '/edit' },
+  { key: 'bio',           label: 'Bio (30+ characters)',     pts: 20, action: '/edit', check: t => t.bio && t.bio.length >= 30 },
+  { key: 'reps_verified', label: 'Verification badge',       pts: 15, action: '/edit' },
+  { key: 'specialties',   label: 'Specialties',              pts: 10, action: '/edit', check: t => t.specialties && t.specialties.length > 0 },
+  { key: 'city',          label: 'City / location',          pts: 10, action: '/edit' },
+  { key: 'instagram',     label: 'Instagram handle',         pts: 10, action: '/edit' },
+  { key: 'session_packages', label: 'Session packages',      pts: 15, action: '/edit', check: t => t.session_packages && t.session_packages.length > 0 },
+];
+
+function computePC(t) {
+  let score = 0;
+  const items = PC_ITEMS.map(item => {
+    const done = item.check ? item.check(t) : !!t[item.key];
+    if (done) score += item.pts;
+    return { ...item, done };
+  });
+  return { score: Math.min(100, score), items };
+}
+
+function renderPC(trainer) {
+  const widget = document.getElementById('profile-completeness');
+  if (!widget) return;
+
+  const { score, items } = computePC(trainer);
+
+  // Show widget
+  widget.classList.remove('hidden');
+
+  // Ring animation
+  const circumference = 113.1;
+  const offset = circumference - (score / 100) * circumference;
+  const ring = document.getElementById('pc-ring-fill');
+  if (ring) {
+    setTimeout(() => { ring.style.strokeDashoffset = offset; }, 100);
+  }
+
+  // Percentage
+  const pctEl = document.getElementById('pc-pct');
+  if (pctEl) pctEl.textContent = score + '%';
+
+  // Status label
+  const statusEl = document.getElementById('pc-status');
+  if (statusEl) {
+    if (score >= 90) statusEl.textContent = 'Elite — you\'re maximising visibility';
+    else if (score >= 70) statusEl.textContent = 'Strong — a few items left';
+    else if (score >= 40) statusEl.textContent = 'Building — keep going';
+    else statusEl.textContent = 'Just started — complete your profile';
+  }
+
+  // Items list
+  const itemsEl = document.getElementById('pc-items');
+  if (itemsEl) {
+    itemsEl.innerHTML = '';
+    items.forEach(item => {
+      const el = document.createElement('a');
+      el.href = item.done ? '#' : item.action;
+      el.className = 'pc-item' + (item.done ? ' done' : '');
+      el.innerHTML = `
+        <div class="pc-check">
+          <svg class="pc-check-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+          <span class="pc-check-empty" style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2)"></span>
+        </div>
+        <span class="pc-item-label">${item.label}</span>
+        <span class="pc-item-pts">${item.done ? '✓' : '+' + item.pts + 'pts'}</span>
+      `;
+      if (item.done) el.onclick = e => e.preventDefault();
+      itemsEl.appendChild(el);
+    });
+  }
+
+  // Upgrade nudge for free plan trainers
+  const nudge = document.getElementById('pc-upgrade-nudge');
+  if (nudge && trainer.plan === 'free' && score >= 70) {
+    nudge.classList.remove('hidden');
+  }
+}
+
+function togglePCDetails() {
+  const details = document.getElementById('pc-details');
+  const chevron = document.getElementById('pc-chevron');
+  if (!details) return;
+  const isHidden = details.classList.toggle('hidden');
+  if (chevron) {
+    chevron.style.transform = isHidden ? '' : 'rotate(180deg)';
+  }
+}
+
+// Expose globally so dashboard.js can call renderPC(trainer)
+window.renderPC = renderPC;
+</script>

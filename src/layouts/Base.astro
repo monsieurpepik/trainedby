@@ -11,27 +11,12 @@ interface Props {
 
 const {
   title,
-  description = "TrainedBy — The UAE Trainer's Operating System. Build your fitness business with digital products, affiliate income, and a Grand Slam Offer builder.",
-  ogImage = 'https://trainedby-ae.netlify.app/og-image.jpg',
+  description,
+  ogImage,
   canonical,
   noIndex = false,
   structuredData,
 } = Astro.props;
-
-const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site ?? 'https://trainedby-ae.netlify.app').href;
-
-// Default structured data for the organisation
-const defaultStructuredData = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'TrainedBy',
-  url: 'https://trainedby-ae.netlify.app',
-  logo: 'https://trainedby-ae.netlify.app/logo.png',
-  description: "UAE's verified personal trainer platform",
-  areaServed: 'AE',
-};
-
-const jsonLd = structuredData ?? defaultStructuredData;
 
 import { getMarket } from '../lib/market.ts';
 import { getLocale, TRANSLATIONS, BRAND, getLocaleScript } from '../lib/i18n.ts';
@@ -43,6 +28,29 @@ const i18nStrings = TRANSLATIONS[locale];
 // Market-aware canonical URL
 const marketCanonicalBase = canonical ?? `https://${market.domain}${Astro.url.pathname}`;
 const marketOgLocale = market.locale.replace('-', '_');
+
+// Market-aware defaults
+const resolvedDescription = description ?? market.metaDescription;
+const resolvedOgImage = ogImage ?? `https://${market.domain}/og-image.jpg`;
+const resolvedTitle = title;
+
+// Market-aware default structured data for the organisation
+const defaultStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: market.brandName ?? 'TrainedBy',
+  url: `https://${market.domain}`,
+  logo: `https://${market.domain}/logo.png`,
+  description: market.metaDescription,
+  areaServed: market.market.toUpperCase(),
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer support',
+    availableLanguage: market.i18nLocale ?? 'en',
+  },
+};
+
+const jsonLd = structuredData ?? defaultStructuredData;
 ---
 
 <!doctype html>
@@ -52,27 +60,34 @@ const marketOgLocale = market.locale.replace('-', '_');
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
     <!-- ── Critical meta ─────────────────────────────────────────────── -->
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <title>{resolvedTitle}</title>
+    <meta name="description" content={resolvedDescription} />
     <link rel="canonical" href={marketCanonicalBase} />
     {noIndex && <meta name="robots" content="noindex,nofollow" />}
     <meta name="theme-color" content="#0a0a0a" />
     <meta name="color-scheme" content="dark" />
 
+    <!-- ── PWA Manifest ──────────────────────────────────────────────── -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content={market.brandName ?? 'TrainedBy'} />
+
     <!-- ── Open Graph / Twitter ──────────────────────────────────────── -->
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
+    <meta property="og:title" content={resolvedTitle} />
+    <meta property="og:description" content={resolvedDescription} />
+    <meta property="og:image" content={resolvedOgImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:url" content={marketCanonicalBase} />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="TrainedBy" />
+    <meta property="og:site_name" content={market.brandName ?? 'TrainedBy'} />
     <meta property="og:locale" content={marketOgLocale} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:title" content={resolvedTitle} />
+    <meta name="twitter:description" content={resolvedDescription} />
+    <meta name="twitter:image" content={resolvedOgImage} />
 
     <!-- ── Performance: DNS prefetch & preconnect ────────────────────── -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />

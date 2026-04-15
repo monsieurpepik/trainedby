@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import ProfileCompleteness from '../components/ProfileCompleteness.astro';
 ---
 
 <Base
@@ -529,10 +530,13 @@ body {
         </div>
       </div>
       <div class="url-bar">
-        <span class="url-bar-text" id="dash-url">trainedby.ae/...</span>
+        <span class="url-bar-text" id="dash-url">...</span>
         <button class="url-copy-btn" onclick="copyUrl()">Copy Link</button>
       </div>
     </div>
+
+    <!-- Profile Completeness Widget -->
+    <ProfileCompleteness />
 
     <!-- Stats -->
     <div class="stats-section">
@@ -714,7 +718,7 @@ body {
           </div>
         </div>
         <div class="referral-url">
-          <span class="referral-url-text" id="referral-url-text">trainedby.ae/join?ref=...</span>
+          <span class="referral-url-text" id="referral-url-text">loading...</span>
           <button class="url-copy-btn" onclick="copyReferral()">Copy</button>
         </div>
         <div class="referral-share-btns">
@@ -856,14 +860,15 @@ function populateDash(t) {
   document.getElementById('dash-avatar').src = t.avatar_url || '';
   document.getElementById('dash-name').textContent = 'Hey, ' + (t.name?.split(' ')[0] || 'Trainer') + ' 👋';
   document.getElementById('dash-sub').textContent = t.reps_verified ? 'REPs Verified Trainer' : 'Verification Pending';
-  const url = 'trainedby.ae/' + t.slug;
+  const _domain = window.location.hostname;
+  const url = _domain + '/' + t.slug;
   document.getElementById('dash-url').textContent = url;
   document.getElementById('view-link').href = '/' + t.slug;
   document.getElementById('nav-view-profile').href = '/' + t.slug;
 
   // Referral flywheel
-  const refUrl = 'https://trainedby.ae/join?ref=' + t.slug;
-  document.getElementById('referral-url-text').textContent = 'trainedby.ae/join?ref=' + t.slug;
+  const refUrl = 'https://' + _domain + '/join?ref=' + t.slug;
+  document.getElementById('referral-url-text').textContent = _domain + '/join?ref=' + t.slug;
   const waMsg = encodeURIComponent('Hey! I\'m using TrainedBy to manage my PT business and earn passive income from affiliates. Get your free profile here: ' + refUrl);
   document.getElementById('referral-wa-share').href = 'https://wa.me/?text=' + waMsg;
   const refCount = t.referral_count || 0;
@@ -894,6 +899,9 @@ function populateDash(t) {
       if (val) { val.textContent = 'Active'; val.classList.add('green'); }
     });
   }
+
+  // Profile completeness widget
+  if (typeof window.renderPC === 'function') window.renderPC(t);
 }
 
 async function loadStats() {
@@ -1021,10 +1029,10 @@ function buildChecklist(t) {
 }
 
 function copyUrl() {
-  navigator.clipboard.writeText('https://trainedby.ae/' + trainer.slug).then(() => showToast('Link copied!', 'success'));
+  navigator.clipboard.writeText('https://' + window.location.hostname + '/' + trainer.slug).then(() => showToast('Link copied!', 'success'));
 }
 function copyReferral() {
-  navigator.clipboard.writeText('https://trainedby.ae/join?ref=' + trainer.slug).then(() => showToast('Referral link copied!', 'success'));
+  navigator.clipboard.writeText('https://' + window.location.hostname + '/join?ref=' + trainer.slug).then(() => showToast('Referral link copied!', 'success'));
 }
 
 async function startUpgrade() {
