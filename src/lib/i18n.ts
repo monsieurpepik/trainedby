@@ -424,6 +424,81 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
   },
 };
 
+// ─── Underscore-style keys used by data-i18n attributes in HTML ──────────────
+// The landing page and nav use data-i18n="hero_headline" style keys.
+// These must exist in TRANSLATIONS for the runtime translator to work.
+// We merge them directly into each locale's record below.
+const UNDERSCORE_KEYS: Record<Locale, Record<string, string>> = {
+  en: {
+    brand:              'TrainedBy',
+    hero_headline:      'Find a trainer who actually gets results.',
+    hero_sub:           'Every trainer is certified and verified. Browse real profiles, read real stories, and book the right person for you.',
+    search_btn:         'Search',
+    filter_weight_loss: 'Weight Loss',
+    filter_strength:    'Strength',
+    filter_nutrition:   'Nutrition',
+    filter_running:     'Running',
+    nav_find:           'Find a Trainer',
+    nav_blog:           'Stories',
+    nav_community:      'Community',
+    nav_for_trainers:   'For Trainers',
+    nav_cta_find:       'Find Your Trainer \u2192',
+  },
+  fr: {
+    brand:              'Coach\u00e9Par',
+    hero_headline:      'Trouvez un coach qui obtient vraiment des r\u00e9sultats.',
+    hero_sub:           'Chaque coach est certifi\u00e9 et v\u00e9rifi\u00e9. Parcourez de vrais profils, lisez de vraies histoires et r\u00e9servez la bonne personne pour vous.',
+    search_btn:         'Rechercher',
+    filter_weight_loss: 'Perte de poids',
+    filter_strength:    'Force',
+    filter_nutrition:   'Nutrition',
+    filter_running:     'Course',
+    nav_find:           'Trouver un Coach',
+    nav_blog:           'Histoires',
+    nav_community:      'Communaut\u00e9',
+    nav_for_trainers:   'Pour les Coachs',
+    nav_cta_find:       'Trouver votre Coach \u2192',
+  },
+  it: {
+    brand:              'AllenatoCon',
+    hero_headline:      'Trova un allenatore che ottiene davvero risultati.',
+    hero_sub:           'Ogni allenatore \u00e8 certificato e verificato. Sfoglia profili reali, leggi storie vere e prenota la persona giusta per te.',
+    search_btn:         'Cerca',
+    filter_weight_loss: 'Perdita di peso',
+    filter_strength:    'Forza',
+    filter_nutrition:   'Nutrizione',
+    filter_running:     'Corsa',
+    nav_find:           'Trova un Allenatore',
+    nav_blog:           'Storie',
+    nav_community:      'Comunit\u00e0',
+    nav_for_trainers:   'Per gli Allenatori',
+    nav_cta_find:       'Trova il tuo Allenatore \u2192',
+  },
+  es: {
+    brand:              'EntrenaCon',
+    hero_headline:      'Encuentra un entrenador que realmente obtiene resultados.',
+    hero_sub:           'Cada entrenador est\u00e1 certificado y verificado. Explora perfiles reales, lee historias reales y reserva a la persona adecuada para ti.',
+    search_btn:         'Buscar',
+    filter_weight_loss: 'P\u00e9rdida de peso',
+    filter_strength:    'Fuerza',
+    filter_nutrition:   'Nutrici\u00f3n',
+    filter_running:     'Running',
+    nav_find:           'Encontrar un Entrenador',
+    nav_blog:           'Historias',
+    nav_community:      'Comunidad',
+    nav_for_trainers:   'Para Entrenadores',
+    nav_cta_find:       'Encuentra tu Entrenador \u2192',
+  },
+};
+
+// Merge underscore keys into TRANSLATIONS at module load time
+(Object.keys(UNDERSCORE_KEYS) as Locale[]).forEach((locale) => {
+  Object.assign(TRANSLATIONS[locale], UNDERSCORE_KEYS[locale]);
+});
+
+/** Export for use in Base.astro server-side merge */
+export const UNDERSCORE_KEYS_EXPORT = UNDERSCORE_KEYS;
+
 /** Translate a key for a given locale, falling back to English */
 export function t(locale: Locale, key: string): string {
   return TRANSLATIONS[locale]?.[key] ?? TRANSLATIONS['en'][key] ?? key;
@@ -440,7 +515,13 @@ export function getBrand(locale: Locale) {
   return BRAND[locale];
 }
 
-/** Inline script string to inject locale into window for client-side JS */
+/** Inline script string to inject locale + full translations into window for client-side JS */
 export function getLocaleScript(locale: Locale): string {
-  return `window.__LOCALE__ = '${locale}'; window.__BRAND__ = ${JSON.stringify(BRAND[locale])};`;
+  // Merge underscore keys into the translations before serialising
+  const merged = { ...TRANSLATIONS[locale], ...UNDERSCORE_KEYS[locale] };
+  return [
+    `window.__LOCALE__ = '${locale}';`,
+    `window.__BRAND__ = ${JSON.stringify(BRAND[locale])};`,
+    `window.__I18N__ = ${JSON.stringify(merged)};`,
+  ].join(' ');
 }

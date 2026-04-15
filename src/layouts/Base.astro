@@ -19,12 +19,13 @@ const {
 } = Astro.props;
 
 import { getMarket } from '../lib/market.ts';
-import { getLocale, TRANSLATIONS, BRAND, getLocaleScript } from '../lib/i18n.ts';
+import { getLocale, TRANSLATIONS, BRAND, UNDERSCORE_KEYS_EXPORT } from '../lib/i18n.ts';
 import CookieConsent from '../components/CookieConsent.astro';
 const market = getMarket(Astro.url.hostname);
 const locale = getLocale(Astro.request);
 const brand = BRAND[locale];
-const i18nStrings = TRANSLATIONS[locale];
+// Merge dot-notation and underscore-style keys so all data-i18n attributes resolve
+const i18nStrings = { ...TRANSLATIONS[locale], ...(UNDERSCORE_KEYS_EXPORT?.[locale] ?? {}) };
 
 // Market-aware canonical URL
 const marketCanonicalBase = canonical ?? `https://${market.domain}${Astro.url.pathname}`;
