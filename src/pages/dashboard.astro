@@ -666,6 +666,45 @@ body {
 
 
 
+    <!-- Generate Training Plan — Pro Feature Card -->
+    <div class="checklist-section" id="generate-plan-section" style="display:none">
+      <div class="checklist-title" style="display:flex;align-items:center;gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Generate a Training Plan
+      </div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">
+        Build a personalised training plan for a client in 30 seconds. Send it as a PDF or share the link directly.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="field" style="margin-bottom:0">
+          <label style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;">Client goal</label>
+          <input type="text" id="plan-goal" placeholder="e.g. Lose 8kg in 12 weeks" style="background:var(--surface-3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;width:100%;outline:none;font-family:'Inter',sans-serif;">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;">Sessions per week</label>
+          <div style="display:flex;gap:8px;">
+            <button class="toggle-pill active" id="plan-freq-2" onclick="setPlanFreq(2)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--brand);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;">2×</button>
+            <button class="toggle-pill" id="plan-freq-3" onclick="setPlanFreq(3)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">3×</button>
+            <button class="toggle-pill" id="plan-freq-4" onclick="setPlanFreq(4)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">4×</button>
+            <button class="toggle-pill" id="plan-freq-5" onclick="setPlanFreq(5)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">5×</button>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;">Duration</label>
+          <div style="display:flex;gap:8px;">
+            <button class="toggle-pill active" id="plan-dur-4" onclick="setPlanDur(4)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--brand);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;">4 wk</button>
+            <button class="toggle-pill" id="plan-dur-8" onclick="setPlanDur(8)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">8 wk</button>
+            <button class="toggle-pill" id="plan-dur-12" onclick="setPlanDur(12)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">12 wk</button>
+          </div>
+        </div>
+        <button id="generate-plan-btn" onclick="generatePlan()" style="background:var(--brand);color:#fff;border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Generate Plan
+        </button>
+        <div id="plan-result" style="display:none;background:var(--surface-3);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:13px;color:var(--text-muted);line-height:1.6;"></div>
+      </div>
+    </div>
+
     <!-- AI Assistant Channel Settings (Pro only) -->
     <div class="checklist-section" id="ai-settings-section" style="display:none">
       <div class="checklist-title">{t(locale, 'dash.channel_title')}</div>
@@ -893,6 +932,12 @@ function populateDash(t) {
   // Profile completeness widget
   if (typeof window.renderPC === 'function') window.renderPC(t);
 
+  // Generate Plan — show for Pro trainers
+  if (isPro) {
+    const planSection = document.getElementById('generate-plan-section');
+    if (planSection) planSection.style.display = 'block';
+  }
+
   // AI Assistant settings — show for Pro trainers
   if (isPro) {
     const aiSection = document.getElementById('ai-settings-section');
@@ -913,6 +958,73 @@ function populateDash(t) {
     }
   }
 }
+
+// ── Generate Plan ───────────────────────────────────────────────────────────
+let planFreq = 2;
+let planDur = 4;
+
+window.setPlanFreq = function(n) {
+  planFreq = n;
+  [2,3,4,5].forEach(v => {
+    const btn = document.getElementById('plan-freq-' + v);
+    if (btn) {
+      btn.style.borderColor = v === n ? 'var(--brand)' : 'var(--border)';
+      btn.style.color = v === n ? 'var(--text)' : 'var(--text-muted)';
+    }
+  });
+};
+
+window.setPlanDur = function(n) {
+  planDur = n;
+  [4,8,12].forEach(v => {
+    const btn = document.getElementById('plan-dur-' + v);
+    if (btn) {
+      btn.style.borderColor = v === n ? 'var(--brand)' : 'var(--border)';
+      btn.style.color = v === n ? 'var(--text)' : 'var(--text-muted)';
+    }
+  });
+};
+
+window.generatePlan = async function() {
+  const goal = document.getElementById('plan-goal').value.trim();
+  if (!goal) { showToast('Enter a client goal first'); return; }
+
+  const btn = document.getElementById('generate-plan-btn');
+  const result = document.getElementById('plan-result');
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Generating...';
+  result.style.display = 'none';
+
+  try {
+    const res = await fetch(EDGE_BASE + '/generate-plan', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + getAuthToken()
+      },
+      body: JSON.stringify({
+        goal,
+        sessions_per_week: planFreq,
+        duration_weeks: planDur,
+      })
+    });
+    const data = await res.json();
+    if (data.plan) {
+      result.style.display = 'block';
+      result.innerHTML = '<pre style="white-space:pre-wrap;font-family:inherit;">' + data.plan + '</pre>';
+      if (data.share_url) {
+        result.innerHTML += '<a href="' + data.share_url + '" target="_blank" style="display:inline-block;margin-top:12px;color:var(--brand);font-size:12px;font-weight:700;">Share plan link →</a>';
+      }
+    } else {
+      showToast('Could not generate plan — try again');
+    }
+  } catch {
+    showToast('Error generating plan');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate Plan';
+  }
+};
 
 async function loadStats() {
   try {
