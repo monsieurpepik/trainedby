@@ -439,6 +439,23 @@ body {
   font-family: 'Manrope', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 6px;
 }
 .ai-welcome-sub { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+/* AI channel settings */
+.ai-channel-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted);
+  cursor: pointer; transition: all 0.2s;
+}
+.ai-channel-btn:hover { border-color: var(--border-hover); color: var(--text); }
+.ai-channel-btn.active { background: var(--brand-dim); border-color: var(--brand-border); color: var(--brand); }
+.ai-channel-info { padding: 4px 0; }
+.btn-primary {
+  display: block; width: 100%; padding: 14px; border-radius: 12px;
+  background: var(--brand); color: #fff; font-size: 14px; font-weight: 700;
+  border: none; cursor: pointer; transition: background 0.2s; text-align: center;
+}
+.btn-primary:hover { background: #e05200; }
+
 /* Empty state */
 .empty-state {
   text-align: center; padding: 32px 0;
@@ -646,6 +663,63 @@ body {
 
 
 
+    <!-- AI Assistant Channel Settings (Pro only) -->
+    <div class="checklist-section" id="ai-settings-section" style="display:none">
+      <div class="checklist-title">AI Assistant</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Choose how you want to talk to your AI assistant. Available on Pro.</div>
+
+      <!-- Channel selector -->
+      <div style="display:flex;gap:10px;margin-bottom:20px;" id="ai-channel-selector">
+        <button class="ai-channel-btn active" data-channel="dashboard" onclick="selectChannel('dashboard')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </button>
+        <button class="ai-channel-btn" data-channel="whatsapp" onclick="selectChannel('whatsapp')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+          WhatsApp
+        </button>
+        <button class="ai-channel-btn" data-channel="telegram" onclick="selectChannel('telegram')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Telegram
+        </button>
+      </div>
+
+      <!-- Dashboard info -->
+      <div id="ai-channel-dashboard" class="ai-channel-info">
+        <p style="font-size:13px;color:var(--text-muted);">Your AI assistant is available in the AI Coach tab below. Tap it to start a conversation.</p>
+      </div>
+
+      <!-- WhatsApp setup -->
+      <div id="ai-channel-whatsapp" class="ai-channel-info" style="display:none">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Your AI assistant will reply to messages sent to the platform WhatsApp number from your registered WhatsApp number.</p>
+        <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;font-size:13px;">
+          <div style="color:rgba(255,255,255,0.5);margin-bottom:4px;">Your registered number</div>
+          <div id="wa-registered-number" style="color:rgba(255,255,255,0.9);font-weight:600;">Loading...</div>
+        </div>
+        <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:10px;">To change your number, update it in Edit Profile.</p>
+      </div>
+
+      <!-- Telegram setup -->
+      <div id="ai-channel-telegram" class="ai-channel-info" style="display:none">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Link your Telegram account to talk to your AI assistant there.</p>
+        <div id="tg-linked-state" style="display:none;background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;font-size:13px;">
+          <div style="color:rgba(255,255,255,0.5);margin-bottom:4px;">Linked account</div>
+          <div id="tg-username" style="color:rgba(255,255,255,0.9);font-weight:600;"></div>
+          <button onclick="unlinkTelegram()" style="margin-top:10px;font-size:12px;color:rgba(255,92,0,0.8);background:none;border:none;cursor:pointer;padding:0;">Unlink</button>
+        </div>
+        <div id="tg-unlinked-state">
+          <button class="btn-primary" onclick="generateTelegramLink()" style="width:100%;margin-top:0;">
+            Generate Telegram Link
+          </button>
+          <div id="tg-link-display" style="display:none;margin-top:12px;background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;">
+            <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px;">Open this link on your phone:</div>
+            <a id="tg-link-url" href="#" target="_blank" style="font-size:13px;color:#FF5C00;word-break:break-all;"></a>
+            <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px;">Link expires in 10 minutes. Tap it to open Telegram and complete the connection.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /dash-content -->
 
 </div><!-- /dash-wrap -->
@@ -815,6 +889,26 @@ function populateDash(t) {
 
   // Profile completeness widget
   if (typeof window.renderPC === 'function') window.renderPC(t);
+
+  // AI Assistant settings — show for Pro trainers
+  if (isPro) {
+    const aiSection = document.getElementById('ai-settings-section');
+    if (aiSection) {
+      aiSection.style.display = 'block';
+      // Set active channel
+      const ch = t.assistant_channel || 'dashboard';
+      selectChannel(ch, false); // false = don't save to DB
+      // Show WhatsApp number
+      const waEl = document.getElementById('wa-registered-number');
+      if (waEl) waEl.textContent = t.whatsapp || 'Not set — add in Edit Profile';
+      // Show Telegram linked state
+      if (t.telegram_chat_id) {
+        document.getElementById('tg-linked-state').style.display = 'block';
+        document.getElementById('tg-unlinked-state').style.display = 'none';
+        document.getElementById('tg-username').textContent = t.telegram_username ? '@' + t.telegram_username : 'Linked';
+      }
+    }
+  }
 }
 
 async function loadStats() {
@@ -1072,10 +1166,10 @@ init();
 
 // ── Trainer AI Coach ─────────────────────────────────────────────────────────
 (function() {
-  const AI_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1/trainer-assistant';
-  const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
+  const AI_URL = EDGE_BASE + '/trainer-assistant';
   let aiHistory = [];
   let aiBusy = false;
+  let aiConversationId = 'default';
 
   window.openAI = function() {
     document.getElementById('ai-panel').classList.add('open');
@@ -1136,23 +1230,17 @@ init();
     aiHistory.push({ role: 'user', content: question });
 
     try {
-      const token = (function() {
-        const cookies = document.cookie.split(';').map(c => c.trim());
-        for (const c of cookies) { if (c.startsWith('tb_session=')) return c.slice('tb_session='.length); }
-        return localStorage.getItem('tb_edit_token');
-      })();
-
       const res = await fetch(AI_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + ANON_KEY
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
         },
         body: JSON.stringify({
+          trainer_id: trainer?.id,
           message: question,
-          history: aiHistory.slice(-10), // last 10 turns for context
-          token: token,
-          locale: window.__LOCALE__ || 'en'
+          conversation_id: aiConversationId,
+          source: 'dashboard'
         })
       });
 
@@ -1195,5 +1283,56 @@ init();
     }
   });
 })();
+
+// ── AI Assistant Channel Management ─────────────────────────────────────────────────────────
+window.selectChannel = async function(channel, save = true) {
+  // Update button states
+  document.querySelectorAll('.ai-channel-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.channel === channel);
+  });
+  // Show correct info panel
+  ['dashboard', 'whatsapp', 'telegram'].forEach(ch => {
+    const el = document.getElementById('ai-channel-' + ch);
+    if (el) el.style.display = ch === channel ? 'block' : 'none';
+  });
+  // Persist to DB
+  if (save && trainer?.id) {
+    try {
+      await sb.from('trainers').update({ assistant_channel: channel }).eq('id', trainer.id);
+      showToast('Channel updated to ' + channel);
+    } catch { /* silently fail */ }
+  }
+};
+
+window.generateTelegramLink = async function() {
+  if (!trainer?.id) return;
+  try {
+    const { data, error } = await sb.rpc('generate_telegram_link_token', { p_trainer_id: trainer.id });
+    if (error) throw error;
+    const token = data;
+    const botName = window.__BRAND__?.telegramBot || 'TrainedByAssistantBot';
+    const linkUrl = `https://t.me/${botName}?start=${token}`;
+    document.getElementById('tg-link-url').textContent = linkUrl;
+    document.getElementById('tg-link-url').href = linkUrl;
+    document.getElementById('tg-link-display').style.display = 'block';
+  } catch (e) {
+    showToast('Could not generate link. Please try again.', 'error');
+  }
+};
+
+window.unlinkTelegram = async function() {
+  if (!trainer?.id) return;
+  try {
+    await sb.from('trainers').update({
+      telegram_chat_id: null,
+      telegram_username: null,
+      assistant_channel: 'dashboard'
+    }).eq('id', trainer.id);
+    document.getElementById('tg-linked-state').style.display = 'none';
+    document.getElementById('tg-unlinked-state').style.display = 'block';
+    selectChannel('dashboard', false);
+    showToast('Telegram unlinked');
+  } catch { showToast('Could not unlink. Please try again.', 'error'); }
+};
 </script>
 </Base>
