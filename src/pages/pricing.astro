@@ -1,8 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getMarket } from '../lib/market.ts';
+import { getLocale, t, getBrand } from '../lib/i18n.ts';
 const market = getMarket(Astro.url.hostname);
-const brandName = market.brandName;
+const locale = getLocale(Astro.request);
+const brand = getBrand(locale);
+const brandName = brand.name;
+// Per-market pricing
+const proMonthly = market.currency === 'AED' ? 99 : market.currency === 'GBP' ? 29 : market.currency === 'EUR' ? 29 : market.currency === 'INR' ? 1999 : 29;
+const proAnnual = Math.round(proMonthly * 0.8);
+const premiumMonthly = market.currency === 'AED' ? 199 : market.currency === 'GBP' ? 59 : market.currency === 'EUR' ? 59 : market.currency === 'INR' ? 3999 : 59;
+const premiumAnnual = Math.round(premiumMonthly * 0.8);
+const pricingHeadline = t(locale, 'pricing.headline').replace('{price}', `${market.currency} ${proMonthly}`);
 ---
 
 <Base
@@ -187,26 +196,26 @@ footer {
       <svg width="30" height="30" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
       {brandName}
     </a>
-    <a href="/join" class="nav-cta">Get Your Page →</a>
+    <a href="/join" class="nav-cta">{t(locale, 'join.submit').replace(' →', '')} →</a>
   </div>
 </nav>
 
 <div class="pricing-wrap">
 
   <div class="pricing-header">
-    <div class="pricing-label">Pricing</div>
-    <h1 class="pricing-title">Invest AED 99.<br>Earn AED 10,000+.</h1>
-    <p class="pricing-sub">Pro gets you an AI assistant, priority placement, unlimited packages, and analytics. Everything you need to grow your client base.</p>
+    <div class="pricing-label">{t(locale, 'pricing.title')}</div>
+    <h1 class="pricing-title" set:html={pricingHeadline.replace('. ', '.<br>')}></h1>
+    <p class="pricing-sub">{t(locale, 'pricing.sub_ext')}</p>
   </div>
 
   <!-- Billing toggle -->
   <div class="billing-toggle">
-    <span class="billing-option active" id="monthly-label" onclick="setBilling('monthly')">Monthly</span>
+    <span class="billing-option active" id="monthly-label" onclick="setBilling('monthly')">{t(locale, 'pricing.monthly_label')}</span>
     <div class="toggle-switch" id="billing-switch" onclick="toggleBilling()">
       <div class="toggle-knob"></div>
     </div>
-    <span class="billing-option" id="annual-label" onclick="setBilling('annual')">Annual</span>
-    <span class="billing-save">Save 20%</span>
+    <span class="billing-option" id="annual-label" onclick="setBilling('annual')">{t(locale, 'pricing.annual_label')}</span>
+    <span class="billing-save">{t(locale, 'pricing.save')}</span>
   </div>
 
   <!-- Plans -->
@@ -214,134 +223,126 @@ footer {
 
     <!-- Free -->
     <div class="plan-card">
-      <div class="plan-name">Free</div>
+      <div class="plan-name">{t(locale, 'pricing.free_name')}</div>
       <div class="plan-price">
-        <span class="plan-price-currency">AED</span>
+        <span class="plan-price-currency">{market.currency}</span>
         <span class="plan-price-value">0</span>
-        <span class="plan-price-period">/mo</span>
+        <span class="plan-price-period">/{t(locale, 'pricing.monthly')}</span>
       </div>
       <div class="plan-price-annual">&nbsp;</div>
-      <div class="plan-desc">Get your verified profile live in 2 minutes. No credit card required.</div>
-      <button class="plan-btn plan-btn-ghost" onclick="location.href='/join'">Get Started Free</button>
+      <div class="plan-desc">{t(locale, 'pricing.free_desc')}</div>
+      <button class="plan-btn plan-btn-ghost" onclick="location.href='/join'">{t(locale, 'pricing.get_started_free')}</button>
       <div class="plan-features">
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Public profile page
+          {t(locale, 'pricing.f_profile')}
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          REPs UAE verified badge
+          {market.certificationBody} {t(locale, 'pricing.f_badge')}
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          WhatsApp CTA button
+          {t(locale, 'pricing.f_whatsapp')}
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          1 session package
+          {t(locale, 'pricing.f_1_package')}
         </div>
         <div class="plan-feature excluded">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
-          Fitness assessment tool
+          {t(locale, 'pricing.f_assessment')}
         </div>
         <div class="plan-feature excluded">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
-          AI personal assistant
+          {t(locale, 'pricing.f_ai')}
         </div>
         <div class="plan-feature excluded">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
-          Analytics &amp; lead tracking
+          {t(locale, 'pricing.f_analytics')}
         </div>
         <div class="plan-feature excluded">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
-          Priority search placement
+          {t(locale, 'pricing.f_priority')}
         </div>
       </div>
     </div>
 
     <!-- Pro (Popular) -->
     <div class="plan-card popular">
-      <div class="popular-badge">Most Popular</div>
-      <div class="plan-name">Pro</div>
+      <div class="popular-badge">{t(locale, 'pricing.popular')}</div>
+      <div class="plan-name">{t(locale, 'pricing.pro_name')}</div>
       <div class="plan-price">
-        <span class="plan-price-currency">AED</span>
-        <span class="plan-price-value" id="pro-price">99</span>
-        <span class="plan-price-period">/mo</span>
+        <span class="plan-price-currency">{market.currency}</span>
+        <span class="plan-price-value" id="pro-price">{proMonthly}</span>
+        <span class="plan-price-period">/{t(locale, 'pricing.monthly')}</span>
       </div>
       <div class="plan-price-annual" id="pro-annual-note">&nbsp;</div>
-      <div class="plan-desc">AI assistant, priority placement, unlimited packages, and full analytics. Everything you need to grow your client base.</div>
-      <button class="plan-btn plan-btn-brand" onclick="startCheckout('pro')">Upgrade to Pro →</button>
+      <div class="plan-desc">{t(locale, 'pricing.pro_desc')}</div>
+      <button class="plan-btn plan-btn-brand" onclick="startCheckout('pro')">{t(locale, 'pricing.upgrade_pro')}</button>
       <div class="plan-features">
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Everything in Free
+          {t(locale, 'pricing.f_everything_free')}
         </div>
         <div class="plan-feature included" style="background:rgba(255,92,0,0.04);border-radius:8px;padding:6px 8px;margin:-2px 0">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5C00"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong style="color:#FF5C00">📊 Advanced analytics &amp; lead tracking</strong>
+          <strong style="color:#FF5C00">📊 {t(locale, 'pricing.f_analytics')}</strong>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Unlimited session packages
+          {t(locale, 'pricing.f_unlimited')} {t(locale, 'pricing.f_packages').toLowerCase()}
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong>AI personal assistant (unlimited)</strong>
+          <strong>{t(locale, 'pricing.f_ai')} ({t(locale, 'pricing.f_unlimited').toLowerCase()})</strong>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong>Priority search placement</strong>
+          <strong>{t(locale, 'pricing.f_priority')}</strong>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Transformation gallery (9 photos)
+          {t(locale, 'pricing.f_gallery')} ({t(locale, 'pricing.f_9_photos')})
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong>Analytics dashboard + weekly report</strong>
+          <strong>{t(locale, 'pricing.f_analytics')}</strong>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Remove TrainedBy branding
+          {t(locale, 'pricing.f_branding')}
         </div>
       </div>
     </div>
 
     <!-- Premium -->
     <div class="plan-card">
-      <div class="plan-name">Premium</div>
+      <div class="plan-name">{t(locale, 'pricing.premium_name')}</div>
       <div class="plan-price">
-        <span class="plan-price-currency">AED</span>
-        <span class="plan-price-value" id="premium-price">199</span>
-        <span class="plan-price-period">/mo</span>
+        <span class="plan-price-currency">{market.currency}</span>
+        <span class="plan-price-value" id="premium-price">{premiumMonthly}</span>
+        <span class="plan-price-period">/{t(locale, 'pricing.monthly')}</span>
       </div>
       <div class="plan-price-annual" id="premium-annual-note">&nbsp;</div>
-      <div class="plan-desc">For elite trainers and gym owners managing multiple profiles.</div>
-      <button class="plan-btn plan-btn-brand" style="background:var(--surface-3);color:var(--text);border:1px solid var(--border);" onmouseover="this.style.background='var(--brand)';this.style.borderColor='var(--brand)'" onmouseout="this.style.background='var(--surface-3)';this.style.borderColor='var(--border)'" onclick="startCheckout('premium')">Get Premium</button>
+      <div class="plan-desc">{t(locale, 'pricing.premium_desc')}</div>
+      <button class="plan-btn plan-btn-brand" style="background:var(--surface-3);color:var(--text);border:1px solid var(--border);" onmouseover="this.style.background='var(--brand)';this.style.borderColor='var(--brand)'" onmouseout="this.style.background='var(--surface-3)';this.style.borderColor='var(--border)'" onclick="startCheckout('premium')">{t(locale, 'pricing.get_premium')}</button>
       <div class="plan-features">
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Everything in Pro
+          {t(locale, 'pricing.f_everything_pro')}
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong>Up to 5 trainer profiles</strong>
+          <strong>{t(locale, 'pricing.f_up_to_5')} {t(locale, 'pricing.f_multi').toLowerCase()}</strong>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Gym / agency page
+          {t(locale, 'pricing.f_gym')}
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Featured trainer spotlight
-        </div>
-        <div class="plan-feature included">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Priority support
-        </div>
-        <div class="plan-feature included">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Custom domain (coming soon)
+          {t(locale, 'pricing.f_support')}
         </div>
       </div>
     </div>
@@ -350,31 +351,30 @@ footer {
 
   <!-- Comparison table -->
   <div class="compare-section">
-    <div class="compare-title">Full Comparison</div>
+    <div class="compare-title">{t(locale, 'pricing.full_comparison')}</div>
     <table class="compare-table">
       <thead>
         <tr>
-          <th>Feature</th>
-          <th>Free</th>
-          <th style="color:var(--brand);">Pro</th>
-          <th>Premium</th>
+          <th>{t(locale, 'pricing.feature')}</th>
+          <th>{t(locale, 'pricing.free_name')}</th>
+          <th style="color:var(--brand);">{t(locale, 'pricing.pro_name')}</th>
+          <th>{t(locale, 'pricing.premium_name')}</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>Public profile page</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>REPs UAE verified badge</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>WhatsApp CTA</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-
-        <tr><td>Fitness assessment tool</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Session packages</td><td>1</td><td class="plan-highlight">Unlimited</td><td class="plan-highlight">Unlimited</td></tr>
-        <tr><td>Transformation gallery</td><td><span class="cross">—</span></td><td class="plan-highlight">9 photos</td><td class="plan-highlight">9 photos</td></tr>
-        <tr><td>AI personal assistant</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Priority search placement</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Analytics &amp; lead tracking</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Remove TrainedBy branding</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Multiple trainer profiles</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td class="plan-highlight">Up to 5</td></tr>
-        <tr><td>Gym / agency page</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Priority support</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_profile')}</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{market.certificationBody} {t(locale, 'pricing.f_badge')}</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_whatsapp')}</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_assessment')}</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_packages')}</td><td>{t(locale, 'pricing.f_1_package')}</td><td class="plan-highlight">{t(locale, 'pricing.f_unlimited')}</td><td class="plan-highlight">{t(locale, 'pricing.f_unlimited')}</td></tr>
+        <tr><td>{t(locale, 'pricing.f_gallery')}</td><td><span class="cross">—</span></td><td class="plan-highlight">{t(locale, 'pricing.f_9_photos')}</td><td class="plan-highlight">{t(locale, 'pricing.f_9_photos')}</td></tr>
+        <tr><td>{t(locale, 'pricing.f_ai')}</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_priority')}</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_analytics')}</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_branding')}</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_multi')}</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td class="plan-highlight">{t(locale, 'pricing.f_up_to_5')}</td></tr>
+        <tr><td>{t(locale, 'pricing.f_gym')}</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_support')}</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -402,10 +402,13 @@ function setBilling(mode) {
   document.getElementById('billing-switch').classList.toggle('annual', isAnnual);
   document.getElementById('monthly-label').classList.toggle('active', !isAnnual);
   document.getElementById('annual-label').classList.toggle('active', isAnnual);
-  document.getElementById('pro-price').textContent = isAnnual ? '79' : '99';
-  document.getElementById('premium-price').textContent = isAnnual ? '159' : '199';
-  document.getElementById('pro-annual-note').textContent = isAnnual ? 'AED 948/yr — save AED 240' : '';
-  document.getElementById('premium-annual-note').textContent = isAnnual ? 'AED 1,908/yr — save AED 480' : '';
+  const currency = '{market.currency}';
+  const proM = {proMonthly}, proA = {proAnnual};
+  const premM = {premiumMonthly}, premA = {premiumAnnual};
+  document.getElementById('pro-price').textContent = isAnnual ? proA : proM;
+  document.getElementById('premium-price').textContent = isAnnual ? premA : premM;
+  document.getElementById('pro-annual-note').textContent = isAnnual ? currency + ' ' + (proA * 12) + '/yr — save ' + currency + ' ' + ((proM - proA) * 12) : '';
+  document.getElementById('premium-annual-note').textContent = isAnnual ? currency + ' ' + (premA * 12) + '/yr — save ' + currency + ' ' + ((premM - premA) * 12) : '';
 }
 
 function getAuthToken() {
