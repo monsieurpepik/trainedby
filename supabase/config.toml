@@ -394,3 +394,28 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 # declarative_schema_path = "./declarative"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# ── Edge Function Authentication Configuration ───────────────────────────────
+# Functions that receive external webhooks (Telegram, Stripe, Razorpay) MUST
+# have verify_jwt = false. These services do not send Supabase JWTs.
+# Security is handled by payload signature verification inside each function.
+#
+# RULE: Any function that receives a POST from an external service (not the
+# TrainedBy frontend) must be listed here with verify_jwt = false.
+# All other functions default to verify_jwt = true (secure by default).
+
+[functions.ceo-agent]
+# Receives Telegram webhook POSTs — no JWT, secured by chat ID allowlist
+verify_jwt = false
+
+[functions.stripe-webhook]
+# Receives Stripe webhook POSTs — no JWT, secured by Stripe-Signature header
+verify_jwt = false
+
+[functions.razorpay-webhook]
+# Receives Razorpay webhook POSTs — no JWT, secured by Razorpay-Signature header
+verify_jwt = false
+
+[functions.academy-booking-webhook]
+# Receives Stripe webhook POSTs for academy bookings — no JWT, secured by Stripe-Signature header
+verify_jwt = false
