@@ -244,7 +244,7 @@ const pageImage = trainerPhoto || 'https://images.unsplash.com/photo-15719029432
         img.src = photoUrl;
       }
 
-      const brand = window.__BRAND__ || 'TrainedBy';
+      const brand = (window.__BRAND__ && window.__BRAND__.name) ? window.__BRAND__.name : (window.__BRAND__ || 'TrainedBy');
       const specialties = Array.isArray(t.specialties) ? t.specialties : (t.specialties ? [t.specialties] : ['Personal Trainer']);
       const rating = t.avg_rating ? parseFloat(t.avg_rating).toFixed(1) : '5.0';
       const reviews = t.review_count || 0;

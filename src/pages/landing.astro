@@ -207,8 +207,8 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
 
     <!-- EXAMPLE PROFILE LINK -->
     <p style="margin-top:16px;font-size:13px;color:rgba(255,255,255,0.45)">
-      Not sure what your profile looks like?
-      <a href={`/${demoSlug}`} style="color:rgba(255,255,255,0.7);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">See an example profile</a>
+      {locale === 'fr' ? 'Pas sûr de ce à quoi ressemble votre profil ?' : locale === 'it' ? 'Non sai come appare il tuo profilo?' : locale === 'es' ? '¿No sabes cómo se ve tu perfil?' : 'Not sure what your profile looks like?'}
+      {' '}<a href={`/${demoSlug}`} style="color:rgba(255,255,255,0.7);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">{locale === 'fr' ? 'Voir un exemple de profil' : locale === 'it' ? 'Vedi un profilo esempio' : locale === 'es' ? 'Ver un perfil de ejemplo' : 'See an example profile'}</a>
     </p>
 
     <!-- QUICK FILTERS -->
@@ -383,7 +383,7 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
       <div class="trainer-banner-actions">
         <a href="/for-trainers" class="btn-primary">{t(locale, 'banner_cta_primary')}</a>
         <a href="/join" class="btn-ghost">{t(locale, 'banner_cta_ghost')}</a>
-        <a href={`/${demoSlug}`} style="font-size:13px;color:rgba(255,255,255,0.45);text-decoration:underline;text-underline-offset:3px;margin-top:8px" target="_blank" rel="noopener">See what your profile looks like</a>
+        <a href={`/${demoSlug}`} style="font-size:13px;color:rgba(255,255,255,0.45);text-decoration:underline;text-underline-offset:3px;margin-top:8px" target="_blank" rel="noopener">{locale === 'fr' ? 'Voir à quoi ressemble votre profil' : locale === 'it' ? 'Guarda come appare il tuo profilo' : locale === 'es' ? 'Ver cómo se ve tu perfil' : 'See what your profile looks like'}</a>
       </div>
     </div>
   </div>

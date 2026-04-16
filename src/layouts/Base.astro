@@ -188,7 +188,8 @@ const jsonLd = structuredData ?? defaultStructuredData;
       }
 
       /* ── CoachePar / France – Cobalt Blue ──────────────────────── */
-      [data-market="fr"] {
+      /* html[data-market] has higher specificity than :root in page-level <style> blocks */
+      html[data-market="fr"], html[data-market="fr"] :root {
         --brand: #2563EB;
         --brand-hover: #1d4ed8;
         --brand-dim: rgba(37,99,235,0.12);
@@ -197,7 +198,7 @@ const jsonLd = structuredData ?? defaultStructuredData;
       }
 
       /* ── AllenatoCon / Italy – Scuderia Red ───────────────────── */
-      [data-market="it"] {
+      html[data-market="it"], html[data-market="it"] :root {
         --brand: #DC2626;
         --brand-hover: #b91c1c;
         --brand-dim: rgba(220,38,38,0.12);
@@ -206,7 +207,8 @@ const jsonLd = structuredData ?? defaultStructuredData;
       }
 
       /* ── EntrenaCon / Spain & LatAm – Solar Yellow ──────────────── */
-      [data-market="es"], [data-market="mx"] {
+      html[data-market="es"], html[data-market="mx"],
+      html[data-market="es"] :root, html[data-market="mx"] :root {
         --brand: #D97706;
         --brand-hover: #b45309;
         --brand-dim: rgba(217,119,6,0.12);
@@ -421,6 +423,42 @@ const jsonLd = structuredData ?? defaultStructuredData;
         }
       }
     </style>
+
+    <!-- ── Per-market brand token override (server-rendered, highest priority) ── -->
+    <!-- This runs after all <style is:global> and page <style> blocks, so it always wins -->
+    {market.market === 'fr' && (
+      <style set:html={`
+        :root {
+          --brand: #2563EB !important;
+          --brand-hover: #1d4ed8 !important;
+          --brand-dim: rgba(37,99,235,0.12) !important;
+          --brand-border: rgba(37,99,235,0.30) !important;
+          --brand-glow: rgba(37,99,235,0.45) !important;
+        }
+      `} />
+    )}
+    {market.market === 'it' && (
+      <style set:html={`
+        :root {
+          --brand: #DC2626 !important;
+          --brand-hover: #b91c1c !important;
+          --brand-dim: rgba(220,38,38,0.12) !important;
+          --brand-border: rgba(220,38,38,0.30) !important;
+          --brand-glow: rgba(220,38,38,0.45) !important;
+        }
+      `} />
+    )}
+    {(market.market === 'es' || market.market === 'mx') && (
+      <style set:html={`
+        :root {
+          --brand: #D97706 !important;
+          --brand-hover: #b45309 !important;
+          --brand-dim: rgba(217,119,6,0.12) !important;
+          --brand-border: rgba(217,119,6,0.30) !important;
+          --brand-glow: rgba(217,119,6,0.45) !important;
+        }
+      `} />
+    )}
 
     <!-- ── i18n: locale + brand + translation strings ─────────────────── -->
     <script is:inline set:html={`
