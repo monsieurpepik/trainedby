@@ -12,7 +12,8 @@ const brandName = market.brandName;
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --orange:#FF5C00;--orange-dim:rgba(255,92,0,0.12);
+  /* --brand is inherited from Base.astro global tokens and overridden per market */
+  --orange-dim:var(--brand-dim, rgba(255,92,0,0.12)); /* fallback dim for non-brand uses */
   --green:#22c55e;--green-dim:rgba(34,197,94,0.12);
   --white:#fff;--white-60:rgba(255,255,255,0.6);--white-30:rgba(255,255,255,0.3);--white-10:rgba(255,255,255,0.1);--white-06:rgba(255,255,255,0.06);
   --surface:#0a0a0a;--surface2:#111;--surface3:#1a1a1a;
@@ -31,9 +32,9 @@ nav{
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
 }
 .nav-logo{font-size:15px;font-weight:800;letter-spacing:-0.01em;text-decoration:none;color:var(--white)}
-.nav-logo span{color:var(--orange)}
+.nav-logo span{color:var(--brand)}
 .nav-cta{
-  background:var(--orange);color:#fff;font-size:13px;font-weight:700;
+  background:var(--brand);color:#fff;font-size:13px;font-weight:700;
   padding:8px 16px;border-radius:20px;text-decoration:none;letter-spacing:0.01em;
 }
 
@@ -45,9 +46,9 @@ nav{
 }
 .hero-eyebrow{
   display:inline-flex;align-items:center;gap:6px;
-  background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
+  background:var(--orange-dim);border:1px solid var(--brand-border, rgba(255,92,0,0.2));
   border-radius:20px;padding:4px 12px;
-  font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--orange);
+  font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--brand);
   margin-bottom:16px;
 }
 .hero h1{font-size:clamp(26px,6vw,40px);font-weight:800;letter-spacing:-0.03em;line-height:1.15;margin-bottom:10px}
@@ -64,7 +65,7 @@ nav{
   border-radius:12px;color:var(--white);font-family:var(--font);font-size:15px;
   outline:none;transition:border-color 0.2s;
 }
-#searchInput:focus{border-color:var(--orange)}
+#searchInput:focus{border-color:var(--brand)}
 #searchInput::placeholder{color:var(--white-30)}
 
 /* FILTERS */
@@ -80,8 +81,8 @@ nav{
   color:var(--white-60);font-size:12px;font-weight:600;cursor:pointer;
   transition:all 0.15s;white-space:nowrap;font-family:var(--font);
 }
-.filter-btn:hover{border-color:var(--orange);color:var(--orange)}
-.filter-btn.active{background:var(--orange-dim);border-color:rgba(255,92,0,0.4);color:var(--orange)}
+.filter-btn:hover{border-color:var(--brand);color:var(--brand)}
+.filter-btn.active{background:var(--orange-dim);border-color:var(--brand-glow, rgba(255,92,0,0.4));color:var(--brand)}
 
 /* MAIN LAYOUT */
 .main{max-width:900px;margin:0 auto;padding:0 16px 60px}
@@ -137,21 +138,21 @@ nav{
 .card-avatar{
   width:52px;height:52px;border-radius:50%;
   background:linear-gradient(135deg,#1a1a1a,#2a1500);
-  border:2px solid var(--orange);
+  border:2px solid var(--brand);
   display:flex;align-items:center;justify-content:center;
-  font-size:16px;font-weight:800;color:var(--orange);
+  font-size:16px;font-weight:800;color:var(--brand);
   flex-shrink:0;overflow:hidden;margin-top:-32px;
   position:relative;z-index:1;
 }
 .card-avatar img{width:100%;height:100%;object-fit:cover}
 .card-info{flex:1;min-width:0;padding-top:4px}
 .card-name{font-size:15px;font-weight:800;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-verified{width:14px;height:14px;background:var(--orange);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-verified{width:14px;height:14px;background:var(--brand);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 .card-verified svg{width:8px;height:8px}
 .card-title{font-size:12px;color:var(--white-60);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
-.card-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;background:var(--orange-dim);color:var(--orange);border:1px solid rgba(255,92,0,0.15)}
+.card-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;background:var(--orange-dim);color:var(--brand);border:1px solid var(--brand-border, rgba(255,92,0,0.15))}
 
 .card-stats{display:flex;gap:0;border-top:1px solid var(--glass-border);padding-top:10px}
 .card-stat{flex:1;text-align:center}
@@ -165,7 +166,7 @@ nav{
   border-top:1px solid var(--glass-border);
   background:rgba(255,255,255,0.02);
 }
-.card-price{font-size:13px;font-weight:700;color:var(--orange)}
+.card-price{font-size:13px;font-weight:700;color:var(--brand)}
 .card-price span{font-size:10px;color:var(--white-60);font-weight:500}
 .card-wa{
   display:flex;align-items:center;gap:5px;
@@ -180,7 +181,7 @@ nav{
 .card-rating{display:flex;align-items:center;gap:4px;margin-bottom:8px}
 .card-stars{display:flex;gap:1px}
 .cs{font-size:11px}
-.cs.f{color:var(--orange)}.cs.e{color:rgba(255,255,255,0.15)}
+.cs.f{color:var(--brand)}.cs.e{color:rgba(255,255,255,0.15)}
 .card-rating-score{font-size:12px;font-weight:700}
 .card-rating-count{font-size:11px;color:var(--white-60)}
 
@@ -213,7 +214,7 @@ nav{
   padding:12px 28px;border-radius:20px;cursor:pointer;
   transition:border-color 0.2s;
 }
-.btn-load-more:hover{border-color:var(--orange);color:var(--orange)}
+.btn-load-more:hover{border-color:var(--brand);color:var(--brand)}
 
 /* ── Mobile responsive ────────────────────────────────────────────── */
 @media(max-width:640px){
@@ -234,14 +235,14 @@ nav{
   </style>
 
 <nav>
-  <a href="/" class="nav-logo">Trained<span>By</span>.</a>
+  <a href="/" class="nav-logo">{brandName}</a>
   <a href="/join" class="nav-cta">Get Your Page →</a>
 </nav>
 
 <div class="hero">
   <div class="hero-eyebrow">
     <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
-    REPs UAE Verified Trainers
+    {market.certificationBody} Verified Trainers
   </div>
   <h1 data-i18n="find.title">Find Your Perfect<br>Personal Trainer</h1>
   <p data-i18n="find.sub">Browse verified trainers across Dubai and the UAE. Filter by specialty, location, price and training style.</p>
