@@ -185,8 +185,25 @@ nav {
 .cross { color: var(--text-faint); font-size: 16px; }
 .plan-highlight { color: var(--brand); font-weight: 700; }
 
+/* ── Mobile responsive ────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .pricing-wrap { padding: 80px 16px 40px; }
+  .plans-grid { grid-template-columns: 1fr; }
+  .plan-card { padding: 24px 20px; }
+  .billing-toggle { flex-wrap: wrap; gap: 8px; }
+  .compare-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .compare-table { min-width: 480px; }
+  .nav-inner { padding: 0 16px; }
+}
+
+/* ── Safe area for notched phones ─────────────────────────────────── */
+.pricing-wrap {
+  padding-bottom: max(80px, calc(80px + env(safe-area-inset-bottom)));
+}
+
 footer {
   padding: 40px 24px; border-top: 1px solid var(--border); margin-top: 60px;
+  padding-bottom: max(40px, calc(40px + env(safe-area-inset-bottom)));
 }
 .footer-inner {
   max-width: 1100px; margin: 0 auto;

@@ -113,7 +113,7 @@ VALUES
   'published',
   'TrainedBy Content Team',
   'it',
-  'allenatacon',
+  'allenaticon',
   NOW() - INTERVAL '2 days'
 )
 

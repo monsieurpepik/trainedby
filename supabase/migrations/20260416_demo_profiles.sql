@@ -168,7 +168,7 @@ INSERT INTO trainers (
   TRUE, TRUE, 'fr', 'fr'
 ) ON CONFLICT (slug) DO NOTHING;
 
--- ─── Italy - allenatacon.it ───────────────────────────────────────────────────
+-- ─── Italy - allenaticon.it ───────────────────────────────────────────────────
 INSERT INTO trainers (
   slug, name, title, bio,
   avatar_url, specialties, certifications,

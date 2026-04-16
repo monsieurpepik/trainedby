@@ -316,6 +316,24 @@ body {
   color: var(--brand); margin: 8px 0 4px;
 }
 
+/* ── Mobile responsive ────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .join-wrap { padding-left: 16px; padding-right: 16px; }
+  .field-row { grid-template-columns: 1fr; gap: 0; }
+  .otp-input { width: 44px; height: 52px; font-size: 20px; }
+  .otp-row { gap: 8px; }
+  .step-title { font-size: 22px; }
+  .success-title { font-size: 26px; }
+  .income-teaser-amount { font-size: 18px; }
+  .toggle-row { gap: 6px; }
+  .toggle-pill { padding: 7px 12px; font-size: 11px; }
+}
+
+/* ── Safe area for notched phones ─────────────────────────────────── */
+.join-wrap {
+  padding-bottom: max(40px, calc(40px + env(safe-area-inset-bottom)));
+}
+
 .hidden { display: none !important; }
   </style>
 
@@ -713,9 +731,14 @@ function checkSlug(val) {
   }, 400);
 }
 
+// ===== Client-side sanitization (belt-and-suspenders; server also sanitizes) =====
+function sanitizeInput(str) {
+  return str.replace(/<[^>]*>/g, '').replace(/[<>"'`]/g, '').trim().slice(0, 500);
+}
+
 // ===== STEP 1 =====
 async function step1Next() {
-  const name = document.getElementById('s1-name').value.trim();
+  const name = sanitizeInput(document.getElementById('s1-name').value.trim());
   const slug = document.getElementById('s1-slug').value.trim();
   const email = document.getElementById('s1-email').value.trim();
   const phone = document.getElementById('s1-phone').value.trim();
