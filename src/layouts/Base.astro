@@ -463,6 +463,8 @@ const jsonLd = structuredData ?? defaultStructuredData;
     <!-- ── i18n: locale + brand + translation strings ─────────────────── -->
     <script is:inline set:html={`
       window.__LOCALE__ = '${locale}';
+      window.__MARKET__ = '${market.market}';
+      window.__CURRENCY__ = '${market.currencySymbol}';
       window.__BRAND__ = ${JSON.stringify(brand)};
       window.__I18N__ = ${JSON.stringify(i18nStrings)};
     `} />
