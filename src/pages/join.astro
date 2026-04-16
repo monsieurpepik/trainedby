@@ -5,6 +5,16 @@ import { getLocale, t, getBrand } from '../lib/i18n.ts';
 const market = getMarket(Astro.url.hostname);
 const locale = getLocale(Astro.request);
 const brand = getBrand(locale);
+const DEMO_SLUGS: Record<string, string> = {
+  'en-ae': 'sarah-al-mansoori',
+  'en-uk': 'james-hartley',
+  'en-us': 'marcus-johnson',
+  'en-in': 'arjun-sharma',
+  'es':    'lucia-fernandez',
+  'fr':    'thomas-moreau',
+  'it':    'giulia-romano',
+};
+const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
 ---
 
 <Base
@@ -434,6 +444,10 @@ body {
         {t(locale, 'join.trust_speed')}
       </div>
     </div>
+    <p style="text-align:center;margin-top:20px;font-size:12px;color:rgba(255,255,255,0.35)">
+      Wondering what your profile will look like?
+      <a href={`/${demoSlug}`} style="color:rgba(255,255,255,0.55);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">See an example</a>
+    </p>
   </div>
 
   <!-- ===== STEP 2: Specialties + OTP ===== -->

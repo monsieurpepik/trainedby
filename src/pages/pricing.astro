@@ -12,6 +12,16 @@ const proAnnual = Math.round(proMonthly * 0.8);
 const premiumMonthly = market.currency === 'AED' ? 199 : market.currency === 'GBP' ? 59 : market.currency === 'EUR' ? 59 : market.currency === 'INR' ? 3999 : 59;
 const premiumAnnual = Math.round(premiumMonthly * 0.8);
 const pricingHeadline = t(locale, 'pricing.headline').replace('{price}', `${market.currency} ${proMonthly}`);
+const DEMO_SLUGS: Record<string, string> = {
+  'en-ae': 'sarah-al-mansoori',
+  'en-uk': 'james-hartley',
+  'en-us': 'marcus-johnson',
+  'en-in': 'arjun-sharma',
+  'es':    'lucia-fernandez',
+  'fr':    'thomas-moreau',
+  'it':    'giulia-romano',
+};
+const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
 ---
 
 <Base
@@ -280,6 +290,7 @@ footer {
       <div class="plan-price-annual" id="pro-annual-note">&nbsp;</div>
       <div class="plan-desc">{t(locale, 'pricing.pro_desc')}</div>
       <button class="plan-btn plan-btn-brand" onclick="startCheckout('pro')">{t(locale, 'pricing.upgrade_pro')}</button>
+      <a href={`/${demoSlug}`} style="display:block;text-align:center;margin-top:10px;font-size:12px;color:rgba(255,255,255,0.4);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">See an example Pro profile</a>
       <div class="plan-features">
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>

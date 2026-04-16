@@ -6,6 +6,18 @@ const market = getMarket(Astro.url.hostname);
 const locale = getLocale(Astro.request);
 const brand = getBrand(locale);
 const brandName = brand.name;
+
+// Demo profile slug per locale - links to the example trainer for this market
+const DEMO_SLUGS: Record<string, string> = {
+  'en-ae': 'sarah-al-mansoori',
+  'en-uk': 'james-hartley',
+  'en-us': 'marcus-johnson',
+  'en-in': 'arjun-sharma',
+  'es':    'lucia-fernandez',
+  'fr':    'thomas-moreau',
+  'it':    'giulia-romano',
+};
+const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
 ---
 
 <Base
@@ -182,6 +194,12 @@ const brandName = brand.name;
       <button class="search-btn" onclick="doSearch()">{t(locale, 'search_btn')}</button>
     </div>
 
+    <!-- EXAMPLE PROFILE LINK -->
+    <p style="margin-top:16px;font-size:13px;color:rgba(255,255,255,0.45)">
+      Not sure what your profile looks like?
+      <a href={`/${demoSlug}`} style="color:rgba(255,255,255,0.7);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">See an example profile</a>
+    </p>
+
     <!-- QUICK FILTERS -->
     <div class="quick-filters">
       <a href="/find?specialty=weight-loss" class="qf-pill">{t(locale, 'filter_weight_loss')}</a>
@@ -354,6 +372,7 @@ const brandName = brand.name;
       <div class="trainer-banner-actions">
         <a href="/for-trainers" class="btn-primary">{t(locale, 'banner_cta_primary')}</a>
         <a href="/join" class="btn-ghost">{t(locale, 'banner_cta_ghost')}</a>
+        <a href={`/${demoSlug}`} style="font-size:13px;color:rgba(255,255,255,0.45);text-decoration:underline;text-underline-offset:3px;margin-top:8px" target="_blank" rel="noopener">See what your profile looks like</a>
       </div>
     </div>
   </div>
