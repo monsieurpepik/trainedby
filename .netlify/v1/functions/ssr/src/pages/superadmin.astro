@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 ---
 
-<Base title="TrainedBy — Global Command Centre" description="Super admin dashboard for all markets">
+<Base title="TrainedBy  -  Global Command Centre" description="Super admin dashboard for all markets">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -112,12 +112,12 @@ import Base from '../layouts/Base.astro';
 
   <!-- GLOBAL KPIs -->
   <div class="global-kpis" id="global-kpis">
-    <div class="kpi highlight"><div class="kpi-label">Total Trainers</div><div class="kpi-value" id="g-trainers">—</div><div class="kpi-sub">across all markets</div></div>
-    <div class="kpi"><div class="kpi-label">Pro Subscribers</div><div class="kpi-value" id="g-pro">—</div><div class="kpi-sub">paying trainers</div></div>
-    <div class="kpi"><div class="kpi-label">Verified</div><div class="kpi-value" id="g-verified">—</div><div class="kpi-sub">cert verified</div></div>
-    <div class="kpi"><div class="kpi-label">Waitlist</div><div class="kpi-value" id="g-waitlist">—</div><div class="kpi-sub">across 4 markets</div></div>
-    <div class="kpi"><div class="kpi-label">New This Week</div><div class="kpi-value" id="g-week">—</div><div class="kpi-sub">trainer signups</div></div>
-    <div class="kpi highlight"><div class="kpi-label">Est. MRR</div><div class="kpi-value" id="g-mrr">—</div><div class="kpi-sub">all markets</div></div>
+    <div class="kpi highlight"><div class="kpi-label">Total Trainers</div><div class="kpi-value" id="g-trainers"> - </div><div class="kpi-sub">across all markets</div></div>
+    <div class="kpi"><div class="kpi-label">Pro Subscribers</div><div class="kpi-value" id="g-pro"> - </div><div class="kpi-sub">paying trainers</div></div>
+    <div class="kpi"><div class="kpi-label">Verified</div><div class="kpi-value" id="g-verified"> - </div><div class="kpi-sub">cert verified</div></div>
+    <div class="kpi"><div class="kpi-label">Waitlist</div><div class="kpi-value" id="g-waitlist"> - </div><div class="kpi-sub">across 4 markets</div></div>
+    <div class="kpi"><div class="kpi-label">New This Week</div><div class="kpi-value" id="g-week"> - </div><div class="kpi-sub">trainer signups</div></div>
+    <div class="kpi highlight"><div class="kpi-label">Est. MRR</div><div class="kpi-value" id="g-mrr"> - </div><div class="kpi-sub">all markets</div></div>
   </div>
 
   <!-- TABS -->
@@ -351,7 +351,7 @@ import Base from '../layouts/Base.astro';
                        '<span class="badge badge-gray">Unverified</span>';
       const joined = new Date(t.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'2-digit' });
       return `<tr>
-        <td><div style="font-weight:600">${t.full_name || '—'}</div><div style="font-size:11px;color:var(--text-2)">${t.email || ''}</div></td>
+        <td><div style="font-weight:600">${t.full_name || ' - '}</div><div style="font-size:11px;color:var(--text-2)">${t.email || ''}</div></td>
         <td>${m.flag} ${m.name}</td>
         <td>${planBadge}</td>
         <td>${verBadge}</td>
@@ -388,10 +388,10 @@ import Base from '../layouts/Base.astro';
       const roleBadge = w.role === 'trainer' ? '<span class="badge badge-orange">Trainer</span>' : '<span class="badge badge-gray">Client</span>';
       return `<tr>
         <td style="font-weight:500">${w.email}</td>
-        <td style="color:var(--text-2)">${w.name || '—'}</td>
+        <td style="color:var(--text-2)">${w.name || ' - '}</td>
         <td>${m.flag} ${m.name}</td>
         <td>${roleBadge}</td>
-        <td style="font-size:11px;color:var(--text-2)">${w.source_domain || '—'}</td>
+        <td style="font-size:11px;color:var(--text-2)">${w.source_domain || ' - '}</td>
         <td style="color:var(--text-2)">${joined}</td>
       </tr>`;
     }).join('');
@@ -437,7 +437,7 @@ import Base from '../layouts/Base.astro';
         <td>${m.currency}</td>
         <td style="text-align:center">${stats.pro}</td>
         <td style="font-weight:700;color:var(--brand)">${m.currency} ${mrr.toLocaleString()}</td>
-        <td style="color:var(--text-2)">—</td>
+        <td style="color:var(--text-2)"> - </td>
         <td style="font-weight:700">${m.currency} ${mrr.toLocaleString()}</td>
         <td>${payStatus}</td>
       </tr>`;

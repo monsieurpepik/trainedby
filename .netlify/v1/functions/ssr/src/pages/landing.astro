@@ -1,64 +1,74 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getMarket } from '../lib/market.ts';
+import { getLocale, t, getBrand } from '../lib/i18n.ts';
 const market = getMarket(Astro.url.hostname);
-const brandName = market.brandName || 'TrainedBy';
+const locale = getLocale(Astro.request);
+const brand = getBrand(locale);
+const brandName = brand.name;
+
+// Demo profile slug per locale - links to the example trainer for this market
+const DEMO_SLUGS: Record<string, string> = {
+  'en-ae': 'sarah-al-mansoori',
+  'en-uk': 'james-hartley',
+  'en-us': 'marcus-johnson',
+  'en-in': 'arjun-sharma',
+  'es':    'lucia-fernandez',
+  'fr':    'thomas-moreau',
+  'it':    'giulia-romano',
+};
+const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
 ---
 
 <Base
-  title={`${brandName} — Find a Verified Personal Trainer`}
+  title={`${brandName}  -  Find a Verified Personal Trainer`}
   description={`Discover verified personal trainers in ${market.cityName || 'your city'}. Every trainer is ${market.certificationBody}-certified and background-checked. Real results, real people.`}
 >
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --brand: #FF5C00;
-      --brand-dim: rgba(255,92,0,0.10);
-      --brand-border: rgba(255,92,0,0.25);
-      --reps: #00C853;
-      --gold: #F5C842;
-      --surface: #0a0a0a;
-      --surface-2: #111111;
-      --surface-3: #1a1a1a;
-      --surface-4: #222222;
-      --border: rgba(255,255,255,0.07);
-      --border-2: rgba(255,255,255,0.12);
-      --text: #f2f2f2;
-      --text-2: #888888;
-      --text-3: #555555;
+      /* Local aliases that map to Base.astro global tokens */
+      --surface: var(--bg, #0a0a0a);
+      --surface-2: var(--surface, #111111);
+      --surface-3: var(--surface-2, #161616);
+      --surface-4: var(--surface-3, #1c1c1c);
+      --border-2: var(--border-strong, rgba(255,255,255,0.12));
+      --text-2: var(--text-2, #a3a3a3);
+      --text-3: var(--text-3, #666666);
+      --reps: var(--green, #00C853);
       --max: 1100px;
     }
-    body { background: var(--surface); color: var(--text); font-family: 'Manrope', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    body { background: var(--bg, #0a0a0a); color: var(--text, #f0f0f0); font-family: var(--font-body, 'Inter', sans-serif); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
     /* NAV */
     .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 32px; height: 64px; display: flex; align-items: center; gap: 32px; transition: background 0.3s, border-color 0.3s; border-bottom: 1px solid transparent; }
     .nav.scrolled { background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); border-color: var(--border); }
-    .nav-logo { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 20px; color: var(--brand); text-decoration: none; letter-spacing: -0.5px; margin-right: auto; }
+    .nav-logo { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 900; font-size: 20px; color: var(--brand); text-decoration: none; letter-spacing: -0.5px; margin-right: auto; }
     .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a { color: var(--text-2); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a { color: var(--text-2); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; font-family: var(--font-body); }
     .nav-links a:hover { color: var(--text); }
     .nav-links a.for-trainers { color: var(--brand); font-weight: 700; }
-    .nav-links a.for-trainers:hover { color: #e05200; }
-    .nav-cta { display: inline-flex; align-items: center; gap: 6px; padding: 9px 20px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; white-space: nowrap; }
-    .nav-cta:hover { background: #e05200; transform: translateY(-1px); }
+    .nav-links a.for-trainers:hover { color: var(--brand-hover, #e05200); }
+    .nav-cta { display: inline-flex; align-items: center; gap: 6px; padding: 9px 20px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; white-space: nowrap; font-family: var(--font-body); }
+    .nav-cta:hover { background: var(--brand-hover, #e05200); transform: translateY(-1px); }
     @media (max-width: 640px) { .nav-links { display: none; } .nav { padding: 0 20px; } }
 
-    /* HERO — Consumer Search */
+    /* HERO  -  Consumer Search */
     .hero { min-height: 92vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
     .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 90% 70% at 50% 30%, rgba(255,92,0,0.06) 0%, transparent 65%); pointer-events: none; }
     .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 100px; border: 1px solid var(--brand-border); background: var(--brand-dim); font-size: 12px; font-weight: 700; color: var(--brand); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 28px; }
-    .hero-headline { font-family: 'Manrope', sans-serif; font-size: clamp(38px, 7vw, 80px); font-weight: 900; line-height: 1.0; letter-spacing: -3px; max-width: 820px; margin-bottom: 20px; }
+    .hero-headline { font-family: var(--font-display, 'Manrope', sans-serif); font-size: clamp(38px, 7vw, 80px); font-weight: 900; line-height: 1.0; letter-spacing: -0.04em; max-width: 820px; margin-bottom: 20px; }
     .hero-headline em { font-style: normal; color: var(--brand); }
     .hero-sub { font-size: clamp(15px, 2vw, 17px); color: var(--text-2); max-width: 480px; line-height: 1.7; margin-bottom: 40px; }
 
     /* SEARCH BAR */
     .search-wrap { width: 100%; max-width: 640px; position: relative; margin-bottom: 24px; }
     .search-bar { width: 100%; padding: 18px 140px 18px 56px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text); font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-    .search-bar:focus { border-color: rgba(255,92,0,0.4); box-shadow: 0 0 0 3px rgba(255,92,0,0.08); }
+    .search-bar:focus { border-color: var(--brand-border); box-shadow: 0 0 0 3px var(--brand-dim); }
     .search-bar::placeholder { color: var(--text-3); }
     .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-2); pointer-events: none; }
     .search-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); padding: 10px 22px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
-    .search-btn:hover { background: #e05200; }
+    .search-btn:hover { background: var(--brand-hover, #e05200); }
 
     /* QUICK FILTERS */
     .quick-filters { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 56px; }
@@ -73,21 +83,21 @@ const brandName = market.brandName || 'TrainedBy';
     /* SECTION STRUCTURE */
     .section { padding: 80px 24px; max-width: var(--max); margin: 0 auto; }
     .section-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
-    .section-title { font-family: 'Manrope', sans-serif; font-size: clamp(26px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+    .section-title { font-family: var(--font-display, 'Manrope', sans-serif); font-size: clamp(26px, 4vw, 44px); font-weight: 900; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 16px; }
     .section-sub { font-size: 15px; color: var(--text-2); line-height: 1.7; max-width: 480px; }
 
     /* FEATURED TRAINERS */
     .trainers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 40px; }
     .trainer-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.2s, transform 0.2s; display: block; }
     .trainer-card:hover { border-color: var(--border-2); transform: translateY(-2px); }
-    .trainer-card-img { width: 100%; aspect-ratio: 4/3; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 36px; color: var(--brand); position: relative; overflow: hidden; }
+    .trainer-card-img { width: 100%; aspect-ratio: 4/3; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 900; font-size: 36px; color: var(--brand); position: relative; overflow: hidden; }
     .trainer-card-img .verified-badge { position: absolute; top: 10px; right: 10px; padding: 3px 9px; border-radius: 20px; background: rgba(0,200,83,0.15); border: 1px solid rgba(0,200,83,0.3); color: #00C853; font-size: 10px; font-weight: 700; }
     .trainer-card-body { padding: 16px; }
-    .trainer-card-name { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 15px; margin-bottom: 3px; }
+    .trainer-card-name { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 800; font-size: 15px; margin-bottom: 3px; }
     .trainer-card-meta { font-size: 12px; color: var(--text-2); margin-bottom: 10px; }
     .trainer-card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
     .trainer-tag { padding: 3px 9px; border-radius: 20px; background: var(--surface-3); border: 1px solid var(--border); font-size: 11px; color: var(--text-2); font-weight: 600; }
-    .trainer-card-price { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 14px; color: var(--text); }
+    .trainer-card-price { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 800; font-size: 14px; color: var(--text); }
     .trainer-card-price span { font-size: 11px; font-weight: 500; color: var(--text-2); }
 
     /* TRANSFORMATIONS */
@@ -98,12 +108,12 @@ const brandName = market.brandName || 'TrainedBy';
     .transform-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 14px; color: var(--brand); flex-shrink: 0; }
     .transform-trainer-name { font-weight: 700; font-size: 13px; }
     .transform-trainer-cert { font-size: 11px; color: #00C853; font-weight: 600; }
-    .transform-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.3px; margin-bottom: 10px; }
+    .transform-title { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 800; font-size: 17px; letter-spacing: -0.02em; margin-bottom: 10px; }
     .transform-body { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
     .transform-stats { display: flex; gap: 0; border-top: 1px solid var(--border); }
     .transform-stat { flex: 1; padding: 14px 16px; text-align: center; border-right: 1px solid var(--border); }
     .transform-stat:last-child { border-right: none; }
-    .transform-stat-val { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 18px; color: var(--brand); letter-spacing: -0.5px; }
+    .transform-stat-val { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 900; font-size: 18px; color: var(--brand); letter-spacing: -0.03em; }
     .transform-stat-label { font-size: 10px; color: var(--text-2); margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
     /* BLOG PREVIEW */
@@ -113,7 +123,7 @@ const brandName = market.brandName || 'TrainedBy';
     .blog-card:hover { border-color: var(--border-2); transform: translateY(-2px); }
     .blog-card.featured { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; }
     .blog-cat { display: inline-block; padding: 4px 12px; border-radius: 100px; background: var(--brand-dim); border: 1px solid var(--brand-border); color: var(--brand); font-size: 11px; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 14px; }
-    .blog-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; line-height: 1.25; margin-bottom: 10px; }
+    .blog-title { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 800; font-size: 20px; letter-spacing: -0.03em; line-height: 1.25; margin-bottom: 10px; }
     .blog-card:not(.featured) .blog-title { font-size: 16px; }
     .blog-excerpt { font-size: 14px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
     .blog-author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2); }
@@ -122,20 +132,20 @@ const brandName = market.brandName || 'TrainedBy';
     @media (max-width: 720px) { .blog-grid { grid-template-columns: 1fr; } .blog-card.featured { grid-template-columns: 1fr; } }
 
     /* FOR TRAINERS BANNER */
-    .trainer-banner { margin: 0 24px; border-radius: 20px; background: linear-gradient(135deg, rgba(255,92,0,0.12) 0%, rgba(255,92,0,0.04) 100%); border: 1px solid rgba(255,92,0,0.2); padding: 56px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+    .trainer-banner { margin: 0 24px; border-radius: 20px; background: linear-gradient(135deg, var(--brand-dim) 0%, transparent 100%); border: 1px solid var(--brand-border); padding: 56px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
     .trainer-banner-text {}
     .trainer-banner-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
-    .trainer-banner-title { font-family: 'Manrope', sans-serif; font-size: clamp(22px, 3vw, 36px); font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; }
+    .trainer-banner-title { font-family: var(--font-display, 'Manrope', sans-serif); font-size: clamp(22px, 3vw, 36px); font-weight: 900; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 12px; }
     .trainer-banner-sub { font-size: 15px; color: var(--text-2); line-height: 1.6; max-width: 420px; }
     .trainer-banner-actions { display: flex; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
     .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
-    .btn-primary:hover { background: #e05200; transform: translateY(-2px); }
+    .btn-primary:hover { background: var(--brand-hover, #e05200); transform: translateY(-2px); }
     .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--border-2); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
     .btn-ghost:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-2px); }
 
     /* FOOTER */
     footer { border-top: 1px solid var(--border); padding: 48px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; max-width: var(--max); margin: 0 auto; }
-    .footer-logo { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 18px; color: var(--brand); text-decoration: none; }
+    .footer-logo { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 900; font-size: 18px; color: var(--brand); text-decoration: none; }
     .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
     .footer-links a { color: var(--text-2); text-decoration: none; font-size: 13px; transition: color 0.2s; }
     .footer-links a:hover { color: var(--text); }
@@ -144,18 +154,33 @@ const brandName = market.brandName || 'TrainedBy';
     /* SKELETON LOADER */
     .skeleton { background: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-4) 50%, var(--surface-3) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* SCROLL FADE-IN */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.55s ease, transform 0.55s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* MOBILE */
+    @media (max-width: 640px) {
+      .section { padding: 48px 16px; }
+      .trainer-banner { padding: 32px 20px; margin: 0 16px; }
+      .trainers-grid { grid-template-columns: 1fr; }
+      .transforms-grid { grid-template-columns: 1fr; }
+      footer { padding: 32px 20px; }
+    }
   </style>
 
   <!-- NAV -->
   <nav class="nav" id="nav">
-    <a href="/landing" class="nav-logo" data-i18n="brand">{brandName}</a>
+    <a href="/landing" class="nav-logo">{brandName}</a>
     <div class="nav-links">
-      <a href="/find" data-i18n="nav_find">Find a Trainer</a>
-      <a href="/blog" data-i18n="nav_blog">Stories</a>
-      <a href="/community" data-i18n="nav_community">Community</a>
-      <a href="/for-trainers" class="for-trainers" data-i18n="nav_for_trainers">For Trainers</a>
+      <a href="/find">{t(locale, 'nav_find')}</a>
+      <a href="/blog">{t(locale, 'nav_blog')}</a>
+      <a href="/for-trainers" class="for-trainers">{t(locale, 'nav_for_trainers')}</a>
     </div>
-    <a href="/find" class="nav-cta" data-i18n="nav_cta_find">Find Your Trainer →</a>
+    <a href="/find" class="nav-cta">{t(locale, 'nav_cta_find')}</a>
   </nav>
 
   <!-- HERO -->
@@ -164,12 +189,8 @@ const brandName = market.brandName || 'TrainedBy';
       <div style="width:6px;height:6px;border-radius:50%;background:#00C853;flex-shrink:0"></div>
       {market.certificationBody} Verified Trainers · {market.cityName || market.market.toUpperCase()}
     </div>
-    <h1 class="hero-headline" data-i18n="hero_headline">
-      Find a trainer<br>who <em>actually</em><br>gets results.
-    </h1>
-    <p class="hero-sub" data-i18n="hero_sub">
-      Every trainer on {brandName} is {market.certificationBody}-certified and verified. Browse real profiles, read real stories, and book the right person for you.
-    </p>
+    <h1 class="hero-headline">{t(locale, 'hero_headline')}</h1>
+    <p class="hero-sub">{t(locale, 'hero_sub')}</p>
 
     <!-- SEARCH -->
     <div class="search-wrap">
@@ -178,44 +199,47 @@ const brandName = market.brandName || 'TrainedBy';
         class="search-bar"
         id="hero-search"
         type="text"
-        placeholder={market.market === 'fr' ? 'Rechercher par spécialité, lieu...' :
-                     market.market === 'it' ? 'Cerca per specialità, zona...' :
-                     market.market === 'es' || market.market === 'mx' ? 'Buscar por especialidad, zona...' :
-                     'Search by specialty, area, or name...'}
+        placeholder={t(locale, 'search_placeholder')}
         autocomplete="off"
       />
-      <button class="search-btn" onclick="doSearch()" data-i18n="search_btn">Search</button>
+      <button class="search-btn" onclick="doSearch()">{t(locale, 'search_btn')}</button>
     </div>
+
+    <!-- EXAMPLE PROFILE LINK -->
+    <p style="margin-top:16px;font-size:13px;color:rgba(255,255,255,0.45)">
+      {locale === 'fr' ? 'Pas sûr de ce à quoi ressemble votre profil ?' : locale === 'it' ? 'Non sai come appare il tuo profilo?' : locale === 'es' ? '¿No sabes cómo se ve tu perfil?' : 'Not sure what your profile looks like?'}
+      {' '}<a href={`/${demoSlug}`} style="color:rgba(255,255,255,0.7);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">{locale === 'fr' ? 'Voir un exemple de profil' : locale === 'it' ? 'Vedi un profilo esempio' : locale === 'es' ? 'Ver un perfil de ejemplo' : 'See an example profile'}</a>
+    </p>
 
     <!-- QUICK FILTERS -->
     <div class="quick-filters">
-      <a href="/find?specialty=weight-loss" class="qf-pill" data-i18n="filter_weight_loss">Weight Loss</a>
-      <a href="/find?specialty=strength" class="qf-pill" data-i18n="filter_strength">Strength</a>
+      <a href="/find?specialty=weight-loss" class="qf-pill">{t(locale, 'filter_weight_loss')}</a>
+      <a href="/find?specialty=strength" class="qf-pill">{t(locale, 'filter_strength')}</a>
       <a href="/find?specialty=hiit" class="qf-pill">HIIT</a>
-      <a href="/find?specialty=nutrition" class="qf-pill" data-i18n="filter_nutrition">Nutrition</a>
+      <a href="/find?specialty=nutrition" class="qf-pill">{t(locale, 'filter_nutrition')}</a>
       <a href="/find?specialty=yoga" class="qf-pill">Yoga</a>
-      <a href="/find?specialty=running" class="qf-pill" data-i18n="filter_running">Running</a>
-      <a href="/find?specialty=boxing" class="qf-pill">Boxing</a>
+      <a href="/find?specialty=running" class="qf-pill">{t(locale, 'filter_running')}</a>
+      <a href="/find?specialty=boxing" class="qf-pill">{t(locale, 'filter_boxing')}</a>
     </div>
 
     <!-- TRUST STRIP -->
     <div class="trust-strip">
-      <div class="trust-item"><div class="trust-dot"></div><span data-i18n="trust_verified">Verified Trainers</span></div>
-      <div class="trust-item"><div class="trust-dot"></div><span data-i18n="trust_profiles">Real Trainer Profiles</span></div>
-      <div class="trust-item"><div class="trust-dot"></div><span data-i18n="trust_reviews">No Fake Reviews</span></div>
-      <div class="trust-item"><div class="trust-dot"></div><span data-i18n="trust_free">Free to Browse</span></div>
+      <div class="trust-item"><div class="trust-dot"></div><span>{t(locale, 'trust_verified')}</span></div>
+      <div class="trust-item"><div class="trust-dot"></div><span>{t(locale, 'trust_profiles')}</span></div>
+      <div class="trust-item"><div class="trust-dot"></div><span>{t(locale, 'trust_reviews')}</span></div>
+      <div class="trust-item"><div class="trust-dot"></div><span>{t(locale, 'trust_free')}</span></div>
     </div>
   </section>
 
   <!-- FEATURED TRAINERS -->
   <div style="border-top:1px solid var(--border)">
-    <div class="section">
-      <p class="section-eyebrow" data-i18n="featured_eyebrow">Top trainers near you.</p>
+    <div class="section reveal">
+      <p class="section-eyebrow">{t(locale, 'featured_eyebrow')}</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
-        <h2 class="section-title" style="margin-bottom:0" data-i18n="featured_title">Top trainers<br>near you.</h2>
-        <a href="/find" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none" data-i18n="featured_cta">See all trainers →</a>
+        <h2 class="section-title" style="margin-bottom:0">{t(locale, 'featured_title')}</h2>
+        <a href="/find" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">{t(locale, 'featured_cta')}</a>
       </div>
-      <p class="section-sub" data-i18n="trust_verified_sub">Every trainer is certified and verified.</p>
+      <p class="section-sub">{t(locale, 'trust_verified_sub')}</p>
       <div class="trainers-grid" id="featured-trainers">
         <!-- Skeleton loaders -->
         <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
@@ -240,15 +264,15 @@ const brandName = market.brandName || 'TrainedBy';
 
   <!-- TRANSFORMATIONS -->
   <div style="border-top:1px solid var(--border);background:var(--surface-2)">
-    <div class="section">
-      <p class="section-eyebrow" data-i18n="transform_eyebrow">Real Results</p>
+    <div class="section reveal reveal-delay-1">
+      <p class="section-eyebrow">{t(locale, 'transform_eyebrow')}</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
-        <h2 class="section-title" style="margin-bottom:0" data-i18n="transform_title">Transformations<br>that speak for themselves.</h2>
-        <a href="/community?category=transformations" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">See all →</a>
+        <h2 class="section-title" style="margin-bottom:0">{t(locale, 'transform_title')}</h2>
+        <a href="/find" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">{t(locale, 'featured_cta')}</a>
       </div>
-      <p class="section-sub" data-i18n="blog_sub">No sponsored content. No generic listicles. Written by verified trainers from their own practice.</p>
+      <p class="section-sub">{t(locale, 'blog_sub')}</p>
       <div class="transforms-grid" id="transformations-grid">
-        <!-- Static seed cards — replaced by live data when available -->
+        <!-- Static seed cards  -  replaced by live data when available -->
         <div class="transform-card">
           <div class="transform-header">
             <div class="transform-trainer">
@@ -258,14 +282,13 @@ const brandName = market.brandName || 'TrainedBy';
                 <div class="transform-trainer-cert">{market.certificationBody} Level 3 · Strength Coach</div>
               </div>
             </div>
-            <div class="transform-title" data-i18n="transform_story1_title">From sedentary to running her first 10k in 14 weeks</div>
-            <p class="transform-body" data-i18n="transform_story1_body">My client came to me post-pregnancy, hadn't exercised in 3 years. We started with 20-minute walks and built from there. The key was making every session feel achievable — never overwhelming.</p>
+            <div class="transform-title">{t(locale, 'transform_story1_title')}</div>
+            <p class="transform-body">{t(locale, 'transform_story1_body')}</p>
           </div>
           <div class="transform-stats">
-            <div class="transform-stat"><div class="transform-stat-val">14</div><div class="transform-stat-label" data-i18n="transform_stat_weeks">Weeks</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">8kg</div><div class="transform-stat-label" data-i18n="transform_stat_lost">Lost</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">10k</div><div class="transform-stat-label" data-i18n="transform_stat_race">First Race</div></div>
-          </div>
+            <div class="transfo            <div class="transform-stat-val">14</div><div class="transform-stat-label">{t(locale, 'transform_stat_weeks')}</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">8kg</div><div class="transform-stat-label">{t(locale, 'transform_stat_lost')}</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">10k</div><div class="transform-stat-label">{t(locale, 'transform_stat_race')}</div></div>        </div>
         </div>
         <div class="transform-card">
           <div class="transform-header">
@@ -276,14 +299,13 @@ const brandName = market.brandName || 'TrainedBy';
                 <div class="transform-trainer-cert">{market.certificationBody} Level 4 · HIIT Specialist</div>
               </div>
             </div>
-            <div class="transform-title" data-i18n="transform_story2_title">Corporate burnout to competing in his first obstacle race</div>
-            <p class="transform-body" data-i18n="transform_story2_body">He was working 70-hour weeks and using food as stress relief. We didn't talk about diet for the first month — just built the habit of showing up. Everything else followed naturally.</p>
+            <div class="transform-title">{t(locale, 'transform_story2_title')}</div>
+            <p class="transform-body">{t(locale, 'transform_story2_body')}</p>
           </div>
           <div class="transform-stats">
-            <div class="transform-stat"><div class="transform-stat-val">20</div><div class="transform-stat-label" data-i18n="transform_stat_weeks">Weeks</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">14kg</div><div class="transform-stat-label" data-i18n="transform_stat_lost">Lost</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">1st</div><div class="transform-stat-label" data-i18n="transform_stat_race">Race Done</div></div>
-          </div>
+            <div class="transform-stat            <div class="transform-stat-val">20</div><div class="transform-stat-label">{t(locale, 'transform_stat_weeks')}</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">14kg</div><div class="transform-stat-label">{t(locale, 'transform_stat_lost')}</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">1st</div><div class="transform-stat-label">{t(locale, 'transform_stat_race')}</div></div> </div>
         </div>
         <div class="transform-card">
           <div class="transform-header">
@@ -294,14 +316,13 @@ const brandName = market.brandName || 'TrainedBy';
                 <div class="transform-trainer-cert">{market.certificationBody} Level 3 · Nutrition & Wellness</div>
               </div>
             </div>
-            <div class="transform-title" data-i18n="transform_story3_title">Rebuilding strength after a back injury — without surgery</div>
-            <p class="transform-body" data-i18n="transform_story3_body">Her physio cleared her for light exercise but she was terrified to move. We worked with her physiotherapist from day one. Six months later she's deadlifting bodyweight and pain-free.</p>
+            <div class="transform-title">{t(locale, 'transform_story3_title')}</div>
+            <p class="transform-body">{t(locale, 'transform_story3_body')}</p>
           </div>
           <div class="transform-stats">
-            <div class="transform-stat"><div class="transform-stat-val">24</div><div class="transform-stat-label" data-i18n="transform_stat_weeks">Weeks</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">0</div><div class="transform-stat-label" data-i18n="transform_stat_pain">Pain Days</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">BW</div><div class="transform-stat-label" data-i18n="transform_stat_deadlift">Deadlift</div></div>
-          </div>
+            <div class="transfo            <div class="transform-stat-val">24</div><div class="transform-stat-label">{t(locale, 'transform_stat_weeks')}</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">0</div><div class="transform-stat-label">{t(locale, 'transform_stat_pain')}</div></div>
+            <div class="transform-stat"><div class="transform-stat-val">BW</div><div class="transform-stat-label">{t(locale, 'transform_stat_deadlift')}</div></div>        </div>
         </div>
       </div>
     </div>
@@ -309,42 +330,42 @@ const brandName = market.brandName || 'TrainedBy';
 
   <!-- BLOG PREVIEW -->
   <div style="border-top:1px solid var(--border)">
-    <div class="section">
+    <div class="section reveal reveal-delay-2">
       <p class="section-eyebrow" data-i18n="blog_eyebrow">From the Community</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
-        <h2 class="section-title" style="margin-bottom:0" data-i18n="blog_title">Advice from trainers<br>who actually train.</h2>
-        <a href="/blog" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none" data-i18n="blog_cta">Read all articles →</a>
+        <h2 class="section-title" style="margin-bottom:0">{t(locale, 'blog_title')}</h2>
+        <a href="/blog" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">{t(locale, 'blog_cta')}</a>
       </div>
-      <p class="section-sub" data-i18n="blog_sub">No sponsored content. No generic listicles. Written by verified trainers from their own practice.</p>
+      <p class="section-sub">{t(locale, 'blog_sub')}</p>
       <div class="blog-grid" id="blog-preview">
         <a href="/blog" class="blog-card featured">
           <div>
-            <span class="blog-cat" data-i18n="blog_cat_science">Training Science</span>
-            <div class="blog-title" data-i18n="blog_post1_title">Why most people plateau after 3 months — and what actually breaks it</div>
-            <p class="blog-excerpt" data-i18n="blog_post1_excerpt">The first three months of training are almost always productive. Then something stops working. Here's the physiology behind the plateau and the four interventions that consistently restart progress.</p>
+            <span class="blog-cat">{t(locale, 'blog_cat_science')}</span>
+            <div class="blog-title">{t(locale, 'blog_post1_title')}</div>
+            <p class="blog-excerpt">{t(locale, 'blog_post1_excerpt')}</p>
             <div class="blog-author">
               <div class="blog-author-dot"></div>
-              <span data-i18n="blog_post1_author">Level 4 Trainer · 6 min read</span>
+              <span>{t(locale, 'blog_post1_author')}</span>
             </div>
           </div>
           <div class="blog-visual">🏋️</div>
         </a>
         <a href="/blog" class="blog-card">
-          <span class="blog-cat" data-i18n="blog_cat_nutrition">Nutrition</span>
-          <div class="blog-title" data-i18n="blog_post2_title">The only meal timing advice that actually matters</div>
-          <p class="blog-excerpt" data-i18n="blog_post2_excerpt">Forget the 6-meal-a-day myth. Here's what the research says about when to eat — and why most of it is irrelevant if you're not getting the basics right first.</p>
+          <span class="blog-cat">{t(locale, 'blog_cat_nutrition')}</span>
+          <div class="blog-title">{t(locale, 'blog_post2_title')}</div>
+          <p class="blog-excerpt">{t(locale, 'blog_post2_excerpt')}</p>
           <div class="blog-author">
             <div class="blog-author-dot"></div>
-            <span data-i18n="blog_post2_author">Nutrition Coach · 4 min read</span>
+            <span>{t(locale, 'blog_post2_author')}</span>
           </div>
         </a>
         <a href="/blog" class="blog-card">
-          <span class="blog-cat" data-i18n="blog_cat_mindset">Mindset</span>
-          <div class="blog-title" data-i18n="blog_post3_title">What I tell every new client in the first session</div>
-          <p class="blog-excerpt" data-i18n="blog_post3_excerpt">After hundreds of first sessions, I've learned that the conversation that happens before the first rep is the one that determines everything. Here's what I say — and why.</p>
+          <span class="blog-cat">{t(locale, 'blog_cat_mindset')}</span>
+          <div class="blog-title">{t(locale, 'blog_post3_title')}</div>
+          <p class="blog-excerpt">{t(locale, 'blog_post3_excerpt')}</p>
           <div class="blog-author">
             <div class="blog-author-dot"></div>
-            <span data-i18n="blog_post3_author">Strength Coach · 5 min read</span>
+            <span>{t(locale, 'blog_post3_author')}</span>
           </div>
         </a>
       </div>
@@ -352,16 +373,17 @@ const brandName = market.brandName || 'TrainedBy';
   </div>
 
   <!-- FOR TRAINERS BANNER -->
-  <div style="padding:60px 0;border-top:1px solid var(--border)">
+  <div style="padding:60px 0;border-top:1px solid var(--border)" class="reveal reveal-delay-3">
     <div class="trainer-banner" style="max-width:calc(var(--max) - 48px);margin:0 auto">
         <div class="trainer-banner-text">
-        <div class="trainer-banner-eyebrow" data-i18n="banner_eyebrow">For Trainers</div>
-        <div class="trainer-banner-title" data-i18n="banner_title">Build your practice<br>on a platform that<br>works as hard as you do.</div>
-        <p class="trainer-banner-sub" data-i18n="banner_sub">Verified profile, digital products, lead management, and an AI assistant — all in one place. Free to start.</p>
+        <div class="trainer-banner-eyebrow">{t(locale, 'banner_eyebrow')}</div>
+        <div class="trainer-banner-title">{t(locale, 'banner_title')}</div>
+        <p class="trainer-banner-sub">{t(locale, 'banner_sub')}</p>
       </div>
       <div class="trainer-banner-actions">
-        <a href="/for-trainers" class="btn-primary" data-i18n="banner_cta_primary">See how it works →</a>
-        <a href="/join" class="btn-ghost" data-i18n="banner_cta_ghost">Create your profile</a>
+        <a href="/for-trainers" class="btn-primary">{t(locale, 'banner_cta_primary')}</a>
+        <a href="/join" class="btn-ghost">{t(locale, 'banner_cta_ghost')}</a>
+        <a href={`/${demoSlug}`} style="font-size:13px;color:rgba(255,255,255,0.45);text-decoration:underline;text-underline-offset:3px;margin-top:8px" target="_blank" rel="noopener">{locale === 'fr' ? 'Voir à quoi ressemble votre profil' : locale === 'it' ? 'Guarda come appare il tuo profilo' : locale === 'es' ? 'Ver cómo se ve tu perfil' : 'See what your profile looks like'}</a>
       </div>
     </div>
   </div>
@@ -370,11 +392,10 @@ const brandName = market.brandName || 'TrainedBy';
   <footer>
     <a href="/landing" class="footer-logo">{brandName}</a>
     <div class="footer-links">
-      <a href="/find" data-i18n="footer_find">Find a Trainer</a>
-      <a href="/blog" data-i18n="footer_stories">Stories</a>
-      <a href="/community" data-i18n="footer_community">Community</a>
-      <a href="/for-trainers" data-i18n="footer_for_trainers">For Trainers</a>
-      <a href="/join" data-i18n="footer_join">Join as Trainer</a>
+      <a href="/find">{t(locale, 'footer_find')}</a>
+      <a href="/blog">{t(locale, 'footer_stories')}</a>
+      <a href="/for-trainers">{t(locale, 'footer_for_trainers')}</a>
+      <a href="/join">{t(locale, 'footer_join')}</a>
     </div>
     <div class="footer-copy">© {new Date().getFullYear()} {brandName}</div>
   </footer>
@@ -385,6 +406,17 @@ const brandName = market.brandName || 'TrainedBy';
     window.addEventListener('scroll', () => {
       nav?.classList.toggle('scrolled', window.scrollY > 40);
     }, { passive: true });
+
+    // Scroll-triggered reveal animations
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
     // Hero search
     window.doSearch = function() {
@@ -441,7 +473,7 @@ const brandName = market.brandName || 'TrainedBy';
           grid.appendChild(card);
         });
       } catch(e) {
-        // Silently fail — skeleton loaders remain
+        // Silently fail  -  skeleton loaders remain
       }
     })();
   </script>

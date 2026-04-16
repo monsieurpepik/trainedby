@@ -1,27 +1,50 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getMarket } from '../lib/market.ts';
+import { getLocale, t, getBrand } from '../lib/i18n.ts';
 const market = getMarket(Astro.url.hostname);
-const brandName = market.brandName;
+const locale = getLocale(Astro.request);
+const brand = getBrand(locale);
+const brandName = brand.name;
+// Per-market pricing
+const proMonthly = market.currency === 'AED' ? 99 : market.currency === 'GBP' ? 29 : market.currency === 'EUR' ? 29 : market.currency === 'INR' ? 1999 : 29;
+const proAnnual = Math.round(proMonthly * 0.8);
+const premiumMonthly = market.currency === 'AED' ? 199 : market.currency === 'GBP' ? 59 : market.currency === 'EUR' ? 59 : market.currency === 'INR' ? 3999 : 59;
+const premiumAnnual = Math.round(premiumMonthly * 0.8);
+const pricingHeadline = t(locale, 'pricing.headline').replace('{price}', `${market.currency} ${proMonthly}`);
+const DEMO_SLUGS: Record<string, string> = {
+  'en-ae': 'sarah-al-mansoori',
+  'en-uk': 'james-hartley',
+  'en-us': 'marcus-johnson',
+  'en-in': 'arjun-sharma',
+  'es':    'lucia-fernandez',
+  'fr':    'thomas-moreau',
+  'it':    'giulia-romano',
+};
+const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
 ---
 
 <Base
-  title={`Pricing — ${brandName}`}
+  title={`Pricing  -  ${brandName}`}
   description={`Simple, transparent pricing for ${brandName}. Free to start. Pro plan with a 30-day ROI guarantee.`}
 >
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --brand: #FF5C00; --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
-  --reps: #00C853; --reps-dim: rgba(0,200,83,0.08); --reps-border: rgba(0,200,83,0.2);
-  --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c;
-  --border: rgba(255,255,255,0.08); --text: #fff;
-  --text-muted: rgba(255,255,255,0.55); --text-faint: rgba(255,255,255,0.25);
+  /* Aliases to Base.astro global tokens */
+  --reps: var(--green, #00C853);
+  --reps-dim: var(--green-dim, rgba(0,200,83,0.08));
+  --reps-border: var(--green-border, rgba(0,200,83,0.2));
+  --surface: var(--bg, #0a0a0a);
+  --surface-2: var(--surface, #111);
+  --surface-3: var(--surface-3, #1c1c1c);
+  --text-muted: var(--text-2, rgba(255,255,255,0.55));
+  --text-faint: var(--text-faint, rgba(255,255,255,0.25));
 }
 html { scroll-behavior: smooth; }
 body {
-  background: var(--surface); color: var(--text);
-  font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6;
+  background: var(--bg, #0a0a0a); color: var(--text, #f0f0f0);
+  font-family: var(--font-body, 'Inter', sans-serif); font-size: 15px; line-height: 1.6;
   -webkit-font-smoothing: antialiased; min-height: 100vh;
 }
 nav {
@@ -43,7 +66,7 @@ nav {
   font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
   text-decoration: none; transition: background 0.2s;
 }
-.nav-cta:hover { background: #e05200; }
+.nav-cta:hover { background: var(--brand-hover, #e05200); }
 
 .pricing-wrap { max-width: 1000px; margin: 0 auto; padding: 100px 24px 80px; }
 .pricing-header { text-align: center; margin-bottom: 48px; }
@@ -52,8 +75,8 @@ nav {
   text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;
 }
 .pricing-title {
-  font-family: 'Manrope', sans-serif; font-size: clamp(28px, 5vw, 48px); font-weight: 800;
-  letter-spacing: -1px; margin-bottom: 12px;
+  font-family: var(--font-display, 'Manrope', sans-serif); font-size: clamp(28px, 5vw, 48px); font-weight: 900;
+  letter-spacing: -0.04em; margin-bottom: 12px;
 }
 .pricing-sub { font-size: 16px; color: var(--text-muted); max-width: 440px; margin: 0 auto; }
 
@@ -94,28 +117,48 @@ nav {
   border-radius: 24px; padding: 28px; position: relative;
   transition: border-color 0.2s;
 }
+/* Pro card: metallic gold treatment */
 .plan-card.popular {
-  border-color: var(--brand-border);
-  background: linear-gradient(135deg, rgba(255,92,0,0.06) 0%, var(--surface-2) 100%);
+  border-color: var(--pro-border, rgba(197,162,39,0.35));
+  background: linear-gradient(135deg, rgba(197,162,39,0.07) 0%, var(--surface-2, #111) 60%);
+  box-shadow: 0 0 0 1px var(--pro-border, rgba(197,162,39,0.35)), 0 0 40px var(--pro-dim, rgba(197,162,39,0.10));
+  position: relative;
+}
+.plan-card.popular::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(245,208,107,0.04) 0%, transparent 55%);
+  pointer-events: none;
 }
 .popular-badge {
   position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-  background: var(--brand); color: #fff;
-  font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 700;
+  background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
+  color: #0a0a0a;
+  font-family: var(--font-display, 'Manrope', sans-serif); font-size: 11px; font-weight: 800;
   padding: 4px 14px; border-radius: 20px; white-space: nowrap;
-  letter-spacing: 0.04em; text-transform: uppercase;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  box-shadow: 0 2px 12px rgba(197,162,39,0.4);
 }
 .plan-name {
-  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
-  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;
+  font-family: var(--font-body, 'Inter', sans-serif); font-size: 11px; font-weight: 700;
+  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
   margin-bottom: 12px;
+}
+/* Pro plan name gets metallic gold color */
+.plan-card.popular .plan-name {
+  background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .plan-price {
   display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px;
 }
 .plan-price-value {
-  font-family: 'Manrope', sans-serif; font-size: 40px; font-weight: 800;
-  letter-spacing: -2px;
+  font-family: var(--font-display, 'Manrope', sans-serif); font-size: 40px; font-weight: 900;
+  letter-spacing: -0.05em;
 }
 .plan-price-currency { font-size: 18px; font-weight: 700; color: var(--text-muted); }
 .plan-price-period { font-size: 13px; color: var(--text-muted); }
@@ -123,11 +166,22 @@ nav {
 .plan-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
 .plan-btn {
   width: 100%; padding: 14px; border-radius: 12px;
-  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
+  font-family: var(--font-display, 'Manrope', sans-serif); font-size: 14px; font-weight: 700;
   cursor: pointer; transition: all 0.2s; border: none; margin-bottom: 24px;
 }
 .plan-btn-brand { background: var(--brand); color: #fff; }
-.plan-btn-brand:hover { background: #e05200; }
+.plan-btn-brand:hover { background: var(--brand-hover, #e05200); transform: translateY(-1px); }
+/* Pro CTA button: metallic gold */
+.plan-card.popular .plan-btn-brand {
+  background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
+  color: #0a0a0a;
+  box-shadow: 0 4px 20px rgba(197,162,39,0.35);
+}
+.plan-card.popular .plan-btn-brand:hover {
+  background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
+  box-shadow: 0 6px 28px rgba(197,162,39,0.5);
+  transform: translateY(-2px);
+}
 .plan-btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
 .plan-btn-ghost:hover { border-color: rgba(255,255,255,0.2); }
 .plan-features { display: flex; flex-direction: column; gap: 10px; }
@@ -145,14 +199,14 @@ nav {
 /* Comparison table */
 .compare-section { margin-top: 60px; }
 .compare-title {
-  font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800;
-  text-align: center; margin-bottom: 24px;
+  font-family: var(--font-display, 'Manrope', sans-serif); font-size: 22px; font-weight: 900;
+  text-align: center; margin-bottom: 24px; letter-spacing: -0.03em;
 }
 .compare-table { width: 100%; border-collapse: collapse; }
 .compare-table th {
   padding: 12px 16px; text-align: center;
-  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
-  border-bottom: 1px solid var(--border);
+  font-family: var(--font-body, 'Inter', sans-serif); font-size: 12px; font-weight: 700;
+  border-bottom: 1px solid var(--border); letter-spacing: 0.02em;
 }
 .compare-table th:first-child { text-align: left; }
 .compare-table td {
@@ -166,8 +220,25 @@ nav {
 .cross { color: var(--text-faint); font-size: 16px; }
 .plan-highlight { color: var(--brand); font-weight: 700; }
 
+/* ── Mobile responsive ────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .pricing-wrap { padding: 80px 16px 40px; }
+  .plans-grid { grid-template-columns: 1fr; }
+  .plan-card { padding: 24px 20px; }
+  .billing-toggle { flex-wrap: wrap; gap: 8px; }
+  .compare-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .compare-table { min-width: 480px; }
+  .nav-inner { padding: 0 16px; }
+}
+
+/* ── Safe area for notched phones ─────────────────────────────────── */
+.pricing-wrap {
+  padding-bottom: max(80px, calc(80px + env(safe-area-inset-bottom)));
+}
+
 footer {
   padding: 40px 24px; border-top: 1px solid var(--border); margin-top: 60px;
+  padding-bottom: max(40px, calc(40px + env(safe-area-inset-bottom)));
 }
 .footer-inner {
   max-width: 1100px; margin: 0 auto;
@@ -187,29 +258,26 @@ footer {
       <svg width="30" height="30" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
       {brandName}
     </a>
-    <a href="/join" class="nav-cta">Get Your Page →</a>
+    <a href="/join" class="nav-cta">{t(locale, 'join.submit').replace(' →', '')} →</a>
   </div>
 </nav>
 
 <div class="pricing-wrap">
 
   <div class="pricing-header">
-    <div class="pricing-label">Pricing</div>
-    <h1 class="pricing-title">Invest AED 99.<br>Earn AED 10,000+.</h1>
-    <p class="pricing-sub">Pro pays for itself the moment your first affiliate commission lands. Most trainers see ROI in under 7 days.</p>
-    <div style="display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:8px 16px;border-radius:100px;border:1px solid rgba(0,200,83,0.25);background:rgba(0,200,83,0.06);font-size:12px;font-weight:600;color:#00C853">
-      🛡 ROI Guarantee: 1,000 AED in 30 days or full refund
-    </div>
+    <div class="pricing-label">{t(locale, 'pricing.title')}</div>
+    <h1 class="pricing-title" set:html={pricingHeadline.replace('. ', '.<br>')}></h1>
+    <p class="pricing-sub">{t(locale, 'pricing.sub_ext')}</p>
   </div>
 
   <!-- Billing toggle -->
   <div class="billing-toggle">
-    <span class="billing-option active" id="monthly-label" onclick="setBilling('monthly')">Monthly</span>
+    <span class="billing-option active" id="monthly-label" onclick="setBilling('monthly')">{t(locale, 'pricing.monthly_label')}</span>
     <div class="toggle-switch" id="billing-switch" onclick="toggleBilling()">
       <div class="toggle-knob"></div>
     </div>
-    <span class="billing-option" id="annual-label" onclick="setBilling('annual')">Annual</span>
-    <span class="billing-save">Save 20%</span>
+    <span class="billing-option" id="annual-label" onclick="setBilling('annual')">{t(locale, 'pricing.annual_label')}</span>
+    <span class="billing-save">{t(locale, 'pricing.save')}</span>
   </div>
 
   <!-- Plans -->
@@ -217,142 +285,127 @@ footer {
 
     <!-- Free -->
     <div class="plan-card">
-      <div class="plan-name">Free</div>
+      <div class="plan-name">{t(locale, 'pricing.free_name')}</div>
       <div class="plan-price">
-        <span class="plan-price-currency">AED</span>
+        <span class="plan-price-currency">{market.currency}</span>
         <span class="plan-price-value">0</span>
-        <span class="plan-price-period">/mo</span>
+        <span class="plan-price-period">/{t(locale, 'pricing.monthly')}</span>
       </div>
       <div class="plan-price-annual">&nbsp;</div>
-      <div class="plan-desc">Get your verified profile live in 2 minutes. No credit card required.</div>
-      <button class="plan-btn plan-btn-ghost" onclick="location.href='/join'">Get Started Free</button>
+      <div class="plan-desc">{t(locale, 'pricing.free_desc')}</div>
+      <button class="plan-btn plan-btn-ghost" onclick="location.href='/join'">{t(locale, 'pricing.get_started_free')}</button>
       <div class="plan-features">
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Public profile page
+          {t(locale, 'pricing.f_profile')}
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          REPs UAE verified badge
+          {market.certificationBody} {t(locale, 'pricing.f_badge')}
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          WhatsApp CTA button
+          {t(locale, 'pricing.f_whatsapp')}
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          1 session package
+          {t(locale, 'pricing.f_1_package')}
         </div>
         <div class="plan-feature excluded">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
-          Fitness assessment tool
+          {t(locale, 'pricing.f_assessment')}
         </div>
         <div class="plan-feature excluded">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
-          WhatsApp lead notifications
+          {t(locale, 'pricing.f_ai')}
         </div>
         <div class="plan-feature excluded">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
-          Analytics &amp; lead tracking
+          {t(locale, 'pricing.f_analytics')}
         </div>
         <div class="plan-feature excluded">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
-          Priority search placement
+          {t(locale, 'pricing.f_priority')}
         </div>
       </div>
     </div>
 
     <!-- Pro (Popular) -->
     <div class="plan-card popular">
-      <div class="popular-badge">Most Popular</div>
-      <div class="plan-name">Pro</div>
+      <div class="popular-badge">{t(locale, 'pricing.popular')}</div>
+      <div class="plan-name">{t(locale, 'pricing.pro_name')}</div>
       <div class="plan-price">
-        <span class="plan-price-currency">AED</span>
-        <span class="plan-price-value" id="pro-price">99</span>
-        <span class="plan-price-period">/mo</span>
+        <span class="plan-price-currency">{market.currency}</span>
+        <span class="plan-price-value" id="pro-price">{proMonthly}</span>
+        <span class="plan-price-period">/{t(locale, 'pricing.monthly')}</span>
       </div>
       <div class="plan-price-annual" id="pro-annual-note">&nbsp;</div>
-      <div class="plan-desc">The complete income OS. Passive income from affiliates, digital products, and Grand Slam Offers — all in one place.</div>
-      <button class="plan-btn plan-btn-brand" onclick="startCheckout('pro')">Unlock Passive Income →</button>
+      <div class="plan-desc">{t(locale, 'pricing.pro_desc')}</div>
+      <button class="plan-btn plan-btn-brand" onclick="startCheckout('pro')">{t(locale, 'pricing.upgrade_pro')}</button>
+      <a href={`/${demoSlug}`} style="display:block;text-align:center;margin-top:10px;font-size:12px;color:rgba(255,255,255,0.4);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">See an example Pro profile</a>
       <div class="plan-features">
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Everything in Free
+          {t(locale, 'pricing.f_everything_free')}
         </div>
         <div class="plan-feature included" style="background:rgba(255,92,0,0.04);border-radius:8px;padding:6px 8px;margin:-2px 0">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5C00"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong style="color:#FF5C00">💰 Master Affiliate Vault</strong> <span style="font-size:11px;color:var(--text-muted)">— earn from Gymshark, ZEROFAT &amp; more</span>
-        </div>
-        <div class="plan-feature included" style="background:rgba(255,92,0,0.04);border-radius:8px;padding:6px 8px;margin:-2px 0">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5C00"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong style="color:#FF5C00">📦 Digital Product Hub</strong> <span style="font-size:11px;color:var(--text-muted)">— sell PDFs, plans &amp; courses (5% fee)</span>
-        </div>
-        <div class="plan-feature included" style="background:rgba(255,92,0,0.04);border-radius:8px;padding:6px 8px;margin:-2px 0">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5C00"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong style="color:#FF5C00">🎯 Grand Slam Offer Builder</strong> <span style="font-size:11px;color:var(--text-muted)">— AI outcome + guarantee cards</span>
+          <strong style="color:#FF5C00">📊 {t(locale, 'pricing.f_analytics')}</strong>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Unlimited session packages
+          {t(locale, 'pricing.f_unlimited')} {t(locale, 'pricing.f_packages').toLowerCase()}
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong>WhatsApp lead notifications</strong>
+          <strong>{t(locale, 'pricing.f_ai')} ({t(locale, 'pricing.f_unlimited').toLowerCase()})</strong>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong>Priority search placement</strong>
+          <strong>{t(locale, 'pricing.f_priority')}</strong>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Transformation gallery (9 photos)
+          {t(locale, 'pricing.f_gallery')} ({t(locale, 'pricing.f_9_photos')})
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong>Analytics dashboard + weekly report</strong>
+          <strong>{t(locale, 'pricing.f_analytics')}</strong>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Remove TrainedBy branding
+          {t(locale, 'pricing.f_branding')}
         </div>
       </div>
     </div>
 
     <!-- Premium -->
     <div class="plan-card">
-      <div class="plan-name">Premium</div>
+      <div class="plan-name">{t(locale, 'pricing.premium_name')}</div>
       <div class="plan-price">
-        <span class="plan-price-currency">AED</span>
-        <span class="plan-price-value" id="premium-price">199</span>
-        <span class="plan-price-period">/mo</span>
+        <span class="plan-price-currency">{market.currency}</span>
+        <span class="plan-price-value" id="premium-price">{premiumMonthly}</span>
+        <span class="plan-price-period">/{t(locale, 'pricing.monthly')}</span>
       </div>
       <div class="plan-price-annual" id="premium-annual-note">&nbsp;</div>
-      <div class="plan-desc">For elite trainers and gym owners managing multiple profiles.</div>
-      <button class="plan-btn plan-btn-brand" style="background:var(--surface-3);color:var(--text);border:1px solid var(--border);" onmouseover="this.style.background='var(--brand)';this.style.borderColor='var(--brand)'" onmouseout="this.style.background='var(--surface-3)';this.style.borderColor='var(--border)'" onclick="startCheckout('premium')">Get Premium</button>
+      <div class="plan-desc">{t(locale, 'pricing.premium_desc')}</div>
+      <button class="plan-btn plan-btn-brand" style="background:var(--surface-3);color:var(--text);border:1px solid var(--border);" onmouseover="this.style.background='var(--brand)';this.style.borderColor='var(--brand)'" onmouseout="this.style.background='var(--surface-3)';this.style.borderColor='var(--border)'" onclick="startCheckout('premium')">{t(locale, 'pricing.get_premium')}</button>
       <div class="plan-features">
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Everything in Pro
+          {t(locale, 'pricing.f_everything_pro')}
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong>Up to 5 trainer profiles</strong>
+          <strong>{t(locale, 'pricing.f_up_to_5')} {t(locale, 'pricing.f_multi').toLowerCase()}</strong>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Gym / agency page
+          {t(locale, 'pricing.f_gym')}
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Featured trainer spotlight
-        </div>
-        <div class="plan-feature included">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Priority support
-        </div>
-        <div class="plan-feature included">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Custom domain (coming soon)
+          {t(locale, 'pricing.f_support')}
         </div>
       </div>
     </div>
@@ -361,33 +414,30 @@ footer {
 
   <!-- Comparison table -->
   <div class="compare-section">
-    <div class="compare-title">Full Comparison</div>
+    <div class="compare-title">{t(locale, 'pricing.full_comparison')}</div>
     <table class="compare-table">
       <thead>
         <tr>
-          <th>Feature</th>
-          <th>Free</th>
-          <th style="color:var(--brand);">Pro</th>
-          <th>Premium</th>
+          <th>{t(locale, 'pricing.feature')}</th>
+          <th>{t(locale, 'pricing.free_name')}</th>
+          <th style="color:var(--brand);">{t(locale, 'pricing.pro_name')}</th>
+          <th>{t(locale, 'pricing.premium_name')}</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>Public profile page</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>REPs UAE verified badge</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>WhatsApp CTA</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Master Affiliate Vault</td><td><span class="cross">—</span></td><td><span class="check" style="color:#FF5C00">✓</span></td><td><span class="check" style="color:#FF5C00">✓</span></td></tr>
-        <tr><td>Digital Product Hub</td><td><span class="cross">—</span></td><td><span class="check" style="color:#FF5C00">✓</span></td><td><span class="check" style="color:#FF5C00">✓</span></td></tr>
-        <tr><td>Grand Slam Offer Builder</td><td><span class="cross">—</span></td><td><span class="check" style="color:#FF5C00">✓</span></td><td><span class="check" style="color:#FF5C00">✓</span></td></tr>
-        <tr><td>Fitness assessment tool</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Session packages</td><td>1</td><td class="plan-highlight">Unlimited</td><td class="plan-highlight">Unlimited</td></tr>
-        <tr><td>Transformation gallery</td><td><span class="cross">—</span></td><td class="plan-highlight">9 photos</td><td class="plan-highlight">9 photos</td></tr>
-        <tr><td>WhatsApp lead notifications</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Priority search placement</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Analytics &amp; lead tracking</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Remove TrainedBy branding</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Multiple trainer profiles</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td class="plan-highlight">Up to 5</td></tr>
-        <tr><td>Gym / agency page</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Priority support</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_profile')}</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{market.certificationBody} {t(locale, 'pricing.f_badge')}</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_whatsapp')}</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_assessment')}</td><td><span class="cross"> - </span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_packages')}</td><td>{t(locale, 'pricing.f_1_package')}</td><td class="plan-highlight">{t(locale, 'pricing.f_unlimited')}</td><td class="plan-highlight">{t(locale, 'pricing.f_unlimited')}</td></tr>
+        <tr><td>{t(locale, 'pricing.f_gallery')}</td><td><span class="cross"> - </span></td><td class="plan-highlight">{t(locale, 'pricing.f_9_photos')}</td><td class="plan-highlight">{t(locale, 'pricing.f_9_photos')}</td></tr>
+        <tr><td>{t(locale, 'pricing.f_ai')}</td><td><span class="cross"> - </span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_priority')}</td><td><span class="cross"> - </span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_analytics')}</td><td><span class="cross"> - </span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_branding')}</td><td><span class="cross"> - </span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_multi')}</td><td><span class="cross"> - </span></td><td><span class="cross"> - </span></td><td class="plan-highlight">{t(locale, 'pricing.f_up_to_5')}</td></tr>
+        <tr><td>{t(locale, 'pricing.f_gym')}</td><td><span class="cross"> - </span></td><td><span class="cross"> - </span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>{t(locale, 'pricing.f_support')}</td><td><span class="cross"> - </span></td><td><span class="cross"> - </span></td><td><span class="check">✓</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -415,10 +465,13 @@ function setBilling(mode) {
   document.getElementById('billing-switch').classList.toggle('annual', isAnnual);
   document.getElementById('monthly-label').classList.toggle('active', !isAnnual);
   document.getElementById('annual-label').classList.toggle('active', isAnnual);
-  document.getElementById('pro-price').textContent = isAnnual ? '79' : '99';
-  document.getElementById('premium-price').textContent = isAnnual ? '159' : '199';
-  document.getElementById('pro-annual-note').textContent = isAnnual ? 'AED 948/yr — save AED 240' : '';
-  document.getElementById('premium-annual-note').textContent = isAnnual ? 'AED 1,908/yr — save AED 480' : '';
+  const currency = '{market.currency}';
+  const proM = {proMonthly}, proA = {proAnnual};
+  const premM = {premiumMonthly}, premA = {premiumAnnual};
+  document.getElementById('pro-price').textContent = isAnnual ? proA : proM;
+  document.getElementById('premium-price').textContent = isAnnual ? premA : premM;
+  document.getElementById('pro-annual-note').textContent = isAnnual ? currency + ' ' + (proA * 12) + '/yr  -  save ' + currency + ' ' + ((proM - proA) * 12) : '';
+  document.getElementById('premium-annual-note').textContent = isAnnual ? currency + ' ' + (premA * 12) + '/yr  -  save ' + currency + ' ' + ((premM - premA) * 12) : '';
 }
 
 function getAuthToken() {

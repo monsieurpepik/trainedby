@@ -21,7 +21,7 @@ const {
 import { getMarket } from '../lib/market.ts';
 import { getLocale, TRANSLATIONS, BRAND, UNDERSCORE_KEYS_EXPORT } from '../lib/i18n.ts';
 import CookieConsent from '../components/CookieConsent.astro';
-import { ViewTransitions } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions';
 const market = getMarket(Astro.url.hostname);
 const locale = getLocale(Astro.request);
 const brand = BRAND[locale];
@@ -119,7 +119,7 @@ const jsonLd = structuredData ?? defaultStructuredData;
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
     <!-- ── View Transitions: app-like page navigation ─────────────────── -->
-    <ViewTransitions fallback="none" />
+    <ClientRouter fallback="none" />
 
        <!-- ── Global design tokens & critical CSS ──────────────────── -->
     <style is:global>
