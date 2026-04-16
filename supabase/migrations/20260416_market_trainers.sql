@@ -150,7 +150,7 @@ INSERT INTO trainers (
   'Emily Chen',
   'Olympic Lifting & Conditioning Coach',
   'I coach Olympic weightlifting and general strength conditioning in Manchester. Former GB junior lifter. UKSCA accredited, REPs Level 4. I work with athletes, CrossFitters, and anyone who wants to learn to lift properly. Technique first, always.',
-  'https://images.unsplash.com/photo-1609899464726-209f9a4e9b6c?w=800&q=85',
+  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=85',
   ARRAY['Olympic Lifting','Strength','CrossFit','Conditioning'],
   ARRAY['REPs UK Level 4','UKSCA Accredited','British Weightlifting Coach'],
   8, 195, 4.8, 33, 70,
