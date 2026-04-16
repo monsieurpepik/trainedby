@@ -31,16 +31,20 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --brand: #FF5C00; --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
-  --reps: #00C853; --reps-dim: rgba(0,200,83,0.08); --reps-border: rgba(0,200,83,0.2);
-  --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c;
-  --border: rgba(255,255,255,0.08); --text: #fff;
-  --text-muted: rgba(255,255,255,0.55); --text-faint: rgba(255,255,255,0.25);
+  /* Aliases to Base.astro global tokens */
+  --reps: var(--green, #00C853);
+  --reps-dim: var(--green-dim, rgba(0,200,83,0.08));
+  --reps-border: var(--green-border, rgba(0,200,83,0.2));
+  --surface: var(--bg, #0a0a0a);
+  --surface-2: var(--surface, #111);
+  --surface-3: var(--surface-3, #1c1c1c);
+  --text-muted: var(--text-2, rgba(255,255,255,0.55));
+  --text-faint: var(--text-faint, rgba(255,255,255,0.25));
 }
 html { scroll-behavior: smooth; }
 body {
-  background: var(--surface); color: var(--text);
-  font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6;
+  background: var(--bg, #0a0a0a); color: var(--text, #f0f0f0);
+  font-family: var(--font-body, 'Inter', sans-serif); font-size: 15px; line-height: 1.6;
   -webkit-font-smoothing: antialiased; min-height: 100vh;
 }
 nav {
@@ -62,7 +66,7 @@ nav {
   font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
   text-decoration: none; transition: background 0.2s;
 }
-.nav-cta:hover { background: #e05200; }
+.nav-cta:hover { background: var(--brand-hover, #e05200); }
 
 .pricing-wrap { max-width: 1000px; margin: 0 auto; padding: 100px 24px 80px; }
 .pricing-header { text-align: center; margin-bottom: 48px; }
@@ -71,8 +75,8 @@ nav {
   text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;
 }
 .pricing-title {
-  font-family: 'Manrope', sans-serif; font-size: clamp(28px, 5vw, 48px); font-weight: 800;
-  letter-spacing: -1px; margin-bottom: 12px;
+  font-family: var(--font-display, 'Manrope', sans-serif); font-size: clamp(28px, 5vw, 48px); font-weight: 900;
+  letter-spacing: -0.04em; margin-bottom: 12px;
 }
 .pricing-sub { font-size: 16px; color: var(--text-muted); max-width: 440px; margin: 0 auto; }
 
@@ -113,28 +117,48 @@ nav {
   border-radius: 24px; padding: 28px; position: relative;
   transition: border-color 0.2s;
 }
+/* Pro card: metallic gold treatment */
 .plan-card.popular {
-  border-color: var(--brand-border);
-  background: linear-gradient(135deg, rgba(255,92,0,0.06) 0%, var(--surface-2) 100%);
+  border-color: var(--pro-border, rgba(197,162,39,0.35));
+  background: linear-gradient(135deg, rgba(197,162,39,0.07) 0%, var(--surface-2, #111) 60%);
+  box-shadow: 0 0 0 1px var(--pro-border, rgba(197,162,39,0.35)), 0 0 40px var(--pro-dim, rgba(197,162,39,0.10));
+  position: relative;
+}
+.plan-card.popular::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(245,208,107,0.04) 0%, transparent 55%);
+  pointer-events: none;
 }
 .popular-badge {
   position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-  background: var(--brand); color: #fff;
-  font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 700;
+  background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
+  color: #0a0a0a;
+  font-family: var(--font-display, 'Manrope', sans-serif); font-size: 11px; font-weight: 800;
   padding: 4px 14px; border-radius: 20px; white-space: nowrap;
-  letter-spacing: 0.04em; text-transform: uppercase;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  box-shadow: 0 2px 12px rgba(197,162,39,0.4);
 }
 .plan-name {
-  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
-  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;
+  font-family: var(--font-body, 'Inter', sans-serif); font-size: 11px; font-weight: 700;
+  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
   margin-bottom: 12px;
+}
+/* Pro plan name gets metallic gold color */
+.plan-card.popular .plan-name {
+  background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .plan-price {
   display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px;
 }
 .plan-price-value {
-  font-family: 'Manrope', sans-serif; font-size: 40px; font-weight: 800;
-  letter-spacing: -2px;
+  font-family: var(--font-display, 'Manrope', sans-serif); font-size: 40px; font-weight: 900;
+  letter-spacing: -0.05em;
 }
 .plan-price-currency { font-size: 18px; font-weight: 700; color: var(--text-muted); }
 .plan-price-period { font-size: 13px; color: var(--text-muted); }
@@ -142,11 +166,22 @@ nav {
 .plan-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
 .plan-btn {
   width: 100%; padding: 14px; border-radius: 12px;
-  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
+  font-family: var(--font-display, 'Manrope', sans-serif); font-size: 14px; font-weight: 700;
   cursor: pointer; transition: all 0.2s; border: none; margin-bottom: 24px;
 }
 .plan-btn-brand { background: var(--brand); color: #fff; }
-.plan-btn-brand:hover { background: #e05200; }
+.plan-btn-brand:hover { background: var(--brand-hover, #e05200); transform: translateY(-1px); }
+/* Pro CTA button: metallic gold */
+.plan-card.popular .plan-btn-brand {
+  background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
+  color: #0a0a0a;
+  box-shadow: 0 4px 20px rgba(197,162,39,0.35);
+}
+.plan-card.popular .plan-btn-brand:hover {
+  background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
+  box-shadow: 0 6px 28px rgba(197,162,39,0.5);
+  transform: translateY(-2px);
+}
 .plan-btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
 .plan-btn-ghost:hover { border-color: rgba(255,255,255,0.2); }
 .plan-features { display: flex; flex-direction: column; gap: 10px; }
@@ -164,14 +199,14 @@ nav {
 /* Comparison table */
 .compare-section { margin-top: 60px; }
 .compare-title {
-  font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800;
-  text-align: center; margin-bottom: 24px;
+  font-family: var(--font-display, 'Manrope', sans-serif); font-size: 22px; font-weight: 900;
+  text-align: center; margin-bottom: 24px; letter-spacing: -0.03em;
 }
 .compare-table { width: 100%; border-collapse: collapse; }
 .compare-table th {
   padding: 12px 16px; text-align: center;
-  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
-  border-bottom: 1px solid var(--border);
+  font-family: var(--font-body, 'Inter', sans-serif); font-size: 12px; font-weight: 700;
+  border-bottom: 1px solid var(--border); letter-spacing: 0.02em;
 }
 .compare-table th:first-child { text-align: left; }
 .compare-table td {

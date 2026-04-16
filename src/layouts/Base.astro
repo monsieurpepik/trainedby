@@ -21,6 +21,7 @@ const {
 import { getMarket } from '../lib/market.ts';
 import { getLocale, TRANSLATIONS, BRAND, UNDERSCORE_KEYS_EXPORT } from '../lib/i18n.ts';
 import CookieConsent from '../components/CookieConsent.astro';
+import { ViewTransitions } from 'astro:transitions';
 const market = getMarket(Astro.url.hostname);
 const locale = getLocale(Astro.request);
 const brand = BRAND[locale];
@@ -99,15 +100,14 @@ const jsonLd = structuredData ?? defaultStructuredData;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://mezhtdbfyvkshpuplqqw.supabase.co" />
 
-    <!-- ── Fonts: preload critical weights, then full load ───────────── -->
-    <!-- Preload the 700 weight used in headings for fastest LCP -->
+    <!-- ── Fonts: Manrope (display/headings) + Inter (body/UI) ────────── -->
     <link
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
@@ -118,31 +118,100 @@ const jsonLd = structuredData ?? defaultStructuredData;
     <!-- ── Structured Data (JSON-LD) ─────────────────────────────────── -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
-    <!-- ── Global design tokens & critical CSS ───────────────────────── -->
+    <!-- ── View Transitions: app-like page navigation ─────────────────── -->
+    <ViewTransitions fallback="none" />
+
+       <!-- ── Global design tokens & critical CSS ──────────────────── -->
     <style is:global>
-      /* Design tokens */
+      /* ================================================================
+         DESIGN TOKEN SYSTEM
+         Base tokens are defined on :root (TrainedBy / English markets).
+         Per-brand overrides are applied via [data-market] attribute on
+         <html>, which is already set by Base.astro from market.market.
+         This means EVERY page automatically inherits the correct brand
+         color with zero additional code.
+         ================================================================ */
+
+      /* ── Base tokens (TrainedBy / en-ae / en-uk / en-us / en-in) ──── */
       :root {
+        /* Brand accent – Electric Orange */
         --brand: #FF5C00;
+        --brand-hover: #e05200;
         --brand-dim: rgba(255,92,0,0.12);
         --brand-border: rgba(255,92,0,0.25);
+        --brand-glow: rgba(255,92,0,0.4);
+
+        /* Pro / Premium tier – metallic gold gradient */
+        --pro-gradient: linear-gradient(135deg, #c9a227 0%, #f5d06b 40%, #c9a227 70%, #a07c1a 100%);
+        --pro-color: #f5d06b;
+        --pro-dim: rgba(197,162,39,0.12);
+        --pro-border: rgba(197,162,39,0.35);
+        --pro-glow: rgba(197,162,39,0.45);
+
+        /* Surfaces */
         --bg: #0a0a0a;
         --surface: #111111;
         --surface-2: #161616;
         --surface-3: #1c1c1c;
+        --surface-4: #222222;
+
+        /* Borders */
         --border: rgba(255,255,255,0.07);
         --border-hover: rgba(255,255,255,0.14);
+        --border-strong: rgba(255,255,255,0.2);
+
+        /* Text */
         --text: #f0f0f0;
-        --text-2: #a0a0a0;
-        --text-3: #606060;
+        --text-2: #a3a3a3;
+        --text-3: #666666;
         --text-muted: #808080;
+        --text-faint: rgba(255,255,255,0.35);
+
+        /* Semantic colors */
         --green: #00C853;
         --green-dim: rgba(0,200,83,0.08);
         --green-border: rgba(0,200,83,0.2);
         --red: #ff5555;
+        --gold: #F5C842;
+
+        /* Spacing & shape */
         --radius: 12px;
         --radius-lg: 20px;
+        --radius-xl: 28px;
         --shadow: 0 4px 24px rgba(0,0,0,0.4);
+        --shadow-lg: 0 8px 48px rgba(0,0,0,0.6);
         --transition: 0.18s ease;
+
+        /* Typography */
+        --font-display: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+
+      /* ── CoachePar / France – Cobalt Blue ──────────────────────── */
+      [data-market="fr"] {
+        --brand: #2563EB;
+        --brand-hover: #1d4ed8;
+        --brand-dim: rgba(37,99,235,0.12);
+        --brand-border: rgba(37,99,235,0.30);
+        --brand-glow: rgba(37,99,235,0.45);
+      }
+
+      /* ── AllenatoCon / Italy – Scuderia Red ───────────────────── */
+      [data-market="it"] {
+        --brand: #DC2626;
+        --brand-hover: #b91c1c;
+        --brand-dim: rgba(220,38,38,0.12);
+        --brand-border: rgba(220,38,38,0.30);
+        --brand-glow: rgba(220,38,38,0.45);
+      }
+
+      /* ── EntrenaCon / Spain & LatAm – Solar Yellow ──────────────── */
+      [data-market="es"], [data-market="mx"] {
+        --brand: #D97706;
+        --brand-hover: #b45309;
+        --brand-dim: rgba(217,119,6,0.12);
+        --brand-border: rgba(217,119,6,0.30);
+        --brand-glow: rgba(217,119,6,0.45);
       }
 
       /* Reset */
@@ -153,7 +222,7 @@ const jsonLd = structuredData ?? defaultStructuredData;
         text-rendering: optimizeLegibility;
       }
       body {
-        font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-family: var(--font-body);
         background: var(--bg);
         color: var(--text);
         line-height: 1.6;
@@ -161,6 +230,29 @@ const jsonLd = structuredData ?? defaultStructuredData;
         -moz-osx-font-smoothing: grayscale;
         min-height: 100dvh;
         overflow-x: hidden;
+      }
+
+      /* ── Typography hierarchy ─────────────────────────────────────── */
+      /* Display / headings always use Manrope for bold, geometric impact */
+      h1, h2, h3, h4, h5, h6,
+      .display, .heading {
+        font-family: var(--font-display);
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+      /* Body text, labels, inputs use Inter for maximum legibility */
+      p, li, label, span, td, th, input, select, textarea, button {
+        font-family: var(--font-body);
+      }
+      /* Eyebrows / small caps use Inter with tracked-out uppercase */
+      .eyebrow, .label-caps {
+        font-family: var(--font-body);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--brand);
       }
 
       /* Images  -  lazy loading by default */
@@ -241,12 +333,50 @@ const jsonLd = structuredData ?? defaultStructuredData;
         transition: background 0.2s ease;
       }
 
-      /* ── Pulse animation for primary CTA ────────────────────────────── */
+      /* ── Pulse animation for primary CTA ──────────────────────────── */
       @keyframes cta-pulse {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(255,92,0,0.4); }
-        50% { box-shadow: 0 0 0 8px rgba(255,92,0,0); }
+        0%, 100% { box-shadow: 0 0 0 0 var(--brand-glow); }
+        50% { box-shadow: 0 0 0 8px transparent; }
       }
       .btn-pulse { animation: cta-pulse 2.5s ease infinite; }
+
+      /* ── Pro tier badge ──────────────────────────────────────────── */
+      .badge-pro {
+        background: var(--pro-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+      }
+      .card-pro {
+        border-color: var(--pro-border) !important;
+        box-shadow: 0 0 0 1px var(--pro-border), 0 0 32px var(--pro-dim);
+      }
+      .card-pro::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(135deg, rgba(197,162,39,0.06) 0%, transparent 60%);
+        pointer-events: none;
+      }
+
+      /* ── AI presence animation ───────────────────────────────────── */
+      @keyframes ai-breathe {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.0), 0 0 12px rgba(99,102,241,0.15); }
+        50% { box-shadow: 0 0 0 4px rgba(99,102,241,0.0), 0 0 28px rgba(99,102,241,0.35); }
+      }
+      .ai-presence {
+        animation: ai-breathe 3s ease-in-out infinite;
+        border-color: rgba(99,102,241,0.4) !important;
+      }
+      @keyframes ai-typing {
+        0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+        30% { opacity: 1; transform: translateY(-3px); }
+      }
+      .ai-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #6366f1; animation: ai-typing 1.2s ease infinite; }
+      .ai-dot:nth-child(2) { animation-delay: 0.2s; }
+      .ai-dot:nth-child(3) { animation-delay: 0.4s; }
 
       /* ── Reduced motion */
       @media (prefers-reduced-motion: reduce) {
@@ -268,6 +398,28 @@ const jsonLd = structuredData ?? defaultStructuredData;
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       }
       .visually-hidden { @extend .sr-only; }
+
+      /* ── Astro View Transitions: app-like page fade ─────────────────── */
+      @keyframes vt-fade-in {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes vt-fade-out {
+        from { opacity: 1; transform: translateY(0); }
+        to   { opacity: 0; transform: translateY(-6px); }
+      }
+      ::view-transition-old(root) {
+        animation: vt-fade-out 0.18s ease forwards;
+      }
+      ::view-transition-new(root) {
+        animation: vt-fade-in 0.22s ease forwards;
+      }
+      /* Respect reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        ::view-transition-old(root), ::view-transition-new(root) {
+          animation: none;
+        }
+      }
     </style>
 
     <!-- ── i18n: locale + brand + translation strings ─────────────────── -->
