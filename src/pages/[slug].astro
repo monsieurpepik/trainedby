@@ -316,7 +316,14 @@ const pageImage = trainerPhoto || 'https://images.unsplash.com/photo-15719029432
       const instagram = t.instagram || t.instagram_handle || '';
       const whatsapp = t.whatsapp || t.phone || '';
       const certifications = Array.isArray(t.certifications) ? t.certifications : [];
-      const pkgList = Array.isArray(packages) ? packages : [];
+      // Deduplicate packages by name (guard against duplicate DB rows)
+      const _rawPkgs = Array.isArray(packages) ? packages : [];
+      const _seenPkgNames = new Set();
+      const pkgList = _rawPkgs.filter(p => {
+        if (_seenPkgNames.has(p.name)) return false;
+        _seenPkgNames.add(p.name);
+        return true;
+      });
       const priceFrom = pkgList[0]?.price || null;
       const priceCurrency = pkgList[0]?.currency || '';
 

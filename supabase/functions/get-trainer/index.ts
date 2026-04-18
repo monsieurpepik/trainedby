@@ -42,7 +42,15 @@ serve(async (req) => {
       referrer: req.headers.get("referer") || null,
     }).then(() => {});
 
-    return new Response(JSON.stringify({ trainer, packages: packages || [] }), {
+    // Deduplicate packages by name — keep the one with the lowest sort_order
+    const seen = new Set<string>();
+    const dedupedPackages = (packages || []).filter(p => {
+      if (seen.has(p.name)) return false;
+      seen.add(p.name);
+      return true;
+    });
+
+    return new Response(JSON.stringify({ trainer, packages: dedupedPackages }), {
       headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=30" },
     });
   } catch (e) {
