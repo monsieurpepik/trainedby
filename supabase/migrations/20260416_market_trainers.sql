@@ -235,7 +235,7 @@ INSERT INTO trainers (
   11, 510, 4.9, 67, 120,
   'New York', 'USA', '+12125550001', 'marcus.johnson.fit',
   ARRAY['in-person','online'], 'verified', 'pro',
-  TRUE, TRUE, 'en-us', 'us'
+  TRUE, TRUE, 'en-us', 'com'
 ) ON CONFLICT (slug) DO UPDATE SET
   avatar_url = EXCLUDED.avatar_url,
   market = EXCLUDED.market,
@@ -260,7 +260,7 @@ INSERT INTO trainers (
   7, 310, 5.0, 44, 100,
   'Los Angeles', 'USA', '+13105550002', 'ashley.rivera.fit',
   ARRAY['in-person','online'], 'verified', 'pro',
-  TRUE, TRUE, 'en-us', 'us'
+  TRUE, TRUE, 'en-us', 'com'
 ) ON CONFLICT (slug) DO UPDATE SET
   avatar_url = EXCLUDED.avatar_url,
   market = EXCLUDED.market,
@@ -285,7 +285,7 @@ INSERT INTO trainers (
   8, 260, 4.8, 35, 110,
   'Chicago', 'USA', '+13125550003', 'derek.kim.speed',
   ARRAY['in-person','online'], 'verified', 'free',
-  TRUE, TRUE, 'en-us', 'us'
+  TRUE, TRUE, 'en-us', 'com'
 ) ON CONFLICT (slug) DO UPDATE SET
   avatar_url = EXCLUDED.avatar_url,
   market = EXCLUDED.market,
