@@ -1,6 +1,6 @@
 ---
 /**
- * ProfileCompleteness  -  Gamified profile progress widget
+ * ProfileCompleteness - Gamified profile progress widget
  * ─────────────────────────────────────────────────────────────────────────────
  * Shows profile completion score with Strava-style progress ring,
  * missing items checklist, and contextual upgrade nudge.
@@ -224,10 +224,10 @@ function renderPC(trainer) {
   // Status label
   const statusEl = document.getElementById('pc-status');
   if (statusEl) {
-    if (score >= 90) statusEl.textContent = 'Elite  -  you\'re maximising visibility';
-    else if (score >= 70) statusEl.textContent = 'Strong  -  a few items left';
-    else if (score >= 40) statusEl.textContent = 'Building  -  keep going';
-    else statusEl.textContent = 'Just started  -  complete your profile';
+    if (score >= 90) statusEl.textContent = 'Elite - you\'re maximising visibility';
+    else if (score >= 70) statusEl.textContent = 'Strong - a few items left';
+    else if (score >= 40) statusEl.textContent = 'Building - keep going';
+    else statusEl.textContent = 'Just started - complete your profile';
   }
 
   // Items list

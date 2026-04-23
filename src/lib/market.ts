@@ -1,5 +1,5 @@
 /**
- * TrainedBy  -  Market Detection & Configuration
+ * TrainedBy - Market Detection & Configuration
  * ─────────────────────────────────────────────────────────────────────────────
  * Detects the current market from the request hostname and returns the
  * appropriate market configuration. Used by all Astro pages to adapt
@@ -56,6 +56,15 @@ export interface MarketConfig {
   incomeSessionLabel: string;
   incomeProLabel: string;
   incomePassiveLabel: string;
+  /**
+   * Transaction monetization layer.
+   * takeRatePercent: platform fee applied to bookings processed through TrainedBy Payments.
+   * takeRateEnabled: false = SaaS-only mode (current default); true = payments flow through platform.
+   * takeRateNote: optional UI note shown on the pricing page.
+   */
+  takeRatePercent: number;
+  takeRateEnabled: boolean;
+  takeRateNote?: string;
 }
 
 const MARKETS: Record<string, MarketConfig> = {
@@ -79,9 +88,12 @@ const MARKETS: Record<string, MarketConfig> = {
     incomeSession: '8,400', incomePro: '24,600', incomePassive: '6,200',
     incomeSessionLabel: 'AED/month from 6 clients × 1,400 AED packages',
     incomeProLabel: 'Sessions + digital products + affiliate commissions',
-    incomePassiveLabel: 'AED while you sleep  -  digital products & affiliate deals',
+    incomePassiveLabel: 'AED while you sleep - digital products & affiliate deals',
+    takeRatePercent: 8,
+    takeRateEnabled: false,
+    takeRateNote: 'When TrainedBy Payments launches, a platform fee of 8% applies to sessions booked through the platform. Trainers on Pro pay 5%.',
     paymentProvider: 'stripe',
-    siteTitle: 'TrainedBy.ae  -  Verified Personal Trainers in the UAE',
+    siteTitle: 'TrainedBy.ae - Verified Personal Trainers in the UAE',
     metaDescription: 'Find REPs UAE verified personal trainers in Dubai, Abu Dhabi, and across the UAE. Build your verified trainer profile for free.',
     certVerifyLabel: 'REPs UAE Number',
     certVerifyPlaceholder: 'e.g. REP-12345',
@@ -108,9 +120,12 @@ const MARKETS: Record<string, MarketConfig> = {
     incomeSession: '3,200', incomePro: '9,400', incomePassive: '2,300',
     incomeSessionLabel: '£/month from 6 clients × £530 packages',
     incomeProLabel: 'Sessions + digital products + affiliate commissions',
-    incomePassiveLabel: '£ while you sleep  -  digital products & affiliate deals',
+    incomePassiveLabel: '£ while you sleep - digital products & affiliate deals',
+    takeRatePercent: 8,
+    takeRateEnabled: false,
+    takeRateNote: 'When TrainedBy Payments launches, a platform fee of 8% applies to sessions booked through the platform. Trainers on Pro pay 5%.',
     paymentProvider: 'stripe',
-    siteTitle: 'TrainedBy.uk  -  Verified Personal Trainers in the UK',
+    siteTitle: 'TrainedBy.uk - Verified Personal Trainers in the UK',
     metaDescription: 'Find REPs UK registered personal trainers near you. Build your verified trainer profile for free.',
     certVerifyLabel: 'REPs UK Number',
     certVerifyPlaceholder: 'e.g. R0012345',
@@ -140,9 +155,12 @@ const MARKETS: Record<string, MarketConfig> = {
     incomeSession: '52,000', incomePro: '1,52,000', incomePassive: '38,000',
     incomeSessionLabel: '₹/month from 6 clients × ₹8,500 packages',
     incomeProLabel: 'Sessions + digital products + affiliate commissions',
-    incomePassiveLabel: '₹ while you sleep  -  digital products & affiliate deals',
+    incomePassiveLabel: '₹ while you sleep - digital products & affiliate deals',
+    takeRatePercent: 8,
+    takeRateEnabled: false,
+    takeRateNote: 'When TrainedBy Payments launches in India, a platform fee of 8% applies to sessions booked through the platform. Trainers on Pro pay 5%.',
     paymentProvider: 'razorpay',
-    siteTitle: 'TrainedBy.in  -  Verified Personal Trainers in India',
+    siteTitle: 'TrainedBy.in - Verified Personal Trainers in India',
     metaDescription: 'Find NSCA, ACSM and CIMSPA-aligned verified personal trainers across India. Build your verified trainer profile for free.',
     certVerifyLabel: 'Certification Number (NSCA, ACSM, ACE, CIMSPA or equivalent)',
     certVerifyPlaceholder: 'e.g. NSCA-CPT-12345 or CIMSPA-12345',
@@ -169,9 +187,12 @@ const MARKETS: Record<string, MarketConfig> = {
     incomeSession: '2,400', incomePro: '7,200', incomePassive: '1,800',
     incomeSessionLabel: '$/month from 6 clients × $400 packages',
     incomeProLabel: 'Sessions + digital products + affiliate commissions',
-    incomePassiveLabel: '$ while you sleep  -  digital products & affiliate deals',
+    incomePassiveLabel: '$ while you sleep - digital products & affiliate deals',
+    takeRatePercent: 8,
+    takeRateEnabled: false,
+    takeRateNote: 'When TrainedBy Payments launches, a platform fee of 8% applies to sessions booked through the platform. Trainers on Pro pay 5%.',
     paymentProvider: 'stripe',
-    siteTitle: 'TrainedBy  -  Verified Personal Trainers Worldwide',
+    siteTitle: 'TrainedBy - Verified Personal Trainers Worldwide',
     metaDescription: 'The global platform for NASM, ACE, and NSCA certified personal trainers. Build your verified profile for free.',
     certVerifyLabel: 'Certification Number',
     certVerifyPlaceholder: 'e.g. NASM-12345',
@@ -201,9 +222,12 @@ const MARKETS: Record<string, MarketConfig> = {
     incomeSession: '2,400', incomePro: '7,200', incomePassive: '1,800',
     incomeSessionLabel: '€/mois de 6 clients × 400€ forfaits',
     incomeProLabel: 'Séances + produits digitaux + commissions d\'affiliation',
-    incomePassiveLabel: '€ pendant que vous dormez  -  produits digitaux & affiliation',
+    incomePassiveLabel: '€ pendant que vous dormez - produits digitaux & affiliation',
+    takeRatePercent: 8,
+    takeRateEnabled: false,
+    takeRateNote: 'Lorsque CoachéPar Paiements sera lancé, des frais de plateforme de 8% s\'appliqueront aux séances réservées via la plateforme. Les coachs Pro paient 5%.',
     paymentProvider: 'stripe',
-    siteTitle: 'CoachéPar  -  Coachs Sportifs Certifiés en France',
+    siteTitle: 'CoachéPar - Coachs Sportifs Certifiés en France',
     metaDescription: 'Trouvez un coach sportif certifié BPJEPS ou STAPS près de chez vous. Créez votre profil de coach vérifié gratuitement.',
     certVerifyLabel: 'Numéro de certification (BPJEPS / STAPS)',
     certVerifyPlaceholder: 'ex. BPJEPS-12345',
@@ -233,9 +257,12 @@ const MARKETS: Record<string, MarketConfig> = {
     incomeSession: '2,400', incomePro: '7,200', incomePassive: '1,800',
     incomeSessionLabel: '€/mese da 6 clienti × 400€ pacchetti',
     incomeProLabel: 'Sessioni + prodotti digitali + commissioni di affiliazione',
-    incomePassiveLabel: '€ mentre dormi  -  prodotti digitali & affiliazione',
+    incomePassiveLabel: '€ mentre dormi - prodotti digitali & affiliazione',
+    takeRatePercent: 8,
+    takeRateEnabled: false,
+    takeRateNote: 'Quando AllenatoCon Pagamenti sarà lanciato, si applicherà una commissione di piattaforma dell\'8% alle sessioni prenotate tramite la piattaforma. I trainer Pro pagano il 5%.',
     paymentProvider: 'stripe',
-    siteTitle: 'AllenatoCon  -  Personal Trainer Certificati in Italia',
+    siteTitle: 'AllenatoCon - Personal Trainer Certificati in Italia',
     metaDescription: 'Trova un personal trainer certificato EQF o CONI vicino a te. Crea il tuo profilo verificato gratuitamente.',
     certVerifyLabel: 'Numero certificazione (EQF / CONI / FIPE)',
     certVerifyPlaceholder: 'es. EQF-12345',
@@ -264,18 +291,19 @@ const MARKETS: Record<string, MarketConfig> = {
     paymentNote: 'Los pagos llegarán pronto en España. Únete a la lista de espera para acceso anticipado y bloquea el precio de lanzamiento.',
     incomeSession: '2,400', incomePro: '7,200', incomePassive: '1,800',
     incomeSessionLabel: '€/mes de 6 clientes × 400€ paquetes',
-    incomeProLabel: 'Sesiones + productos digitales + comisiones de afiliados',
-    incomePassiveLabel: '€ mientras duermes  -  productos digitales & afiliación',
+    incomeProLabel: 'Sesiones + productos digitales + comisiones de afiliados',    incomePassiveLabel: 'MX$ mientras duermes - productos digitales & afiliación',
+    takeRatePercent: 8,
+    takeRateEnabled: false,
+    takeRateNote: 'Cuando EntrenaCon Pagos se lance en México, se aplicará una tarifa de plataforma del 8% a las sesiones reservadas a través de la plataforma. Los entrenadores Pro pagan el 5%.',
     paymentProvider: 'stripe',
-    siteTitle: 'EntrenaCon  -  Entrenadores Personales Certificados',
-    metaDescription: 'Encuentra un entrenador personal certificado NSCA, ISSA o CFES cerca de ti. Crea tu perfil verificado gratis.',
+    siteTitle: 'EntrenaCon - Entrenadores Personales Certificados en MéxicoDescription: 'Encuentra un entrenador personal certificado NSCA, ISSA o CFES cerca de ti. Crea tu perfil verificado gratis.',
     certVerifyLabel: 'Número de certificación (NSCA / ISSA / CFES)',
     certVerifyPlaceholder: 'ej. NSCA-CPT-12345',
     i18nLocale: 'es',
     brandName: 'EntrenaCon',
   },
 
-  // ── Mexico market (entrenacon.mx)  -  Spanish UI, MXN pricing ──────────────
+  // ── Mexico market (entrenacon.mx) - Spanish UI, MXN pricing ──────────────
   mx: {
     market: 'mx',
     domain: 'entrenacon.mx',
@@ -296,10 +324,12 @@ const MARKETS: Record<string, MarketConfig> = {
     paymentNote: 'Los pagos llegarán pronto en México. Únete a la lista de espera para acceso anticipado y bloquea el precio de lanzamiento.',
     incomeSession: '48,000', incomePro: '1,44,000', incomePassive: '36,000',
     incomeSessionLabel: 'MX$/mes de 6 clientes × MX$8,000 paquetes',
-    incomeProLabel: 'Sesiones + productos digitales + comisiones de afiliados',
-    incomePassiveLabel: 'MX$ mientras duermes  -  productos digitales & afiliación',
+    incomeProLabel: 'Sesiones + productos digitales + comisiones de afiliados',    incomePassiveLabel: '€ mientras duermes - productos digitales & afiliación',
+    takeRatePercent: 8,
+    takeRateEnabled: false,
+    takeRateNote: 'Cuando EntrenaCon Pagos se lance, se aplicará una tarifa de plataforma del 8% a las sesiones reservadas a través de la plataforma. Los entrenadores Pro pagan el 5%.',
     paymentProvider: 'stripe',
-    siteTitle: 'EntrenaCon  -  Entrenadores Personales Certificados en México',
+    siteTitle: 'EntrenaCon - Entrenadores Personales Certificados en Españaico',
     metaDescription: 'Encuentra un entrenador personal certificado CONADE, NSCA o ISSA cerca de ti. Crea tu perfil verificado gratis.',
     certVerifyLabel: 'Número de certificación (CONADE / NSCA / ISSA)',
     certVerifyPlaceholder: 'ej. CONADE-12345',

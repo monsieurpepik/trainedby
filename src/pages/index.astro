@@ -1,13 +1,13 @@
 ---
-// Root index  -  serves as the homepage for all domains.
+// Root index - serves as the homepage for all domains.
 // Detects market and renders the landing page content directly
-// (no redirect needed  -  better for SEO and performance).
+// (no redirect needed - better for SEO and performance).
 import Base from '../layouts/Base.astro';
 import { getMarket } from '../lib/market.ts';
 
 const market = getMarket(Astro.url.hostname);
 
-// Redirect to /landing  -  the landing page is the full homepage
+// Redirect to /landing - the landing page is the full homepage
 // We use a meta refresh + JS redirect for instant client-side navigation
 // while still serving a crawlable page for SEO.
 ---

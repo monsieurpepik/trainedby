@@ -25,7 +25,7 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
 ---
 
 <Base
-  title={`Pricing  -  ${brandName}`}
+  title={`Pricing - ${brandName}`}
   description={`Simple, transparent pricing for ${brandName}. Free to start. Pro plan with a 30-day ROI guarantee.`}
 >
   <style>
@@ -470,8 +470,8 @@ function setBilling(mode) {
   const premM = {premiumMonthly}, premA = {premiumAnnual};
   document.getElementById('pro-price').textContent = isAnnual ? proA : proM;
   document.getElementById('premium-price').textContent = isAnnual ? premA : premM;
-  document.getElementById('pro-annual-note').textContent = isAnnual ? currency + ' ' + (proA * 12) + '/yr  -  save ' + currency + ' ' + ((proM - proA) * 12) : '';
-  document.getElementById('premium-annual-note').textContent = isAnnual ? currency + ' ' + (premA * 12) + '/yr  -  save ' + currency + ' ' + ((premM - premA) * 12) : '';
+  document.getElementById('pro-annual-note').textContent = isAnnual ? currency + ' ' + (proA * 12) + '/yr - save ' + currency + ' ' + ((proM - proA) * 12) : '';
+  document.getElementById('premium-annual-note').textContent = isAnnual ? currency + ' ' + (premA * 12) + '/yr - save ' + currency + ' ' + ((premM - premA) * 12) : '';
 }
 
 function getAuthToken() {

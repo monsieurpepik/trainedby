@@ -6,7 +6,7 @@ const brandName = market.brandName;
 ---
 
 <Base
-  title={`Edit Profile  -  ${brandName}`}
+  title={`Edit Profile - ${brandName}`}
   description={`Edit your ${brandName} trainer profile, packages, and settings.`}
 >
   <style>
@@ -274,11 +274,11 @@ body {
     <div class="auth-gate">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" style="margin-bottom:20px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
       <h2>Sign in to edit</h2>
-      <p>Enter your email to receive a magic link  -  no password needed.</p>
+      <p>Enter your email to receive a magic link - no password needed.</p>
       <input class="auth-field" type="email" id="auth-email" placeholder="your@email.com" autocomplete="email">
       <div id="auth-error" style="display:none;font-size:12px;color:#ff5555;margin-bottom:10px;max-width:340px;"></div>
       <button class="auth-btn" id="auth-btn" onclick="sendMagicLink()">Send Magic Link</button>
-      <div class="auth-hint">Check your inbox  -  link expires in 15 minutes.</div>
+      <div class="auth-hint">Check your inbox - link expires in 15 minutes.</div>
     </div>
     <div id="auth-sent" class="hidden" style="text-align:center;padding:40px 0;">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="1.5" style="margin-bottom:16px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -343,7 +343,7 @@ body {
     <!-- Section: Specialties -->
     <div class="edit-section">
       <div class="section-heading">Specialties</div>
-      <div class="section-sub">Select all that apply  -  shown as pills on your profile.</div>
+      <div class="section-sub">Select all that apply - shown as pills on your profile.</div>
       <div class="toggle-row" id="spec-row">
         <div class="toggle-pill" onclick="togglePill(this,'spec','Strength')">Strength</div>
         <div class="toggle-pill" onclick="togglePill(this,'spec','Fat Loss')">Fat Loss</div>
@@ -412,7 +412,7 @@ body {
     <!-- Section: Video Intro -->
     <div class="edit-section">
       <div class="section-heading">Video Intro</div>
-      <div class="section-sub">Add a short intro video  -  YouTube or Instagram Reel link. Clients who watch a video are 3× more likely to book.</div>
+      <div class="section-sub">Add a short intro video - YouTube or Instagram Reel link. Clients who watch a video are 3× more likely to book.</div>
       <div class="field">
         <label>Video URL</label>
         <input type="url" id="e-video-intro" placeholder="https://youtube.com/shorts/... or https://instagram.com/reel/...">
@@ -788,7 +788,7 @@ async function submitRepsVerification() {
       'Authorization': 'Bearer ' + getAuthToken() },
     body: JSON.stringify({ trainer_id: trainer.id, reps_number: reps })
   });
-  if (res.ok) showToast('Verification submitted  -  we\'ll confirm within 24h', 'success');
+  if (res.ok) showToast('Verification submitted - we\'ll confirm within 24h', 'success');
   else showToast('Failed to submit. Please try again.', 'error');
 }
 

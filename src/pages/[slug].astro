@@ -12,12 +12,12 @@ const { slug } = Astro.params;
 const market = getMarket(Astro.url.hostname);
 const brandName = market.brandName;
 
-// Validate slug  -  only alphanumeric and hyphens
+// Validate slug - only alphanumeric and hyphens
 if (!slug || !/^[a-z0-9-]+$/i.test(slug)) {
   return Astro.redirect('/find', 302);
 }
 
-// Reserved routes  -  never treat these as trainer slugs
+// Reserved routes - never treat these as trainer slugs
 const RESERVED = new Set([
   'find', 'join', 'pricing', 'blog', 'dashboard', 'edit',
   'admin', 'superadmin', 'for-trainers', 'privacy',
@@ -28,7 +28,7 @@ if (RESERVED.has(slug.toLowerCase())) {
   return Astro.redirect('/find', 302);
 }
 
-// Verify trainer exists before rendering (SSR  -  runs on server)
+// Verify trainer exists before rendering (SSR - runs on server)
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
 
@@ -54,7 +54,7 @@ try {
     }
   }
 } catch (e) {
-  // On network error, still render  -  client JS will handle the error state
+  // On network error, still render - client JS will handle the error state
   trainerExists = true;
 }
 
@@ -63,8 +63,8 @@ if (!trainerExists) {
 }
 
 const pageTitle = trainerName
-  ? `${trainerName}  -  Verified Trainer on ${brandName}`
-  : `Trainer Profile  -  ${brandName}`;
+  ? `${trainerName} - Verified Trainer on ${brandName}`
+  : `Trainer Profile - ${brandName}`;
 const pageDesc = trainerName
   ? `Book sessions with ${trainerName}, a verified ${trainerSpecialty} on ${brandName}.`
   : `Verified personal trainer profile on ${brandName}`;
@@ -80,7 +80,7 @@ const pageImage = trainerPhoto || 'https://images.unsplash.com/photo-15719029432
     window.__TRAINER_SLUG__ = slug;
   </script>
 
-  <!-- Full profile page content  -  identical to profile.astro but slug-aware -->
+  <!-- Full profile page content - identical to profile.astro but slug-aware -->
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
@@ -191,15 +191,21 @@ const pageImage = trainerPhoto || 'https://images.unsplash.com/photo-15719029432
         mount.style.display = 'block';
         mount.innerHTML = `
           <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;gap:24px;padding:32px;text-align:center">
-            <div style="font-size:48px">🔍</div>
+            <div style="font-size:64px;font-weight:900;line-height:1;background:linear-gradient(135deg,#FF5C00,#ff8c42);-webkit-background-clip:text;-webkit-text-fill-color:transparent">404</div>
             <h1 style="font-size:24px;font-weight:700">Trainer not found</h1>
-            <p style="color:rgba(255,255,255,0.6);max-width:360px">This trainer profile doesn't exist or has been removed.</p>
-            <a href="/find" style="background:#FF5C00;color:#fff;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700">Find a Trainer</a>
+            <p style="color:rgba(255,255,255,0.6);max-width:400px;line-height:1.6">This trainer profile doesn't exist or may have been removed.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+              <a href="/find" style="background:#FF5C00;color:#fff;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700">Find a Trainer</a>
+              <a href="/" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:600">Go Home</a>
+            </div>
+            <div style="padding:14px 20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;max-width:400px;font-size:13px;color:rgba(255,255,255,0.45);line-height:1.6">
+              <strong style="color:rgba(255,255,255,0.65)">Looking for a specific trainer?</strong> Try searching by name or specialty on the Find page.
+            </div>
           </div>`;
       }
     }
 
-    // Premium gradient avatar fallback — generates a branded canvas image with initials
+    // Premium gradient avatar fallback - generates a branded canvas image with initials
     function makeAvatarFallback(name) {
       const initials = (name || '?').split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0, 2) || '?';
       const brandColor = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#FF5C00';
@@ -264,7 +270,7 @@ const pageImage = trainerPhoto || 'https://images.unsplash.com/photo-15719029432
       const displayName = t.name || t.full_name || '';
       const photoUrl = t.avatar_url || t.profile_photo_url || '';
 
-      // Set background image — premium gradient+initials fallback if image fails or missing
+      // Set background image - premium gradient+initials fallback if image fails or missing
       const bg = document.getElementById('bg');
       if (photoUrl) {
         const testImg = new Image();
@@ -327,7 +333,7 @@ const pageImage = trainerPhoto || 'https://images.unsplash.com/photo-15719029432
       const priceFrom = pkgList[0]?.price || null;
       const priceCurrency = pkgList[0]?.currency || '';
 
-      document.title = `${displayName}  -  Verified Trainer on ${brand}`;
+      document.title = `${displayName} - Verified Trainer on ${brand}`;
 
       mount.innerHTML = `
         <div style="max-width:680px;margin:0 auto;padding:24px 16px 80px">

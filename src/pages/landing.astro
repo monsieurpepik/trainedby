@@ -21,7 +21,7 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
 ---
 
 <Base
-  title={`${brandName}  -  Find a Verified Personal Trainer`}
+  title={`${brandName} - Find a Verified Personal Trainer`}
   description={`Discover verified personal trainers in ${market.cityName || 'your city'}. Every trainer is ${market.certificationBody}-certified and background-checked. Real results, real people.`}
 >
   <style>
@@ -53,7 +53,7 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
     .nav-cta:hover { background: var(--brand-hover, #e05200); transform: translateY(-1px); }
     @media (max-width: 640px) { .nav-links { display: none; } .nav { padding: 0 20px; } }
 
-    /* HERO  -  Consumer Search */
+    /* HERO - Consumer Search */
     .hero { min-height: 92vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
     .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 90% 70% at 50% 30%, rgba(255,92,0,0.06) 0%, transparent 65%); pointer-events: none; }
     .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 100px; border: 1px solid var(--brand-border); background: var(--brand-dim); font-size: 12px; font-weight: 700; color: var(--brand); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 28px; }
@@ -272,7 +272,7 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
       </div>
       <p class="section-sub">{t(locale, 'blog_sub')}</p>
       <div class="transforms-grid" id="transformations-grid">
-        <!-- Static seed cards  -  replaced by live data when available -->
+        <!-- Static seed cards - replaced by live data when available -->
         <div class="transform-card">
           <div class="transform-header">
             <div class="transform-trainer">
@@ -473,7 +473,7 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
           grid.appendChild(card);
         });
       } catch(e) {
-        // Silently fail  -  skeleton loaders remain
+        // Silently fail - skeleton loaders remain
       }
     })();
   </script>

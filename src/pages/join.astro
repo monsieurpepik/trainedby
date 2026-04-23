@@ -18,7 +18,7 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
 ---
 
 <Base
-  title={`Get Your Verified Trainer Profile  -  ${market.brandName}`}
+  title={`Get Your Verified Trainer Profile - ${market.brandName}`}
   description={`Create your verified personal trainer profile on ${market.brandName}. ${market.certificationBody} verified. Free to set up in 2 minutes.`}
 >
   <style>
@@ -431,11 +431,11 @@ body {
       <input type="text" id="s1-reps" placeholder={market.certVerifyPlaceholder} autocomplete="off" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.05em;">
       <div class="field-hint" id="cert-hint">
         {locale === 'en-ae' ? (
-          <>Find yours at <a href="https://repsuae.com/searcht" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">repsuae.com/searcht</a>  -  leave blank to add later</>
+          <>Find yours at <a href="https://repsuae.com/searcht" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">repsuae.com/searcht</a> - leave blank to add later</>
         ) : locale === 'en-uk' ? (
-          <>Find yours at <a href="https://www.reps-uk.org/find-a-trainer/" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">reps-uk.org</a>  -  leave blank to add later</>
+          <>Find yours at <a href="https://www.reps-uk.org/find-a-trainer/" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">reps-uk.org</a> - leave blank to add later</>
         ) : locale === 'en-us' ? (
-          <>Find yours at <a href="https://www.nasm.org/resources/validate-credentials" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">nasm.org/validate</a>  -  leave blank to add later</>
+          <>Find yours at <a href="https://www.nasm.org/resources/validate-credentials" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">nasm.org/validate</a> - leave blank to add later</>
         ) : (
           <>Leave blank to add later</>
         )}
@@ -525,7 +525,7 @@ body {
 
     <div class="field-error hidden" id="s2-error" style="text-align:center;margin-bottom:12px;"></div>
 
-    <!-- Consent checkbox  -  required before account creation (GDPR / CCPA / PDPL) -->
+    <!-- Consent checkbox - required before account creation (GDPR / CCPA / PDPL) -->
     <label id="consent-label" style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;cursor:pointer;font-size:13px;color:var(--text-muted);line-height:1.5;">
       <input type="checkbox" id="consent-checkbox" style="margin-top:2px;accent-color:var(--brand);width:16px;height:16px;flex-shrink:0;" />
       <span>I agree to the <a href="/terms" target="_blank" style="color:var(--brand);text-decoration:underline;">Terms of Service</a> and <a href="/privacy" target="_blank" style="color:var(--brand);text-decoration:underline;">Privacy Policy</a>. I confirm my certification details are genuine and accurate.</span>
@@ -691,7 +691,7 @@ async function autoBuildFromIG() {
     }
     // Store Instagram handle in state for later
     state.instagram = '@' + handle;
-    status.textContent = '\u2713 Pre-filled from @' + handle + '  -  review and adjust below';
+    status.textContent = '\u2713 Pre-filled from @' + handle + ' - review and adjust below';
     status.style.color = '#00C853';
   } catch(e) {
     status.textContent = 'Could not fetch profile. Fill in manually below.';
@@ -825,7 +825,7 @@ async function verifyAndCreate() {
   if (state.specialties.length === 0) { showErr(errEl, 'Please select at least one specialty.'); return; }
   if (!title) { showErr(errEl, 'Please enter your title/role.'); return; }
 
-  // Consent validation  -  required for GDPR / CCPA / PDPL compliance
+  // Consent validation - required for GDPR / CCPA / PDPL compliance
   const consentBox = document.getElementById('consent-checkbox');
   if (consentBox && !consentBox.checked) {
     showErr(errEl, 'Please agree to the Terms of Service and Privacy Policy to continue.');
@@ -878,7 +878,7 @@ async function verifyAndCreate() {
       .single();
 
     if (trainerErr) {
-      // Trainer might already exist  -  try to fetch
+      // Trainer might already exist - try to fetch
       const { data: existing } = await sb.from('trainers').select('*').eq('email', state.email).maybeSingle();
       if (!existing) throw trainerErr;
       state.trainer_id = existing.id;

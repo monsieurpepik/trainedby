@@ -1,5 +1,5 @@
 /**
- * Auth helpers  -  cookie-first, localStorage fallback.
+ * Auth helpers - cookie-first, localStorage fallback.
  * The tb_session HttpOnly cookie is set by the verify-magic-link edge function.
  * localStorage is kept as a fallback for backward compatibility.
  */
