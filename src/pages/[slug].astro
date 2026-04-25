@@ -260,6 +260,7 @@ const pageImage = trainerPhoto || 'https://images.unsplash.com/photo-15719029432
     }
 
     function renderProfile(t, packages) {
+      window.__TRAINER_ID__ = t.id;
       const loading = document.getElementById('loading-state');
       const mount = document.getElementById('profile-mount');
       if (loading) loading.style.display = 'none';
@@ -427,6 +428,26 @@ const pageImage = trainerPhoto || 'https://images.unsplash.com/photo-15719029432
             </button>` : ''}
           </div>
 
+          <!-- Client Reviews -->
+          <div id="reviewsSection" style="background:rgba(10,10,10,0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.09);border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:0 4px 24px rgba(0,0,0,0.3)">
+            <h2 style="font-family:var(--font-display,'Manrope',sans-serif);font-size:15px;font-weight:800;margin-bottom:14px;letter-spacing:-0.01em">Client Reviews</h2>
+            <div id="reviewsContent"><div style="text-align:center;padding:20px;color:rgba(255,255,255,0.3);font-size:13px">Loading reviews...</div></div>
+            <!-- Write a Review -->
+            <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.07)">
+              <button id="writeReviewToggle" onclick="document.getElementById('writeReviewForm').style.display=document.getElementById('writeReviewForm').style.display==='none'?'block':'none'" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.8);cursor:pointer">
+                &#9998; Write a Review
+              </button>
+              <div id="writeReviewForm" style="display:none;margin-top:12px">
+                <div style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Your Name</label><input id="rvName" type="text" placeholder="e.g. James M." maxlength="60" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none" /></div>
+                <div style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Rating</label><div id="starPicker" style="display:flex;gap:6px"><span onclick="setRating(1)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span><span onclick="setRating(2)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span><span onclick="setRating(3)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span><span onclick="setRating(4)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span><span onclick="setRating(5)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span></div></div>
+                <div style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Your Review</label><textarea id="rvText" rows="4" placeholder="Share your experience with this trainer..." maxlength="600" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none;resize:vertical"></textarea></div>
+                <div style="margin-bottom:16px"><label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Goal Achieved (optional)</label><input id="rvGoal" type="text" placeholder="e.g. Lost 8kg in 10 weeks" maxlength="80" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none" /></div>
+                <button onclick="submitReview()" id="rvSubmitBtn" style="padding:11px 24px;background:#FF5C00;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;width:100%">Submit Review</button>
+                <div id="rvMsg" style="margin-top:10px;font-size:13px;display:none"></div>
+              </div>
+            </div>
+          </div>
+
           <!-- Powered by footer -->
           <div style="text-align:center;margin-top:40px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08)">
             <a href="/" style="color:rgba(255,255,255,0.3);text-decoration:none;font-size:13px">
@@ -434,6 +455,9 @@ const pageImage = trainerPhoto || 'https://images.unsplash.com/photo-15719029432
             </a>
           </div>
         </div>`;
+
+      // Load reviews asynchronously after rendering
+      loadReviews(t.id);
     }
 
     // Web Share API
@@ -451,6 +475,91 @@ const pageImage = trainerPhoto || 'https://images.unsplash.com/photo-15719029432
           if (btn) { btn.textContent = 'Link copied!'; setTimeout(() => { btn.textContent = 'Share this profile'; }, 2000); }
         });
       }
+    }
+
+    // ── Reviews ──────────────────────────────────────────────────────────────
+    async function loadReviews(trainerId) {
+      if (!trainerId) return;
+      try {
+        const r = await fetch(
+          `${SUPABASE_URL}/rest/v1/reviews?trainer_id=eq.${trainerId}&verified=eq.true&order=created_at.desc&limit=8`,
+          { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+        );
+        const reviews = await r.json();
+        const el = document.getElementById('reviewsContent');
+        if (!el) return;
+        if (!Array.isArray(reviews) || reviews.length === 0) {
+          el.innerHTML = `<div style="text-align:center;padding:20px 16px;border:1px dashed rgba(255,255,255,0.1);border-radius:12px"><div style="font-size:28px;margin-bottom:8px">&#11088;</div><div style="font-size:14px;font-weight:700;margin-bottom:4px">No reviews yet</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6">Be the first to train with this trainer and leave a review after your session.</div></div>`;
+          return;
+        }
+        const avg = reviews.reduce((a,b) => a + b.rating, 0) / reviews.length;
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) starsHtml += `<span style="color:${i<=Math.round(avg)?'#FF5C00':'rgba(255,255,255,0.2)'};font-size:14px">&#9733;</span>`;
+        let html = `<div style="display:flex;align-items:center;gap:14px;padding:14px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.09);margin-bottom:12px"><div style="font-size:44px;font-weight:800;line-height:1">${avg.toFixed(1)}</div><div><div style="display:flex;gap:2px;margin-bottom:4px">${starsHtml}</div><div style="font-size:12px;color:rgba(255,255,255,0.5)">${reviews.length} verified review${reviews.length>1?'s':''}</div></div></div>`;
+        reviews.forEach(rv => {
+          let rvStars = '';
+          for (let i=1;i<=5;i++) rvStars += `<span style="color:${i<=rv.rating?'#FF5C00':'rgba(255,255,255,0.2)'};font-size:12px">&#9733;</span>`;
+          const initials = (rv.client_name||'?').substring(0,2).toUpperCase();
+          html += `<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:34px;height:34px;border-radius:50%;background:rgba(255,92,0,0.15);border:1px solid rgba(255,92,0,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#FF5C00;flex-shrink:0">${initials}</div><div><div style="font-size:13px;font-weight:700">${rv.client_name||'Client'}</div><div style="font-size:10px;color:#22c55e;font-weight:600;margin-top:2px">&#10003; Verified</div></div><div style="display:flex;gap:2px;margin-left:auto">${rvStars}</div></div><div style="font-size:13px;line-height:1.7;color:rgba(255,255,255,0.6)">${rv.review_text||''}</div>${rv.goal_achieved?`<div style="display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:600;color:#22c55e">&#127919; ${rv.goal_achieved}</div>`:''}</div>`;
+        });
+        el.innerHTML = html;
+      } catch(e) {
+        const el = document.getElementById('reviewsContent');
+        if (el) el.innerHTML = `<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.3);font-size:13px">Could not load reviews.</div>`;
+      }
+    }
+
+    let _selectedRating = 0;
+    function setRating(v) {
+      _selectedRating = v;
+      const stars = document.querySelectorAll('#starPicker span');
+      stars.forEach((s, i) => { s.style.color = i < v ? '#FF5C00' : 'rgba(255,255,255,0.2)'; });
+    }
+
+    async function submitReview() {
+      const name = (document.getElementById('rvName').value || '').trim();
+      const text = (document.getElementById('rvText').value || '').trim();
+      const goal = (document.getElementById('rvGoal').value || '').trim();
+      const btn = document.getElementById('rvSubmitBtn');
+      if (!name) { showRvMsg('Please enter your name.', '#ff5555'); return; }
+      if (!_selectedRating) { showRvMsg('Please select a star rating.', '#ff5555'); return; }
+      if (text.length < 10) { showRvMsg('Please write at least 10 characters.', '#ff5555'); return; }
+      btn.disabled = true; btn.textContent = 'Submitting...';
+      try {
+        const trainerId = window.__TRAINER_ID__;
+        const payload = {
+          trainer_id: trainerId,
+          client_name: name,
+          client_avatar_initials: name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(),
+          rating: _selectedRating,
+          review_text: text,
+          goal_achieved: goal || null,
+          verified: false,
+          featured: false,
+        };
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/reviews`, {
+          method: 'POST',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+          body: JSON.stringify(payload),
+        });
+        if (r.ok || r.status === 201) {
+          showRvMsg('Thank you! Your review will appear once verified.', '#22c55e');
+          document.getElementById('writeReviewForm').style.display = 'none';
+          document.getElementById('writeReviewToggle').style.display = 'none';
+        } else {
+          showRvMsg('Something went wrong. Please try again.', '#ff5555');
+        }
+      } catch(e) {
+        showRvMsg('Network error. Please try again.', '#ff5555');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Submit Review';
+      }
+    }
+
+    function showRvMsg(text, color) {
+      const el = document.getElementById('rvMsg');
+      if (!el) return;
+      el.textContent = text; el.style.color = color; el.style.display = 'block';
     }
 
     // Kick off on load
