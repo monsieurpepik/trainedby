@@ -454,7 +454,7 @@ async function loadBlog() {
       .from('blog_posts')
       .select(`
         id, title, slug, excerpt, category, cover_url, emoji, read_time_mins,
-        published_at, view_count,
+        published_at,
         trainer:trainer_id (id, name, slug, avatar_url, photo_url, reps_verified, specialties)
       `)
       .eq('status', 'published')
