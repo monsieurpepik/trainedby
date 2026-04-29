@@ -454,8 +454,7 @@ async function loadBlog() {
       .from('blog_posts')
       .select(`
         id, title, slug, excerpt, category, cover_url, emoji, read_time_mins,
-        published_at,
-        trainer:trainer_id (id, name, slug, avatar_url, photo_url, reps_verified, specialties)
+        published_at, author
       `)
       .eq('status', 'published')
       .order('published_at', { ascending: false })
@@ -504,11 +503,9 @@ function renderArticles(articles) {
 }
 
 function buildFeaturedCard(a) {
-  const trainer = a.trainer || {};
-  const initials = (trainer.name||'TB').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-  const avatarHtml = trainer.avatar_url || trainer.photo_url
-    ? `<img class="article-meta-avatar" src="${trainer.avatar_url||trainer.photo_url}" alt="${trainer.name}">`
-    : `<div class="article-meta-avatar-initials">${initials}</div>`;
+  const authorName = a.author || (window.__BRAND__?.name || 'TrainedBy') + ' Trainer';
+  const initials = authorName.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const avatarHtml = `<div class="article-meta-avatar-initials">${initials}</div>`;
   const imgHtml = a.cover_url
     ? `<img class="featured-img" src="${a.cover_url}" alt="${a.title}" loading="lazy">`
     : `<div class="featured-img-placeholder">${a.emoji || '💪'}</div>`;
@@ -522,19 +519,17 @@ function buildFeaturedCard(a) {
         <div class="featured-excerpt">${a.excerpt || ''}</div>
         <div class="article-meta">
           ${avatarHtml}
-          <span class="article-meta-name">${trainer.name || `${window.__BRAND__?.name || 'TrainedBy'} Trainer`}</span>
-          ${trainer.reps_verified ? '<span class="reps-badge-sm">REPs</span>' : ''}
+          <span class="article-meta-name">${authorName}</span>
           <span>·</span>
           <span>${a.read_time_mins || 5} min read</span>
           ${date ? `<span>·</span><span>${date}</span>` : ''}
         </div>
       </div>
-    </div>`;
+    </div>\`;
 }
 
 function buildArticleCard(a) {
-  const trainer = a.trainer || {};
-  const initials = (trainer.name||'TB').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const authorName = a.author || 'Trainer';
   const imgHtml = a.cover_url
     ? `<img class="article-card-img" src="${a.cover_url}" alt="${a.title}" loading="lazy">`
     : `<div class="article-card-img-placeholder">${a.emoji || '🏋️'}</div>`;
@@ -544,12 +539,11 @@ function buildArticleCard(a) {
       <div class="article-category" style="margin-bottom:6px;">${a.category || 'Training'}</div>
       <div class="article-card-title">${a.title}</div>
       <div class="article-card-meta">
-        <span>${trainer.name || 'Trainer'}</span>
-        ${trainer.reps_verified ? '<span class="reps-badge-sm">REPs</span>' : ''}
+        <span>${authorName}</span>
         <span>·</span>
         <span>${a.read_time_mins || 5} min</span>
       </div>
-    </div>`;
+    </div>\`;
 }
 
 function loadTopContributors(articles) {
