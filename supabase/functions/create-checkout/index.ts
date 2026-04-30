@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import { checkRateLimit } from '../_shared/rate_limit.ts';
+import { getDashboardUrl, getPricingUrl } from '../_shared/market_url.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,6 +24,16 @@ const PRICE_IDS: Record<string, Record<string, string>> = {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Rate limit: 10 checkout attempts per IP per hour
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+  const limited = checkRateLimit(`checkout:${clientIp}`, 10, 60 * 60 * 1000);
+  if (limited) {
+    return new Response(
+      JSON.stringify({ error: 'Too many requests. Please try again later.', code: 'RATE_LIMITED' }),
+      { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': '3600' } }
+    );
+  }
+
   try {
     const token = req.headers.get("authorization")?.replace("Bearer ", "");
     if (!token) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
@@ -42,7 +54,7 @@ serve(async (req) => {
     const { trainer_id, plan, billing = "monthly", success_url, cancel_url } = await req.json();
     if (link.trainer_id !== trainer_id) return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: corsHeaders });
 
-    const { data: trainer } = await sb.from("trainers").select("email,name,stripe_customer_id").eq("id", trainer_id).single();
+    const { data: trainer } = await sb.from("trainers").select("email,name,stripe_customer_id,market").eq("id", trainer_id).single();
     if (!trainer) return new Response(JSON.stringify({ error: "Trainer not found" }), { status: 404, headers: corsHeaders });
 
     // Get or create Stripe customer
@@ -60,8 +72,8 @@ serve(async (req) => {
       customer: customerId,
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: success_url || "https://trainedby.ae/dashboard?upgraded=1",
-      cancel_url: cancel_url || "https://trainedby.ae/pricing",
+      success_url: success_url || getDashboardUrl(trainer?.market ?? 'ae', 'upgraded=1'),
+      cancel_url: cancel_url || getPricingUrl(trainer?.market ?? 'ae'),
       metadata: { trainer_id, plan },
       subscription_data: { metadata: { trainer_id, plan } },
       allow_promotion_codes: true,
