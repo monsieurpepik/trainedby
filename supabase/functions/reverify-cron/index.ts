@@ -15,7 +15,11 @@ import { createLogger } from '../_shared/logger.ts';
 const log = createLogger('reverify-cron');
 
 const SUPABASE_URL = () => Deno.env.get('SUPABASE_URL')!;
-const ADMIN_SECRET = () => Deno.env.get('ADMIN_SECRET') ?? 'trainedby-admin-2026';
+const ADMIN_SECRET = () => {
+  const secret = Deno.env.get('ADMIN_SECRET');
+  if (!secret) throw new Error('ADMIN_SECRET environment variable is required');
+  return secret;
+};
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: CORS_HEADERS });

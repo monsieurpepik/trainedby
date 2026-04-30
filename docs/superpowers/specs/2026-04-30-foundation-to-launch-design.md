@@ -84,7 +84,7 @@ No phase executes without a verified `PLAN.md`. GSD manages all execution.
 - Both checkboxes must be unchecked by default
 
 #### 2.4 Admin Password Rotation
-- Remove `trainedby-admin-2026` from `CLAUDE.md` immediately (it's in a public repo)
+- Remove `[old-admin-password]` from `CLAUDE.md` immediately (it's in a public repo)
 - Rotate the actual `/superadmin` password
 - New password stored only in a password manager — never in source files or committed docs
 

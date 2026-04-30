@@ -205,7 +205,8 @@ import Base from '../layouts/Base.astro';
 <script>
   const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MzE5NTIsImV4cCI6MjA2MDIwNzk1Mn0.Yd4OGMBqwvLz5_6vFAFqBNRLNFBMXCRKFiGJFCqQUYI';
-  const ADMIN_SECRET = 'trainedby-admin-2026';
+  // ADMIN_SECRET must be injected server-side — client-side hardcoding removed
+  const ADMIN_SECRET = '';
 
   let allTrainers = [];
   let allWaitlist = [];
