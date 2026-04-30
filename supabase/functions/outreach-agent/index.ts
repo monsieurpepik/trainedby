@@ -253,7 +253,7 @@ async function sendOutreach(sb: ReturnType<typeof createClient>, requestId: stri
   </div>
   <div style="white-space: pre-wrap; line-height: 1.7; font-size: 15px;">${r.outreach_body}</div>
   <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #e5e5e5; font-size: 13px; color: #666;">
-    <p>TrainedBy.ae  -  The Verified Trainer Platform for the UAE</p>
+    <p>${getMarketBrand(trainerMarket)}</p>
     <p><a href="${getDashboardUrl(trainerMarket)}" style="color: #FF5C00;">Your dashboard</a></p>
   </div>
 </div>`;

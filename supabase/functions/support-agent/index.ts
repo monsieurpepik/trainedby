@@ -206,7 +206,11 @@ ${context}`;
 
     // KB-only fallback
     if (!answer) {
-      const fallbackSupportEmail = getMarketSupportEmail(market.locale.split('-').pop() ?? 'ae');
+      const localeToMarket: Record<string, string> = {
+        'en-ae': 'ae', 'en-uk': 'uk', 'en-us': 'com', 'en-in': 'in',
+        'fr': 'fr', 'it': 'it', 'es': 'es',
+      };
+      const fallbackSupportEmail = getMarketSupportEmail(localeToMarket[market.locale] ?? 'ae');
       if (context) {
         const firstChunk = context.split('\n\n')[0].replace(/^[^:]+:\s*/, '').trim();
         answer = firstChunk.length > 20
