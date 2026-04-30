@@ -5,11 +5,12 @@ import { getMarketBaseUrl } from '../_shared/market_url.ts';
 // ─── CORS ─────────────────────────────────────────────────────────────────────
 // Note: credentials:true requires a specific origin, not wildcard.
 // The frontend must send requests with credentials:include.
+const stagingUrl = Deno.env.get('STAGING_URL');
 const ALLOWED_ORIGINS = [
   getMarketBaseUrl('ae'),
-  "https://trainedby-ae.netlify.app",
   "http://localhost:3000",
   "http://127.0.0.1:5500",
+  ...(stagingUrl ? [stagingUrl] : []),
 ];
 
 function getCorsHeaders(req: Request): Record<string, string> {

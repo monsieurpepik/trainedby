@@ -66,10 +66,11 @@ serve(async (req) => {
     }
 
     // Validate redirect URL  -  only allow known TrainedBy domains
+    const stagingUrl = Deno.env.get('STAGING_URL');
     const allowedRedirects = [
       getEditUrl('ae'),
-      "https://trainedby-ae.netlify.app/edit",
       getDashboardUrl('ae'),
+      ...(stagingUrl ? [`${stagingUrl}/edit`] : []),
     ];
     const safeRedirect = allowedRedirects.includes(redirect)
       ? redirect
