@@ -18,7 +18,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { CORS_HEADERS } from '../_shared/errors.ts';
 import { createLogger } from '../_shared/logger.ts';
 import { callClaude } from '../_shared/claude.ts';
-import { getMarketBrand, getMarketSupportEmail } from '../_shared/market_url.ts';
+import { getMarketBaseUrl, getMarketBrand, getDashboardUrl, getMarketSupportEmail } from '../_shared/market_url.ts';
 
 const log = createLogger('outreach-agent');
 
@@ -249,12 +249,12 @@ async function sendOutreach(sb: ReturnType<typeof createClient>, requestId: stri
   const emailHtml = `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a; padding: 32px 24px;">
   <div style="margin-bottom: 32px;">
-    <img src="https://trainedby-ae.netlify.app/logo.svg" alt="TrainedBy" style="height: 32px;" />
+    <img src="${getMarketBaseUrl(trainerMarket)}/logo.svg" alt="TrainedBy" style="height: 32px;" />
   </div>
   <div style="white-space: pre-wrap; line-height: 1.7; font-size: 15px;">${r.outreach_body}</div>
   <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #e5e5e5; font-size: 13px; color: #666;">
     <p>TrainedBy.ae  -  The Verified Trainer Platform for the UAE</p>
-    <p><a href="https://trainedby-ae.netlify.app/dashboard" style="color: #FF5C00;">Your dashboard</a></p>
+    <p><a href="${getDashboardUrl(trainerMarket)}" style="color: #FF5C00;">Your dashboard</a></p>
   </div>
 </div>`;
 

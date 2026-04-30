@@ -20,7 +20,7 @@ import { jsonResponse, errorResponse, CORS_HEADERS } from '../_shared/errors.ts'
 import { createLogger } from '../_shared/logger.ts';
 import { calculateSlopScore } from '../_shared/voice.ts';
 import { callClaudeJSON } from '../_shared/claude.ts';
-import { getMarketSupportEmail } from '../_shared/market_url.ts';
+import { getMarketBaseUrl, getMarketSupportEmail } from '../_shared/market_url.ts';
 
 const log = createLogger('meta-agent');
 
