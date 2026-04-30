@@ -581,7 +581,7 @@ function openDetail(id) {
   if (!t.instagram) missing.push('Instagram');
 
   document.getElementById('modal-name').textContent = t.name || 'Unknown Trainer';
-  document.getElementById('modal-profile-link').href = 'https://trainedby.ae/' + (t.slug || '');
+  document.getElementById('modal-profile-link').href = window.location.origin + '/' + (t.slug || '');
   document.getElementById('modal-email-btn').onclick = () => sendEmail(t.id, t.email, t.name);
 
   document.getElementById('modal-body').innerHTML = `
