@@ -14,6 +14,7 @@ import { createLogger } from '../_shared/logger.ts';
 import { calculateSlopScore } from '../_shared/voice.ts';
 import { callClaude } from '../_shared/claude.ts';
 import { getLocale, getMarket, getEmailCopy } from '../_shared/locale.ts';
+import { getMarketSupportEmail } from '../_shared/market_url.ts';
 
 const log = createLogger('support-agent');
 
@@ -205,13 +206,14 @@ ${context}`;
 
     // KB-only fallback
     if (!answer) {
+      const fallbackSupportEmail = getMarketSupportEmail(market.locale.split('-').pop() ?? 'ae');
       if (context) {
         const firstChunk = context.split('\n\n')[0].replace(/^[^:]+:\s*/, '').trim();
         answer = firstChunk.length > 20
           ? firstChunk
-          : "I don't have that info  -  email support@trainedby.ae and they'll sort you out.";
+          : `I don't have that info  -  email ${fallbackSupportEmail} and they'll sort you out.`;
       } else {
-        answer = "I don't have that info  -  email support@trainedby.ae and they'll sort you out.";
+        answer = `I don't have that info  -  email ${fallbackSupportEmail} and they'll sort you out.`;
       }
     }
 

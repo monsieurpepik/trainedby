@@ -20,6 +20,7 @@ import { jsonResponse, errorResponse, CORS_HEADERS } from '../_shared/errors.ts'
 import { createLogger } from '../_shared/logger.ts';
 import { calculateSlopScore } from '../_shared/voice.ts';
 import { callClaudeJSON } from '../_shared/claude.ts';
+import { getMarketSupportEmail } from '../_shared/market_url.ts';
 
 const log = createLogger('meta-agent');
 
@@ -290,7 +291,7 @@ async function sendMetaMemoEmail(to: string, memo: Record<string, unknown>): Pro
       method: 'POST',
       headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'TrainedBy Meta-Agent <meta@trainedby.ae>',
+        from: `TrainedBy Meta-Agent <${getMarketSupportEmail('ae')}>`,
         to: [to],
         subject: `TrainedBy Product Memo  -  ${improvements[0]?.title ?? 'Weekly review'}`,
         html,

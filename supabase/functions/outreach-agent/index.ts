@@ -18,6 +18,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { CORS_HEADERS } from '../_shared/errors.ts';
 import { createLogger } from '../_shared/logger.ts';
 import { callClaude } from '../_shared/claude.ts';
+import { getMarketBrand, getMarketSupportEmail } from '../_shared/market_url.ts';
 
 const log = createLogger('outreach-agent');
 
@@ -25,7 +26,6 @@ const SUPABASE_URL = () => Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_KEY = () => Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ANTHROPIC_KEY = () => Deno.env.get('ANTHROPIC_API_KEY')!;
 const RESEND_KEY = () => Deno.env.get('RESEND_API_KEY') ?? '';
-const FROM_EMAIL = 'TrainedBy <hello@trainedby.ae>';
 
 // ── Blog topics pool  -  rotated weekly ─────────────────────────────────────────
 
@@ -214,7 +214,7 @@ Write the outreach email (subject line + body).`;
 async function sendOutreach(sb: ReturnType<typeof createClient>, requestId: string): Promise<Record<string, unknown>> {
   const { data: request } = await sb
     .from('content_requests')
-    .select('*, trainer:trainer_id(name, email)')
+    .select('*, trainer:trainer_id(name, email, market)')
     .eq('id', requestId)
     .single();
 
@@ -226,7 +226,7 @@ async function sendOutreach(sb: ReturnType<typeof createClient>, requestId: stri
     outreach_subject: string;
     outreach_body: string;
     status: string;
-    trainer: { name: string; email: string };
+    trainer: { name: string; email: string; market?: string };
   };
 
   if (r.status !== 'pending') {
@@ -235,6 +235,8 @@ async function sendOutreach(sb: ReturnType<typeof createClient>, requestId: stri
 
   const trainerEmail = r.trainer?.email;
   const trainerName = r.trainer?.name;
+  const trainerMarket = r.trainer?.market ?? 'ae';
+  const fromEmail = `${getMarketBrand(trainerMarket)} <${getMarketSupportEmail(trainerMarket)}>`;
 
   if (!trainerEmail) return { error: 'Trainer email not found' };
 
@@ -263,7 +265,7 @@ async function sendOutreach(sb: ReturnType<typeof createClient>, requestId: stri
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: FROM_EMAIL,
+      from: fromEmail,
       to: trainerEmail,
       subject: r.outreach_subject,
       html: emailHtml,
