@@ -152,7 +152,7 @@ async function draftOutreach(
 
   const t = trainer as { name: string; email: string; city: string; specialties: string[]; bio: string; plan: string };
 
-  const systemPrompt = `You are writing a personalised outreach email on behalf of TrainedBy.ae  -  a platform for verified personal trainers in the UAE. 
+  const systemPrompt = `You are writing a personalised outreach email on behalf of ${getMarketBrand(trainerMarket)} (${getMarketBaseUrl(trainerMarket)}) - a platform for verified personal trainers.
 
 The email asks the trainer to share their expert thoughts on a topic for a blog post. The tone is collegial, direct, and respectful of their expertise. You are not asking them to write a full article  -  just to share their perspective in a few paragraphs, which the platform will format and publish under their name with their profile linked.
 
