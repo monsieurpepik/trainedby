@@ -201,7 +201,7 @@ Respond as JSON:
     created_at: now.toISOString(),
   });
 
-  const ownerEmail = Deno.env.get('OWNER_EMAIL') ?? 'admin@trainedby.ae';
+  const ownerEmail = Deno.env.get('OWNER_EMAIL') ?? getMarketSupportEmail('ae');
   await sendMetaMemoEmail(ownerEmail, memo);
 
   log.info('Meta-agent complete', { duration_ms: Date.now() - start });
@@ -282,7 +282,7 @@ async function sendMetaMemoEmail(to: string, memo: Record<string, unknown>): Pro
   <div style="background:#111;border:1px solid #222;padding:12px 16px;border-radius:8px;margin-bottom:24px;">
     <p style="color:#888;font-size:12px;margin:0;">Check Monday: <strong style="color:#fff;">${memo.watch_metric}</strong></p>
   </div>
-  <p style="color:#555;font-size:12px;text-align:center;margin-top:32px;">TrainedBy Meta-Agent · <a href="https://trainedby-ae.netlify.app" style="color:#FF5C00;">trainedby.ae</a></p>
+  <p style="color:#555;font-size:12px;text-align:center;margin-top:32px;">TrainedBy Meta-Agent · <a href="${getMarketBaseUrl('ae')}" style="color:#FF5C00;">${getMarketBaseUrl('ae').replace('https://', '')}</a></p>
 </body>
 </html>`;
 
