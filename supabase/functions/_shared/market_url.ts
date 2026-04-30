@@ -84,3 +84,8 @@ export function getJoinUrl(market: string, refSlug?: string): string {
 export function getTrainerMarket(trainer: { market?: string }): string {
   return trainer.market ?? 'ae';
 }
+
+/** Build the edit profile URL for a given market */
+export function getEditUrl(market: string): string {
+  return `${getMarketBaseUrl(market)}/edit`;
+}
