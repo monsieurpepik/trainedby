@@ -25,12 +25,7 @@ export default defineConfig({
       ],
     }),
     sentry({
-      dsn: import.meta.env.PUBLIC_SENTRY_DSN,
       enabled: !!import.meta.env.PUBLIC_SENTRY_DSN,
-      environment: import.meta.env.MODE === 'production' ? 'production' : 'development',
-      tracesSampleRate: 0.1,
-      replaysSessionSampleRate: 0,
-      replaysOnErrorSampleRate: 0,
       sourceMapsUploadOptions: {
         project: 'trainedby-frontend',
         authToken: import.meta.env.SENTRY_AUTH_TOKEN,
