@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getDashboardUrl, getMarketBrand } from "../_shared/market_url.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -136,7 +137,7 @@ serve(async (req) => {
 
     // ── Fetch trainer for notification ────────────────────────────────────────
     const { data: trainer } = await sb.from("trainers")
-      .select("name,phone,plan")
+      .select("name,phone,plan,market")
       .eq("id", trainer_id)
       .single();
 
@@ -158,14 +159,17 @@ serve(async (req) => {
 });
 
 async function sendWhatsAppNotification(
-  trainer: { name: string; phone: string },
+  trainer: { name: string; phone: string; market?: string },
   lead: { name?: string; goal?: string; type?: string }
 ) {
   const apiKey = Deno.env.get("WHATSAPP_API_KEY");
   const apiUrl = Deno.env.get("WHATSAPP_API_URL");
   if (!apiKey || !apiUrl) return;
 
-  const message = `🔥 New lead on TrainedBy!\n\nName: ${lead.name || "Unknown"}\nGoal: ${lead.goal || "Not specified"}\nType: ${lead.type || "Booking"}\n\nSign in to view: https://trainedby.ae/dashboard`;
+  const market = trainer.market ?? "ae";
+  const brand = getMarketBrand(market);
+  const dashboardUrl = getDashboardUrl(market);
+  const message = `🔥 New lead on ${brand}!\n\nName: ${lead.name || "Unknown"}\nGoal: ${lead.goal || "Not specified"}\nType: ${lead.type || "Booking"}\n\nSign in to view: ${dashboardUrl}`;
 
   try {
     await fetch(apiUrl, {
