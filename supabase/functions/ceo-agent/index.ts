@@ -28,6 +28,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { CORS_HEADERS } from '../_shared/errors.ts';
 import { createLogger } from '../_shared/logger.ts';
 import { callClaude } from '../_shared/claude.ts';
+import { getMarketBaseUrl } from '../_shared/market_url.ts';
 
 const log = createLogger('ceo-agent');
 
@@ -365,7 +366,7 @@ async function handleTriggerContent(chatId: number): Promise<void> {
 📝 *"${post.title}"*
 🔑 Keyword: ${post.keyword}
 📊 ${post.word_count} words | Slop score: ${quality.slop_score ?? 0}/100
-🔗 trainedby.ae/blog/${post.slug}
+🔗 ${getMarketBaseUrl('ae')}/blog/${post.slug}
 
 ${quality.slop_score > 20 ? '⚠️ Slop score is high  -  review before promoting' : '✅ Quality check passed'}`);
   } catch (err) {
@@ -769,7 +770,7 @@ async function handleNotify(req: Request): Promise<Response> {
 
     switch (type) {
       case 'blog_published':
-        await sendMessage(chatId, `✍️ *New post published*\n\n"${data.title}"\n🔑 ${data.keyword} | ${data.word_count}w\n🔗 trainedby.ae/blog/${data.slug}`);
+        await sendMessage(chatId, `✍️ *New post published*\n\n"${data.title}"\n🔑 ${data.keyword} | ${data.word_count}w\n🔗 ${getMarketBaseUrl('ae')}/blog/${data.slug}`);
         break;
       case 'growth_digest':
         await sendMessage(chatId, `📈 *Weekly Growth Digest ready*\n\n${data.summary ?? 'Check /growth for details'}`);
