@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import netlify from '@astrojs/netlify';
+import sentry from '@sentry/astro';
 
 export default defineConfig({
   // Primary site — used for canonical URLs and sitemap base
@@ -22,6 +23,18 @@ export default defineConfig({
         'https://entrenacon.com/',
         'https://entrenacon.mx/',
       ],
+    }),
+    sentry({
+      dsn: import.meta.env.PUBLIC_SENTRY_DSN,
+      enabled: !!import.meta.env.PUBLIC_SENTRY_DSN,
+      environment: import.meta.env.MODE === 'production' ? 'production' : 'development',
+      tracesSampleRate: 0.1,
+      replaysSessionSampleRate: 0,
+      replaysOnErrorSampleRate: 0,
+      sourceMapsUploadOptions: {
+        project: 'trainedby-frontend',
+        authToken: import.meta.env.SENTRY_AUTH_TOKEN,
+      },
     }),
   ],
   // SSR mode — renders per-request so market/brand detection works correctly
