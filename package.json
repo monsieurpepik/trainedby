@@ -42,6 +42,7 @@
     "@astrojs/tailwind": "^6.0.2",
     "@resvg/resvg-wasm": "^2.6.2",
     "@sentry/astro": "^10.51.0",
+    "@supabase/supabase-js": "^2.105.1",
     "astro": "^6.1.6",
     "satori": "^0.26.0"
   }

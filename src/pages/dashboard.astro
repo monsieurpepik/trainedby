@@ -3,9 +3,61 @@ import Base from '../layouts/Base.astro';
 import ProfileCompleteness from '../components/ProfileCompleteness.astro';
 import { getMarket } from '../lib/market.ts';
 import { getLocale, t, getBrand } from '../lib/i18n.ts';
+import { createClient } from '@supabase/supabase-js';
+
 const market = getMarket(Astro.url.hostname);
 const locale = getLocale(Astro.request);
 const brand = getBrand(locale);
+
+// ── SSR: compute profile completeness ──────────────────────────────────────
+let ssrScore = 0;
+let ssrFields: { key: string; label: string; pts: number; done: boolean; action: string }[] = [];
+let ssrPlan = 'free';
+let ssrSlug = '';
+
+const cookieHeader = Astro.request.headers.get('cookie') || '';
+const tbSession = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith('tb_session='))?.slice('tb_session='.length);
+
+if (tbSession) {
+  try {
+    const svc = createClient(
+      import.meta.env.SUPABASE_URL,
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Validate session token
+    const { data: link } = await svc
+      .from('magic_links')
+      .select('trainer_id')
+      .eq('token', tbSession)
+      .eq('used', false)
+      .gt('expires_at', new Date().toISOString())
+      .single();
+
+    if (link?.trainer_id) {
+      const [{ data: trainer }, { count: pkgCount }] = await Promise.all([
+        svc.from('trainers').select('avatar_url, bio, instagram_handle, reps_verified, verification_status, plan, slug').eq('id', link.trainer_id).single(),
+        svc.from('session_packages').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id),
+      ]);
+
+      if (trainer) {
+        ssrPlan = trainer.plan || 'free';
+        ssrSlug = trainer.slug || '';
+        const certVerified = trainer.reps_verified === true || trainer.verification_status === 'verified';
+        const FIELDS = [
+          { key: 'avatar_url', label: 'Profile photo', pts: 20, done: !!trainer.avatar_url, action: '/edit' },
+          { key: 'bio', label: 'Bio (50+ characters)', pts: 20, done: !!(trainer.bio && trainer.bio.length > 50), action: '/edit' },
+          { key: 'instagram_handle', label: 'Instagram handle', pts: 15, done: !!trainer.instagram_handle, action: '/edit' },
+          { key: 'packages', label: 'At least 1 package', pts: 20, done: (pkgCount ?? 0) >= 1, action: '/edit' },
+          { key: 'cert_verified', label: 'Certification verified', pts: 10, done: certVerified, action: '/edit' },
+        ];
+        const raw = FIELDS.filter(f => f.done).reduce((sum, f) => sum + f.pts, 0);
+        ssrScore = Math.round((raw / 85) * 100);
+        ssrFields = FIELDS;
+      }
+    }
+  } catch (_) {}
+}
 ---
 
 <Base
@@ -583,7 +635,7 @@ body {
     </div>
 
     <!-- Profile Completeness Widget -->
-    <ProfileCompleteness />
+    <ProfileCompleteness score={ssrScore} fields={ssrFields} plan={ssrPlan} slug={ssrSlug} />
 
     <!-- Stats -->
     <div class="stats-section">
@@ -859,6 +911,7 @@ const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
 const EDGE_BASE = SUPABASE_URL + '/functions/v1';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+window.renderPC = function() {}; // widget now server-rendered
 
 let trainer = null;
 
