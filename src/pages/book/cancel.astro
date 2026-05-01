@@ -1,0 +1,79 @@
+---
+// src/pages/book/cancel.astro
+const bookingId = Astro.url.searchParams.get('id');
+const token = Astro.url.searchParams.get('token');
+
+const SUPABASE_URL = import.meta.env.SUPABASE_URL as string;
+const FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
+
+let result: { cancelled?: boolean; refunded?: boolean; alreadyCancelled?: boolean; error?: string } = {};
+let errorMsg = '';
+
+if (!bookingId || !token) {
+  errorMsg = 'Invalid cancellation link.';
+} else {
+  try {
+    const res = await fetch(`${FUNCTIONS_URL}/cancel-booking`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId, token }),
+    });
+    result = await res.json();
+    if (!res.ok) errorMsg = result.error ?? 'Cancellation failed.';
+  } catch {
+    errorMsg = 'Could not process cancellation. Please try again.';
+  }
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking cancellation — TrainedBy</title>
+  <style>
+    body { background: #0a0a0a; color: #fff; font-family: 'Inter', -apple-system, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .card { max-width: 400px; width: 100%; background: #111; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 32px; text-align: center; }
+    .logo { font-family: 'Manrope', sans-serif; font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 24px; }
+    .logo span { color: #FF5C00; }
+    h1 { font-size: 20px; font-weight: 800; margin-bottom: 12px; }
+    p { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.7; }
+    .icon { font-size: 40px; margin-bottom: 16px; }
+    .btn { display: inline-block; background: #FF5C00; color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; text-decoration: none; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Trained<span>By</span></div>
+    {errorMsg ? (
+      <>
+        <div class="icon">⚠️</div>
+        <h1>Something went wrong</h1>
+        <p>{errorMsg}</p>
+        <a href="/" class="btn" style="background:#333">Go home</a>
+      </>
+    ) : result.alreadyCancelled ? (
+      <>
+        <div class="icon">ℹ️</div>
+        <h1>Already cancelled</h1>
+        <p>This booking was already cancelled{result.refunded ? ' and refunded' : ''}.</p>
+      </>
+    ) : result.cancelled ? (
+      <>
+        <div class="icon">✓</div>
+        <h1>Booking cancelled</h1>
+        {result.refunded
+          ? <p>Your booking has been cancelled and a full refund has been issued. It will appear in 5–10 business days.</p>
+          : <p>Your booking has been cancelled. No refund is available as it was within 24 hours of the session.</p>}
+      </>
+    ) : (
+      <>
+        <div class="icon">⚠️</div>
+        <h1>Cancellation failed</h1>
+        <p>Please contact support.</p>
+      </>
+    )}
+  </div>
+</body>
+</html>
