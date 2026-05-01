@@ -1,7 +1,9 @@
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async ({ request }) => {
-  const host = request.headers.get('host') || 'trainedby.ae';
+  const host = request.headers.get('x-forwarded-host')
+    || request.headers.get('host')
+    || 'trainedby.ae';
   const domain = host.split(':')[0];
   const isLocal = domain === 'localhost' || domain.startsWith('127.');
   const protocol = isLocal ? 'http' : 'https';
