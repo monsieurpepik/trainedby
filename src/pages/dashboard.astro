@@ -88,6 +88,8 @@ if (tbSession) {
   --reps: var(--green, #00C853);
   --reps-dim: var(--green-dim, rgba(0,200,83,0.08));
   --reps-border: var(--green-border, rgba(0,200,83,0.2));
+  --danger: #ff5555;
+  --danger-dim: rgba(255,85,85,0.10);
   --surface: var(--bg, #0a0a0a);
   --surface-2: var(--surface, #111);
   --surface-3: var(--surface-3, #1c1c1c);
@@ -793,17 +795,17 @@ body {
             const d = new Date(b.scheduled_at);
             const isPast = d < new Date();
             const isUpcoming = !isPast && b.status === 'confirmed';
-            const statusColor = b.status === 'confirmed' ? '#4CAF50' : (b.status === 'cancelled' || b.status === 'refunded') ? '#F44336' : 'rgba(255,255,255,0.3)';
-            const statusBg = b.status === 'confirmed' ? 'rgba(76,175,80,0.12)' : (b.status === 'cancelled' || b.status === 'refunded') ? 'rgba(244,67,54,0.12)' : 'rgba(255,255,255,0.05)';
+            const statusColor = (b.status === 'confirmed' || b.status === 'completed') ? 'var(--reps)' : (b.status === 'cancelled' || b.status === 'refunded') ? 'var(--danger)' : 'var(--text-faint)';
+            const statusBg = (b.status === 'confirmed' || b.status === 'completed') ? 'var(--reps-dim)' : (b.status === 'cancelled' || b.status === 'refunded') ? 'var(--danger-dim)' : 'rgba(255,255,255,0.05)';
             return (
               <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
                 <div>
                   <div style="font-size:13px;font-weight:600">{b.consumer_name}</div>
                   <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
-                    {b.session_type?.name ?? 'Session'} · {d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})} at {d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}
+                    {b.session_type?.name ?? 'Session'} · {d.toLocaleDateString(locale,{weekday:'short',month:'short',day:'numeric'})} at {d.toLocaleTimeString(locale,{hour:'numeric',minute:'2-digit'})}
                   </div>
                   <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
-                    ${(b.amount_cents/100).toFixed(2)} · {b.duration_min} min
+                    {market.currencySymbol}{(b.amount_cents/100).toFixed(2)} · {b.duration_min} min
                   </div>
                 </div>
                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
