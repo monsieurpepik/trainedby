@@ -246,7 +246,7 @@ const isWaitlist = market.waitlistEnabled === true;
 
     <!-- Product mockup — visual proof of the profile -->
     <div class="hero-mockup">
-      <div class="phone-frame">
+      <div class="phone-frame" aria-hidden="true">
         <div class="phone-notch"></div>
         <div class="mock-avatar">S</div>
         <div class="mock-name">Sarah Al Mansoori</div>
@@ -284,7 +284,7 @@ const isWaitlist = market.waitlistEnabled === true;
         <div class="feature-card">
           <div class="feature-icon">✓</div>
           <div class="feature-title">Verified Public Profile</div>
-          <p class="feature-desc">Your profile lives at <strong style="color:var(--brand)">{Astro.url.hostname}/{`yourname`}</strong>. {market.certificationBody} verification badge, specialties, packages, and a contact form — all in one clean page.</p>
+          <p class="feature-desc">Your profile lives at <strong style="color:var(--brand)">{Astro.url.hostname}/yourname</strong>. {market.certificationBody} verification badge, specialties, packages, and a contact form — all in one clean page.</p>
           <span class="feature-badge">Free forever</span>
         </div>
         <div class="feature-card">
