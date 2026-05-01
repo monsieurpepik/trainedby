@@ -11,6 +11,15 @@ const sb = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 );
 
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  const ae = new TextEncoder().encode(a);
+  const be = new TextEncoder().encode(b);
+  let result = 0;
+  for (let i = 0; i < ae.length; i++) result |= ae[i] ^ be[i];
+  return result === 0;
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-cron-secret',
@@ -60,7 +69,7 @@ function emailBase(content: string, market = 'ae'): string {
 function weeklyDigestEmail(name: string, _slug: string, market: string, views: number, leads: number, waTaps: number): { subject: string; html: string } {
   const brand = getMarketBrand(market);
   const dashUrl = getDashboardUrl(market);
-  const firstName = name.split(' ')[0];
+  const firstName = (name?.trim() || 'there').split(' ')[0] || 'there';
   const subject = `${firstName}, your week on ${brand}: ${views} views · ${leads} leads`;
   const html = emailBase(`
     <h1>Your week on ${brand}</h1>
@@ -110,7 +119,7 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
 
   const cronSecret = req.headers.get('x-cron-secret');
-  if (!CRON_SECRET || cronSecret !== CRON_SECRET) {
+  if (!CRON_SECRET || !cronSecret || !timingSafeEqual(cronSecret, CRON_SECRET)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
@@ -138,22 +147,26 @@ Deno.serve(async (req) => {
       if (!t.email?.includes('@')) { skipped++; continue; }
 
       const [viewsRes, leadsRes, eventsRes] = await Promise.all([
-        sb.from('profile_views').select('id', { count: 'exact' }).eq('trainer_id', t.id).gte('created_at', weekAgo),
-        sb.from('leads').select('id', { count: 'exact' }).eq('trainer_id', t.id).gte('created_at', weekAgo),
-        sb.from('events').select('event_type').eq('trainer_id', t.id).gte('created_at', weekAgo),
+        sb.from('profile_views').select('*', { count: 'exact', head: true }).eq('trainer_id', t.id).gte('created_at', weekAgo),
+        sb.from('leads').select('*', { count: 'exact', head: true }).eq('trainer_id', t.id).gte('created_at', weekAgo),
+        sb.from('events')
+          .select('*', { count: 'exact', head: true })
+          .eq('trainer_id', t.id)
+          .eq('event_type', 'wa_tap')
+          .gte('created_at', weekAgo),
       ]);
 
       const views = viewsRes.count || 0;
       const leads = leadsRes.count || 0;
-      const waTaps = eventsRes.data?.filter((e: { event_type: string }) => e.event_type === 'wa_tap').length || 0;
+      const waTaps = eventsRes.count || 0;
 
       if (views === 0 && leads === 0 && waTaps === 0) { skipped++; continue; }
 
       const market = t.market || 'ae';
       const email = weeklyDigestEmail(t.name, t.slug, market, views, leads, waTaps);
       const from = `${getMarketBrand(market)} <${getMarketSupportEmail(market)}>`;
-      await sendEmail(t.email, email.subject, email.html, from);
-      sent++;
+      const ok = await sendEmail(t.email, email.subject, email.html, from);
+      if (ok) sent++; else skipped++;
       await new Promise(r => setTimeout(r, 200));
     }
 
