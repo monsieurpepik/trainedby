@@ -423,3 +423,23 @@ verify_jwt = false
 [functions.trainer-weekly-digest]
 # Called by external cron trigger  -  no JWT, secured by x-cron-secret header
 verify_jwt = false
+
+[functions.booking-webhook]
+# Receives Stripe webhook POSTs for direct bookings  -  no JWT, secured by Stripe-Signature header
+verify_jwt = false
+
+[functions.send-booking-reminders]
+# Called by external cron trigger  -  no JWT, secured internally
+verify_jwt = false
+
+[functions.connect-stripe-return]
+# Called after Stripe redirect  -  no JWT (redirect from Stripe, token in body)
+verify_jwt = false
+
+[functions.book-session]
+# Called by public booking page  -  no JWT required (consumer has no account)
+verify_jwt = false
+
+[functions.cancel-booking]
+# Called via cancel link in email  -  no JWT (HMAC token for auth)
+verify_jwt = false
