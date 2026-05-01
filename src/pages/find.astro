@@ -136,6 +136,10 @@ nav{
   transform:translateY(-2px);
   box-shadow:0 8px 32px rgba(0,0,0,0.6);
 }
+.trainer-card:focus-visible{
+  outline:2px solid #D4622A;
+  outline-offset:2px;
+}
 .tc-hero{position:relative;height:320px;background:#0A0A0A;overflow:hidden}
 .tc-brand{
   position:absolute;top:22px;left:22px;
@@ -490,31 +494,35 @@ function loadMore() {
   renderGrid();
 }
 
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
 function trainerCardHTML(t) {
   const name = t.full_name || t.name || 'Trainer';
-  const firstName = name.split(' ')[0] || name;
-  const lastName = name.split(' ').slice(1).join(' ') || '';
-  const initials = name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const firstName = esc(name.split(' ')[0] || name);
+  const lastName = esc(name.split(' ').slice(1).join(' ') || '');
+  const initials = esc(name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase());
   const slug = t.slug || t.id;
-  const specialty = (t.specialties || [])[0] || 'Personal Trainer';
-  const certStr = (t.certifications || []).slice(0, 2).join(' · ');
+  const specialty = esc((t.specialties || [])[0] || 'Personal Trainer');
+  const certStr = (t.certifications || []).slice(0, 2).map(esc).join(' · ');
   const yearsStr = t.years_experience ? ` · ${t.years_experience} years` : '';
   const metaLine = [certStr, yearsStr].filter(Boolean).join('');
   const rating = t.avg_rating ? parseFloat(t.avg_rating).toFixed(1) + '★' : '—';
   const clients = t.clients_trained || '—';
   const currency = window.__CURRENCY__ || '';
   const price = t.min_price ? `${currency} ${t.min_price.toLocaleString()}`.trim() : '—';
-  const city = t.city || '';
+  const city = esc(t.city || '');
 
   // Unique gradient IDs per card to prevent SVG defs collision
-  const uid = t.id || slug;
+  const uid = t.id || t.slug || `fb-${Math.random().toString(36).slice(2,7)}`;
   const arcMass = `arc-${uid}-mass`;
   const arcHair = `arc-${uid}-hair`;
   const arcGlow = `arc-${uid}-glow`;
   const arcSpark = `arc-${uid}-spark`;
 
   const avatarContent = t.avatar_url
-    ? `<img src="${t.avatar_url}" alt="${name}" loading="lazy">`
+    ? `<img src="${esc(t.avatar_url)}" alt="${esc(name)}" loading="lazy">`
     : `<div class="tc-avatar-initials">${initials}</div>`;
 
   const arc = `
@@ -575,7 +583,7 @@ function trainerCardHTML(t) {
 </svg>`;
 
   return `
-<a href="/${slug}" class="trainer-card">
+<a href="/${slug || '#'}" class="trainer-card">
   <div class="tc-hero">
     ${arc}
     <div class="tc-brand">TrainedBy</div>
