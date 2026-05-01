@@ -130,6 +130,68 @@ const isWaitlist = market.waitlistEnabled === true;
     .footer-links a { color: var(--text-2); text-decoration: none; font-size: 13px; transition: color 0.2s; }
     .footer-links a:hover { color: var(--text); }
     .footer-copy { font-size: 12px; color: var(--text-3); }
+
+    /* Product mockup */
+    .hero-mockup {
+      margin: 48px auto 0;
+      max-width: 340px;
+      position: relative;
+    }
+    .phone-frame {
+      background: #111;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+      padding: 20px;
+    }
+    .phone-notch {
+      width: 80px; height: 6px; background: rgba(255,255,255,0.08);
+      border-radius: 3px; margin: 0 auto 20px;
+    }
+    .mock-avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg, #FF5C00, #FF8C42);
+      margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;
+      font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 800; color: #fff;
+    }
+    .mock-name {
+      text-align: center; font-family: 'Manrope', sans-serif;
+      font-size: 17px; font-weight: 800; color: #fff; margin-bottom: 4px;
+    }
+    .mock-title {
+      text-align: center; font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 12px;
+    }
+    .mock-badge {
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; margin-bottom: 16px;
+    }
+    .mock-badge-pill {
+      background: rgba(0,200,83,0.12); border: 1px solid rgba(0,200,83,0.25);
+      color: #00C853; font-size: 10px; font-weight: 700; border-radius: 20px;
+      padding: 3px 10px; font-family: 'Manrope', sans-serif;
+    }
+    .mock-stats {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px; margin-bottom: 16px;
+    }
+    .mock-stat {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; padding: 10px 6px; text-align: center;
+    }
+    .mock-stat-val {
+      font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 800; color: #fff;
+    }
+    .mock-stat-label { font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+    .mock-wa-btn {
+      background: #25D366; border-radius: 10px; padding: 12px;
+      text-align: center; font-size: 13px; font-weight: 700; color: #fff;
+      font-family: 'Manrope', sans-serif;
+    }
+    .mockup-label {
+      text-align: center; font-size: 11px; color: rgba(255,255,255,0.3);
+      margin-top: 16px; letter-spacing: 0.05em; text-transform: uppercase;
+    }
   </style>
 
   <!-- NAV -->
@@ -181,6 +243,35 @@ const isWaitlist = market.waitlistEnabled === true;
         <div class="proof-label">To go live</div>
       </div>
     </div>
+
+    <!-- Product mockup — visual proof of the profile -->
+    <div class="hero-mockup">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="mock-avatar">S</div>
+        <div class="mock-name">Sarah Al Mansoori</div>
+        <div class="mock-title">Certified Personal Trainer · Dubai</div>
+        <div class="mock-badge">
+          <div class="mock-badge-pill">✓ {market.certificationBody} Verified</div>
+        </div>
+        <div class="mock-stats">
+          <div class="mock-stat">
+            <div class="mock-stat-val">4.9</div>
+            <div class="mock-stat-label">Rating</div>
+          </div>
+          <div class="mock-stat">
+            <div class="mock-stat-val">127</div>
+            <div class="mock-stat-label">Clients</div>
+          </div>
+          <div class="mock-stat">
+            <div class="mock-stat-val">6yr</div>
+            <div class="mock-stat-label">Experience</div>
+          </div>
+        </div>
+        <div class="mock-wa-btn">📱 Book via WhatsApp</div>
+      </div>
+      <div class="mockup-label">Your profile looks like this</div>
+    </div>
   </section>
 
   <!-- WHAT YOU GET -->
@@ -193,7 +284,7 @@ const isWaitlist = market.waitlistEnabled === true;
         <div class="feature-card">
           <div class="feature-icon">✓</div>
           <div class="feature-title">Verified Public Profile</div>
-          <p class="feature-desc">Your profile lives at {brandName.toLowerCase()}.ae/yourname. {market.certificationBody} verification badge, specialties, packages, and a contact form - all in one clean page.</p>
+          <p class="feature-desc">Your profile lives at <strong style="color:var(--brand)">{Astro.url.hostname}/{`yourname`}</strong>. {market.certificationBody} verification badge, specialties, packages, and a contact form — all in one clean page.</p>
           <span class="feature-badge">Free forever</span>
         </div>
         <div class="feature-card">
