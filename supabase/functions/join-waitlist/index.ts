@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { getMarketBaseUrl } from '../_shared/market_url.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -17,28 +18,27 @@ const FROM_EMAILS: Record<string, string> = {
   es: 'hola@entrenacon.com', mx: 'hola@entrenacon.mx',
 };
 
-const CONFIRMATION_COPY: Record<string, { subject: string; body: string }> = {
-  en: {
-    subject: "You're on the list  -  we'll notify you when we launch",
-    body: `<p>Thanks for joining the waitlist. You'll be the first to know when we launch in your market  -  and you'll get the early-bird price locked in.</p>
-<p>In the meantime, feel free to check out what's already live on <a href="https://trainedby.ae">trainedby.ae</a>.</p>`,
-  },
-  fr: {
-    subject: "Vous êtes sur la liste  -  nous vous préviendrons au lancement",
-    body: `<p>Merci de rejoindre la liste d'attente. Vous serez le premier informé du lancement en France  -  avec le prix de lancement bloqué.</p>
-<p>En attendant, découvrez ce qui est déjà en ligne sur <a href="https://trainedby.ae">trainedby.ae</a>.</p>`,
-  },
-  it: {
-    subject: "Sei nella lista  -  ti avviseremo al lancio",
-    body: `<p>Grazie per esserti unito alla lista d'attesa. Sarai il primo a sapere quando lanceremo in Italia  -  con il prezzo di lancio bloccato.</p>
-<p>Nel frattempo, scopri cosa è già online su <a href="https://trainedby.ae">trainedby.ae</a>.</p>`,
-  },
-  es: {
-    subject: "Estás en la lista  -  te avisaremos cuando lancemos",
-    body: `<p>Gracias por unirte a la lista de espera. Serás el primero en saber cuando lancemos en tu mercado  -  con el precio de lanzamiento bloqueado.</p>
-<p>Mientras tanto, descubre lo que ya está en línea en <a href="https://trainedby.ae">trainedby.ae</a>.</p>`,
-  },
+const CONFIRMATION_SUBJECTS: Record<string, string> = {
+  en: "You're on the list  -  we'll notify you when we launch",
+  fr: "Vous êtes sur la liste  -  nous vous préviendrons au lancement",
+  it: "Sei nella lista  -  ti avviseremo al lancio",
+  es: "Estás en la lista  -  te avisaremos cuando lancemos",
 };
+
+function getConfirmationBody(locale: string, marketUrl: string): string {
+  const domain = marketUrl.replace('https://', '');
+  const bodies: Record<string, string> = {
+    en: `<p>Thanks for joining the waitlist. You'll be the first to know when we launch in your market  -  and you'll get the early-bird price locked in.</p>
+<p>In the meantime, feel free to check out what's already live on <a href="${marketUrl}">${domain}</a>.</p>`,
+    fr: `<p>Merci de rejoindre la liste d'attente. Vous serez le premier informé du lancement en France  -  avec le prix de lancement bloqué.</p>
+<p>En attendant, découvrez ce qui est déjà en ligne sur <a href="${marketUrl}">${domain}</a>.</p>`,
+    it: `<p>Grazie per esserti unito alla lista d'attesa. Sarai il primo a sapere quando lanceremo in Italia  -  con il prezzo di lancio bloccato.</p>
+<p>Nel frattempo, scopri cosa è già online su <a href="${marketUrl}">${domain}</a>.</p>`,
+    es: `<p>Gracias por unirte a la lista de espera. Serás el primero en saber cuando lancemos en tu mercado  -  con el precio de lanzamiento bloqueado.</p>
+<p>Mientras tanto, descubre lo que ya está en línea en <a href="${marketUrl}">${domain}</a>.</p>`,
+  };
+  return bodies[locale] ?? bodies['en'];
+}
 
 const LOCALE_MAP: Record<string, string> = {
   ae: 'en', uk: 'en', com: 'en', in: 'en',
@@ -73,7 +73,9 @@ serve(async (req) => {
 
     // Send confirmation email via Resend
     const locale = LOCALE_MAP[market] || 'en';
-    const copy = CONFIRMATION_COPY[locale] || CONFIRMATION_COPY.en;
+    const subject = CONFIRMATION_SUBJECTS[locale] ?? CONFIRMATION_SUBJECTS['en'];
+    const marketUrl = getMarketBaseUrl(market);
+    const body = getConfirmationBody(locale, marketUrl);
     const brandName = BRAND_NAMES[market] || 'TrainedBy';
     const fromEmail = FROM_EMAILS[market] || 'hello@trainedby.ae';
 
@@ -85,11 +87,11 @@ serve(async (req) => {
         body: JSON.stringify({
           from: `${brandName} <${fromEmail}>`,
           to: email,
-          subject: copy.subject,
+          subject,
           html: `
             <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#0a0a0a;color:#f2f2f2;border-radius:12px;">
               <div style="font-size:22px;font-weight:900;color:#FF5C00;margin-bottom:24px;">${brandName}</div>
-              ${copy.body}
+              ${body}
               <hr style="border:none;border-top:1px solid #222;margin:24px 0;" />
               <p style="font-size:12px;color:#555;">${brandName} · ${source_domain || fromEmail.split('@')[1]}</p>
             </div>
