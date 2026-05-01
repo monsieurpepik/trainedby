@@ -663,6 +663,7 @@ const SESSION_ID = crypto.randomUUID();
 const UTM_SOURCE = new URLSearchParams(location.search).get('utm_source') || '';
 const UTM_MEDIUM = new URLSearchParams(location.search).get('utm_medium') || '';
 const REFERRER = document.referrer || '';
+const REF_SLUG = new URLSearchParams(location.search).get('ref') || '';
 
 function trackEvent(event_name, metadata) {
   fetch(EDGE_BASE + '/growth-agent', {
@@ -998,6 +999,7 @@ async function verifyAndCreate() {
       training_modes: state.training_modes,
       plan: 'free',
       accepting_clients: true,
+      referred_by_slug: REF_SLUG || null,
     };
     if (userId) trainerPayload.user_id = userId;
 
