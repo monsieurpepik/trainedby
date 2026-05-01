@@ -1,54 +1,39 @@
 ---
 // src/pages/my-bookings.astro
 const token = Astro.url.searchParams.get('token');
-const email = Astro.url.searchParams.get('email');
-const pi = Astro.url.searchParams.get('pi');
 
 const SUPABASE_URL = import.meta.env.SUPABASE_URL as string;
 const SERVICE_KEY = import.meta.env.SUPABASE_SERVICE_ROLE_KEY as string;
-const BOOKING_SECRET = import.meta.env.BOOKING_SECRET as string;
 
-// Recompute HMAC server-side to verify token
-async function computeHmac(secret: string, message: string): Promise<string> {
-  const enc = new TextEncoder();
-  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(message));
-  return Array.from(new Uint8Array(sig)).map((b: number) => b.toString(16).padStart(2, '0')).join('');
-}
-
-// Timing-safe comparison using HMAC of both sides (no early exit on length)
-async function timingSafeEqual(a: string, b: string): Promise<boolean> {
-  const enc = new TextEncoder();
-  const key = await crypto.subtle.importKey('raw', enc.encode('compare'), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const aSig = await crypto.subtle.sign('HMAC', key, enc.encode(a));
-  const bSig = await crypto.subtle.sign('HMAC', key, enc.encode(b));
-  const aArr = new Uint8Array(aSig);
-  const bArr = new Uint8Array(bSig);
-  let diff = 0;
-  for (let i = 0; i < aArr.length; i++) diff |= aArr[i] ^ bArr[i];
-  return diff === 0;
-}
-
-let valid = false;
 let credits: any[] = [];
 let errorMsg = '';
+let email = '';
 
 if (!SUPABASE_URL || !SERVICE_KEY) {
   errorMsg = 'Server configuration error. Please contact support.';
-} else if (!token || !email || !pi) {
+} else if (!token) {
   errorMsg = 'Invalid link.';
-} else if (!BOOKING_SECRET) {
-  errorMsg = 'Server configuration error. Please contact support.';
 } else {
-  const expected = await computeHmac(BOOKING_SECRET, `mybookings:${email}:${pi}`);
-  valid = await timingSafeEqual(token, expected);
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const sb = createClient(SUPABASE_URL, SERVICE_KEY);
 
-  if (!valid) {
-    errorMsg = 'This link is invalid or has expired.';
-  } else {
-    try {
-      const { createClient } = await import('@supabase/supabase-js');
-      const sb = createClient(SUPABASE_URL, SERVICE_KEY);
+    // Look up token in booking_tokens
+    const { data: tokenRow, error: tokenErr } = await sb
+      .from('booking_tokens')
+      .select('consumer_email, stripe_payment_intent_id, expires_at')
+      .eq('token', token)
+      .eq('token_type', 'my_bookings')
+      .single();
+
+    if (tokenErr || !tokenRow) {
+      errorMsg = 'This link is invalid.';
+    } else if (new Date(tokenRow.expires_at) < new Date()) {
+      errorMsg = 'This link has expired. Contact your trainer.';
+    } else {
+      email = tokenRow.consumer_email ?? '';
+      const pi = tokenRow.stripe_payment_intent_id ?? '';
+
       const { data } = await sb
         .from('package_credits')
         .select('id, status, session_type:session_types(name, duration_min), created_at')
@@ -56,9 +41,9 @@ if (!SUPABASE_URL || !SERVICE_KEY) {
         .eq('stripe_payment_intent_id', pi)
         .order('created_at', { ascending: true });
       credits = data ?? [];
-    } catch {
-      errorMsg = 'Could not load your sessions. Please try again.';
     }
+  } catch {
+    errorMsg = 'Could not load your sessions. Please try again.';
   }
 }
 
