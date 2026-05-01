@@ -36,10 +36,13 @@ let trainerName = '';
 let trainerSpecialty = '';
 let trainerPhoto = '';
 let trainerExists = false;
+let avgRating: number | null = null;
+let reviewCount: number = 0;
+let certifications: string[] = [];
 
 try {
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/trainers?slug=eq.${encodeURIComponent(slug)}&select=name,specialties,avatar_url&limit=1`,
+    `${SUPABASE_URL}/rest/v1/trainers?slug=eq.${encodeURIComponent(slug)}&select=name,specialties,avatar_url,avg_rating,review_count,certifications&limit=1`,
     { headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${ANON_KEY}` } }
   );
   if (res.ok) {
@@ -51,6 +54,9 @@ try {
         ? data[0].specialties[0]
         : (data[0].specialties || 'Personal Trainer');
       trainerPhoto = data[0].avatar_url || '';
+      avgRating = data[0].avg_rating ?? null;
+      reviewCount = data[0].review_count ?? 0;
+      certifications = Array.isArray(data[0].certifications) ? data[0].certifications : [];
     }
   }
 } catch (e) {
@@ -69,12 +75,36 @@ const pageDesc = trainerName
   ? `Book sessions with ${trainerName}, a verified ${trainerSpecialty} on ${brandName}.`
   : `Verified personal trainer profile on ${brandName}`;
 const pageImage = trainerPhoto || 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&q=85';
+
+const profileUrl = `${Astro.url.origin}/${slug}`;
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": trainerName,
+  "url": profileUrl,
+  ...(trainerPhoto ? { "image": trainerPhoto } : {}),
+  "jobTitle": trainerSpecialty,
+  "description": pageDesc,
+  ...(certifications.length > 0 ? {
+    "hasCredential": certifications.map(c => ({ "@type": "EducationalOccupationalCredential", "name": c }))
+  } : {}),
+  ...(avgRating !== null && reviewCount > 0 ? {
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": avgRating.toFixed(1),
+      "reviewCount": reviewCount,
+      "bestRating": "5",
+      "worstRating": "1",
+    }
+  } : {}),
+};
 ---
 <Base
   title={pageTitle}
   description={pageDesc}
   ogImage={pageImage}
 >
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <!-- Inject the slug server-side so client getSlug() picks it up immediately -->
   <script define:vars={{ slug }}>
     window.__TRAINER_SLUG__ = slug;
