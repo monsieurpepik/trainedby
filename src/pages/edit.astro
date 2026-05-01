@@ -424,6 +424,29 @@ body {
       </div>
     </div>
 
+    <!-- Section: Booking Availability -->
+    <div class="edit-section" id="booking-avail-section">
+      <div class="section-heading">Booking Availability</div>
+      <div class="section-sub">Set which days and hours clients can book you. Block specific dates when you're unavailable.</div>
+
+      <!-- Weekly schedule -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Weekly Schedule</div>
+        <div id="avail-days-grid"></div>
+        <button onclick="saveSchedule()" style="margin-top:12px;width:100%;padding:12px;border-radius:10px;background:var(--brand);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;" id="save-schedule-btn">Save Schedule</button>
+      </div>
+
+      <!-- Date overrides -->
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Block a Date</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="date" id="block-date-input" style="flex:1;padding:11px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none;" onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'">
+          <button onclick="blockDate()" style="padding:11px 16px;border-radius:10px;background:var(--surface-3);border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">Block Day</button>
+        </div>
+        <div id="blocked-dates-list" style="margin-top:12px;"></div>
+      </div>
+    </div>
+
     <!-- Section: Transformation Gallery -->
     <div class="edit-section">
       <div class="section-heading">Transformation Gallery</div>
@@ -669,6 +692,7 @@ function populateForm(t) {
 
   // Session types
   loadSessionTypes();
+  loadAvailability();
 }
 
 // ===== AVAILABILITY =====
@@ -977,6 +1001,148 @@ async function toggleSessionType(id, newActive) {
     showToast(newActive ? 'Session type activated.' : 'Session type deactivated.');
   } catch {
     showToast('Could not update session type. Try again.', 'error');
+  }
+}
+
+// ===== BOOKING AVAILABILITY =====
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+let scheduleState = {}; // key: day_of_week (0-6), value: { start_time, end_time } | null
+
+async function loadAvailability() {
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-availability', {
+      headers: { 'Authorization': 'Bearer ' + getAuthToken() }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    // Build scheduleState map
+    scheduleState = {};
+    (data.schedule || []).forEach(s => {
+      scheduleState[s.day_of_week] = { start_time: s.start_time, end_time: s.end_time };
+    });
+    renderSchedule();
+    renderOverrides(data.overrides || []);
+  } catch {}
+}
+
+function renderSchedule() {
+  const grid = document.getElementById('avail-days-grid');
+  if (!grid) return;
+  grid.innerHTML = DAYS.map((day, i) => {
+    const on = !!scheduleState[i];
+    const start = scheduleState[i]?.start_time || '09:00';
+    const end = scheduleState[i]?.end_time || '17:00';
+    return `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);" id="day-row-${i}">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0;width:110px;">
+          <input type="checkbox" id="day-check-${i}" ${on ? 'checked' : ''} onchange="toggleDay(${i})" style="width:16px;height:16px;accent-color:var(--brand);cursor:pointer;">
+          <span style="font-size:13px;font-weight:600;">${day}</span>
+        </label>
+        <div style="display:flex;align-items:center;gap:6px;flex:1;${on ? '' : 'opacity:0.3;pointer-events:none;'}" id="day-times-${i}">
+          <input type="time" id="day-start-${i}" value="${start}" style="flex:1;padding:7px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;outline:none;min-width:0;">
+          <span style="font-size:11px;color:var(--text-muted);">to</span>
+          <input type="time" id="day-end-${i}" value="${end}" style="flex:1;padding:7px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;outline:none;min-width:0;">
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleDay(i) {
+  const checked = document.getElementById('day-check-' + i).checked;
+  const timesDiv = document.getElementById('day-times-' + i);
+  timesDiv.style.opacity = checked ? '1' : '0.3';
+  timesDiv.style.pointerEvents = checked ? '' : 'none';
+  if (checked) {
+    scheduleState[i] = {
+      start_time: document.getElementById('day-start-' + i).value || '09:00',
+      end_time: document.getElementById('day-end-' + i).value || '17:00'
+    };
+  } else {
+    delete scheduleState[i];
+  }
+}
+
+async function saveSchedule() {
+  const schedule = [];
+  for (let i = 0; i < 7; i++) {
+    const checked = document.getElementById('day-check-' + i)?.checked;
+    if (!checked) continue;
+    const start = document.getElementById('day-start-' + i)?.value;
+    const end = document.getElementById('day-end-' + i)?.value;
+    if (!start || !end || end <= start) {
+      showToast('End time must be after start time for ' + DAYS[i] + '.', 'error');
+      return;
+    }
+    schedule.push({ day_of_week: i, start_time: start, end_time: end });
+  }
+
+  const btn = document.getElementById('save-schedule-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-availability?op=schedule', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({ trainer_id: trainer.id, schedule })
+    });
+    if (!res.ok) throw new Error();
+    showToast('Schedule saved!');
+  } catch {
+    showToast('Could not save schedule. Try again.', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Schedule';
+  }
+}
+
+function renderOverrides(overrides) {
+  const list = document.getElementById('blocked-dates-list');
+  if (!list) return;
+  const blocked = overrides.filter(o => o.is_blocked);
+  if (blocked.length === 0) {
+    list.innerHTML = '<p style="font-size:12px;color:var(--text-faint);">No blocked dates.</p>';
+    return;
+  }
+  list.innerHTML = blocked.map(o => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;">
+      <span style="font-size:13px;">${o.date}</span>
+      <button onclick="unblockDate('${o.date}')" style="padding:4px 10px;border-radius:6px;background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:11px;cursor:pointer;">Unblock</button>
+    </div>
+  `).join('');
+}
+
+async function blockDate() {
+  const dateInput = document.getElementById('block-date-input');
+  const date = dateInput.value;
+  if (!date) { showToast('Please pick a date.', 'error'); return; }
+
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-availability?op=override', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({ trainer_id: trainer.id, date, is_blocked: true })
+    });
+    if (!res.ok) throw new Error();
+    dateInput.value = '';
+    await loadAvailability();
+    showToast('Date blocked.');
+  } catch {
+    showToast('Could not block date. Try again.', 'error');
+  }
+}
+
+async function unblockDate(date) {
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-availability?op=override', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({ trainer_id: trainer.id, date })
+    });
+    if (!res.ok) throw new Error();
+    await loadAvailability();
+    showToast('Date unblocked.');
+  } catch {
+    showToast('Could not unblock date. Try again.', 'error');
   }
 }
 
