@@ -33,7 +33,9 @@ let valid = false;
 let credits: any[] = [];
 let errorMsg = '';
 
-if (!token || !email || !pi) {
+if (!SUPABASE_URL || !SERVICE_KEY) {
+  errorMsg = 'Server configuration error. Please contact support.';
+} else if (!token || !email || !pi) {
   errorMsg = 'Invalid link.';
 } else if (!BOOKING_SECRET) {
   errorMsg = 'Server configuration error. Please contact support.';
@@ -44,15 +46,19 @@ if (!token || !email || !pi) {
   if (!valid) {
     errorMsg = 'This link is invalid or has expired.';
   } else {
-    const { createClient } = await import('@supabase/supabase-js');
-    const sb = createClient(SUPABASE_URL, SERVICE_KEY);
-    const { data } = await sb
-      .from('package_credits')
-      .select('id, status, session_type:session_types(name, duration_min), created_at')
-      .eq('consumer_email', email)
-      .eq('stripe_payment_intent_id', pi)
-      .order('created_at', { ascending: true });
-    credits = data ?? [];
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const sb = createClient(SUPABASE_URL, SERVICE_KEY);
+      const { data } = await sb
+        .from('package_credits')
+        .select('id, status, session_type:session_types(name, duration_min), created_at')
+        .eq('consumer_email', email)
+        .eq('stripe_payment_intent_id', pi)
+        .order('created_at', { ascending: true });
+      credits = data ?? [];
+    } catch {
+      errorMsg = 'Could not load your sessions. Please try again.';
+    }
   }
 }
 
@@ -108,7 +114,7 @@ const used = credits.filter(c => c.status === 'used');
               <div class="credit-card">
                 <div class="credit-info">
                   <div>{(c.session_type as any)?.name ?? 'Session'}</div>
-                  <div class="credit-meta">{(c.session_type as any)?.duration_min} min</div>
+                  <div class="credit-meta">{(c.session_type as any)?.duration_min ?? '—'} min</div>
                 </div>
                 <span class="status-badge badge-available">Available</span>
               </div>
@@ -126,7 +132,7 @@ const used = credits.filter(c => c.status === 'used');
               <div class="credit-card">
                 <div class="credit-info">
                   <div>{(c.session_type as any)?.name ?? 'Session'}</div>
-                  <div class="credit-meta">{(c.session_type as any)?.duration_min} min</div>
+                  <div class="credit-meta">{(c.session_type as any)?.duration_min ?? '—'} min</div>
                 </div>
                 <span class="status-badge badge-scheduled">Scheduled</span>
               </div>

@@ -9,7 +9,9 @@ const FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
 let result: { cancelled?: boolean; refunded?: boolean; alreadyCancelled?: boolean; error?: string } = {};
 let errorMsg = '';
 
-if (!bookingId || !token) {
+if (!SUPABASE_URL) {
+  errorMsg = 'Server configuration error. Please contact support.';
+} else if (!bookingId || !token) {
   errorMsg = 'Invalid cancellation link.';
 } else {
   try {
