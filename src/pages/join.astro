@@ -358,6 +358,8 @@ body {
     <div class="step-dot active" id="dot-1">1</div>
     <div class="step-line" id="line-1"></div>
     <div class="step-dot inactive" id="dot-2">2</div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step-dot inactive" id="dot-3">3</div>
   </div>
 
   <!-- ===== STEP 1: Essentials ===== -->
@@ -540,6 +542,74 @@ body {
     <p style="text-align:center;font-size:11px;color:var(--text-faint);margin-top:8px;">{t(locale, 'join.spam_hint')}</p>
   </div>
 
+  <!-- ===== STEP 3: Profile & Packages ===== -->
+  <div id="step-3" class="hidden">
+    <h1 class="step-title">Complete your profile</h1>
+    <p class="step-subtitle">Add a photo, bio, and your training packages so clients know what to expect.</p>
+
+    <!-- Profile Photo -->
+    <div class="field">
+      <label>Profile Photo <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+      <div id="avatar-upload-area" onclick="document.getElementById('avatar-file-input').click()"
+        style="width:96px;height:96px;border-radius:50%;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;color:var(--text-muted);gap:4px;font-size:11px;transition:border-color 0.15s;">
+        <img id="avatar-preview-img" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Avatar preview" />
+        <span id="avatar-upload-placeholder">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </span>
+        <span id="avatar-upload-label" style="font-size:10px;color:var(--text-faint);">Upload</span>
+      </div>
+      <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="handleAvatarFileChange(event)" />
+    </div>
+
+    <!-- Bio -->
+    <div class="field">
+      <label style="display:flex;justify-content:space-between;align-items:center;">
+        Bio <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;" id="bio-char-count">0 / 300</span>
+      </label>
+      <textarea id="s3-bio" rows="4" maxlength="500"
+        placeholder="Tell clients about your training style and what results they can expect..."
+        oninput="updateBioCharCount()"
+        style="width:100%;padding:14px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:15px;outline:none;resize:vertical;transition:border-color 0.2s;box-sizing:border-box;"></textarea>
+      <button id="ai-bio-btn" onclick="generateAIBio()"
+        style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:transparent;border:1px solid var(--brand);color:var(--brand);border-radius:8px;font-size:12px;cursor:pointer;margin-top:8px;transition:background 0.15s;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Write bio with AI
+      </button>
+    </div>
+
+    <!-- Instagram -->
+    <div class="field">
+      <label>Instagram <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+      <div style="display:flex;align-items:center;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s;" onfocusin="this.style.borderColor='var(--brand)'" onfocusout="this.style.borderColor='var(--border)'">
+        <span style="padding:14px 0 14px 16px;color:var(--text-faint);font-size:15px;">@</span>
+        <input type="text" id="s3-instagram" placeholder="yourhandle" autocomplete="off"
+          style="border:none;background:transparent;padding:14px 16px 14px 4px;font-size:15px;flex:1;min-width:0;color:var(--text);outline:none;font-family:'Inter',sans-serif;" />
+      </div>
+    </div>
+
+    <!-- Packages -->
+    <div class="field">
+      <label>Training Packages <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+      <div id="packages-list"></div>
+      <button onclick="addPackageRow()"
+        style="width:100%;padding:10px;background:transparent;border:1px dashed var(--border);color:var(--text-muted);border-radius:10px;font-size:13px;cursor:pointer;margin-top:4px;">
+        + Add package
+      </button>
+    </div>
+
+    <!-- Availability -->
+    <div class="field">
+      <label>Availability <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+      <input type="text" id="s3-availability" placeholder="e.g. Weekday mornings, flexible schedule"
+        style="width:100%;padding:14px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:15px;outline:none;transition:border-color 0.2s;box-sizing:border-box;" />
+    </div>
+
+    <div class="field-error hidden" id="s3-error"></div>
+
+    <button class="btn-primary" id="s3-btn" onclick="completeStep3()">Finish — Go Live 🚀</button>
+    <button class="btn-ghost" onclick="showStep(2)">← Back</button>
+  </div>
+
   <!-- ===== SUCCESS ===== -->
   <div id="step-success" class="hidden">
     <div class="success-screen">
@@ -628,13 +698,55 @@ const state = {
   trainer_id: null
 };
 
+// ===== DRAFT (localStorage auto-save) =====
+const DRAFT_KEY = 'tb_join_draft';
+function saveDraft() {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      name: state.name, slug: state.slug, email: state.email,
+      phone: state.phone, reps_number: state.reps_number,
+      specialties: state.specialties, title: state.title,
+      training_modes: state.training_modes, trainer_id: state.trainer_id,
+      bio: document.getElementById('s3-bio')?.value || '',
+      instagram: document.getElementById('s3-instagram')?.value || '',
+      availability: document.getElementById('s3-availability')?.value || '',
+    }));
+  } catch(_) {}
+}
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.name) { state.name = d.name; const el = document.getElementById('s1-name'); if (el) el.value = d.name; }
+    if (d.slug) { state.slug = d.slug; const el = document.getElementById('s1-slug'); if (el) el.value = d.slug; }
+    if (d.email) { state.email = d.email; const el = document.getElementById('s1-email'); if (el) el.value = d.email; }
+    if (d.phone) { state.phone = d.phone; const el = document.getElementById('s1-phone'); if (el) el.value = d.phone; }
+    if (d.reps_number) { state.reps_number = d.reps_number; const el = document.getElementById('s1-reps'); if (el) el.value = d.reps_number; }
+    if (d.bio) { const el = document.getElementById('s3-bio'); if (el) { el.value = d.bio; updateBioCharCount(); } }
+    if (d.instagram) { const el = document.getElementById('s3-instagram'); if (el) el.value = d.instagram; }
+    if (d.availability) { const el = document.getElementById('s3-availability'); if (el) el.value = d.availability; }
+    if (Array.isArray(d.specialties)) state.specialties = d.specialties;
+    if (d.title) state.title = d.title;
+    if (Array.isArray(d.training_modes)) state.training_modes = d.training_modes;
+    // If account was already created, resume at step 3
+    if (d.trainer_id) {
+      state.trainer_id = d.trainer_id;
+      showStep(3);
+    }
+  } catch(_) {}
+}
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch(_) {}
+}
+
 // ===== PROGRESS =====
 function setProgress(pct) {
   document.getElementById('progress-fill').style.width = pct + '%';
 }
 
 function showStep(n) {
-  ['1','2','success'].forEach(s => {
+  ['1','2','3','success'].forEach(s => {
     const el = document.getElementById('step-' + s);
     if (el) el.classList.add('hidden');
   });
@@ -653,6 +765,17 @@ function showStep(n) {
     document.getElementById('line-1').className = 'step-line done';
     document.getElementById('step-indicator').style.display = 'flex';
     setProgress(60);
+  } else if (n === 3) {
+    document.getElementById('dot-1').className = 'step-dot done';
+    document.getElementById('dot-1').innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+    document.getElementById('dot-2').className = 'step-dot done';
+    document.getElementById('dot-2').innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+    document.getElementById('dot-3').className = 'step-dot active';
+    document.getElementById('dot-3').innerHTML = '3';
+    document.getElementById('line-1').className = 'step-line done';
+    document.getElementById('line-2').className = 'step-line done';
+    document.getElementById('step-indicator').style.display = 'flex';
+    setProgress(80);
   } else if (n === 'success') {
     document.getElementById('step-indicator').style.display = 'none';
     setProgress(100);
@@ -886,11 +1009,10 @@ async function verifyAndCreate() {
       state.trainer_id = trainer?.id;
     }
 
-    // Success
-    const profileUrl = window.location.hostname + '/' + state.slug;
-    document.getElementById('success-url').textContent = profileUrl;
-    document.getElementById('view-profile-btn').href = `/${state.slug}`;
-    showStep('success');
+    // Success — proceed to step 3 for profile completion
+    state.trainer_id = state.trainer_id; // already set above
+    saveDraft();
+    showStep(3);
 
   } catch(e) {
     showErr(errEl, e.message || 'Verification failed. Please check your code and try again.');
@@ -944,5 +1066,155 @@ document.getElementById('s1-name').addEventListener('input', function() {
 document.getElementById('s1-slug').addEventListener('input', function() {
   this.dataset.userEdited = '1';
 });
+['s1-email', 's1-slug', 's1-phone', 's1-reps'].forEach(function(id) {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', saveDraft);
+});
+
+// ===== STEP 3 FUNCTIONS =====
+let _avatarBlob = null;
+
+function handleAvatarFileChange(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  _avatarBlob = file;
+  const url = URL.createObjectURL(file);
+  const img = document.getElementById('avatar-preview-img');
+  const placeholder = document.getElementById('avatar-upload-placeholder');
+  const label = document.getElementById('avatar-upload-label');
+  if (img) { img.src = url; img.style.display = 'block'; }
+  if (placeholder) placeholder.style.display = 'none';
+  if (label) label.style.display = 'none';
+}
+
+function updateBioCharCount() {
+  const val = document.getElementById('s3-bio')?.value || '';
+  const el = document.getElementById('bio-char-count');
+  if (el) el.textContent = val.length + ' / 300';
+  saveDraft();
+}
+
+async function generateAIBio() {
+  const btn = document.getElementById('ai-bio-btn');
+  if (!btn) return;
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Generating...';
+  try {
+    const res = await fetch(EDGE_BASE + '/ai-bio-writer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: state.name,
+        specialties: state.specialties,
+        title: state.title,
+        market: window.__MARKET__ || 'ae'
+      })
+    });
+    if (res.ok) {
+      const { bio } = await res.json();
+      if (bio) {
+        const bioEl = document.getElementById('s3-bio');
+        if (bioEl) { bioEl.value = bio; updateBioCharCount(); }
+      }
+    }
+  } catch(_) {}
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Write bio with AI';
+}
+
+let _packageCount = 0;
+function addPackageRow() {
+  const list = document.getElementById('packages-list');
+  if (!list) return;
+  const idx = _packageCount++;
+  const div = document.createElement('div');
+  div.id = 'pkg-row-' + idx;
+  div.style.cssText = 'background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;';
+  div.innerHTML = '<div style="margin-bottom:8px;"><input type="text" class="pkg-name" placeholder="e.g. 10-Pack, Monthly Plan" style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;font-family:Inter,sans-serif;box-sizing:border-box;" /></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+    + '<input type="number" class="pkg-price" min="0" step="1" placeholder="Price (e.g. 250)" style="padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;font-family:Inter,sans-serif;width:100%;box-sizing:border-box;" />'
+    + '<select class="pkg-currency" style="padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;font-family:Inter,sans-serif;">'
+    + '<option value="AED">AED</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="EUR">EUR</option>'
+    + '</select></div>';
+  list.appendChild(div);
+}
+
+function collectPackages() {
+  return Array.from(document.querySelectorAll('#packages-list .pkg-name'))
+    .map(function(nameEl, i) {
+      const row = nameEl.closest('div[id^="pkg-row"]') || nameEl.parentElement.parentElement;
+      return {
+        name: nameEl.value.trim(),
+        price: parseFloat(row.querySelector('.pkg-price')?.value) || 0,
+        currency: row.querySelector('.pkg-currency')?.value || 'AED'
+      };
+    })
+    .filter(function(p) { return p.name; });
+}
+
+async function completeStep3() {
+  const errEl = document.getElementById('s3-error');
+  if (errEl) errEl.classList.add('hidden');
+
+  if (!state.trainer_id) {
+    if (errEl) { errEl.textContent = 'Session error — please refresh'; errEl.classList.remove('hidden'); }
+    return;
+  }
+
+  const btn = document.getElementById('s3-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Saving...'; }
+
+  try {
+    const updates = {};
+    const bioVal = document.getElementById('s3-bio')?.value.trim();
+    if (bioVal) updates.bio = bioVal;
+    const igVal = document.getElementById('s3-instagram')?.value.trim().replace(/^@/, '');
+    if (igVal) updates.instagram_handle = igVal;
+    const avail = document.getElementById('s3-availability')?.value.trim();
+    if (avail) updates.availability = avail;
+
+    // Upload avatar if provided
+    if (_avatarBlob) {
+      const ext = (_avatarBlob.name || 'jpg').split('.').pop();
+      const path = 'trainers/' + state.trainer_id + '/avatar.' + ext;
+      const { error: uploadErr } = await sb.storage.from('avatars').upload(path, _avatarBlob, { upsert: true });
+      if (!uploadErr) {
+        const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
+        updates.avatar_url = urlData.publicUrl;
+      }
+    }
+
+    if (Object.keys(updates).length) {
+      await sb.from('trainers').update(updates).eq('id', state.trainer_id);
+    }
+
+    // Save packages
+    const packages = collectPackages();
+    if (packages.length) {
+      await sb.from('session_packages').delete().eq('trainer_id', state.trainer_id);
+      await sb.from('session_packages').insert(packages.map(function(p) {
+        return Object.assign({}, p, { trainer_id: state.trainer_id });
+      }));
+    }
+
+    clearDraft();
+    // Show success screen
+    const profileUrl = window.location.hostname + '/' + state.slug;
+    const successUrl = document.getElementById('success-url');
+    const viewBtn = document.getElementById('view-profile-btn');
+    if (successUrl) successUrl.textContent = profileUrl;
+    if (viewBtn) viewBtn.href = '/' + state.slug;
+    trackEvent('join_signup_complete', { trainer_id: state.trainer_id });
+    showStep('success');
+
+  } catch(e) {
+    if (errEl) { errEl.textContent = e.message || 'Something went wrong. Please try again.'; errEl.classList.remove('hidden'); }
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Finish — Go Live 🚀'; }
+  }
+}
+
+// Load any saved draft on page init
+loadDraft();
 </script>
 </Base>
