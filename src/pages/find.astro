@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import ArcHeader from '../components/ArcHeader.astro';
 import { getMarket } from '../lib/market.ts';
 const market = getMarket(Astro.url.hostname);
 const brandName = market.brandName;
@@ -38,21 +39,30 @@ nav{
   padding:8px 16px;border-radius:20px;text-decoration:none;letter-spacing:0.01em;
 }
 
-/* HERO */
-.hero{
-  padding:48px 20px 32px;
-  text-align:center;
-  background:radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,92,0,0.08) 0%, transparent 70%);
+/* ARC HERO */
+.arc-hero{
+  position:relative;height:240px;background:#0A0A0A;overflow:hidden;
+  margin-bottom:0;
 }
-.hero-eyebrow{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--orange-dim);border:1px solid var(--brand-border, rgba(255,92,0,0.2));
-  border-radius:20px;padding:4px 12px;
-  font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--brand);
-  margin-bottom:16px;
+.arc-hero-text{
+  position:absolute;inset:0;padding:28px 24px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding-bottom:28px;
 }
-.hero h1{font-size:clamp(26px,6vw,40px);font-weight:800;letter-spacing:-0.03em;line-height:1.15;margin-bottom:10px}
-.hero p{font-size:15px;color:var(--white-60);max-width:480px;margin:0 auto 28px}
+.arc-hero-brand{
+  font-size:9px;letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(255,255,255,0.14);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
+  font-weight:700;margin-bottom:14px;
+}
+.arc-hero-title{
+  font-size:32px;font-weight:900;color:#FAFAFA;
+  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
+  letter-spacing:-0.03em;line-height:1.1;margin-bottom:8px;
+}
+.arc-hero-sub{
+  font-size:12px;color:rgba(255,255,255,0.25);
+  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
+}
 
 /* SEARCH BAR */
 .search-wrap{
@@ -219,7 +229,6 @@ nav{
 /* ── Mobile responsive ────────────────────────────────────────────── */
 @media(max-width:640px){
   #trainerGrid{grid-template-columns:1fr}
-  .hero{padding:36px 16px 24px}
   .main{padding:0 12px max(60px,calc(60px + env(safe-area-inset-bottom)))}
   .search-wrap{padding:0 16px}
   .results-header{flex-direction:column;align-items:flex-start;gap:8px}
@@ -239,13 +248,13 @@ nav{
   <a href="/join" class="nav-cta">Get Your Page →</a>
 </nav>
 
-<div class="hero">
-  <div class="hero-eyebrow">
-    <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
-    {market.certificationBody.endsWith('Verified') ? market.certificationBody + ' Trainers' : market.certificationBody + ' Verified Trainers'}
+<div class="arc-hero">
+  <ArcHeader brandLabel={brandName} />
+  <div class="arc-hero-text">
+    <div class="arc-hero-brand">{brandName}</div>
+    <div class="arc-hero-title">Find your<br>trainer.</div>
+    <div class="arc-hero-sub" id="heroSubCount">Browse verified trainers</div>
   </div>
-  <h1 data-i18n="find.title">Find Your Perfect<br>Personal Trainer</h1>
-  <p data-i18n="find.sub">{market.i18nLocale === 'fr' ? 'Parcourez les coachs certifiés. Filtrez par spécialité, lieu et mode d\'entraînement.' : market.i18nLocale === 'it' ? 'Sfoglia i trainer certificati. Filtra per specialità, luogo e modalità di allenamento.' : market.i18nLocale === 'es' ? 'Explora entrenadores certificados. Filtra por especialidad, ubicación y modalidad.' : `Browse ${market.certificationBody} verified trainers. Filter by specialty, location, price and training style.`}</p>
 </div>
 
 <div class="search-wrap">
