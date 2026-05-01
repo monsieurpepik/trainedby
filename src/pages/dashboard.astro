@@ -14,6 +14,8 @@ let ssrScore = 0;
 let ssrFields: { key: string; label: string; pts: number; done: boolean; action: string }[] = [];
 let ssrPlan = 'free';
 let ssrSlug = '';
+let bookingSetupSteps: { label: string; done: boolean; action: string }[] = [];
+let bookingReady = false;
 
 const cookieHeader = Astro.request.headers.get('cookie') || '';
 const tbSession = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith('tb_session='))?.slice('tb_session='.length);
@@ -35,9 +37,11 @@ if (tbSession) {
       .single();
 
     if (link?.trainer_id) {
-      const [{ data: trainer }, { count: pkgCount }] = await Promise.all([
-        svc.from('trainers').select('avatar_url, bio, instagram_handle, reps_verified, verification_status, plan, slug').eq('id', link.trainer_id).single(),
+      const [{ data: trainer }, { count: pkgCount }, { count: sessionTypeCount }, { count: availabilityCount }] = await Promise.all([
+        svc.from('trainers').select('avatar_url, bio, instagram_handle, reps_verified, verification_status, plan, slug, stripe_connect_onboarded').eq('id', link.trainer_id).single(),
         svc.from('session_packages').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id),
+        svc.from('session_types').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id).eq('is_active', true),
+        svc.from('trainer_availability').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id),
       ]);
 
       if (trainer) {
@@ -55,6 +59,13 @@ if (tbSession) {
         const raw = FIELDS.filter(f => f.done).reduce((sum, f) => sum + f.pts, 0);
         ssrScore = Math.round((raw / totalPts) * 100);
         ssrFields = FIELDS;
+        // Booking setup gating
+        bookingSetupSteps = [
+          { label: 'Connect your bank (Stripe)', done: !!trainer.stripe_connect_onboarded, action: '/dashboard?stripe=start' },
+          { label: 'Add at least one session type', done: (sessionTypeCount ?? 0) >= 1, action: '/edit?tab=sessions' },
+          { label: 'Set your availability', done: (availabilityCount ?? 0) >= 1, action: '/edit?tab=availability' },
+        ];
+        bookingReady = bookingSetupSteps.every(s => s.done);
       }
     }
   } catch (e) {
@@ -639,6 +650,30 @@ body {
 
     <!-- Profile Completeness Widget -->
     <ProfileCompleteness score={ssrScore} fields={ssrFields} plan={ssrPlan} slug={ssrSlug} />
+
+    <!-- Booking Setup Card (only shown when setup is incomplete) -->
+    {!bookingReady && (
+      <div style="background:rgba(255,92,0,0.06);border:1px solid rgba(255,92,0,0.18);border-radius:14px;padding:16px 18px;margin-bottom:20px;">
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);margin-bottom:4px;">Finish setup to accept bookings</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:14px;">Complete these steps to go live.</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          {bookingSetupSteps.map((step, i) => (
+            <a href={step.action} style={`display:flex;align-items:center;gap:10px;text-decoration:none;opacity:${i > 0 && !bookingSetupSteps[i-1].done ? '0.4' : '1'};pointer-events:${i > 0 && !bookingSetupSteps[i-1].done ? 'none' : 'auto'};`}>
+              <div style={`width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${step.done ? '#4CAF50' : 'rgba(255,255,255,0.08)'};border:1.5px solid ${step.done ? '#4CAF50' : 'rgba(255,255,255,0.15)'};`}>
+                {step.done
+                  ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  : <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);">{i + 1}</span>
+                }
+              </div>
+              <span style={`font-size:13px;font-weight:500;color:${step.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)'};text-decoration:${step.done ? 'line-through' : 'none'};`}>{step.label}</span>
+              {!step.done && (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" style="margin-left:auto;"><path d="M9 18l6-6-6-6"/></svg>
+              )}
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
 
     <!-- Stats -->
     <div class="stats-section">
@@ -1311,6 +1346,48 @@ if (new URLSearchParams(location.search).get('upgraded') === '1') {
 }
 
 init();
+
+// Handle Stripe Connect redirect params
+(function handleStripeParam() {
+  const params = new URLSearchParams(window.location.search);
+  const stripeParam = params.get('stripe');
+  if (!stripeParam) return;
+
+  const token = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('tb_session='))?.slice('tb_session='.length);
+  if (!token) return;
+
+  const FUNCTIONS_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1';
+
+  if (stripeParam === 'start') {
+    // Initiate Stripe Connect
+    fetch(`${FUNCTIONS_URL}/connect-stripe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ trainer_id: trainer?.id }),
+    })
+    .then(r => r.json())
+    .then(d => { if (d.url) window.location.href = d.url; })
+    .catch(err => console.error('[connect-stripe]', err));
+  }
+
+  if (stripeParam === 'return') {
+    // Verify onboarding completion
+    fetch(`${FUNCTIONS_URL}/connect-stripe-return`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ trainer_id: trainer?.id }),
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.onboarded) {
+        // Clean URL and reload to show updated setup state
+        window.history.replaceState({}, '', '/dashboard');
+        window.location.reload();
+      }
+    })
+    .catch(err => console.error('[connect-stripe-return]', err));
+  }
+})();
 
 // ── Support Chatbot Widget ──────────────────────────────────────────────────────────
 (function() {
