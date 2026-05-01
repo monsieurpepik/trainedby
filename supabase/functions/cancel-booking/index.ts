@@ -1,30 +1,11 @@
 // supabase/functions/cancel-booking/index.ts
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno';
-import { CORS_HEADERS, jsonResponse, errorResponse, validationError, notFoundError, serverError, isValidUUID } from '../_shared/errors.ts';
+import { CORS_HEADERS, jsonResponse, errorResponse, validationError, notFoundError, serverError } from '../_shared/errors.ts';
 import { createLogger } from '../_shared/logger.ts';
 
 const log = createLogger('cancel-booking');
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
-
-async function computeHmac(secret: string, message: string): Promise<string> {
-  const enc = new TextEncoder();
-  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(message));
-  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function timingSafeEqual(a: string, b: string): Promise<boolean> {
-  const enc = new TextEncoder();
-  const aKey = await crypto.subtle.importKey('raw', enc.encode('compare'), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const aSig = await crypto.subtle.sign('HMAC', aKey, enc.encode(a));
-  const bSig = await crypto.subtle.sign('HMAC', aKey, enc.encode(b));
-  const aArr = new Uint8Array(aSig);
-  const bArr = new Uint8Array(bSig);
-  let diff = 0;
-  for (let i = 0; i < aArr.length; i++) diff |= aArr[i] ^ bArr[i];
-  return diff === 0;
-}
 
 async function sendEmail(to: string, subject: string, html: string, from = 'TrainedBy <noreply@trainedby.com>'): Promise<void> {
   if (!RESEND_API_KEY) return;
@@ -58,24 +39,34 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS_HEADERS });
 
   try {
-    const { bookingId, token } = await req.json();
-    if (!bookingId || !token) return validationError('bookingId', 'bookingId and token are required');
+    const { token } = await req.json();
+    if (!token) return validationError('token', 'token is required');
 
-    if (!isValidUUID(bookingId)) return validationError('bookingId', 'Invalid bookingId format');
+    const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
-    const bookingSecret = Deno.env.get('BOOKING_SECRET');
-    if (!bookingSecret) {
-      log.error('BOOKING_SECRET env var not set');
-      return serverError('Server misconfiguration');
-    }
-    const expected = await computeHmac(bookingSecret, `cancel:${bookingId}`);
-    const valid = await timingSafeEqual(token, expected);
-    if (!valid) {
-      log.warn('Invalid cancel token', { bookingId });
+    // DB token lookup
+    const { data: tokenRow, error: tokenErr } = await sb
+      .from('booking_tokens')
+      .select('id, booking_id, used_at, expires_at')
+      .eq('token', token)
+      .eq('token_type', 'cancel')
+      .single();
+
+    if (tokenErr || !tokenRow) {
+      log.warn('Invalid cancel token');
       return errorResponse('Invalid or expired cancellation link', 403);
     }
 
-    const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    if (tokenRow.used_at) {
+      return jsonResponse({ cancelled: true, refunded: false, alreadyCancelled: true });
+    }
+
+    if (new Date(tokenRow.expires_at) < new Date()) {
+      return errorResponse('This link has expired', 410);
+    }
+
+    const bookingId = tokenRow.booking_id;
+    const tokenRowId = tokenRow.id;
 
     const { data: booking, error: bErr } = await sb
       .from('bookings')
@@ -126,6 +117,9 @@ Deno.serve(async (req) => {
       }
       return serverError('Failed to update booking status');
     }
+
+    // Mark token used after successful cancellation
+    await sb.from('booking_tokens').update({ used_at: new Date().toISOString() }).eq('id', tokenRowId);
 
     const refundMsg = refunded
       ? `A full refund of $${(booking.amount_cents / 100).toFixed(2)} has been issued and will appear within 5–10 business days.`
