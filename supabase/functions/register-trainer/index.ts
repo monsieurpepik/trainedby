@@ -80,7 +80,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { name, email, phone, title, specialties, reps_number, referred_by, market = 'ae' } = body;
+    const { name, email, phone, title, specialties, reps_number, referred_by_slug, market = 'ae' } = body;
 
     // ── Validate required fields ──────────────────────────────────────────────
     if (!name || !email) {
@@ -103,7 +103,7 @@ serve(async (req) => {
     const cleanPhone = sanitize(phone);
     const cleanTitle = sanitize(title);
     const cleanReps = sanitize(reps_number);
-    const cleanReferredBy = sanitize(referred_by);
+    const cleanReferredBy = sanitize(referred_by_slug);
     const cleanSpecialties = Array.isArray(specialties)
       ? specialties.slice(0, 10).map((s: string) => sanitize(s))
       : [];
@@ -178,7 +178,7 @@ serve(async (req) => {
       specialties: cleanSpecialties,
       reps_number: cleanReps || null,
       verification_status: cleanReps ? "pending" : "unsubmitted",
-      referred_by: cleanReferredBy || null,
+      referred_by_slug: cleanReferredBy || null,
     }).select().single();
 
     if (error) throw error;

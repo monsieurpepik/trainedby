@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { getMarketBrand, getMarketSupportEmail, getDashboardUrl } from '../_shared/market_url.ts';
+import { getMarketBrand, getMarketSupportEmail, getDashboardUrl, getMarketBaseUrl } from '../_shared/market_url.ts';
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || '';
 const CRON_SECRET = Deno.env.get('CRON_SECRET') || '';
@@ -12,11 +12,11 @@ const sb = createClient(
 );
 
 function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
   const ae = new TextEncoder().encode(a);
   const be = new TextEncoder().encode(b);
-  let result = 0;
-  for (let i = 0; i < ae.length; i++) result |= ae[i] ^ be[i];
+  const len = Math.max(ae.length, be.length);
+  let result = ae.length ^ be.length;
+  for (let i = 0; i < len; i++) result |= (ae[i] ?? 0) ^ (be[i] ?? 0);
   return result === 0;
 }
 
@@ -59,7 +59,7 @@ function emailBase(content: string, market = 'ae'): string {
   <div class="footer">
     ${brand}<br>
     You're receiving this because you have a profile on ${brand}.<br>
-    <a href="https://trainedby.ae/unsubscribe" style="color:rgba(255,255,255,0.25)">Unsubscribe</a>
+    <a href="${getMarketBaseUrl(market)}/unsubscribe" style="color:rgba(255,255,255,0.25)">Unsubscribe</a>
   </div>
 </div>
 </body>
