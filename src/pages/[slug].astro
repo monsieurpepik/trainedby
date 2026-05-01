@@ -112,8 +112,8 @@ const jsonLd = {
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --orange: var(--brand, #FF5C00);
-    --orange-dim: var(--brand-dim, rgba(255,92,0,0.15));
+    --orange: var(--brand, #D4622A);
+    --orange-dim: var(--brand-dim, rgba(212,98,42,0.15));
     --green:#22c55e;--green-dim:rgba(34,197,94,0.15);
     --white:#ffffff;--white-60:rgba(255,255,255,0.6);
     --white-30:rgba(255,255,255,0.3);--white-10:rgba(255,255,255,0.1);
@@ -130,7 +130,7 @@ const jsonLd = {
     --font-display: var(--font-display, 'Manrope', sans-serif);
     --font-body: var(--font-body, 'Inter', sans-serif);
     /* Dynamic avatar color - set by JS after image loads */
-    --avatar-color: 255,92,0;
+    --avatar-color: 212,98,42;
   }
   html,body{height:100%;width:100%;overflow-x:hidden}
   body{font-family:var(--font-body);background:#0a0a0a;color:var(--white);-webkit-font-smoothing:antialiased}
@@ -219,11 +219,11 @@ const jsonLd = {
         mount.style.display = 'block';
         mount.innerHTML = `
           <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;gap:24px;padding:32px;text-align:center">
-            <div style="font-size:64px;font-weight:900;line-height:1;background:linear-gradient(135deg,#FF5C00,#ff8c42);-webkit-background-clip:text;-webkit-text-fill-color:transparent">404</div>
+            <div style="font-size:64px;font-weight:900;line-height:1;background:linear-gradient(135deg,#D4622A,#e07840);-webkit-background-clip:text;-webkit-text-fill-color:transparent">404</div>
             <h1 style="font-size:24px;font-weight:700">Trainer not found</h1>
             <p style="color:rgba(255,255,255,0.6);max-width:400px;line-height:1.6">This trainer profile doesn't exist or may have been removed.</p>
             <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-              <a href="/find" style="background:#FF5C00;color:#fff;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700">Find a Trainer</a>
+              <a href="/find" style="background:#D4622A;color:#fff;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700">Find a Trainer</a>
               <a href="/" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:600">Go Home</a>
             </div>
             <div style="padding:14px 20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;max-width:400px;font-size:13px;color:rgba(255,255,255,0.45);line-height:1.6">
@@ -236,7 +236,7 @@ const jsonLd = {
     // Premium gradient avatar fallback - generates a branded canvas image with initials
     function makeAvatarFallback(name) {
       const initials = (name || '?').split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0, 2) || '?';
-      const brandColor = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#FF5C00';
+      const brandColor = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#D4622A';
       const r = parseInt(brandColor.slice(1,3), 16) || 255;
       const g = parseInt(brandColor.slice(3,5), 16) || 92;
       const b = parseInt(brandColor.slice(5,7), 16) || 0;
@@ -374,20 +374,67 @@ const jsonLd = {
 
           <!-- Hero card -->
           <div style="background:rgba(10,10,10,0.72);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.10);border-radius:24px;overflow:hidden;margin-bottom:16px;box-shadow:0 8px 48px rgba(0,0,0,0.5)">
-            <div style="position:relative;height:240px;background:linear-gradient(135deg,#1a1a1a,#0a0a0a)">
-              ${photoUrl ? `<img data-hero="1" src="${photoUrl}" alt="${displayName}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.style.display='none';applyAvatarFallback('${displayName.replace(/'/g, "\\'")}')">` : ''}
-              <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.75) 100%)"></div>
-              ${isVerified ? `<div style="position:absolute;top:16px;right:16px;background:rgba(34,197,94,0.18);border:1px solid rgba(34,197,94,0.35);color:#22c55e;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;backdrop-filter:blur(12px);letter-spacing:0.03em">✓ Verified</div>` : ''}
-              ${isPro ? `<div style="position:absolute;top:16px;left:16px;background:linear-gradient(135deg,rgba(197,162,39,0.25),rgba(245,208,107,0.15));border:1px solid rgba(197,162,39,0.4);color:#f5d06b;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:800;backdrop-filter:blur(12px);letter-spacing:0.05em">PRO</div>` : ''}
+            <div style="position:relative;height:240px;background:#0A0A0A">
+              <svg aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;z-index:0" viewBox="0 0 390 240" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="slug-arc-mass" x1="-40" y1="240" x2="420" y2="0" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
+                    <stop offset="28%" stop-color="rgba(212,98,42,0.16)"/>
+                    <stop offset="65%" stop-color="rgba(212,98,42,0.55)"/>
+                    <stop offset="100%" stop-color="#D4622A"/>
+                  </linearGradient>
+                  <linearGradient id="slug-arc-hair" x1="-40" y1="240" x2="420" y2="0" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
+                    <stop offset="32%" stop-color="rgba(212,98,42,0.42)"/>
+                    <stop offset="100%" stop-color="rgba(212,98,42,0.88)"/>
+                  </linearGradient>
+                  <filter id="slug-arc-glow" x="-100%" y="-100%" width="300%" height="300%">
+                    <feGaussianBlur stdDeviation="6" result="blur"/>
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                  </filter>
+                  <filter id="slug-arc-spark" x="-80%" y="-80%" width="260%" height="260%">
+                    <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                  </filter>
+                </defs>
+                <path d="M -40 240 Q 120 160 225 90 Q 330 22 420 -5" stroke="url(#slug-arc-mass)" stroke-width="60" fill="none" stroke-linecap="butt"/>
+                <path d="M -40 240 Q 120 160 225 90 Q 330 22 420 -5" stroke="rgba(10,10,10,0.55)" stroke-width="36" fill="none" stroke-linecap="butt"/>
+                <path d="M -40 240 Q 120 160 225 90 Q 330 22 420 -5" stroke="url(#slug-arc-hair)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                <g filter="url(#slug-arc-glow)">
+                  <circle cx="380" cy="16" r="11" fill="rgba(212,98,42,0.93)"/>
+                  <circle cx="363" cy="26" r="8.5" fill="rgba(212,98,42,0.86)"/>
+                  <circle cx="394" cy="8" r="7.5" fill="rgba(232,120,52,0.88)"/>
+                  <circle cx="370" cy="6" r="6.5" fill="rgba(212,98,42,0.82)"/>
+                  <circle cx="390" cy="36" r="5.5" fill="rgba(212,98,42,0.76)"/>
+                </g>
+                <g filter="url(#slug-arc-spark)">
+                  <circle cx="348" cy="14" r="4.5" fill="rgba(212,98,42,0.66)"/>
+                  <circle cx="365" cy="-4" r="4" fill="rgba(212,98,42,0.60)"/>
+                  <circle cx="345" cy="40" r="4" fill="rgba(212,98,42,0.52)"/>
+                  <circle cx="372" cy="46" r="3.5" fill="rgba(212,98,42,0.46)"/>
+                  <circle cx="330" cy="26" r="3" fill="rgba(212,98,42,0.42)"/>
+                  <circle cx="350" cy="56" r="3" fill="rgba(212,98,42,0.36)"/>
+                  <circle cx="380" cy="-14" r="3" fill="rgba(212,98,42,0.48)"/>
+                </g>
+                <circle cx="314" cy="40" r="2.5" fill="rgba(212,98,42,0.26)"/>
+                <circle cx="325" cy="56" r="2" fill="rgba(212,98,42,0.20)"/>
+                <circle cx="336" cy="68" r="1.5" fill="rgba(212,98,42,0.16)"/>
+                <circle cx="370" cy="-20" r="2" fill="rgba(212,98,42,0.34)"/>
+                <circle cx="382" cy="-30" r="1.5" fill="rgba(212,98,42,0.22)"/>
+              </svg>
+              ${photoUrl ? `<img data-hero="1" src="${photoUrl}" alt="${displayName}" style="width:100%;height:100%;object-fit:cover;object-position:top;z-index:1;opacity:0.35" onerror="this.style.display='none';applyAvatarFallback('${displayName.replace(/'/g, "\\'")}')">` : ''}
+              <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.75) 100%);z-index:2"></div>
+              ${isVerified ? `<div style="position:absolute;top:16px;right:16px;background:rgba(34,197,94,0.18);border:1px solid rgba(34,197,94,0.35);color:#22c55e;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;backdrop-filter:blur(12px);letter-spacing:0.03em;z-index:3">✓ Verified</div>` : ''}
+              ${isPro ? `<div style="position:absolute;top:16px;left:16px;background:linear-gradient(135deg,rgba(197,162,39,0.25),rgba(245,208,107,0.15));border:1px solid rgba(197,162,39,0.4);color:#f5d06b;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:800;backdrop-filter:blur(12px);letter-spacing:0.05em;z-index:3">PRO</div>` : ''}
             </div>
             <div style="padding:22px">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
                 <div>
-                  <h1 style="font-family:var(--font-display,'Manrope',sans-serif);font-size:26px;font-weight:900;margin-bottom:4px;letter-spacing:-0.03em">${displayName}</h1>
+                  <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:700;font-style:italic;margin-bottom:4px;letter-spacing:-0.015em;line-height:1.05;color:#FAFAFA">${displayName}</h1>
                   <p style="color:rgba(255,255,255,0.55);font-size:14px;font-family:var(--font-body,'Inter',sans-serif)">${specialties.join(' · ')}${location ? ' · ' + location : ''}</p>
                 </div>
                 <div style="text-align:right">
-                  <div style="font-family:var(--font-display,'Manrope',sans-serif);font-size:22px;font-weight:900;color:var(--brand,#FF5C00);letter-spacing:-0.02em">${priceFrom ? `From ${priceCurrency} ${priceFrom}` : ''}</div>
+                  <div style="font-family:var(--font-display,'Manrope',sans-serif);font-size:22px;font-weight:900;color:var(--brand,#D4622A);letter-spacing:-0.02em">${priceFrom ? `From ${priceCurrency} ${priceFrom}` : ''}</div>
                   <div style="font-size:12px;color:rgba(255,255,255,0.4);font-family:var(--font-body,'Inter',sans-serif)">per session</div>
                 </div>
               </div>
@@ -423,7 +470,7 @@ const jsonLd = {
                   <div style="font-weight:700;font-size:15px">${p.name || p.title || 'Package'}</div>
                   ${p.description ? `<div style="color:rgba(255,255,255,0.5);font-size:13px;margin-top:2px">${p.description}</div>` : ''}
                 </div>
-                <div style="font-family:var(--font-display,'Manrope',sans-serif);font-size:18px;font-weight:900;color:var(--brand,#FF5C00);white-space:nowrap;letter-spacing:-0.02em">${p.price ? `${p.currency || ''} ${p.price}`.trim() : ''}</div>
+                <div style="font-family:var(--font-display,'Manrope',sans-serif);font-size:18px;font-weight:900;color:var(--brand,#D4622A);white-space:nowrap;letter-spacing:-0.02em">${p.price ? `${p.currency || ''} ${p.price}`.trim() : ''}</div>
               </div>`).join('')}
             </div>
           </div>` : ''}
@@ -431,7 +478,7 @@ const jsonLd = {
           <!-- CTA buttons -->
           <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
             ${t.booking_ready ? `
-            <a href="/book/${t.slug}" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#FF5C00;color:#fff;padding:16px;border-radius:14px;text-decoration:none;font-weight:700;font-size:16px;">
+            <a href="/book/${t.slug}" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#D4622A;color:#fff;padding:16px;border-radius:14px;text-decoration:none;font-weight:700;font-size:16px;">
               📅 Book a Session
             </a>` : ''}
             ${whatsapp ? `
@@ -474,8 +521,8 @@ const jsonLd = {
                 <div style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Rating</label><div id="starPicker" style="display:flex;gap:6px"><span onclick="setRating(1)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span><span onclick="setRating(2)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span><span onclick="setRating(3)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span><span onclick="setRating(4)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span><span onclick="setRating(5)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span></div></div>
                 <div style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Your Review</label><textarea id="rvText" rows="4" placeholder="Share your experience with this trainer..." maxlength="600" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none;resize:vertical"></textarea></div>
                 <div style="margin-bottom:16px"><label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Goal Achieved (optional)</label><input id="rvGoal" type="text" placeholder="e.g. Lost 8kg in 10 weeks" maxlength="80" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none" /></div>
-                <label id="rvConsentLabel" style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5;"><input type="checkbox" id="rvConsent" style="margin-top:2px;accent-color:#FF5C00;width:16px;height:16px;flex-shrink:0;" /><span>I consent to being contacted by this trainer and to my name and review being displayed publicly on their profile.</span></label>
-                <button onclick="submitReview()" id="rvSubmitBtn" style="padding:11px 24px;background:#FF5C00;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;width:100%">Submit Review</button>
+                <label id="rvConsentLabel" style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5;"><input type="checkbox" id="rvConsent" style="margin-top:2px;accent-color:#D4622A;width:16px;height:16px;flex-shrink:0;" /><span>I consent to being contacted by this trainer and to my name and review being displayed publicly on their profile.</span></label>
+                <button onclick="submitReview()" id="rvSubmitBtn" style="padding:11px 24px;background:#D4622A;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;width:100%">Submit Review</button>
                 <div id="rvMsg" style="margin-top:10px;font-size:13px;display:none"></div>
               </div>
             </div>
@@ -483,11 +530,11 @@ const jsonLd = {
 
           <!-- Powered by footer — viral acquisition badge -->
           <div style="text-align:center;margin-top:40px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08)">
-            <a href="/join?ref=profile_badge&from=${window.__TRAINER_SLUG__ || t.slug || ''}" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;background:rgba(255,92,0,0.08);border:1px solid rgba(255,92,0,0.2);border-radius:20px;padding:8px 16px;transition:all 0.2s" onmouseover="this.style.background='rgba(255,92,0,0.14)'" onmouseout="this.style.background='rgba(255,92,0,0.08)'">
-              <div style="width:20px;height:20px;background:#FF5C00;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;font-family:'Manrope',sans-serif;flex-shrink:0">T</div>
+            <a href="/join?ref=profile_badge&from=${window.__TRAINER_SLUG__ || t.slug || ''}" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.2);border-radius:20px;padding:8px 16px;transition:all 0.2s" onmouseover="this.style.background='rgba(212,98,42,0.14)'" onmouseout="this.style.background='rgba(212,98,42,0.08)'">
+              <div style="width:20px;height:20px;background:#D4622A;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;font-family:'Manrope',sans-serif;flex-shrink:0">T</div>
               <span style="font-size:12px;color:rgba(255,255,255,0.5)">Powered by</span>
-              <strong style="font-size:12px;color:#FF5C00;font-family:'Manrope',sans-serif;font-weight:800">${brand}</strong>
-              <span style="font-size:11px;color:rgba(255,92,0,0.6);font-weight:600">→ Free for trainers</span>
+              <strong style="font-size:12px;color:#D4622A;font-family:'Manrope',sans-serif;font-weight:800">${brand}</strong>
+              <span style="font-size:11px;color:rgba(212,98,42,0.6);font-weight:600">→ Free for trainers</span>
             </a>
           </div>
         </div>`;
@@ -530,13 +577,13 @@ const jsonLd = {
         }
         const avg = reviews.reduce((a,b) => a + b.rating, 0) / reviews.length;
         let starsHtml = '';
-        for (let i = 1; i <= 5; i++) starsHtml += `<span style="color:${i<=Math.round(avg)?'#FF5C00':'rgba(255,255,255,0.2)'};font-size:14px">&#9733;</span>`;
+        for (let i = 1; i <= 5; i++) starsHtml += `<span style="color:${i<=Math.round(avg)?'#D4622A':'rgba(255,255,255,0.2)'};font-size:14px">&#9733;</span>`;
         let html = `<div style="display:flex;align-items:center;gap:14px;padding:14px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.09);margin-bottom:12px"><div style="font-size:44px;font-weight:800;line-height:1">${avg.toFixed(1)}</div><div><div style="display:flex;gap:2px;margin-bottom:4px">${starsHtml}</div><div style="font-size:12px;color:rgba(255,255,255,0.5)">${reviews.length} verified review${reviews.length>1?'s':''}</div></div></div>`;
         reviews.forEach(rv => {
           let rvStars = '';
-          for (let i=1;i<=5;i++) rvStars += `<span style="color:${i<=rv.rating?'#FF5C00':'rgba(255,255,255,0.2)'};font-size:12px">&#9733;</span>`;
+          for (let i=1;i<=5;i++) rvStars += `<span style="color:${i<=rv.rating?'#D4622A':'rgba(255,255,255,0.2)'};font-size:12px">&#9733;</span>`;
           const initials = (rv.client_name||'?').substring(0,2).toUpperCase();
-          html += `<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:34px;height:34px;border-radius:50%;background:rgba(255,92,0,0.15);border:1px solid rgba(255,92,0,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#FF5C00;flex-shrink:0">${initials}</div><div><div style="font-size:13px;font-weight:700">${rv.client_name||'Client'}</div><div style="font-size:10px;color:#22c55e;font-weight:600;margin-top:2px">&#10003; Verified</div></div><div style="display:flex;gap:2px;margin-left:auto">${rvStars}</div></div><div style="font-size:13px;line-height:1.7;color:rgba(255,255,255,0.6)">${rv.review_text||''}</div>${rv.goal_achieved?`<div style="display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:600;color:#22c55e">&#127919; ${rv.goal_achieved}</div>`:''}</div>`;
+          html += `<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:34px;height:34px;border-radius:50%;background:rgba(212,98,42,0.15);border:1px solid rgba(212,98,42,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#D4622A;flex-shrink:0">${initials}</div><div><div style="font-size:13px;font-weight:700">${rv.client_name||'Client'}</div><div style="font-size:10px;color:#22c55e;font-weight:600;margin-top:2px">&#10003; Verified</div></div><div style="display:flex;gap:2px;margin-left:auto">${rvStars}</div></div><div style="font-size:13px;line-height:1.7;color:rgba(255,255,255,0.6)">${rv.review_text||''}</div>${rv.goal_achieved?`<div style="display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:600;color:#22c55e">&#127919; ${rv.goal_achieved}</div>`:''}</div>`;
         });
         el.innerHTML = html;
       } catch(e) {
@@ -549,7 +596,7 @@ const jsonLd = {
     function setRating(v) {
       _selectedRating = v;
       const stars = document.querySelectorAll('#starPicker span');
-      stars.forEach((s, i) => { s.style.color = i < v ? '#FF5C00' : 'rgba(255,255,255,0.2)'; });
+      stars.forEach((s, i) => { s.style.color = i < v ? '#D4622A' : 'rgba(255,255,255,0.2)'; });
     }
 
     async function submitReview() {
