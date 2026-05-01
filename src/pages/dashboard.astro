@@ -16,6 +16,7 @@ let ssrPlan = 'free';
 let ssrSlug = '';
 let bookingSetupSteps: { label: string; done: boolean; action: string }[] = [];
 let bookingReady = false;
+let bookings: { id: string; consumer_name: string; consumer_email: string; scheduled_at: string; duration_min: number; amount_cents: number; status: string; session_type: { name: string } | null }[] = [];
 
 const cookieHeader = Astro.request.headers.get('cookie') || '';
 const tbSession = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith('tb_session='))?.slice('tb_session='.length);
@@ -37,16 +38,18 @@ if (tbSession) {
       .single();
 
     if (link?.trainer_id) {
-      const [{ data: trainer }, { count: pkgCount }, { count: sessionTypeCount }, { count: availabilityCount }] = await Promise.all([
+      const [{ data: trainer }, { count: pkgCount }, { count: sessionTypeCount }, { count: availabilityCount }, { data: bookingsData }] = await Promise.all([
         svc.from('trainers').select('avatar_url, bio, instagram_handle, reps_verified, verification_status, plan, slug, stripe_connect_onboarded').eq('id', link.trainer_id).single(),
         svc.from('session_packages').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id),
         svc.from('session_types').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id).eq('is_active', true),
         svc.from('trainer_availability').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id),
+        svc.from('bookings').select('id, consumer_name, consumer_email, scheduled_at, duration_min, amount_cents, status, session_type:session_types(name)').eq('trainer_id', link.trainer_id).in('status', ['confirmed', 'cancelled', 'refunded', 'completed']).order('scheduled_at', { ascending: false }).limit(50),
       ]);
 
       if (trainer) {
         ssrPlan = trainer.plan || 'free';
         ssrSlug = trainer.slug || '';
+        bookings = (bookingsData ?? []) as typeof bookings;
         const certVerified = trainer.reps_verified === true || trainer.verification_status === 'verified';
         const FIELDS = [
           { key: 'avatar_url', label: 'Profile photo', pts: 20, done: !!trainer.avatar_url, action: '/edit' },
@@ -779,6 +782,44 @@ body {
       </div>
     </div>
 
+    <!-- Bookings Section -->
+    <div class="leads-section" id="bookings-section">
+      <div class="stats-section-title" style="margin-bottom:14px">Your Bookings</div>
+      {bookings.length === 0 ? (
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.6">No bookings yet. Share your booking link with clients to get started.</p>
+      ) : (
+        <div>
+          {bookings.map(b => {
+            const d = new Date(b.scheduled_at);
+            const isPast = d < new Date();
+            const isUpcoming = !isPast && b.status === 'confirmed';
+            const statusColor = b.status === 'confirmed' ? '#4CAF50' : (b.status === 'cancelled' || b.status === 'refunded') ? '#F44336' : 'rgba(255,255,255,0.3)';
+            const statusBg = b.status === 'confirmed' ? 'rgba(76,175,80,0.12)' : (b.status === 'cancelled' || b.status === 'refunded') ? 'rgba(244,67,54,0.12)' : 'rgba(255,255,255,0.05)';
+            return (
+              <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                <div>
+                  <div style="font-size:13px;font-weight:600">{b.consumer_name}</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
+                    {b.session_type?.name ?? 'Session'} · {d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})} at {d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}
+                  </div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
+                    ${(b.amount_cents/100).toFixed(2)} · {b.duration_min} min
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+                  <span style={`font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:${statusBg};color:${statusColor}`}>
+                    {b.status.toUpperCase()}
+                  </span>
+                  {isUpcoming && (
+                    <span style="font-size:11px;color:var(--text-muted)">Contact client to cancel</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
 
 
     <!-- Generate Training Plan - Pro Feature Card -->
