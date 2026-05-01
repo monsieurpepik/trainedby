@@ -663,7 +663,7 @@ const SESSION_ID = crypto.randomUUID();
 const UTM_SOURCE = new URLSearchParams(location.search).get('utm_source') || '';
 const UTM_MEDIUM = new URLSearchParams(location.search).get('utm_medium') || '';
 const REFERRER = document.referrer || '';
-const REF_SLUG = new URLSearchParams(location.search).get('ref') || '';
+const REF_SLUG = (new URLSearchParams(location.search).get('ref') || '').slice(0, 80);
 
 function trackEvent(event_name, metadata) {
   fetch(EDGE_BASE + '/growth-agent', {
