@@ -1204,14 +1204,18 @@ async function startUpgrade() {
     } else {
       showToast('Could not start checkout. Please try again.', 'error');
     }
-  } catch { showToast('Could not start checkout.', 'error'); }
+  } catch (err) {
+    if (err && err.message && err.message.includes('razorpay')) {
+      showToast('Payment provider unavailable. Please try again.', 'error');
+    } else {
+      showToast('Could not start checkout.', 'error');
+    }
+  }
 }
 
 function openRazorpay(data) {
-  return new Promise((resolve) => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = () => {
+  return new Promise((resolve, reject) => {
+    function openModal() {
       const rzp = new Razorpay({
         key: data.key_id,
         amount: data.amount,
@@ -1220,11 +1224,18 @@ function openRazorpay(data) {
         name: 'TrainedBy',
         description: data.description,
         prefill: { name: data.trainer_name, email: data.trainer_email },
-        handler: () => { location.href = location.origin + '/dashboard?upgraded=1'; },
+        handler: () => { resolve(); location.href = location.origin + '/dashboard?upgraded=1'; },
         modal: { ondismiss: resolve },
       });
       rzp.open();
-    };
+    }
+    if (window.Razorpay) { openModal(); return; }
+    const existing = document.querySelector('script[src*="checkout.razorpay.com"]');
+    if (existing) { existing.addEventListener('load', openModal); existing.addEventListener('error', () => reject(new Error('razorpay-sdk-load-failed'))); return; }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = openModal;
+    script.onerror = () => reject(new Error('razorpay-sdk-load-failed'));
     document.head.appendChild(script);
   });
 }

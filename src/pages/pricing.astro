@@ -486,10 +486,22 @@ async function startCheckout(plan) {
   const token = getAuthToken();
   if (!token) { location.href = '/join'; return; }
   try {
+    // Resolve trainer_id from token — required by payment-router auth check
+    const verifyRes = await fetch(EDGE_BASE + '/verify-magic-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ token })
+    });
+    const verifyData = await verifyRes.json();
+    if (!verifyRes.ok || !verifyData.trainer) { alert('Session expired. Please log in again.'); location.href = '/join'; return; }
+    const trainer_id = verifyData.trainer.id;
+
     const res = await fetch(EDGE_BASE + '/payment-router', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({
+        trainer_id,
         plan,
         billing: isAnnual ? 'annual' : 'monthly',
         success_url: location.origin + '/dashboard?upgraded=1',
@@ -505,14 +517,18 @@ async function startCheckout(plan) {
     } else {
       alert('Could not start checkout. Please try again.');
     }
-  } catch { alert('Could not start checkout. Please try again.'); }
+  } catch (err) {
+    if (err && err.message && err.message.includes('razorpay')) {
+      alert('Payment provider unavailable. Please try again or contact support.');
+    } else {
+      alert('Could not start checkout. Please try again.');
+    }
+  }
 }
 
 function openRazorpay(data) {
-  return new Promise((resolve) => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = () => {
+  return new Promise((resolve, reject) => {
+    function openModal() {
       const rzp = new Razorpay({
         key: data.key_id,
         amount: data.amount,
@@ -521,11 +537,18 @@ function openRazorpay(data) {
         name: 'TrainedBy',
         description: data.description,
         prefill: { name: data.trainer_name, email: data.trainer_email },
-        handler: () => { location.href = location.origin + '/dashboard?upgraded=1'; },
+        handler: () => { resolve(); location.href = location.origin + '/dashboard?upgraded=1'; },
         modal: { ondismiss: resolve },
       });
       rzp.open();
-    };
+    }
+    if (window.Razorpay) { openModal(); return; }
+    const existing = document.querySelector('script[src*="checkout.razorpay.com"]');
+    if (existing) { existing.addEventListener('load', openModal); existing.addEventListener('error', () => reject(new Error('razorpay-sdk-load-failed'))); return; }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = openModal;
+    script.onerror = () => reject(new Error('razorpay-sdk-load-failed'));
     document.head.appendChild(script);
   });
 }
