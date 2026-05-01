@@ -74,8 +74,6 @@ const pageTitle = trainerName
 const pageDesc = trainerName
   ? `Book sessions with ${trainerName}, a verified ${trainerSpecialty} on ${brandName}.`
   : `Verified personal trainer profile on ${brandName}`;
-const pageImage = trainerPhoto || 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&q=85';
-
 const profileUrl = `${Astro.url.origin}/${slug}`;
 const jsonLd = {
   "@context": "https://schema.org",
@@ -102,7 +100,7 @@ const jsonLd = {
 <Base
   title={pageTitle}
   description={pageDesc}
-  ogImage={pageImage}
+  ogImage={'/og/' + slug + '.png'}
 >
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <!-- Inject the slug server-side so client getSlug() picks it up immediately -->
