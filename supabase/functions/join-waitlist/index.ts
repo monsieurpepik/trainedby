@@ -26,7 +26,7 @@ const CONFIRMATION_SUBJECTS: Record<string, string> = {
 };
 
 function getConfirmationBody(locale: string, marketUrl: string): string {
-  const domain = marketUrl.replace('https://', '');
+  const domain = new URL(marketUrl).hostname;
   const bodies: Record<string, string> = {
     en: `<p>Thanks for joining the waitlist. You'll be the first to know when we launch in your market  -  and you'll get the early-bird price locked in.</p>
 <p>In the meantime, feel free to check out what's already live on <a href="${marketUrl}">${domain}</a>.</p>`,
