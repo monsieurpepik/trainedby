@@ -108,11 +108,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    const { error: updateError } = await sb.from('bookings').update({
+    const { error: updateError, count } = await sb.from('bookings').update({
       status: refunded ? 'refunded' : 'cancelled',
       cancelled_at: new Date().toISOString(),
       refunded_at: refunded ? new Date().toISOString() : null,
-    }).eq('id', bookingId);
+    }).eq('id', bookingId).eq('status', 'confirmed').select('id', { count: 'exact', head: true });
+
+    // count === 0 means the row was already updated by a concurrent request (race condition)
+    if (!updateError && count === 0) {
+      return jsonResponse({ cancelled: true, refunded: false, alreadyCancelled: true });
+    }
 
     if (updateError) {
       log.error('Failed to update booking status', { bookingId, refunded, updateError });
@@ -135,7 +140,7 @@ Deno.serve(async (req) => {
 
     return jsonResponse({ cancelled: true, refunded });
   } catch (err) {
-    log.exception('cancel-booking', err);
+    log.exception(err, { function: 'cancel-booking' });
     return serverError('Internal error');
   }
 });
