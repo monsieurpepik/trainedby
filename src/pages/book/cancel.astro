@@ -1,6 +1,5 @@
 ---
 // src/pages/book/cancel.astro
-const bookingId = Astro.url.searchParams.get('id');
 const token = Astro.url.searchParams.get('token');
 
 const SUPABASE_URL = import.meta.env.SUPABASE_URL as string;
@@ -11,14 +10,14 @@ let errorMsg = '';
 
 if (!SUPABASE_URL) {
   errorMsg = 'Server configuration error. Please contact support.';
-} else if (!bookingId || !token) {
+} else if (!token) {
   errorMsg = 'Invalid cancellation link.';
 } else {
   try {
     const res = await fetch(`${FUNCTIONS_URL}/cancel-booking`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bookingId, token }),
+      body: JSON.stringify({ token }),
     });
     result = await res.json();
     if (!res.ok) errorMsg = result.error ?? 'Cancellation failed.';
