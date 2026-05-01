@@ -52,7 +52,7 @@ function emailBase(content: string, market = 'ae'): string {
 </head>
 <body>
 <div class="wrap">
-  <div class="logo">Trained<span>By</span></div>
+  <div class="logo">${brand}</div>
   <div class="card">
     ${content}
   </div>
@@ -80,8 +80,8 @@ function weeklyDigestEmail(name: string, _slug: string, market: string, views: n
       <li>WhatsApp taps: <span class="highlight">${waTaps}</span></li>
     </ul>
     ${leads > 0
-      ? `<p>You have <span class="highlight">${leads} new lead${leads > 1 ? 's' : ''}</span> waiting. Reply within the hour to convert.</p>`
-      : '<p>No leads this week. Make sure your profile has a clear photo, bio, and specialties — those are the biggest factors.</p>'}
+      ? `<p>You have <span class="highlight">${leads} new lead${leads > 1 ? 's' : ''}</span> this week. Check your dashboard for their details.</p>`
+      : '<p>No leads this week. Profiles with a photo, a short bio, and listed specialties tend to get more contact requests.</p>'}
     <a href="${dashUrl}" class="btn">Open Dashboard →</a>
   `, market);
   return { subject, html };

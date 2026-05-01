@@ -419,3 +419,7 @@ verify_jwt = false
 [functions.academy-booking-webhook]
 # Receives Stripe webhook POSTs for academy bookings  -  no JWT, secured by Stripe-Signature header
 verify_jwt = false
+
+[functions.trainer-weekly-digest]
+# Called by external cron trigger  -  no JWT, secured by x-cron-secret header
+verify_jwt = false
