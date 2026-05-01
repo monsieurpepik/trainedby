@@ -51,12 +51,15 @@ if (tbSession) {
           { key: 'packages', label: 'At least 1 package', pts: 20, done: (pkgCount ?? 0) >= 1, action: '/edit' },
           { key: 'cert_verified', label: 'Certification verified', pts: 10, done: certVerified, action: '/edit' },
         ];
+        const totalPts = FIELDS.reduce((s, f) => s + f.pts, 0);
         const raw = FIELDS.filter(f => f.done).reduce((sum, f) => sum + f.pts, 0);
-        ssrScore = Math.round((raw / 85) * 100);
+        ssrScore = Math.round((raw / totalPts) * 100);
         ssrFields = FIELDS;
       }
     }
-  } catch (_) {}
+  } catch (e) {
+    console.error('[SSR ProfileCompleteness]', e);
+  }
 }
 ---
 
