@@ -19,7 +19,7 @@ serve(async (req) => {
     // Fetch trainer
     const { data: trainer, error } = await sb
       .from("trainers")
-      .select("id,slug,name,title,bio,avatar_url,cover_url,specialties,certifications,reps_number,reps_level,reps_verified,years_experience,clients_trained,sessions_delivered,locations,city,instagram,tiktok,youtube,accepting_clients,gallery_urls,plan,verification_status,created_at")
+      .select("id,slug,name,title,bio,avatar_url,cover_url,specialties,certifications,reps_number,reps_level,reps_verified,years_experience,clients_trained,sessions_delivered,locations,city,instagram,tiktok,youtube,accepting_clients,gallery_urls,plan,verification_status,created_at,stripe_connect_onboarded")
       .eq("slug", slug.toLowerCase())
       .single();
 
@@ -50,7 +50,17 @@ serve(async (req) => {
       return true;
     });
 
-    return new Response(JSON.stringify({ trainer, packages: dedupedPackages }), {
+    // Check if trainer is bookable (has Stripe, active session types, and availability)
+    let bookingReady = false;
+    if (trainer.stripe_connect_onboarded) {
+      const [{ count: stCount }, { count: avCount }] = await Promise.all([
+        sb.from('session_types').select('id', { count: 'exact', head: true }).eq('trainer_id', trainer.id).eq('is_active', true),
+        sb.from('trainer_availability').select('id', { count: 'exact', head: true }).eq('trainer_id', trainer.id),
+      ]);
+      bookingReady = (stCount ?? 0) > 0 && (avCount ?? 0) > 0;
+    }
+
+    return new Response(JSON.stringify({ trainer: { ...trainer, booking_ready: bookingReady }, packages: dedupedPackages }), {
       headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=30" },
     });
   } catch (e) {
