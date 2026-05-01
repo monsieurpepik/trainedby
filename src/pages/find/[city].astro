@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { getMarket } from '../../lib/market.ts';
 import { createClient } from '@supabase/supabase-js';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../lib/config.ts';
 
 const market = getMarket(Astro.url.hostname);
 
@@ -31,18 +32,16 @@ if (!cityName) {
   return Astro.redirect('/find', 302);
 }
 
-const sb = createClient(
-  import.meta.env.PUBLIC_SUPABASE_URL,
-  import.meta.env.PUBLIC_SUPABASE_ANON_KEY
-);
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const { data: trainers } = await sb
+const { data: trainers, error: trainersError } = await sb
   .from('trainers')
   .select('id, name, slug, title, avatar_url, specialties, city, market, plan, reps_verified')
   .ilike('city', `%${cityName}%`)
   .eq('market', market.market)
   .order('plan', { ascending: false })
   .limit(20);
+if (trainersError) console.error('[city page] Supabase error:', trainersError.message);
 
 const pageTitle = `Personal Trainers in ${cityName} | ${market.brandName}`;
 const pageDesc = `Find verified personal trainers in ${cityName}. Book sessions, compare rates, and connect via WhatsApp — free on ${market.brandName}.`;
@@ -85,7 +84,7 @@ const pageDesc = `Find verified personal trainers in ${cityName}. Book sessions,
   </style>
 
   <nav>
-    <a href="/" class="logo">Trained<span>By</span></a>
+    <a href="/" class="logo">{market.brandName}</a>
     <a href="/join" class="nav-cta">Create your profile →</a>
   </nav>
 
