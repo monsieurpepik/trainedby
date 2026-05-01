@@ -1,7 +1,7 @@
 // supabase/functions/cancel-booking/index.ts
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno';
-import { CORS_HEADERS, jsonResponse, errorResponse, validationError, notFoundError, serverError } from '../_shared/errors.ts';
+import { CORS_HEADERS, jsonResponse, errorResponse, validationError, notFoundError, serverError, isValidUUID } from '../_shared/errors.ts';
 import { createLogger } from '../_shared/logger.ts';
 
 const log = createLogger('cancel-booking');
@@ -15,7 +15,6 @@ async function computeHmac(secret: string, message: string): Promise<string> {
 }
 
 async function timingSafeEqual(a: string, b: string): Promise<boolean> {
-  if (a.length !== b.length) return false;
   const enc = new TextEncoder();
   const aKey = await crypto.subtle.importKey('raw', enc.encode('compare'), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   const aSig = await crypto.subtle.sign('HMAC', aKey, enc.encode(a));
@@ -62,7 +61,13 @@ Deno.serve(async (req) => {
     const { bookingId, token } = await req.json();
     if (!bookingId || !token) return validationError('bookingId', 'bookingId and token are required');
 
-    const bookingSecret = Deno.env.get('BOOKING_SECRET') ?? 'fallback-secret';
+    if (!isValidUUID(bookingId)) return validationError('bookingId', 'Invalid bookingId format');
+
+    const bookingSecret = Deno.env.get('BOOKING_SECRET');
+    if (!bookingSecret) {
+      log.error('BOOKING_SECRET env var not set');
+      return serverError('Server misconfiguration');
+    }
     const expected = await computeHmac(bookingSecret, `cancel:${bookingId}`);
     const valid = await timingSafeEqual(token, expected);
     if (!valid) {
@@ -103,11 +108,19 @@ Deno.serve(async (req) => {
       }
     }
 
-    await sb.from('bookings').update({
+    const { error: updateError } = await sb.from('bookings').update({
       status: refunded ? 'refunded' : 'cancelled',
       cancelled_at: new Date().toISOString(),
       refunded_at: refunded ? new Date().toISOString() : null,
     }).eq('id', bookingId);
+
+    if (updateError) {
+      log.error('Failed to update booking status', { bookingId, refunded, updateError });
+      if (refunded) {
+        log.error('CRITICAL: Stripe refund issued but booking not marked — needs manual reconciliation', { bookingId });
+      }
+      return serverError('Failed to update booking status');
+    }
 
     const refundMsg = refunded
       ? `A full refund of $${(booking.amount_cents / 100).toFixed(2)} has been issued and will appear within 5–10 business days.`
