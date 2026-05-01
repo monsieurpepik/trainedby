@@ -385,6 +385,45 @@ body {
       </button>
     </div>
 
+    <!-- Section: Book Sessions -->
+    <div class="edit-section" id="sessions-section">
+      <div class="section-heading">Book Sessions</div>
+      <div class="section-sub">Set up session types that clients can book and pay for online.</div>
+      <div id="session-types-list" style="margin-bottom:14px;"></div>
+      <button onclick="showAddSessionForm()" id="add-session-btn" style="width:100%;padding:12px;border-radius:10px;background:transparent;border:1px dashed var(--border);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
+        + Add Session Type
+      </button>
+      <div id="add-session-form" style="display:none;margin-top:14px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px;">
+        <div class="field">
+          <label>Session Name</label>
+          <input type="text" id="new-session-name" placeholder="e.g. 1:1 Strength Session" maxlength="80">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="field">
+            <label>Price (USD)</label>
+            <input type="number" id="new-session-price" placeholder="75" min="1" step="1" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label>Duration (min)</label>
+            <input type="number" id="new-session-duration" placeholder="60" min="15" step="15" inputmode="numeric">
+          </div>
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <select id="new-session-package">
+            <option value="single">Single session</option>
+            <option value="4">4-session pack</option>
+            <option value="8">8-session pack</option>
+            <option value="12">12-session pack</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button onclick="saveNewSessionType()" style="flex:1;padding:12px;border-radius:10px;background:var(--brand);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;" id="save-session-btn">Save</button>
+          <button onclick="cancelAddSession()" style="padding:12px 20px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:13px;cursor:pointer;">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Section: Transformation Gallery -->
     <div class="edit-section">
       <div class="section-heading">Transformation Gallery</div>
@@ -627,6 +666,9 @@ function populateForm(t) {
   if (t.gallery_urls) {
     t.gallery_urls.forEach(url => addGalleryItem(url));
   }
+
+  // Session types
+  loadSessionTypes();
 }
 
 // ===== AVAILABILITY =====
@@ -837,6 +879,105 @@ function confirmDelete() {
     if (r.ok) { clearAuthToken(); location.href = '/'; }
     else showToast('Delete failed. Please try again.', 'error');
   });
+}
+
+// ===== SESSION TYPES =====
+let sessionTypes = [];
+
+async function loadSessionTypes() {
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-session-types', {
+      headers: { 'Authorization': 'Bearer ' + getAuthToken() }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    sessionTypes = data.session_types || [];
+    renderSessionTypes();
+  } catch {}
+}
+
+function renderSessionTypes() {
+  const list = document.getElementById('session-types-list');
+  if (!list) return;
+  if (sessionTypes.length === 0) {
+    list.innerHTML = '<p style="font-size:13px;color:var(--text-faint);text-align:center;padding:16px 0;">No session types yet. Add one below.</p>';
+    return;
+  }
+  list.innerHTML = sessionTypes.map(st => `
+    <div style="background:var(--surface-3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${st.name}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
+          $${(st.price_cents / 100).toFixed(0)} · ${st.duration_min}min${st.package_count ? ' · Pack of ' + st.package_count : ''}
+        </div>
+      </div>
+      <button onclick="toggleSessionType('${st.id}', ${!st.is_active})" style="padding:6px 12px;border-radius:8px;border:1px solid ${st.is_active ? 'var(--border)' : 'var(--brand)'};background:${st.is_active ? 'transparent' : 'var(--brand)'};color:${st.is_active ? 'var(--text-muted)' : '#fff'};font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">
+        ${st.is_active ? 'Deactivate' : 'Activate'}
+      </button>
+    </div>
+  `).join('');
+}
+
+function showAddSessionForm() {
+  document.getElementById('add-session-form').style.display = 'block';
+  document.getElementById('add-session-btn').style.display = 'none';
+}
+
+function cancelAddSession() {
+  document.getElementById('add-session-form').style.display = 'none';
+  document.getElementById('add-session-btn').style.display = '';
+  document.getElementById('new-session-name').value = '';
+  document.getElementById('new-session-price').value = '';
+  document.getElementById('new-session-duration').value = '';
+  document.getElementById('new-session-package').value = 'single';
+}
+
+async function saveNewSessionType() {
+  const name = document.getElementById('new-session-name').value.trim();
+  const priceInput = parseFloat(document.getElementById('new-session-price').value);
+  const durationMin = parseInt(document.getElementById('new-session-duration').value);
+  const packageVal = document.getElementById('new-session-package').value;
+
+  if (!name) { showToast('Please enter a session name.', 'error'); return; }
+  if (!priceInput || priceInput < 1) { showToast('Please enter a valid price.', 'error'); return; }
+  if (!durationMin || durationMin < 15) { showToast('Duration must be at least 15 minutes.', 'error'); return; }
+
+  const priceCents = Math.round(priceInput * 100);
+  const packageCount = packageVal === 'single' ? null : parseInt(packageVal);
+
+  const btn = document.getElementById('save-session-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-session-types', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({ trainer_id: trainer.id, name, price_cents: priceCents, duration_min: durationMin, package_count: packageCount })
+    });
+    if (!res.ok) throw new Error();
+    await loadSessionTypes();
+    cancelAddSession();
+    showToast('Session type added!');
+  } catch {
+    showToast('Could not save session type. Try again.', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save';
+  }
+}
+
+async function toggleSessionType(id, newActive) {
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-session-types', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({ id, trainer_id: trainer.id, is_active: newActive })
+    });
+    if (!res.ok) throw new Error();
+    await loadSessionTypes();
+    showToast(newActive ? 'Session type activated.' : 'Session type deactivated.');
+  } catch {
+    showToast('Could not update session type. Try again.', 'error');
+  }
 }
 
 init();
