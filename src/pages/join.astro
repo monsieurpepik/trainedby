@@ -575,6 +575,7 @@ body {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
         Write bio with AI
       </button>
+      <p id="ai-bio-error" class="hidden" style="color:var(--danger,#ef4444);font-size:13px;margin-top:4px;"></p>
     </div>
 
     <!-- Instagram -->
@@ -713,7 +714,7 @@ function saveDraft() {
     }));
   } catch(_) {}
 }
-function loadDraft() {
+async function loadDraft() {
   try {
     const raw = localStorage.getItem(DRAFT_KEY);
     if (!raw) return;
@@ -731,8 +732,14 @@ function loadDraft() {
     if (Array.isArray(d.training_modes)) state.training_modes = d.training_modes;
     // If account was already created, resume at step 3
     if (d.trainer_id) {
-      state.trainer_id = d.trainer_id;
-      showStep(3);
+      const { data: sessionData } = await sb.auth.getSession();
+      if (sessionData?.session) {
+        state.trainer_id = d.trainer_id;
+        showStep(3);
+      } else {
+        // Stale draft from a different session — clear it
+        clearDraft();
+      }
     }
   } catch(_) {}
 }
@@ -1010,7 +1017,6 @@ async function verifyAndCreate() {
     }
 
     // Success — proceed to step 3 for profile completion
-    state.trainer_id = state.trainer_id; // already set above
     saveDraft();
     showStep(3);
 
@@ -1090,19 +1096,26 @@ function handleAvatarFileChange(event) {
 function updateBioCharCount() {
   const val = document.getElementById('s3-bio')?.value || '';
   const el = document.getElementById('bio-char-count');
-  if (el) el.textContent = val.length + ' / 300';
+  if (el) el.textContent = val.length + ' / 500';
   saveDraft();
 }
 
 async function generateAIBio() {
   const btn = document.getElementById('ai-bio-btn');
-  if (!btn) return;
+  if (!btn || btn.disabled) return;
   btn.disabled = true;
   btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Generating...';
+  const bioErrEl = document.getElementById('ai-bio-error');
+  if (bioErrEl) bioErrEl.classList.add('hidden');
   try {
+    const { data: sessionData } = await sb.auth.getSession();
+    const jwt = sessionData?.session?.access_token;
     const res = await fetch(EDGE_BASE + '/ai-bio-writer', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(jwt ? { 'Authorization': 'Bearer ' + jwt } : {})
+      },
       body: JSON.stringify({
         name: state.name,
         specialties: state.specialties,
@@ -1115,14 +1128,21 @@ async function generateAIBio() {
       if (bio) {
         const bioEl = document.getElementById('s3-bio');
         if (bioEl) { bioEl.value = bio; updateBioCharCount(); }
+      } else {
+        if (bioErrEl) { bioErrEl.textContent = 'Could not generate bio — please write your own.'; bioErrEl.classList.remove('hidden'); }
       }
+    } else {
+      if (bioErrEl) { bioErrEl.textContent = 'Could not generate bio — please write your own.'; bioErrEl.classList.remove('hidden'); }
     }
-  } catch(_) {}
+  } catch(_) {
+    if (bioErrEl) { bioErrEl.textContent = 'Could not generate bio — please write your own.'; bioErrEl.classList.remove('hidden'); }
+  }
   btn.disabled = false;
   btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Write bio with AI';
 }
 
 let _packageCount = 0;
+let _step3Submitting = false;
 function addPackageRow() {
   const list = document.getElementById('packages-list');
   if (!list) return;
@@ -1156,7 +1176,11 @@ async function completeStep3() {
   const errEl = document.getElementById('s3-error');
   if (errEl) errEl.classList.add('hidden');
 
+  if (_step3Submitting) return;
+  _step3Submitting = true;
+
   if (!state.trainer_id) {
+    _step3Submitting = false;
     if (errEl) { errEl.textContent = 'Session error — please refresh'; errEl.classList.remove('hidden'); }
     return;
   }
@@ -1175,10 +1199,20 @@ async function completeStep3() {
 
     // Upload avatar if provided
     if (_avatarBlob) {
-      const ext = (_avatarBlob.name || 'jpg').split('.').pop();
+      const ALLOWED_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+      const MAX_AVATAR_BYTES = 5 * 1024 * 1024; // 5 MB
+      if (!ALLOWED_TYPES[_avatarBlob.type]) {
+        throw new Error('Avatar must be a JPEG, PNG, or WebP image.');
+      }
+      if (_avatarBlob.size > MAX_AVATAR_BYTES) {
+        throw new Error('Avatar file must be under 5 MB.');
+      }
+      const ext = ALLOWED_TYPES[_avatarBlob.type];
       const path = 'trainers/' + state.trainer_id + '/avatar.' + ext;
-      const { error: uploadErr } = await sb.storage.from('avatars').upload(path, _avatarBlob, { upsert: true });
-      if (!uploadErr) {
+      const { error: uploadErr } = await sb.storage.from('avatars').upload(path, _avatarBlob, { upsert: true, contentType: _avatarBlob.type });
+      if (uploadErr) {
+        if (errEl) { errEl.textContent = 'Photo upload failed: ' + uploadErr.message; errEl.classList.remove('hidden'); }
+      } else {
         const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
         updates.avatar_url = urlData.publicUrl;
       }
@@ -1208,8 +1242,8 @@ async function completeStep3() {
     showStep('success');
 
   } catch(e) {
+    _step3Submitting = false;
     if (errEl) { errEl.textContent = e.message || 'Something went wrong. Please try again.'; errEl.classList.remove('hidden'); }
-  } finally {
     if (btn) { btn.disabled = false; btn.innerHTML = 'Finish — Go Live 🚀'; }
   }
 }
