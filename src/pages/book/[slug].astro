@@ -1,0 +1,476 @@
+---
+// src/pages/book/[slug].astro
+import { getMarket } from '../../lib/market.ts';
+
+const { slug } = Astro.params;
+const market = getMarket(Astro.url.hostname);
+
+if (!slug || !/^[a-z0-9-]+$/i.test(slug)) return Astro.redirect('/find', 302);
+
+const SUPABASE_URL = import.meta.env.SUPABASE_URL as string;
+const SERVICE_KEY = import.meta.env.SUPABASE_SERVICE_ROLE_KEY as string;
+const STRIPE_PK = import.meta.env.STRIPE_PUBLISHABLE_KEY as string;
+const FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
+
+interface Trainer { id: string; name: string; avatar_url: string; stripe_connect_onboarded: boolean }
+interface SessionType { id: string; name: string; duration_min: number; price_cents: number; type: string; package_count: number | null }
+
+let trainer: Trainer | null = null;
+let sessionTypes: SessionType[] = [];
+
+try {
+  // Load trainer
+  const tRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/trainers?slug=eq.${encodeURIComponent(slug)}&select=id,name,avatar_url,stripe_connect_onboarded&limit=1`,
+    { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+  );
+  const tData: Trainer[] = await tRes.json();
+  if (!Array.isArray(tData) || tData.length === 0) return Astro.redirect('/find', 302);
+  trainer = tData[0];
+
+  // Check setup gating: trainer must be onboarded
+  if (!trainer.stripe_connect_onboarded) return Astro.redirect(`/${slug}`, 302);
+
+  // Load active session types
+  const stRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/session_types?trainer_id=eq.${trainer.id}&is_active=eq.true&select=id,name,duration_min,price_cents,type,package_count&order=price_cents.asc`,
+    { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+  );
+  sessionTypes = await stRes.json();
+  if (!Array.isArray(sessionTypes) || sessionTypes.length === 0) return Astro.redirect(`/${slug}`, 302);
+
+  // Check availability exists
+  const avRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/trainer_availability?trainer_id=eq.${trainer.id}&select=id&limit=1`,
+    { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+  );
+  const avData = await avRes.json();
+  if (!Array.isArray(avData) || avData.length === 0) return Astro.redirect(`/${slug}`, 302);
+} catch {
+  return Astro.redirect('/find', 302);
+}
+
+// Compute SAVE% badges: compare package to same-duration single
+const singleByDuration = new Map<number, SessionType>();
+for (const st of sessionTypes) {
+  if (st.type === 'single') singleByDuration.set(st.duration_min, st);
+}
+function savePct(pkg: SessionType): number | null {
+  if (pkg.type !== 'package' || !pkg.package_count) return null;
+  const single = singleByDuration.get(pkg.duration_min);
+  if (!single) return null;
+  const full = single.price_cents * pkg.package_count;
+  return Math.round(((full - pkg.price_cents) / full) * 100);
+}
+
+const pageTitle = `Book a session with ${trainer!.name}`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{pageTitle}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0a; color: #fff; font-family: 'Inter', -apple-system, sans-serif; min-height: 100vh; }
+    .page { max-width: 480px; margin: 0 auto; padding: 32px 20px 80px; }
+    .trainer-header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .trainer-avatar { width: 44px; height: 44px; border-radius: 50%; background: #222; object-fit: cover; }
+    .trainer-name { font-size: 15px; font-weight: 700; }
+    .trainer-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+    .step { margin-bottom: 24px; }
+    .step[hidden] { display: none; }
+    .step-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .session-card { background: #111; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 14px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
+    .session-card:hover, .session-card.selected { border-color: #FF5C00; background: #0d0d0d; }
+    .session-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .session-name { font-size: 13px; font-weight: 600; }
+    .session-meta { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+    .session-price { font-size: 14px; font-weight: 700; color: #FF5C00; margin-top: 6px; }
+    .session-price .original { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.3); text-decoration: line-through; margin-left: 6px; }
+    .save-badge { background: #FF5C00; color: #fff; font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 4px; flex-shrink: 0; }
+    /* Calendar */
+    .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .cal-nav button { background: none; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px; }
+    .cal-month { font-size: 13px; font-weight: 600; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-day-label { font-size: 9px; color: rgba(255,255,255,0.2); text-align: center; padding: 4px 0; }
+    .cal-day { font-size: 11px; text-align: center; padding: 7px 0; border-radius: 6px; cursor: pointer; }
+    .cal-day.available { background: #1e1e1e; color: #fff; }
+    .cal-day.available:hover, .cal-day.selected { background: #FF5C00; color: #fff; font-weight: 700; }
+    .cal-day.unavailable { color: rgba(255,255,255,0.15); cursor: default; }
+    .cal-day.empty { background: transparent; cursor: default; }
+    .slots-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; margin: 14px 0 8px; }
+    .slots-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .slot { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 10px; text-align: center; font-size: 12px; cursor: pointer; }
+    .slot:hover, .slot.selected { background: #FF5C00; border-color: #FF5C00; font-weight: 700; }
+    .slot.booked { background: #111; border-color: rgba(255,255,255,0.04); color: rgba(255,255,255,0.2); cursor: default; }
+    /* Step 3 */
+    .booking-summary { background: #111; border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: rgba(255,255,255,0.6); }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 5px; }
+    .field input, .field textarea { width: 100%; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px 12px; font-size: 13px; color: #fff; outline: none; font-family: inherit; }
+    .field input:focus, .field textarea:focus { border-color: #FF5C00; }
+    .field textarea { min-height: 64px; resize: vertical; }
+    .order-summary { background: #111; border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+    .order-row { display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px; }
+    .order-total { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; color: #fff; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
+    #stripe-element { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 12px; margin-bottom: 16px; }
+    .pay-btn { width: 100%; background: #FF5C00; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .pay-btn:disabled { opacity: .5; cursor: default; }
+    .cancel-note { font-size: 11px; color: rgba(255,255,255,0.25); text-align: center; margin-top: 8px; }
+    .error-msg { color: #ff4444; font-size: 12px; margin-top: 8px; }
+    /* Success */
+    #success-screen { text-align: center; padding: 40px 20px; }
+    #success-screen h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+    #success-screen p { font-size: 14px; color: rgba(255,255,255,0.6); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- Trainer header -->
+    <div class="trainer-header">
+      {trainer!.avatar_url
+        ? <img class="trainer-avatar" src={trainer!.avatar_url} alt={trainer!.name} />
+        : <div class="trainer-avatar"></div>}
+      <div>
+        <div class="trainer-name">{trainer!.name}</div>
+        <div class="trainer-sub">Book a session</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Choose session type -->
+    <div class="step" id="step-1">
+      <div class="step-label">1 · Choose a session</div>
+      {sessionTypes.map(st => {
+        const save = savePct(st);
+        const single = st.type === 'single' ? null : singleByDuration.get(st.duration_min);
+        return (
+          <div
+            class="session-card"
+            data-id={st.id}
+            data-name={st.name}
+            data-price={st.price_cents}
+            data-duration={st.duration_min}
+            data-type={st.type}
+          >
+            <div class="session-card-top">
+              <div>
+                <div class="session-name">{st.name}</div>
+                <div class="session-meta">
+                  {st.type === 'single'
+                    ? `1 session · ${st.duration_min} min`
+                    : `${st.package_count} sessions · ${st.duration_min} min each`}
+                </div>
+                <div class="session-price">
+                  ${(st.price_cents / 100).toFixed(0)}
+                  {save !== null && single && (
+                    <span class="original">${(single.price_cents * (st.package_count ?? 1) / 100).toFixed(0)}</span>
+                  )}
+                </div>
+              </div>
+              {save !== null && <span class="save-badge">SAVE {save}%</span>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+    <!-- Step 2: Pick a time -->
+    <div class="step" id="step-2" hidden>
+      <div class="step-label">2 · Pick a time</div>
+      <div class="cal-nav">
+        <button id="cal-prev">←</button>
+        <span class="cal-month" id="cal-month-label"></span>
+        <button id="cal-next">→</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="slots-label" id="slots-label" hidden>Available slots</div>
+      <div class="slots-grid" id="slots-grid"></div>
+    </div>
+
+    <!-- Step 3: Details + pay -->
+    <div class="step" id="step-3" hidden>
+      <div class="step-label">3 · Your details + pay</div>
+      <div class="booking-summary" id="booking-summary"></div>
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" id="f-name" placeholder="Sarah Johnson" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="f-email" placeholder="sarah@email.com" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label>Phone</label>
+        <input type="tel" id="f-phone" placeholder="+1 555 000 1234" autocomplete="tel" />
+      </div>
+      <div class="field">
+        <label>Your goal <span style="color:rgba(255,255,255,0.25)">(optional)</span></label>
+        <textarea id="f-goal" placeholder="e.g. Lose 10kg, no injuries, intermediate level"></textarea>
+      </div>
+      <div class="order-summary" id="order-summary"></div>
+      <div id="stripe-element"></div>
+      <div class="error-msg" id="stripe-error" hidden></div>
+      <button class="pay-btn" id="pay-btn" disabled>Loading…</button>
+      <div class="cancel-note">Free cancellation up to 24h before</div>
+    </div>
+
+    <!-- Success -->
+    <div id="success-screen" hidden>
+      <h2>You're booked!</h2>
+      <p id="success-detail"></p>
+      <p style="margin-top:12px">Check your email for confirmation details.</p>
+    </div>
+  </div>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script define:vars={{ trainerId: trainer!.id, functionsUrl: FUNCTIONS_URL, stripePk: STRIPE_PK }}>
+    // ── State ───────────────────────────────────────────────────────────────
+    let selectedType = null; // { id, name, price_cents, duration_min, type }
+    let selectedDate = null; // 'YYYY-MM-DD'
+    let selectedSlot = null; // '2026-05-12T08:00:00.000Z' (ISO)
+    let calYear = new Date().getFullYear();
+    let calMonth = new Date().getMonth(); // 0-indexed
+    let slotsCache = {}; // { 'YYYY-MM': [{date, slots}] }
+    let stripe = null;
+    let elements = null;
+    let paymentElement = null;
+
+    // ── Step 1: Session type selection ──────────────────────────────────────
+    document.querySelectorAll('.session-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.session-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedType = {
+          id: card.dataset.id,
+          name: card.dataset.name,
+          price_cents: parseInt(card.dataset.price, 10),
+          duration_min: parseInt(card.dataset.duration, 10),
+          type: card.dataset.type,
+        };
+        selectedDate = null;
+        selectedSlot = null;
+        renderCalendar();
+        document.getElementById('step-2').hidden = false;
+        document.getElementById('step-3').hidden = true;
+        document.getElementById('success-screen').hidden = true;
+        document.getElementById('step-2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // ── Step 2: Calendar ────────────────────────────────────────────────────
+    const DAYS = ['M','T','W','T','F','S','S'];
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+    document.getElementById('cal-prev').addEventListener('click', () => {
+      calMonth--;
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      renderCalendar();
+    });
+    document.getElementById('cal-next').addEventListener('click', () => {
+      calMonth++;
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+      renderCalendar();
+    });
+
+    async function loadSlots(year, month) {
+      const key = `${year}-${String(month + 1).padStart(2,'0')}`;
+      if (slotsCache[key]) return slotsCache[key];
+
+      const dateFrom = `${year}-${String(month + 1).padStart(2,'0')}-01`;
+      const lastDay = new Date(year, month + 1, 0).getDate();
+      const dateTo = `${year}-${String(month + 1).padStart(2,'0')}-${lastDay}`;
+
+      const res = await fetch(`${functionsUrl}/get-trainer-slots`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trainerId, dateFrom, dateTo, durationMin: selectedType.duration_min }),
+      });
+      const data = await res.json();
+      slotsCache[key] = data.days ?? [];
+      return slotsCache[key];
+    }
+
+    async function renderCalendar() {
+      document.getElementById('cal-month-label').textContent = `${MONTHS[calMonth]} ${calYear}`;
+      const grid = document.getElementById('cal-grid');
+      grid.innerHTML = DAYS.map(d => `<div class="cal-day-label">${d}</div>`).join('');
+
+      // Day labels = Mon-Sun, JS getDay() is 0=Sun
+      const firstDay = new Date(calYear, calMonth, 1);
+      const startOffset = (firstDay.getDay() + 6) % 7; // shift so Mon=0
+
+      let days;
+      try {
+        days = await loadSlots(calYear, calMonth);
+      } catch { days = []; }
+
+      const availSet = new Set(days.filter(d => d.slots && d.slots.some(s => s.available)).map(d => d.date));
+
+      for (let i = 0; i < startOffset; i++) {
+        grid.insertAdjacentHTML('beforeend', '<div class="cal-day empty"></div>');
+      }
+      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+      const today = new Date(); today.setHours(0,0,0,0);
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const dayDate = new Date(calYear, calMonth, d);
+        const isPast = dayDate < today;
+        const isAvail = !isPast && availSet.has(dateStr);
+        const isSel = dateStr === selectedDate;
+        const cls = isPast || !isAvail ? 'unavailable' : isSel ? 'available selected' : 'available';
+        grid.insertAdjacentHTML('beforeend',
+          `<div class="cal-day ${cls}" data-date="${dateStr}">${d}</div>`);
+      }
+
+      grid.querySelectorAll('.cal-day.available').forEach(el => {
+        el.addEventListener('click', () => selectDate(el.dataset.date, days));
+      });
+
+      if (selectedDate) {
+        const dayData = days.find(d => d.date === selectedDate);
+        renderSlots(dayData?.slots ?? []);
+      }
+    }
+
+    function selectDate(date, days) {
+      selectedDate = date;
+      selectedSlot = null;
+      document.querySelectorAll('.cal-day').forEach(el => {
+        el.classList.toggle('selected', el.dataset.date === date);
+      });
+      const dayData = days.find(d => d.date === date);
+      renderSlots(dayData?.slots ?? []);
+    }
+
+    function renderSlots(slots) {
+      const slotsLabel = document.getElementById('slots-label');
+      const slotsGrid = document.getElementById('slots-grid');
+      slotsLabel.hidden = false;
+      slotsGrid.innerHTML = '';
+      const avail = slots.filter(s => s.available);
+      if (avail.length === 0) {
+        slotsGrid.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.3);grid-column:span 2">No available slots for this day.</div>';
+        return;
+      }
+      for (const slot of slots) {
+        const time = new Date(slot.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        const cls = !slot.available ? 'slot booked' : slot.time === selectedSlot ? 'slot selected' : 'slot';
+        slotsGrid.insertAdjacentHTML('beforeend',
+          `<div class="${cls}" data-time="${slot.time}"${!slot.available ? ' aria-disabled="true"' : ''}>${time}</div>`);
+      }
+      slotsGrid.querySelectorAll('.slot:not(.booked)').forEach(el => {
+        el.addEventListener('click', () => selectSlot(el.dataset.time));
+      });
+    }
+
+    function selectSlot(isoTime) {
+      selectedSlot = isoTime;
+      document.querySelectorAll('.slot').forEach(el => {
+        el.classList.toggle('selected', el.dataset.time === isoTime);
+      });
+      showStep3();
+    }
+
+    // ── Step 3: Details + pay ───────────────────────────────────────────────
+    function showStep3() {
+      document.getElementById('step-3').hidden = false;
+      document.getElementById('step-3').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      const d = new Date(selectedSlot);
+      const dateLabel = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      const timeLabel = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      document.getElementById('booking-summary').textContent =
+        `${dateLabel} · ${timeLabel} · ${selectedType.duration_min} min`;
+
+      document.getElementById('order-summary').innerHTML = `
+        <div class="order-row"><span>${selectedType.name}</span><span>$${(selectedType.price_cents/100).toFixed(2)}</span></div>
+        <div class="order-total"><span>Total</span><span>$${(selectedType.price_cents/100).toFixed(2)}</span></div>`;
+
+      initStripe();
+    }
+
+    async function initStripe() {
+      if (stripe) return; // already initialized
+      stripe = Stripe(stripePk);
+      elements = stripe.elements({ mode: 'payment', amount: selectedType.price_cents, currency: 'usd' });
+      paymentElement = elements.create('payment');
+      paymentElement.mount('#stripe-element');
+      paymentElement.on('ready', () => {
+        const btn = document.getElementById('pay-btn');
+        btn.disabled = false;
+        btn.textContent = `Pay $${(selectedType.price_cents/100).toFixed(2)} · Confirm Booking`;
+      });
+    }
+
+    document.getElementById('pay-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('pay-btn');
+      const errEl = document.getElementById('stripe-error');
+      errEl.hidden = true;
+
+      const name = document.getElementById('f-name').value.trim();
+      const email = document.getElementById('f-email').value.trim();
+      const phone = document.getElementById('f-phone').value.trim();
+      const goal = document.getElementById('f-goal').value.trim();
+
+      if (!name || !email || !phone) {
+        errEl.textContent = 'Please fill in all required fields.';
+        errEl.hidden = false;
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Processing…';
+
+      try {
+        // 1. Create booking + PaymentIntent
+        const bsRes = await fetch(`${functionsUrl}/book-session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            trainerId,
+            sessionTypeId: selectedType.id,
+            scheduledAt: selectedSlot,
+            consumerName: name,
+            consumerEmail: email,
+            consumerPhone: phone,
+            consumerGoal: goal || undefined,
+          }),
+        });
+        const bsData = await bsRes.json();
+        if (!bsRes.ok) throw new Error(bsData.error ?? 'Failed to create booking');
+
+        // 2. Submit elements first (required before confirmPayment)
+        const { error: submitErr } = await elements.submit();
+        if (submitErr) throw new Error(submitErr.message);
+
+        // 3. Confirm payment using client_secret from book-session response
+        const { error: confirmErr } = await stripe.confirmPayment({
+          elements,
+          clientSecret: bsData.client_secret,
+          confirmParams: { return_url: window.location.href },
+          redirect: 'if_required',
+        });
+        if (confirmErr) throw new Error(confirmErr.message);
+
+        // Success
+        document.getElementById('step-1').hidden = true;
+        document.getElementById('step-2').hidden = true;
+        document.getElementById('step-3').hidden = true;
+        document.getElementById('success-screen').hidden = false;
+        const d = new Date(selectedSlot);
+        document.getElementById('success-detail').textContent =
+          `${selectedType.name} on ${d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} at ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}.`;
+      } catch (err) {
+        errEl.textContent = err.message ?? 'Something went wrong. Please try again.';
+        errEl.hidden = false;
+        btn.disabled = false;
+        btn.textContent = `Pay $${(selectedType.price_cents/100).toFixed(2)} · Confirm Booking`;
+      }
+    });
+  </script>
+</body>
+</html>
