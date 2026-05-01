@@ -531,6 +531,15 @@ const jsonLd = structuredData ?? defaultStructuredData;
     <!-- ── Cookie Consent Banner ───────────────────────────────────────── -->
     <CookieConsent />
 
+    <!-- ── Service Worker registration ─────────────────────────────────── -->
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').catch(function() {});
+        });
+      }
+    </script>
+
     <!-- ── Error boundary: catch unhandled errors and log them ─────────── -->
     <script is:inline>
       window.addEventListener('error', function(e) {
