@@ -76,15 +76,37 @@ Deno.serve(async (req) => {
     .eq("id", booking.session_type_id)
     .single();
 
-  // Generate HMAC tokens for cancel link and my-bookings link
-  const hmacSecret = Deno.env.get("BOOKING_HMAC_SECRET") || "trainedby_booking_secret";
+  // Generate and store random tokens in booking_tokens table
   const appUrl = Deno.env.get("APP_URL") || "https://trainedby.com";
 
-  const cancelToken = await generateHmac(booking.id, hmacSecret);
-  const myBookingsToken = await generateHmac(`${booking.consumer_email}:${booking.id}`, hmacSecret);
+  const cancelToken = generateToken();
+  const myBookingsToken = generateToken();
+  const now = new Date();
 
-  const cancelUrl = `${appUrl}/book/cancel?booking_id=${booking.id}&token=${cancelToken}`;
-  const myBookingsUrl = `${appUrl}/my-bookings?email=${encodeURIComponent(booking.consumer_email)}&token=${myBookingsToken}`;
+  const { error: tokenError } = await sb.from("booking_tokens").insert([
+    {
+      token: cancelToken,
+      token_type: "cancel",
+      booking_id: booking.id,
+      expires_at: new Date(now.getTime() + 72 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      token: myBookingsToken,
+      token_type: "my_bookings",
+      booking_id: booking.id,
+      consumer_email: booking.consumer_email,
+      stripe_payment_intent_id: pi.id,
+      expires_at: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+  ]);
+
+  if (tokenError) {
+    console.error("Failed to insert booking tokens:", tokenError);
+    // Non-fatal — booking confirmed; email links will be broken but booking stands
+  }
+
+  const cancelUrl = `${appUrl}/book/cancel?token=${cancelToken}`;
+  const myBookingsUrl = `${appUrl}/my-bookings?token=${myBookingsToken}`;
 
   // Format the date nicely
   const sessionDate = new Date(booking.scheduled_at);
@@ -151,16 +173,10 @@ Deno.serve(async (req) => {
   return new Response("OK", { status: 200 });
 });
 
-async function generateHmac(data: string, secret: string): Promise<string> {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(data));
-  return Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, "0")).join("");
+function generateToken(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function sendEmail(to: string, subject: string, html: string): Promise<void> {
