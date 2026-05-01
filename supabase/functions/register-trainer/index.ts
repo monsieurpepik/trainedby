@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getEditUrl, getProfileUrl, getMarketSupportEmail, getMarketBrand } from '../_shared/market_url.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -79,7 +80,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { name, email, phone, title, specialties, reps_number, referred_by } = body;
+    const { name, email, phone, title, specialties, reps_number, referred_by, market = 'ae' } = body;
 
     // ── Validate required fields ──────────────────────────────────────────────
     if (!name || !email) {
@@ -141,7 +142,7 @@ serve(async (req) => {
         trainer_id: existing.id,
         expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
       });
-      await sendWelcomeEmail(cleanEmail, existing.slug, token, true);
+      await sendWelcomeEmail(cleanEmail, existing.slug, token, true, market);
       return new Response(JSON.stringify({ ok: true, existing: true, slug: existing.slug }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -201,7 +202,7 @@ serve(async (req) => {
     });
 
     // ── Send welcome email ─────────────────────────────────────────────────────
-    await sendWelcomeEmail(cleanEmail, slug, token, false);
+    await sendWelcomeEmail(cleanEmail, slug, token, false, market);
 
     // ── Notify CEO agent (Telegram alert) ─────────────────────────────────────
     const SELF_BASE = `https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1`;
@@ -243,10 +244,11 @@ async function sendWelcomeEmail(
   email: string,
   slug: string,
   token: string,
-  isExisting: boolean
+  isExisting: boolean,
+  market: string
 ) {
-  const editUrl = `https://trainedby.ae/edit?token=${token}`;
-  const profileUrl = `https://trainedby.ae/${slug}`;
+  const editUrl = `${getEditUrl(market)}?token=${token}`;
+  const profileUrl = getProfileUrl(market, slug);
 
   const subject = isExisting
     ? "Welcome back to TrainedBy"
@@ -266,14 +268,14 @@ async function sendWelcomeEmail(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "TrainedBy <hello@trainedby.ae>",
+      from: `${getMarketBrand(market)} <${getMarketSupportEmail(market)}>`,
       to: email,
       subject,
       html: `
         <div style="background:#0a0a0a;padding:40px 24px;font-family:Inter,sans-serif;max-width:480px;margin:0 auto;">
           <div style="margin-bottom:32px;">
             <span style="background:#FF5C00;color:#fff;font-family:Manrope,sans-serif;font-weight:800;font-size:16px;padding:6px 12px;border-radius:8px;">TB</span>
-            <span style="color:#fff;font-family:Manrope,sans-serif;font-weight:800;font-size:16px;margin-left:8px;">TrainedBy</span>
+            <span style="color:#fff;font-family:Manrope,sans-serif;font-weight:800;font-size:16px;margin-left:8px;">${getMarketBrand(market)}</span>
           </div>
           <h1 style="color:#fff;font-family:Manrope,sans-serif;font-size:24px;font-weight:800;margin-bottom:8px;">${headline}</h1>
           <p style="color:rgba(255,255,255,0.55);font-size:15px;margin-bottom:28px;line-height:1.6;">${bodyText}</p>
