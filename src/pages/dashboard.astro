@@ -1184,15 +1184,49 @@ function copyReferral() {
 
 async function startUpgrade() {
   try {
-    const res = await fetch(EDGE_BASE + '/create-checkout', {
-      method: 'POST', headers: { 'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + getAuthToken() },
-      body: JSON.stringify({ trainer_id: trainer.id, plan: 'pro', success_url: location.origin + '/dashboard?upgraded=1', cancel_url: location.origin + '/dashboard' })
+    const res = await fetch(EDGE_BASE + '/payment-router', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({
+        trainer_id: trainer.id,
+        plan: 'pro',
+        billing: 'monthly',
+        success_url: location.origin + '/dashboard?upgraded=1',
+        cancel_url: location.origin + '/dashboard',
+      })
     });
     const data = await res.json();
-    if (data.url) location.href = data.url;
-    else showToast('Could not start checkout. Please try again.', 'error');
+    if (!res.ok) { showToast(data.error || 'Could not start checkout.', 'error'); return; }
+    if (data.provider === 'stripe' && data.checkout_url) {
+      location.href = data.checkout_url;
+    } else if (data.provider === 'razorpay') {
+      await openRazorpay(data);
+    } else {
+      showToast('Could not start checkout. Please try again.', 'error');
+    }
   } catch { showToast('Could not start checkout.', 'error'); }
+}
+
+function openRazorpay(data) {
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => {
+      const rzp = new Razorpay({
+        key: data.key_id,
+        amount: data.amount,
+        currency: data.currency,
+        order_id: data.order_id,
+        name: 'TrainedBy',
+        description: data.description,
+        prefill: { name: data.trainer_name, email: data.trainer_email },
+        handler: () => { location.href = location.origin + '/dashboard?upgraded=1'; },
+        modal: { ondismiss: resolve },
+      });
+      rzp.open();
+    };
+    document.head.appendChild(script);
+  });
 }
 
 function formatTimeAgo(dateStr) {

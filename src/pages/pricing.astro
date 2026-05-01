@@ -486,13 +486,48 @@ async function startCheckout(plan) {
   const token = getAuthToken();
   if (!token) { location.href = '/join'; return; }
   try {
-    const res = await fetch(EDGE_BASE + '/create-checkout', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ plan, billing: isAnnual ? 'annual' : 'monthly', success_url: location.origin + '/dashboard?upgraded=1', cancel_url: location.origin + '/pricing' })
+    const res = await fetch(EDGE_BASE + '/payment-router', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        plan,
+        billing: isAnnual ? 'annual' : 'monthly',
+        success_url: location.origin + '/dashboard?upgraded=1',
+        cancel_url: location.origin + '/pricing',
+      })
     });
     const data = await res.json();
-    if (data.url) location.href = data.url;
+    if (!res.ok) { alert(data.error || 'Could not start checkout.'); return; }
+    if (data.provider === 'stripe' && data.checkout_url) {
+      location.href = data.checkout_url;
+    } else if (data.provider === 'razorpay') {
+      await openRazorpay(data);
+    } else {
+      alert('Could not start checkout. Please try again.');
+    }
   } catch { alert('Could not start checkout. Please try again.'); }
+}
+
+function openRazorpay(data) {
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => {
+      const rzp = new Razorpay({
+        key: data.key_id,
+        amount: data.amount,
+        currency: data.currency,
+        order_id: data.order_id,
+        name: 'TrainedBy',
+        description: data.description,
+        prefill: { name: data.trainer_name, email: data.trainer_email },
+        handler: () => { location.href = location.origin + '/dashboard?upgraded=1'; },
+        modal: { ondismiss: resolve },
+      });
+      rzp.open();
+    };
+    document.head.appendChild(script);
+  });
 }
 </script>
 </Base>
