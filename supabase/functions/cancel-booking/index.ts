@@ -118,8 +118,21 @@ Deno.serve(async (req) => {
       return serverError('Failed to update booking status');
     }
 
-    // Mark token used after successful cancellation
-    await sb.from('booking_tokens').update({ used_at: new Date().toISOString() }).eq('id', tokenRowId);
+    // Mark token used after successful cancellation (atomic — only if not already marked)
+    const { error: markErr, count: markCount } = await sb
+      .from('booking_tokens')
+      .update({ used_at: new Date().toISOString() })
+      .eq('id', tokenRowId)
+      .is('used_at', null)
+      .select('id', { count: 'exact', head: true });
+
+    if (markErr) {
+      log.error('Failed to mark cancel token used', { tokenRowId, markErr });
+      // Non-fatal: cancellation completed, log for manual review
+    } else if (markCount === 0) {
+      // Concurrent request already marked it used — cancellation already handled
+      log.warn('Token already marked used by concurrent request', { tokenRowId });
+    }
 
     const refundMsg = refunded
       ? `A full refund of $${(booking.amount_cents / 100).toFixed(2)} has been issued and will appear within 5–10 business days.`
