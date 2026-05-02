@@ -864,7 +864,7 @@ body {
         </div>` : ''}
 
         <!-- 7. REVIEWS SHELL ─────────────────────────────────────────────── -->
-        <div class="tb-reviews">
+        <div class="tb-reviews" id="tb-reviews-section">
           <div class="tb-section-label" style="margin-bottom:12px">Reviews</div>
           <div id="reviewsContent" class="tb-reviews-loading">Loading reviews...</div>
         </div>
@@ -932,37 +932,78 @@ body {
     async function loadReviews(trainerId) {
       if (!trainerId) return;
       try {
+        // Fetch up to 2 booking-linked reviews + total count
         const r = await fetch(
-          `${SUPABASE_URL}/rest/v1/reviews?trainer_id=eq.${trainerId}&verified=eq.true&order=created_at.desc&limit=8`,
-          { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+          `${SUPABASE_URL}/rest/v1/reviews?trainer_id=eq.${trainerId}&booking_id=not.is.null&order=created_at.desc&limit=2`,
+          { headers: {
+              'apikey': SUPABASE_KEY,
+              'Authorization': `Bearer ${SUPABASE_KEY}`,
+              'Prefer': 'count=exact'
+            }
+          }
         );
+        const total = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
         const reviews = await r.json();
         const el = document.getElementById('reviewsContent');
         if (!el) return;
         el.classList.remove('tb-reviews-loading');
-        if (!Array.isArray(reviews) || reviews.length === 0) {
-          el.innerHTML = `<div style="text-align:center;padding:20px 16px;border:1px dashed rgba(0,0,0,0.08);border-radius:12px;color:var(--text-muted);font-size:13px">No reviews yet — be the first!</div>`;
+
+        if (!Array.isArray(reviews) || total === 0) {
+          // Hide the entire reviews section — spec says hide if 0 reviews
+          const section = document.getElementById('tb-reviews-section');
+          if (section) section.style.display = 'none';
           return;
         }
-        const avg = reviews.reduce((a,b) => a + b.rating, 0) / reviews.length;
-        const starColor = '#F59E0B';
+
+        const avg = reviews.reduce((a, b) => a + (b.rating || 0), 0) / reviews.length;
+        const starFilled = '#1A1411';
         const starEmpty = 'rgba(0,0,0,0.12)';
+
+        // Rating summary row
         let starsHtml = '';
-        for (let i = 1; i <= 5; i++) starsHtml += `<span style="color:${i<=Math.round(avg)?starColor:starEmpty};font-size:14px">&#9733;</span>`;
-        let html = `<div style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--review-card-bg);border-radius:10px;margin-bottom:12px"><div style="font-size:36px;font-weight:200;letter-spacing:-0.02em;color:var(--text-primary);line-height:1">${avg.toFixed(1)}</div><div><div style="display:flex;gap:2px;margin-bottom:4px">${starsHtml}</div><div style="font-size:12px;color:var(--text-muted)">${reviews.length} verified review${reviews.length>1?'s':''}</div></div></div>`;
+        for (let i = 1; i <= 5; i++) {
+          starsHtml += `<span style="color:${i <= Math.round(avg) ? starFilled : starEmpty};font-size:14px">&#9733;</span>`;
+        }
+        let html = `
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+            <div style="font-size:32px;font-weight:200;letter-spacing:-0.02em;color:#111111;line-height:1">${avg.toFixed(1)}</div>
+            <div>
+              <div style="display:flex;gap:2px;margin-bottom:3px">${starsHtml}</div>
+              <div style="font-size:12px;color:var(--text-muted)">from ${total} verified client${total !== 1 ? 's' : ''}</div>
+            </div>
+          </div>`;
+
+        // Review cards — up to 2
         reviews.forEach(rv => {
-          let rvStars = '';
-          for (let i=1;i<=5;i++) rvStars += `<span style="color:${i<=rv.rating?starColor:starEmpty};font-size:12px">&#9733;</span>`;
           const rvName = esc(rv.client_name || 'Client');
-          const initials = rvName.substring(0,2).toUpperCase();
+          const initials = (rv.client_name || 'Cl').substring(0, 2).toUpperCase();
           const rvText = esc(rv.review_text || '');
-          const rvGoal = rv.goal_achieved ? esc(rv.goal_achieved) : null;
-          html += `<div style="background:var(--review-card-bg);border-radius:10px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-secondary);flex-shrink:0">${initials}</div><div><div style="font-size:13px;font-weight:400;color:var(--text-primary)">${rvName}</div><div style="font-size:10px;color:#22c55e;font-weight:500;margin-top:1px">&#10003; Verified</div></div><div style="display:flex;gap:2px;margin-left:auto">${rvStars}</div></div><div style="font-size:13px;line-height:1.7;color:var(--text-secondary);font-weight:300">${rvText}</div>${rvGoal?`<div style="display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:500;color:#22c55e">${rvGoal}</div>`:''}</div>`;
+          const dateStr = rv.created_at
+            ? new Date(rv.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+            : '';
+          let cardStars = '';
+          for (let i = 1; i <= 5; i++) {
+            cardStars += `<span style="color:${i <= (rv.rating || 0) ? starFilled : starEmpty};font-size:12px">&#9733;</span>`;
+          }
+          html += `
+            <div style="background:#F8F7F5;border-radius:12px;padding:16px 18px;margin-bottom:10px">
+              <div style="display:flex;gap:2px;margin-bottom:10px">${cardStars}</div>
+              <div style="font-size:13px;font-weight:300;color:#4A4440;line-height:1.6;margin-bottom:12px">${rvText}</div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-secondary);flex-shrink:0">${initials}</div>
+                <div style="font-size:13px;font-weight:400;color:#111111">${rvName}</div>
+                ${dateStr ? `<div style="font-size:11px;color:var(--text-muted);margin-left:auto">${dateStr}</div>` : ''}
+              </div>
+            </div>`;
         });
+
         el.innerHTML = html;
-      } catch(e) {
+      } catch (e) {
         const el = document.getElementById('reviewsContent');
-        if (el) { el.classList.remove('tb-reviews-loading'); el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Could not load reviews.</div>`; }
+        if (el) {
+          el.classList.remove('tb-reviews-loading');
+          el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Could not load reviews.</div>`;
+        }
       }
     }
 
