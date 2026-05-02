@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 ---
 
 <Base
@@ -338,9 +339,8 @@ import Base from '../layouts/Base.astro';
 
 </div>
 
-<script is:inline>
-  const SUPABASE_URL = 'https://YOUR_SUPABASE_URL.supabase.co';
-  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+<script is:inline define:vars={{ SUPABASE_ANON_KEY }}>
+  const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
 
   // ── Plan type toggle ──
   let planType = 'both';
