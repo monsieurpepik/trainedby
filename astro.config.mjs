@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import netlify from '@astrojs/netlify';
@@ -8,6 +9,7 @@ export default defineConfig({
   // Primary site — used for canonical URLs and sitemap base
   site: 'https://trainedby.ae',
   integrations: [
+    react(),
     tailwind(),
     sitemap({
       // All domains share the same routes; each serves localised content
