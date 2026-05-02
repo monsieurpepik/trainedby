@@ -1,8 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
+const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
 ---
 
-<Base title="TrainedBy  -  Global Command Centre" description="Super admin dashboard for all markets">
+<Base title="TrainedBy - Global Command Centre" description="Super admin dashboard for all markets">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -86,6 +87,7 @@ import Base from '../layouts/Base.astro';
 </style>
 
 <!-- AUTH GATE -->
+<span id="admin-gate-secret" data-secret={adminSecret} style="display:none"></span>
 <div id="gate" class="gate">
   <div class="gate-box">
     <div style="font-size:32px;margin-bottom:16px">🌍</div>
@@ -205,7 +207,7 @@ import Base from '../layouts/Base.astro';
 <script>
   const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MzE5NTIsImV4cCI6MjA2MDIwNzk1Mn0.Yd4OGMBqwvLz5_6vFAFqBNRLNFBMXCRKFiGJFCqQUYI';
-  const ADMIN_SECRET = 'trainedby-admin-2026';
+  const ADMIN_SECRET = document.getElementById('admin-gate-secret')?.dataset.secret ?? '';
 
   let allTrainers = [];
   let allWaitlist = [];

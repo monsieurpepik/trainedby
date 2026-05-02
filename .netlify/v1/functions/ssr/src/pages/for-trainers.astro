@@ -8,8 +8,8 @@ const isWaitlist = market.waitlistEnabled === true;
 ---
 
 <Base
-  title={`For Trainers  -  ${brandName}`}
-  description={`Build your personal training practice on ${brandName}. Verified profile, lead management, and an AI assistant. Free to start.`}
+  title={`${brandName} – Link-in-Bio & Booking Hub for Fitness Trainers`}
+  description={`Your link-in-bio and booking hub as a personal trainer. Get discovered, capture leads, and manage clients on ${brandName} — free to start.`}
 >
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -130,6 +130,68 @@ const isWaitlist = market.waitlistEnabled === true;
     .footer-links a { color: var(--text-2); text-decoration: none; font-size: 13px; transition: color 0.2s; }
     .footer-links a:hover { color: var(--text); }
     .footer-copy { font-size: 12px; color: var(--text-3); }
+
+    /* Product mockup */
+    .hero-mockup {
+      margin: 48px auto 0;
+      max-width: 340px;
+      position: relative;
+    }
+    .phone-frame {
+      background: #111;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+      padding: 20px;
+    }
+    .phone-notch {
+      width: 80px; height: 6px; background: rgba(255,255,255,0.08);
+      border-radius: 3px; margin: 0 auto 20px;
+    }
+    .mock-avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg, #FF5C00, #FF8C42);
+      margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;
+      font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 800; color: #fff;
+    }
+    .mock-name {
+      text-align: center; font-family: 'Manrope', sans-serif;
+      font-size: 17px; font-weight: 800; color: #fff; margin-bottom: 4px;
+    }
+    .mock-title {
+      text-align: center; font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 12px;
+    }
+    .mock-badge {
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; margin-bottom: 16px;
+    }
+    .mock-badge-pill {
+      background: rgba(0,200,83,0.12); border: 1px solid rgba(0,200,83,0.25);
+      color: #00C853; font-size: 10px; font-weight: 700; border-radius: 20px;
+      padding: 3px 10px; font-family: 'Manrope', sans-serif;
+    }
+    .mock-stats {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px; margin-bottom: 16px;
+    }
+    .mock-stat {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; padding: 10px 6px; text-align: center;
+    }
+    .mock-stat-val {
+      font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 800; color: #fff;
+    }
+    .mock-stat-label { font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+    .mock-wa-btn {
+      background: #25D366; border-radius: 10px; padding: 12px;
+      text-align: center; font-size: 13px; font-weight: 700; color: #fff;
+      font-family: 'Manrope', sans-serif;
+    }
+    .mockup-label {
+      text-align: center; font-size: 11px; color: rgba(255,255,255,0.3);
+      margin-top: 16px; letter-spacing: 0.05em; text-transform: uppercase;
+    }
   </style>
 
   <!-- NAV -->
@@ -150,7 +212,7 @@ const isWaitlist = market.waitlistEnabled === true;
       For Personal Trainers · {market.certificationBody} Verified Platform
     </div>
     <h1 class="hero-headline">
-      Your profile.<br>Your clients.<br><em>Your business.</em>
+      Your link-in-bio.<br>Your booking hub.<br><em>Your business.</em>
     </h1>
     <p class="hero-sub">
       {brandName} gives you a verified public profile, tools to manage leads, and an AI assistant that works around the clock. Free to start.
@@ -181,6 +243,35 @@ const isWaitlist = market.waitlistEnabled === true;
         <div class="proof-label">To go live</div>
       </div>
     </div>
+
+    <!-- Product mockup — visual proof of the profile -->
+    <div class="hero-mockup">
+      <div class="phone-frame" aria-hidden="true">
+        <div class="phone-notch"></div>
+        <div class="mock-avatar">S</div>
+        <div class="mock-name">Sarah Al Mansoori</div>
+        <div class="mock-title">Certified Personal Trainer · Dubai</div>
+        <div class="mock-badge">
+          <div class="mock-badge-pill">✓ {market.certificationBody} Verified</div>
+        </div>
+        <div class="mock-stats">
+          <div class="mock-stat">
+            <div class="mock-stat-val">4.9</div>
+            <div class="mock-stat-label">Rating</div>
+          </div>
+          <div class="mock-stat">
+            <div class="mock-stat-val">127</div>
+            <div class="mock-stat-label">Clients</div>
+          </div>
+          <div class="mock-stat">
+            <div class="mock-stat-val">6yr</div>
+            <div class="mock-stat-label">Experience</div>
+          </div>
+        </div>
+        <div class="mock-wa-btn">📱 Book via WhatsApp</div>
+      </div>
+      <div class="mockup-label">Your profile looks like this</div>
+    </div>
   </section>
 
   <!-- WHAT YOU GET -->
@@ -193,7 +284,7 @@ const isWaitlist = market.waitlistEnabled === true;
         <div class="feature-card">
           <div class="feature-icon">✓</div>
           <div class="feature-title">Verified Public Profile</div>
-          <p class="feature-desc">Your profile lives at {brandName.toLowerCase()}.ae/yourname. {market.certificationBody} verification badge, specialties, packages, and a contact form  -  all in one clean page.</p>
+          <p class="feature-desc">Your profile lives at <strong style="color:var(--brand)">{Astro.url.hostname}/yourname</strong>. {market.certificationBody} verification badge, specialties, packages, and a contact form — all in one clean page.</p>
           <span class="feature-badge">Free forever</span>
         </div>
         <div class="feature-card">
@@ -229,7 +320,7 @@ const isWaitlist = market.waitlistEnabled === true;
           <div class="step-num">01</div>
           <div>
             <div class="step-title">Create your profile</div>
-            <p class="step-desc">Name, specialties, your {market.certificationBody} registration number, and a short bio. Your profile is live the moment you submit  -  no waiting, no approval queue.</p>
+            <p class="step-desc">Name, specialties, your {market.certificationBody} registration number, and a short bio. Your profile is live the moment you submit - no waiting, no approval queue.</p>
             <span class="step-time">~2 minutes</span>
           </div>
         </div>
@@ -316,17 +407,17 @@ const isWaitlist = market.waitlistEnabled === true;
       <div class="faq-grid">
         <div class="faq-item">
           <div class="faq-q">Do I need to be {market.certificationBody} registered?</div>
-          <div class="faq-a">You can create a profile and go live immediately without verification. The {market.certificationBody} badge is added once we verify your registration  -  usually within 24 hours. Non-verified profiles still get full access to all features.</div>
+          <div class="faq-a">You can create a profile and go live immediately without verification. The {market.certificationBody} badge is added once we verify your registration - usually within 24 hours. Non-verified profiles still get full access to all features.</div>
         </div>
 
         <div class="faq-item">
           <div class="faq-q">Can I cancel anytime?</div>
-          <div class="faq-a">Yes. No contracts, no lock-in. Cancel from your dashboard and your profile reverts to the Free tier  -  it stays live, just without the Pro tools.</div>
+          <div class="faq-a">Yes. No contracts, no lock-in. Cancel from your dashboard and your profile reverts to the Free tier - it stays live, just without the Pro tools.</div>
         </div>
 
         <div class="faq-item">
           <div class="faq-q">How does the AI assistant work?</div>
-          <div class="faq-a">Your AI assistant knows your full profile, your specialties, your market, and your clients. Ask it anything  -  write a 12-week programme, draft a follow-up email to a lead, explain a nutrition concept, or help you price your packages. It responds in your language.</div>
+          <div class="faq-a">Your AI assistant knows your full profile, your specialties, your market, and your clients. Ask it anything - write a 12-week programme, draft a follow-up email to a lead, explain a nutrition concept, or help you price your packages. It responds in your language.</div>
         </div>
       </div>
     </div>
@@ -337,7 +428,7 @@ const isWaitlist = market.waitlistEnabled === true;
     <div class="waitlist-section" id="waitlist">
       <div class="waitlist-inner">
         <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;border:1px solid rgba(255,92,0,0.3);background:rgba(255,92,0,0.08);font-size:11px;font-weight:700;color:var(--brand);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:24px;">
-          {market.flag} Coming Soon to {market.cityName || market.market.toUpperCase()}
+          {market.flag} Coming Soon to {market.brandName || 'TrainedBy'}
         </div>
         <h2 style="font-family:'Manrope',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:900;letter-spacing:-1px;line-height:1.15;margin-bottom:16px;">
           Be first. Lock in the launch price.

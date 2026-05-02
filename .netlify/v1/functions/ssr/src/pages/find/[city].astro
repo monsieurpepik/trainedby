@@ -1,0 +1,138 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getMarket } from '../../lib/market.ts';
+import { createClient } from '@supabase/supabase-js';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../lib/config.ts';
+
+const market = getMarket(Astro.url.hostname);
+
+const CITY_MAP: Record<string, string> = {
+  'dubai': 'Dubai',
+  'abu-dhabi': 'Abu Dhabi',
+  'sharjah': 'Sharjah',
+  'london': 'London',
+  'manchester': 'Manchester',
+  'new-york': 'New York',
+  'los-angeles': 'Los Angeles',
+  'miami': 'Miami',
+  'paris': 'Paris',
+  'rome': 'Rome',
+  'milan': 'Milan',
+  'madrid': 'Madrid',
+  'barcelona': 'Barcelona',
+  'delhi': 'Delhi',
+  'mumbai': 'Mumbai',
+  'bangalore': 'Bangalore',
+};
+
+const citySlug = Astro.params.city ?? '';
+const cityName = CITY_MAP[citySlug];
+
+if (!cityName) {
+  return Astro.redirect('/find', 302);
+}
+
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const { data: trainers, error: trainersError } = await sb
+  .from('trainers')
+  .select('id, name, slug, title, avatar_url, specialties, city, market, plan, reps_verified')
+  .ilike('city', `%${cityName}%`)
+  .eq('market', market.market)
+  .order('plan', { ascending: false })
+  .limit(20);
+if (trainersError) console.error('[city page] Supabase error:', trainersError.message);
+
+const pageTitle = `Personal Trainers in ${cityName} | ${market.brandName}`;
+const pageDesc = `Find verified personal trainers in ${cityName}. Book sessions, compare rates, and connect via WhatsApp — free on ${market.brandName}.`;
+---
+
+<Base title={pageTitle} description={pageDesc}>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand: #FF5C00; --reps: #00C853;
+      --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c;
+      --border: rgba(255,255,255,0.08); --text: #fff;
+      --text-muted: rgba(255,255,255,0.5);
+    }
+    body { background: var(--surface); color: var(--text); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--border); }
+    .logo { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 18px; color: #fff; text-decoration: none; }
+    .logo span { color: var(--brand); }
+    .nav-cta { background: var(--brand); color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; }
+    .hero { max-width: 900px; margin: 0 auto; padding: 60px 24px 40px; }
+    .hero-eyebrow { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+    h1 { font-family: 'Manrope', sans-serif; font-size: clamp(28px, 5vw, 42px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 16px; }
+    .hero-sub { font-size: 16px; color: var(--text-muted); line-height: 1.6; margin-bottom: 32px; }
+    .trainer-grid { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .trainer-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-decoration: none; color: inherit; display: block; transition: border-color 0.2s; }
+    .trainer-card:hover { border-color: rgba(255,92,0,0.3); }
+    .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .card-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #FF5C00, #FF8C42); flex-shrink: 0; object-fit: cover; }
+    .card-avatar-initials { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #FF5C00, #FF8C42); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 18px; color: #fff; }
+    .card-name { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 15px; margin-bottom: 2px; }
+    .card-title { font-size: 12px; color: var(--text-muted); }
+    .card-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: var(--reps); background: rgba(0,200,83,0.08); border: 1px solid rgba(0,200,83,0.2); border-radius: 20px; padding: 2px 8px; font-weight: 700; margin-bottom: 10px; }
+    .card-specs { display: flex; flex-wrap: wrap; gap: 4px; }
+    .spec-pill { font-size: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 20px; padding: 2px 8px; color: var(--text-muted); }
+    .empty { text-align: center; padding: 80px 24px; color: var(--text-muted); }
+    .cta-strip { background: rgba(255,92,0,0.06); border-top: 1px solid rgba(255,92,0,0.15); border-bottom: 1px solid rgba(255,92,0,0.15); padding: 48px 24px; text-align: center; margin-top: 40px; }
+    .cta-strip h2 { font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+    .cta-strip p { color: var(--text-muted); margin-bottom: 24px; }
+    .btn-primary { background: var(--brand); color: #fff; padding: 14px 28px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; font-family: 'Manrope', sans-serif; }
+  </style>
+
+  <nav>
+    <a href="/" class="logo">{market.brandName}</a>
+    <a href="/join" class="nav-cta">Create your profile →</a>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Verified Trainers · {market.certificationBody} Standard</div>
+    <h1>Personal Trainers<br>in {cityName}</h1>
+    <p class="hero-sub">
+      {trainers && trainers.length > 0
+        ? `${trainers.length} verified trainer${trainers.length > 1 ? 's' : ''} in ${cityName}. Compare profiles, see packages, and book directly via WhatsApp.`
+        : `Be the first verified trainer listed in ${cityName} on ${market.brandName}.`
+      }
+    </p>
+  </div>
+
+  {trainers && trainers.length > 0 ? (
+    <div class="trainer-grid">
+      {trainers.map((trainer) => (
+        <a href={`/${trainer.slug}`} class="trainer-card">
+          <div class="card-header">
+            {trainer.avatar_url
+              ? <img src={trainer.avatar_url} alt={trainer.name} class="card-avatar" loading="lazy" />
+              : <div class="card-avatar-initials">{trainer.name.charAt(0)}</div>
+            }
+            <div>
+              <div class="card-name">{trainer.name}</div>
+              <div class="card-title">{trainer.title || 'Personal Trainer'}</div>
+            </div>
+          </div>
+          {trainer.reps_verified && (
+            <div class="card-badge">✓ {market.certificationBody} Verified</div>
+          )}
+          <div class="card-specs">
+            {(trainer.specialties || []).slice(0, 3).map((s: string) => (
+              <span class="spec-pill">{s}</span>
+            ))}
+          </div>
+        </a>
+      ))}
+    </div>
+  ) : (
+    <div class="empty">
+      <p>No trainers listed in {cityName} yet.</p>
+    </div>
+  )}
+
+  <div class="cta-strip">
+    <h2>Are you a trainer in {cityName}?</h2>
+    <p>Get a verified public profile, manage leads, and book clients — free to start.</p>
+    <a href="/join" class="btn-primary">Create your free profile →</a>
+  </div>
+</Base>

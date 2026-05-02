@@ -3,38 +3,130 @@ import Base from '../layouts/Base.astro';
 import ProfileCompleteness from '../components/ProfileCompleteness.astro';
 import { getMarket } from '../lib/market.ts';
 import { getLocale, t, getBrand } from '../lib/i18n.ts';
+import { createClient } from '@supabase/supabase-js';
+
 const market = getMarket(Astro.url.hostname);
 const locale = getLocale(Astro.request);
 const brand = getBrand(locale);
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+const ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+
+// ── SSR: compute profile completeness ──────────────────────────────────────
+let ssrScore = 0;
+let ssrFields: { key: string; label: string; pts: number; done: boolean; action: string }[] = [];
+let ssrPlan = 'free';
+let ssrSlug = '';
+let bookingSetupSteps: { label: string; done: boolean; action: string }[] = [];
+let bookingReady = false;
+let bookings: { id: string; consumer_name: string; consumer_email: string; scheduled_at: string; duration_min: number; amount_cents: number; status: string; session_type: { name: string } | null }[] = [];
+
+const cookieHeader = Astro.request.headers.get('cookie') || '';
+const tbSession = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith('tb_session='))?.slice('tb_session='.length);
+
+if (tbSession) {
+  try {
+    const svc = createClient(
+      import.meta.env.SUPABASE_URL,
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Validate session token
+    const { data: link } = await svc
+      .from('magic_links')
+      .select('trainer_id')
+      .eq('token', tbSession)
+      .eq('used', false)
+      .gt('expires_at', new Date().toISOString())
+      .single();
+
+    if (link?.trainer_id) {
+      const [{ data: trainer }, { count: pkgCount }, { count: sessionTypeCount }, { count: availabilityCount }, { data: bookingsData }] = await Promise.all([
+        svc.from('trainers').select('avatar_url, bio, instagram_handle, reps_verified, verification_status, plan, slug, stripe_connect_onboarded').eq('id', link.trainer_id).single(),
+        svc.from('session_packages').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id),
+        svc.from('session_types').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id).eq('is_active', true),
+        svc.from('trainer_availability').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id),
+        svc.from('bookings').select('id, consumer_name, consumer_email, scheduled_at, duration_min, amount_cents, status, session_type:session_types(name)').eq('trainer_id', link.trainer_id).in('status', ['confirmed', 'cancelled', 'refunded', 'completed']).order('scheduled_at', { ascending: false }).limit(50),
+      ]);
+
+      if (trainer) {
+        ssrPlan = trainer.plan || 'free';
+        ssrSlug = trainer.slug || '';
+        bookings = (bookingsData ?? []) as typeof bookings;
+        const certVerified = trainer.reps_verified === true || trainer.verification_status === 'verified';
+        const FIELDS = [
+          { key: 'avatar_url', label: 'Profile photo', pts: 20, done: !!trainer.avatar_url, action: '/edit' },
+          { key: 'bio', label: 'Bio (50+ characters)', pts: 20, done: !!(trainer.bio && trainer.bio.length > 50), action: '/edit' },
+          { key: 'instagram_handle', label: 'Instagram handle', pts: 15, done: !!trainer.instagram_handle, action: '/edit' },
+          { key: 'packages', label: 'At least 1 package', pts: 20, done: (pkgCount ?? 0) >= 1, action: '/edit' },
+          { key: 'cert_verified', label: 'Certification verified', pts: 10, done: certVerified, action: '/edit' },
+        ];
+        const totalPts = FIELDS.reduce((s, f) => s + f.pts, 0);
+        const raw = FIELDS.filter(f => f.done).reduce((sum, f) => sum + f.pts, 0);
+        ssrScore = Math.round((raw / totalPts) * 100);
+        ssrFields = FIELDS;
+        // Booking setup gating
+        bookingSetupSteps = [
+          { label: 'Connect your bank (Stripe)', done: !!trainer.stripe_connect_onboarded, action: '/dashboard?stripe=start' },
+          { label: 'Add at least one session type', done: (sessionTypeCount ?? 0) >= 1, action: '/edit?tab=sessions' },
+          { label: 'Set your availability', done: (availabilityCount ?? 0) >= 1, action: '/edit?tab=availability' },
+        ];
+        bookingReady = bookingSetupSteps.every(s => s.done);
+      }
+    }
+  } catch (e) {
+    console.error('[SSR ProfileCompleteness]', e);
+  }
+}
 ---
 
 <Base
-  title={`Dashboard  -  ${market.brandName}`}
+  title={`Dashboard - ${market.brandName}`}
   description={`Your ${market.brandName} trainer dashboard. Manage leads, analytics, and your profile.`}
 >
+  <Fragment slot="head">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#FFFFFF">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+  </Fragment>
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  /* Aliases to Base.astro global tokens */
-  --reps: var(--green, #00C853);
-  --reps-dim: var(--green-dim, rgba(0,200,83,0.08));
-  --reps-border: var(--green-border, rgba(0,200,83,0.2));
-  --surface: var(--bg, #0a0a0a);
-  --surface-2: var(--surface, #111);
-  --surface-3: var(--surface-3, #1c1c1c);
-  --surface-4: var(--surface-4, #222);
-  --text-muted: var(--text-2, rgba(255,255,255,0.5));
-  --text-faint: var(--text-faint, rgba(255,255,255,0.25));
+  --bg: #FFFFFF; --surface: #FAFAF9; --surface-2: #F5F4F3; --surface-3: #E8E5E2; --surface-4: #E0DDD9;
+  --text: #1A1411; --text-muted: #6B6460; --text-faint: rgba(26,20,17,0.4); --border: rgba(0,0,0,0.07);
+  --brand: #FF5C00; --green: #00C853; --reps: #00C853; --reps-dim: rgba(0,200,83,0.1);
+  --danger: #E53935; --danger-dim: rgba(229,57,53,0.1);
+  --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
+  --reps-border: rgba(0,200,83,0.2); --border-hover: rgba(0,0,0,0.14);
 }
 html { scroll-behavior: smooth; }
 body {
-  background: var(--bg, #0a0a0a); color: var(--text, #f0f0f0);
-  font-family: var(--font-body, 'Inter', sans-serif); font-size: 14px; line-height: 1.6;
+  background: var(--surface, #FAFAF9); color: var(--text, #1A1411);
+  font-family: 'DM Sans', system-ui, sans-serif; font-size: 14px; line-height: 1.6;
   -webkit-font-smoothing: antialiased; min-height: 100vh;
 }
 .dash-wrap {
   max-width: 480px; margin: 0 auto;
   padding: 0 20px max(80px, env(safe-area-inset-bottom));
+}
+
+/* Desktop tab nav */
+.dash-tabs { display: none; }
+@media (min-width: 768px) {
+  .dash-header { display: none; }
+  .dash-tabs { display: block; background: #fff; border-bottom: 1px solid rgba(0,0,0,0.07); position: sticky; top: 0; z-index: 50; }
+  .bottom-nav { display: none !important; }
+  .dash-wrap { max-width: 960px; padding-bottom: 32px; }
+  .dash-tabs-inner { max-width: 960px; margin: 0 auto; height: 52px; display: flex; align-items: center; padding: 0 32px; }
+  .tabs-logo { font-weight: 800; font-size: 15px; color: #1A1411; letter-spacing: -0.03em; text-decoration: none; margin-right: 32px; flex-shrink: 0; }
+  .tabs-list { display: flex; flex: 1; height: 52px; }
+  .tab-item { padding: 0 16px; font-size: 13px; font-weight: 500; color: #6B6460; text-decoration: none; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: color 0.15s; }
+  .tab-item:hover { color: #1A1411; }
+  .tab-item.active { color: #1A1411; font-weight: 700; border-bottom-color: #1A1411; }
+  .tabs-right { margin-left: auto; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .tab-view-profile { font-size: 12px; color: #FF5C00; font-weight: 700; text-decoration: none; }
+  .tabs-avatar { width: 30px; height: 30px; border-radius: 50%; background: #F5F4F3; border: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #1A1411; }
+  .stats-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
 /* Header */
@@ -490,7 +582,7 @@ body {
 /* Bottom nav */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(10,10,10,0.95); backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
   border-top: 1px solid var(--border);
   display: flex; padding: 12px 0 max(12px, env(safe-area-inset-bottom));
   z-index: 20;
@@ -506,7 +598,7 @@ body {
 /* Spinner */
 .spinner {
   display: inline-block; width: 14px; height: 14px;
-  border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff;
+  border: 2px solid rgba(26,20,17,0.2); border-top-color: #1A1411;
   border-radius: 50%; animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -533,12 +625,28 @@ body {
 }
   </style>
 
+<!-- Desktop tab nav — hidden on mobile, shown via CSS at ≥768px -->
+<nav class="dash-tabs" id="dash-tabs">
+  <div class="dash-tabs-inner">
+    <a href="/" class="tabs-logo">TrainedBy</a>
+    <div class="tabs-list">
+      <a href="/dashboard" class="tab-item active">Overview</a>
+      <a href="/edit" class="tab-item">Profile</a>
+      <a href="/pricing" class="tab-item">Upgrade</a>
+    </div>
+    <div class="tabs-right">
+      <a id="tab-view-link" href="#" class="tab-view-profile">View my profile →</a>
+      <div class="tabs-avatar" id="tab-avatar-initials">TB</div>
+    </div>
+  </div>
+</nav>
+
 <div class="dash-wrap">
 
   <!-- Header -->
   <div class="dash-header">
     <a href="/" class="dash-logo">
-      <svg width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
+      <svg width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#1A1411"/><text x="16" y="23" font-family="DM Sans,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
       Dashboard
     </a>
     <div class="header-nav">
@@ -583,7 +691,31 @@ body {
     </div>
 
     <!-- Profile Completeness Widget -->
-    <ProfileCompleteness />
+    <ProfileCompleteness score={ssrScore} fields={ssrFields} plan={ssrPlan} slug={ssrSlug} />
+
+    <!-- Booking Setup Card (only shown when setup is incomplete) -->
+    {!bookingReady && (
+      <div style="background:rgba(255,92,0,0.06);border:1px solid rgba(255,92,0,0.18);border-radius:14px;padding:16px 18px;margin-bottom:20px;">
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);margin-bottom:4px;">Finish setup to accept bookings</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:14px;">Complete these steps to go live.</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          {bookingSetupSteps.map((step, i) => (
+            <a href={step.action} style={`display:flex;align-items:center;gap:10px;text-decoration:none;opacity:${i > 0 && !bookingSetupSteps[i-1].done ? '0.4' : '1'};pointer-events:${i > 0 && !bookingSetupSteps[i-1].done ? 'none' : 'auto'};`}>
+              <div style={`width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${step.done ? '#4CAF50' : 'rgba(255,255,255,0.08)'};border:1.5px solid ${step.done ? '#4CAF50' : 'rgba(255,255,255,0.15)'};`}>
+                {step.done
+                  ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  : <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);">{i + 1}</span>
+                }
+              </div>
+              <span style={`font-size:13px;font-weight:500;color:${step.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)'};text-decoration:${step.done ? 'line-through' : 'none'};`}>{step.label}</span>
+              {!step.done && (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" style="margin-left:auto;"><path d="M9 18l6-6-6-6"/></svg>
+              )}
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
 
     <!-- Stats -->
     <div class="stats-section">
@@ -665,7 +797,7 @@ body {
           <div class="empty-state-icon">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
           </div>
-          <div class="empty-state-text">No leads yet  -  share your profile link to get started.</div>
+          <div class="empty-state-text">No leads yet - share your profile link to get started.</div>
         </div>
       </div>
     </div>
@@ -689,9 +821,47 @@ body {
       </div>
     </div>
 
+    <!-- Bookings Section -->
+    <div class="leads-section" id="bookings-section">
+      <div class="stats-section-title" style="margin-bottom:14px">Your Bookings</div>
+      {bookings.length === 0 ? (
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.6">No bookings yet. Share your booking link with clients to get started.</p>
+      ) : (
+        <div>
+          {bookings.map(b => {
+            const d = new Date(b.scheduled_at);
+            const isPast = d < new Date();
+            const isUpcoming = !isPast && b.status === 'confirmed';
+            const statusColor = (b.status === 'confirmed' || b.status === 'completed') ? 'var(--reps)' : (b.status === 'cancelled' || b.status === 'refunded') ? 'var(--danger)' : 'var(--text-faint)';
+            const statusBg = (b.status === 'confirmed' || b.status === 'completed') ? 'var(--reps-dim)' : (b.status === 'cancelled' || b.status === 'refunded') ? 'var(--danger-dim)' : 'rgba(255,255,255,0.05)';
+            return (
+              <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                <div>
+                  <div style="font-size:13px;font-weight:600">{b.consumer_name}</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
+                    {b.session_type?.name ?? 'Session'} · {d.toLocaleDateString(locale,{weekday:'short',month:'short',day:'numeric'})} at {d.toLocaleTimeString(locale,{hour:'numeric',minute:'2-digit'})}
+                  </div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
+                    {market.currencySymbol}{(b.amount_cents/100).toFixed(2)} · {b.duration_min} min
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+                  <span style={`font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:${statusBg};color:${statusColor}`}>
+                    {b.status.toUpperCase()}
+                  </span>
+                  {isUpcoming && (
+                    <span style="font-size:11px;color:var(--text-muted)">Contact client to cancel</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
 
 
-    <!-- Generate Training Plan  -  Pro Feature Card -->
+    <!-- Generate Training Plan - Pro Feature Card -->
     <div class="checklist-section" id="generate-plan-section" style="display:none">
       <div class="checklist-title" style="display:flex;align-items:center;gap:8px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -807,7 +977,7 @@ body {
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
       </div>
       <div class="ai-welcome-title">Hey, I'm your AI coach</div>
-      <div class="ai-welcome-sub">I know your profile, your market, and your goals. Ask me anything  -  from writing your bio to building a 12-week programme.</div>
+      <div class="ai-welcome-sub">I know your profile, your market, and your goals. Ask me anything - from writing your bio to building a 12-week programme.</div>
     </div>
   </div>
   <div class="ai-quick-prompts" id="ai-chips">
@@ -854,11 +1024,11 @@ body {
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
-<script is:inline>
+<script is:inline define:vars={{ SUPABASE_ANON_KEY, ANON_KEY }}>
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
 const EDGE_BASE = SUPABASE_URL + '/functions/v1';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+window.renderPC = function() {}; // widget now server-rendered
 
 let trainer = null;
 
@@ -919,6 +1089,15 @@ function populateDash(t) {
   document.getElementById('view-link').href = '/' + t.slug;
   document.getElementById('nav-view-profile').href = '/' + t.slug;
 
+  // Update desktop tab nav
+  const tabViewLink = document.getElementById('tab-view-link');
+  if (tabViewLink) tabViewLink.href = '/' + t.slug;
+  const tabAvatar = document.getElementById('tab-avatar-initials');
+  if (tabAvatar) {
+    const initials = (t.name || 'TB').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+    tabAvatar.textContent = initials;
+  }
+
   // Referral flywheel
   const refUrl = 'https://' + _domain + '/join?ref=' + t.slug;
   document.getElementById('referral-url-text').textContent = _domain + '/join?ref=' + t.slug;
@@ -938,7 +1117,7 @@ function populateDash(t) {
     document.getElementById('flywheel-reward-text').textContent = '🎉 You\'ve earned free Pro forever!';
   }
 
-  // Income stream cards  -  unlock for Pro/Premium
+  // Income stream cards - unlock for Pro/Premium
   const isPro = t.plan === 'pro' || t.plan === 'premium';
   if (isPro) {
     document.getElementById('upgrade-banner').style.display = 'none';
@@ -957,13 +1136,13 @@ function populateDash(t) {
   // Profile completeness widget
   if (typeof window.renderPC === 'function') window.renderPC(t);
 
-  // Generate Plan  -  show for Pro trainers
+  // Generate Plan - show for Pro trainers
   if (isPro) {
     const planSection = document.getElementById('generate-plan-section');
     if (planSection) planSection.style.display = 'block';
   }
 
-  // AI Assistant settings  -  show for Pro trainers
+  // AI Assistant settings - show for Pro trainers
   if (isPro) {
     const aiSection = document.getElementById('ai-settings-section');
     if (aiSection) {
@@ -973,7 +1152,7 @@ function populateDash(t) {
       selectChannel(ch, false); // false = don't save to DB
       // Show WhatsApp number
       const waEl = document.getElementById('wa-registered-number');
-      if (waEl) waEl.textContent = t.whatsapp || 'Not set  -  add in Edit Profile';
+      if (waEl) waEl.textContent = t.whatsapp || 'Not set - add in Edit Profile';
       // Show Telegram linked state
       if (t.telegram_chat_id) {
         document.getElementById('tg-linked-state').style.display = 'block';
@@ -1041,7 +1220,7 @@ window.generatePlan = async function() {
         result.innerHTML += '<a href="' + data.share_url + '" target="_blank" style="display:inline-block;margin-top:12px;color:var(--brand);font-size:12px;font-weight:700;">Share plan link →</a>';
       }
     } else {
-      showToast('Could not generate plan  -  try again');
+      showToast('Could not generate plan - try again');
     }
   } catch {
     showToast('Error generating plan');
@@ -1085,7 +1264,7 @@ function generateInsight(data) {
     text = `You got <strong>${leads} lead${leads>1?'s':''}</strong> but no WhatsApp taps. Clients filled the form but didn't message you directly.`;
     action = `<a href="/edit" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Make sure your WhatsApp number is visible on your profile</a>`;
   } else if (views > 0 && convRate > 0) {
-    text = `Your conversion rate is <strong>${convRate}%</strong> this week (${leads} lead${leads>1?'s':''} from ${views} views). ${convRate >= 5 ? 'That\'s above average  -  great work.' : 'Industry average is 5-8%. A results guarantee could double this.'}`;
+    text = `Your conversion rate is <strong>${convRate}%</strong> this week (${leads} lead${leads>1?'s':''} from ${views} views). ${convRate >= 5 ? 'That\'s above average - great work.' : 'Industry average is 5-8%. A results guarantee could double this.'}`;
     action = convRate < 5 ? `<a href="/edit" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Add a money-back guarantee to your packages</a>` : '';
   } else if (views === 0) {
     text = 'Your profile has no views yet this week. Share your profile link to start getting traffic.';
@@ -1184,15 +1363,60 @@ function copyReferral() {
 
 async function startUpgrade() {
   try {
-    const res = await fetch(EDGE_BASE + '/create-checkout', {
-      method: 'POST', headers: { 'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + getAuthToken() },
-      body: JSON.stringify({ trainer_id: trainer.id, plan: 'pro', success_url: location.origin + '/dashboard?upgraded=1', cancel_url: location.origin + '/dashboard' })
+    const res = await fetch(EDGE_BASE + '/payment-router', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({
+        trainer_id: trainer.id,
+        plan: 'pro',
+        billing: 'monthly',
+        success_url: location.origin + '/dashboard?upgraded=1',
+        cancel_url: location.origin + '/dashboard',
+      })
     });
     const data = await res.json();
-    if (data.url) location.href = data.url;
-    else showToast('Could not start checkout. Please try again.', 'error');
-  } catch { showToast('Could not start checkout.', 'error'); }
+    if (!res.ok) { showToast(data.error || 'Could not start checkout.', 'error'); return; }
+    if (data.provider === 'stripe' && data.checkout_url) {
+      location.href = data.checkout_url;
+    } else if (data.provider === 'razorpay') {
+      await openRazorpay(data);
+    } else {
+      showToast('Could not start checkout. Please try again.', 'error');
+    }
+  } catch (err) {
+    if (err && err.message && err.message.includes('razorpay')) {
+      showToast('Payment provider unavailable. Please try again.', 'error');
+    } else {
+      showToast('Could not start checkout.', 'error');
+    }
+  }
+}
+
+function openRazorpay(data) {
+  return new Promise((resolve, reject) => {
+    function openModal() {
+      const rzp = new Razorpay({
+        key: data.key_id,
+        amount: data.amount,
+        currency: data.currency,
+        order_id: data.order_id,
+        name: 'TrainedBy',
+        description: data.description,
+        prefill: { name: data.trainer_name, email: data.trainer_email },
+        handler: () => { resolve(); location.href = location.origin + '/dashboard?upgraded=1'; },
+        modal: { ondismiss: resolve },
+      });
+      rzp.open();
+    }
+    if (window.Razorpay) { openModal(); return; }
+    const existing = document.querySelector('script[src*="checkout.razorpay.com"]');
+    if (existing) { existing.addEventListener('load', openModal); existing.addEventListener('error', () => reject(new Error('razorpay-sdk-load-failed'))); return; }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = openModal;
+    script.onerror = () => reject(new Error('razorpay-sdk-load-failed'));
+    document.head.appendChild(script);
+  });
 }
 
 function formatTimeAgo(dateStr) {
@@ -1211,10 +1435,52 @@ if (new URLSearchParams(location.search).get('upgraded') === '1') {
 
 init();
 
+// Handle Stripe Connect redirect params
+(function handleStripeParam() {
+  const params = new URLSearchParams(window.location.search);
+  const stripeParam = params.get('stripe');
+  if (!stripeParam) return;
+
+  const token = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('tb_session='))?.slice('tb_session='.length);
+  if (!token) return;
+
+  const FUNCTIONS_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1';
+
+  if (stripeParam === 'start') {
+    // Initiate Stripe Connect
+    fetch(`${FUNCTIONS_URL}/connect-stripe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ trainer_id: trainer?.id }),
+    })
+    .then(r => r.json())
+    .then(d => { if (d.url) window.location.href = d.url; })
+    .catch(err => console.error('[connect-stripe]', err));
+  }
+
+  if (stripeParam === 'return') {
+    // Verify onboarding completion
+    fetch(`${FUNCTIONS_URL}/connect-stripe-return`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ trainer_id: trainer?.id }),
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.onboarded) {
+        // Clean URL and reload to show updated setup state
+        window.history.replaceState({}, '', '/dashboard');
+        window.location.reload();
+      }
+    })
+    .catch(err => console.error('[connect-stripe-return]', err));
+  }
+})();
+
 // ── Support Chatbot Widget ──────────────────────────────────────────────────────────
 (function() {
   const SUPPORT_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1/support-agent';
-  const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
+  // ANON_KEY injected via define:vars from frontmatter
 
   const style = document.createElement('style');
   style.textContent = [
@@ -1252,7 +1518,7 @@ init();
   const win = document.createElement('div');
   win.className = 'tb-chat-window';
   const _bn = window.__BRAND__?.name || 'TrainedBy';
-  win.innerHTML = '<div class="tb-chat-header"><div><div class="tb-chat-header-title">' + _bn + ' Support</div><div class="tb-chat-header-sub">Ask me anything about your account</div></div><button class="tb-chat-close" id="tb-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div><div class="tb-chat-messages" id="tb-msgs"><div class="tb-msg bot">Hey! Ask me anything about ' + _bn + '  -  pricing, verification, referrals, or how features work.</div></div><div class="tb-chat-input-row"><input class="tb-chat-input" id="tb-input" placeholder="Ask a question..." maxlength="300"/><button class="tb-chat-send" id="tb-send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div>';
+  win.innerHTML = '<div class="tb-chat-header"><div><div class="tb-chat-header-title">' + _bn + ' Support</div><div class="tb-chat-header-sub">Ask me anything about your account</div></div><button class="tb-chat-close" id="tb-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div><div class="tb-chat-messages" id="tb-msgs"><div class="tb-msg bot">Hey! Ask me anything about ' + _bn + ' - pricing, verification, referrals, or how features work.</div></div><div class="tb-chat-input-row"><input class="tb-chat-input" id="tb-input" placeholder="Ask a question..." maxlength="300"/><button class="tb-chat-send" id="tb-send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div>';
 
   document.body.appendChild(btn);
   document.body.appendChild(win);

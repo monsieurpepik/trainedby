@@ -36,7 +36,7 @@ const blogStrings = {
   footer_for_trainers: t(locale, 'footer_for_trainers') || 'For Trainers',
   footer_find:  t(locale, 'footer_find')       || 'Find a Trainer',
   min_read:     locale === 'es' ? 'min de lectura' : locale === 'fr' ? 'min de lecture' : locale === 'it' ? 'min di lettura' : 'min read',
-  no_contributors: locale === 'es' ? 'Aún no hay colaboradores  -  sé el primero en publicar.' : locale === 'fr' ? 'Pas encore de contributeurs  -  soyez le premier à publier.' : locale === 'it' ? 'Nessun contributore ancora  -  sii il primo a pubblicare.' : 'No contributors yet  -  be the first to publish.',
+  no_contributors: locale === 'es' ? 'Aún no hay colaboradores - sé el primero en publicar.' : locale === 'fr' ? 'Pas encore de contributeurs - soyez le premier à publier.' : locale === 'it' ? 'Nessun contributore ancora - sii il primo a pubblicare.' : 'No contributors yet - be the first to publish.',
   empty_title:  locale === 'es' ? 'Aún no hay artículos en esta categoría' : locale === 'fr' ? 'Pas encore d\'articles dans cette catégorie' : locale === 'it' ? 'Nessun articolo in questa categoria' : 'No articles yet in this category',
   empty_sub:    locale === 'es' ? 'Sé el primero en publicar en esta categoría.' : locale === 'fr' ? 'Soyez le premier à publier dans cette catégorie.' : locale === 'it' ? 'Sii il primo a pubblicare in questa categoria.' : 'Be the first trainer to publish in this category.',
 };
@@ -71,7 +71,7 @@ const sampleArticles = {
 const localeSamplesJson = JSON.stringify(sampleArticles[locale] || sampleArticles.en);
 ---
 <Base
-  title={`${brandName} Blog  -  ${blogStrings.title.split('\n')[0]}`}
+  title={`${brandName} Blog - ${blogStrings.title.split('\n')[0]}`}
   description={blogStrings.sub}>
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -454,10 +454,9 @@ async function loadBlog() {
       .from('blog_posts')
       .select(`
         id, title, slug, excerpt, category, cover_url, emoji, read_time_mins,
-        published_at, view_count,
-        trainer:trainer_id (id, name, slug, avatar_url, photo_url, reps_verified, specialties)
+        published_at, author
       `)
-      .eq('published', true)
+      .eq('status', 'published')
       .order('published_at', { ascending: false })
       .limit(20);
 
@@ -504,11 +503,9 @@ function renderArticles(articles) {
 }
 
 function buildFeaturedCard(a) {
-  const trainer = a.trainer || {};
-  const initials = (trainer.name||'TB').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-  const avatarHtml = trainer.avatar_url || trainer.photo_url
-    ? `<img class="article-meta-avatar" src="${trainer.avatar_url||trainer.photo_url}" alt="${trainer.name}">`
-    : `<div class="article-meta-avatar-initials">${initials}</div>`;
+  const authorName = a.author || (window.__BRAND__?.name || 'TrainedBy') + ' Trainer';
+  const initials = authorName.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const avatarHtml = `<div class="article-meta-avatar-initials">${initials}</div>`;
   const imgHtml = a.cover_url
     ? `<img class="featured-img" src="${a.cover_url}" alt="${a.title}" loading="lazy">`
     : `<div class="featured-img-placeholder">${a.emoji || '💪'}</div>`;
@@ -522,19 +519,17 @@ function buildFeaturedCard(a) {
         <div class="featured-excerpt">${a.excerpt || ''}</div>
         <div class="article-meta">
           ${avatarHtml}
-          <span class="article-meta-name">${trainer.name || `${window.__BRAND__?.name || 'TrainedBy'} Trainer`}</span>
-          ${trainer.reps_verified ? '<span class="reps-badge-sm">REPs</span>' : ''}
+          <span class="article-meta-name">${authorName}</span>
           <span>·</span>
           <span>${a.read_time_mins || 5} min read</span>
           ${date ? `<span>·</span><span>${date}</span>` : ''}
         </div>
       </div>
-    </div>`;
+    </div>\`;
 }
 
 function buildArticleCard(a) {
-  const trainer = a.trainer || {};
-  const initials = (trainer.name||'TB').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const authorName = a.author || 'Trainer';
   const imgHtml = a.cover_url
     ? `<img class="article-card-img" src="${a.cover_url}" alt="${a.title}" loading="lazy">`
     : `<div class="article-card-img-placeholder">${a.emoji || '🏋️'}</div>`;
@@ -544,12 +539,11 @@ function buildArticleCard(a) {
       <div class="article-category" style="margin-bottom:6px;">${a.category || 'Training'}</div>
       <div class="article-card-title">${a.title}</div>
       <div class="article-card-meta">
-        <span>${trainer.name || 'Trainer'}</span>
-        ${trainer.reps_verified ? '<span class="reps-badge-sm">REPs</span>' : ''}
+        <span>${authorName}</span>
         <span>·</span>
         <span>${a.read_time_mins || 5} min</span>
       </div>
-    </div>`;
+    </div>\`;
 }
 
 function loadTopContributors(articles) {
@@ -563,7 +557,7 @@ function loadTopContributors(articles) {
   const top = Object.values(trainerMap).sort((a,b) => b.count - a.count).slice(0,5);
   const container = document.getElementById('top-contributors');
   if (!top.length) {
-    container.innerHTML = '<div style="font-size:12px;color:var(--text-faint);">No contributors yet  -  be the first to publish.</div>';
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-faint);">No contributors yet - be the first to publish.</div>';
     return;
   }
   top.forEach(t => {
@@ -603,8 +597,8 @@ function goToArticle(slugOrId) {
   window.location.href = `/blog/${slugOrId}`;
 }
 
-// Sample articles for when DB is empty  -  locale-aware
-const LOCALE_SAMPLES = {localeSamplesJson};
+// Sample articles for when DB is empty - locale-aware
+const LOCALE_SAMPLES = sampleArticles;
 function renderSampleArticles() {
   const samples = LOCALE_SAMPLES;
   allArticles = samples;

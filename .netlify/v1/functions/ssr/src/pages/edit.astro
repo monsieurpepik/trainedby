@@ -6,7 +6,7 @@ const brandName = market.brandName;
 ---
 
 <Base
-  title={`Edit Profile  -  ${brandName}`}
+  title={`Edit Profile - ${brandName}`}
   description={`Edit your ${brandName} trainer profile, packages, and settings.`}
 >
   <style>
@@ -274,11 +274,11 @@ body {
     <div class="auth-gate">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" style="margin-bottom:20px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
       <h2>Sign in to edit</h2>
-      <p>Enter your email to receive a magic link  -  no password needed.</p>
+      <p>Enter your email to receive a magic link - no password needed.</p>
       <input class="auth-field" type="email" id="auth-email" placeholder="your@email.com" autocomplete="email">
       <div id="auth-error" style="display:none;font-size:12px;color:#ff5555;margin-bottom:10px;max-width:340px;"></div>
       <button class="auth-btn" id="auth-btn" onclick="sendMagicLink()">Send Magic Link</button>
-      <div class="auth-hint">Check your inbox  -  link expires in 15 minutes.</div>
+      <div class="auth-hint">Check your inbox - link expires in 15 minutes.</div>
     </div>
     <div id="auth-sent" class="hidden" style="text-align:center;padding:40px 0;">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="1.5" style="margin-bottom:16px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -343,7 +343,7 @@ body {
     <!-- Section: Specialties -->
     <div class="edit-section">
       <div class="section-heading">Specialties</div>
-      <div class="section-sub">Select all that apply  -  shown as pills on your profile.</div>
+      <div class="section-sub">Select all that apply - shown as pills on your profile.</div>
       <div class="toggle-row" id="spec-row">
         <div class="toggle-pill" onclick="togglePill(this,'spec','Strength')">Strength</div>
         <div class="toggle-pill" onclick="togglePill(this,'spec','Fat Loss')">Fat Loss</div>
@@ -385,6 +385,68 @@ body {
       </button>
     </div>
 
+    <!-- Section: Book Sessions -->
+    <div class="edit-section" id="sessions-section">
+      <div class="section-heading">Book Sessions</div>
+      <div class="section-sub">Set up session types that clients can book and pay for online.</div>
+      <div id="session-types-list" style="margin-bottom:14px;"></div>
+      <button onclick="showAddSessionForm()" id="add-session-btn" style="width:100%;padding:12px;border-radius:10px;background:transparent;border:1px dashed var(--border);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
+        + Add Session Type
+      </button>
+      <div id="add-session-form" style="display:none;margin-top:14px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px;">
+        <div class="field">
+          <label>Session Name</label>
+          <input type="text" id="new-session-name" placeholder="e.g. 1:1 Strength Session" maxlength="80">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="field">
+            <label>Price (USD)</label>
+            <input type="number" id="new-session-price" placeholder="75" min="1" step="1" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label>Duration (min)</label>
+            <input type="number" id="new-session-duration" placeholder="60" min="15" step="15" inputmode="numeric">
+          </div>
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <select id="new-session-package">
+            <option value="single">Single session</option>
+            <option value="4">4-session pack</option>
+            <option value="8">8-session pack</option>
+            <option value="12">12-session pack</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button onclick="saveNewSessionType()" style="flex:1;padding:12px;border-radius:10px;background:var(--brand);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;" id="save-session-btn">Save</button>
+          <button onclick="cancelAddSession()" style="padding:12px 20px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:13px;cursor:pointer;">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section: Booking Availability -->
+    <div class="edit-section" id="booking-avail-section">
+      <div class="section-heading">Booking Availability</div>
+      <div class="section-sub">Set which days and hours clients can book you. Block specific dates when you're unavailable.</div>
+
+      <!-- Weekly schedule -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Weekly Schedule</div>
+        <div id="avail-days-grid"></div>
+        <button onclick="saveSchedule()" style="margin-top:12px;width:100%;padding:12px;border-radius:10px;background:var(--brand);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;" id="save-schedule-btn">Save Schedule</button>
+      </div>
+
+      <!-- Date overrides -->
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Block a Date</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="date" id="block-date-input" style="flex:1;padding:11px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none;" onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'">
+          <button onclick="blockDate()" style="padding:11px 16px;border-radius:10px;background:var(--surface-3);border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">Block Day</button>
+        </div>
+        <div id="blocked-dates-list" style="margin-top:12px;"></div>
+      </div>
+    </div>
+
     <!-- Section: Transformation Gallery -->
     <div class="edit-section">
       <div class="section-heading">Transformation Gallery</div>
@@ -412,7 +474,7 @@ body {
     <!-- Section: Video Intro -->
     <div class="edit-section">
       <div class="section-heading">Video Intro</div>
-      <div class="section-sub">Add a short intro video  -  YouTube or Instagram Reel link. Clients who watch a video are 3× more likely to book.</div>
+      <div class="section-sub">Add a short intro video - YouTube or Instagram Reel link. Clients who watch a video are 3× more likely to book.</div>
       <div class="field">
         <label>Video URL</label>
         <input type="url" id="e-video-intro" placeholder="https://youtube.com/shorts/... or https://instagram.com/reel/...">
@@ -627,6 +689,10 @@ function populateForm(t) {
   if (t.gallery_urls) {
     t.gallery_urls.forEach(url => addGalleryItem(url));
   }
+
+  // Session types
+  loadSessionTypes();
+  loadAvailability();
 }
 
 // ===== AVAILABILITY =====
@@ -788,7 +854,7 @@ async function submitRepsVerification() {
       'Authorization': 'Bearer ' + getAuthToken() },
     body: JSON.stringify({ trainer_id: trainer.id, reps_number: reps })
   });
-  if (res.ok) showToast('Verification submitted  -  we\'ll confirm within 24h', 'success');
+  if (res.ok) showToast('Verification submitted - we\'ll confirm within 24h', 'success');
   else showToast('Failed to submit. Please try again.', 'error');
 }
 
@@ -837,6 +903,247 @@ function confirmDelete() {
     if (r.ok) { clearAuthToken(); location.href = '/'; }
     else showToast('Delete failed. Please try again.', 'error');
   });
+}
+
+// ===== SESSION TYPES =====
+let sessionTypes = [];
+
+async function loadSessionTypes() {
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-session-types', {
+      headers: { 'Authorization': 'Bearer ' + getAuthToken() }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    sessionTypes = data.session_types || [];
+    renderSessionTypes();
+  } catch {}
+}
+
+function renderSessionTypes() {
+  const list = document.getElementById('session-types-list');
+  if (!list) return;
+  if (sessionTypes.length === 0) {
+    list.innerHTML = '<p style="font-size:13px;color:var(--text-faint);text-align:center;padding:16px 0;">No session types yet. Add one below.</p>';
+    return;
+  }
+  list.innerHTML = sessionTypes.map(st => `
+    <div style="background:var(--surface-3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${st.name}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
+          $${(st.price_cents / 100).toFixed(0)} · ${st.duration_min}min${st.package_count ? ' · Pack of ' + st.package_count : ''}
+        </div>
+      </div>
+      <button onclick="toggleSessionType('${st.id}', ${!st.is_active})" style="padding:6px 12px;border-radius:8px;border:1px solid ${st.is_active ? 'var(--border)' : 'var(--brand)'};background:${st.is_active ? 'transparent' : 'var(--brand)'};color:${st.is_active ? 'var(--text-muted)' : '#fff'};font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">
+        ${st.is_active ? 'Deactivate' : 'Activate'}
+      </button>
+    </div>
+  `).join('');
+}
+
+function showAddSessionForm() {
+  document.getElementById('add-session-form').style.display = 'block';
+  document.getElementById('add-session-btn').style.display = 'none';
+}
+
+function cancelAddSession() {
+  document.getElementById('add-session-form').style.display = 'none';
+  document.getElementById('add-session-btn').style.display = '';
+  document.getElementById('new-session-name').value = '';
+  document.getElementById('new-session-price').value = '';
+  document.getElementById('new-session-duration').value = '';
+  document.getElementById('new-session-package').value = 'single';
+}
+
+async function saveNewSessionType() {
+  const name = document.getElementById('new-session-name').value.trim();
+  const priceInput = parseFloat(document.getElementById('new-session-price').value);
+  const durationMin = parseInt(document.getElementById('new-session-duration').value);
+  const packageVal = document.getElementById('new-session-package').value;
+
+  if (!name) { showToast('Please enter a session name.', 'error'); return; }
+  if (!priceInput || priceInput < 1) { showToast('Please enter a valid price.', 'error'); return; }
+  if (!durationMin || durationMin < 15) { showToast('Duration must be at least 15 minutes.', 'error'); return; }
+
+  const priceCents = Math.round(priceInput * 100);
+  const packageCount = packageVal === 'single' ? null : parseInt(packageVal);
+
+  const btn = document.getElementById('save-session-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-session-types', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({ trainer_id: trainer.id, name, price_cents: priceCents, duration_min: durationMin, package_count: packageCount })
+    });
+    if (!res.ok) throw new Error();
+    await loadSessionTypes();
+    cancelAddSession();
+    showToast('Session type added!');
+  } catch {
+    showToast('Could not save session type. Try again.', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save';
+  }
+}
+
+async function toggleSessionType(id, newActive) {
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-session-types', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({ id, trainer_id: trainer.id, is_active: newActive })
+    });
+    if (!res.ok) throw new Error();
+    await loadSessionTypes();
+    showToast(newActive ? 'Session type activated.' : 'Session type deactivated.');
+  } catch {
+    showToast('Could not update session type. Try again.', 'error');
+  }
+}
+
+// ===== BOOKING AVAILABILITY =====
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+let scheduleState = {}; // key: day_of_week (0-6), value: { start_time, end_time } | null
+
+async function loadAvailability() {
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-availability', {
+      headers: { 'Authorization': 'Bearer ' + getAuthToken() }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    // Build scheduleState map
+    scheduleState = {};
+    (data.schedule || []).forEach(s => {
+      scheduleState[s.day_of_week] = { start_time: s.start_time, end_time: s.end_time };
+    });
+    renderSchedule();
+    renderOverrides(data.overrides || []);
+  } catch {}
+}
+
+function renderSchedule() {
+  const grid = document.getElementById('avail-days-grid');
+  if (!grid) return;
+  grid.innerHTML = DAYS.map((day, i) => {
+    const on = !!scheduleState[i];
+    const start = scheduleState[i]?.start_time || '09:00';
+    const end = scheduleState[i]?.end_time || '17:00';
+    return `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);" id="day-row-${i}">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0;width:110px;">
+          <input type="checkbox" id="day-check-${i}" ${on ? 'checked' : ''} onchange="toggleDay(${i})" style="width:16px;height:16px;accent-color:var(--brand);cursor:pointer;">
+          <span style="font-size:13px;font-weight:600;">${day}</span>
+        </label>
+        <div style="display:flex;align-items:center;gap:6px;flex:1;${on ? '' : 'opacity:0.3;pointer-events:none;'}" id="day-times-${i}">
+          <input type="time" id="day-start-${i}" value="${start}" style="flex:1;padding:7px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;outline:none;min-width:0;">
+          <span style="font-size:11px;color:var(--text-muted);">to</span>
+          <input type="time" id="day-end-${i}" value="${end}" style="flex:1;padding:7px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;outline:none;min-width:0;">
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleDay(i) {
+  const checked = document.getElementById('day-check-' + i).checked;
+  const timesDiv = document.getElementById('day-times-' + i);
+  timesDiv.style.opacity = checked ? '1' : '0.3';
+  timesDiv.style.pointerEvents = checked ? '' : 'none';
+  if (checked) {
+    scheduleState[i] = {
+      start_time: document.getElementById('day-start-' + i).value || '09:00',
+      end_time: document.getElementById('day-end-' + i).value || '17:00'
+    };
+  } else {
+    delete scheduleState[i];
+  }
+}
+
+async function saveSchedule() {
+  const schedule = [];
+  for (let i = 0; i < 7; i++) {
+    const checked = document.getElementById('day-check-' + i)?.checked;
+    if (!checked) continue;
+    const start = document.getElementById('day-start-' + i)?.value;
+    const end = document.getElementById('day-end-' + i)?.value;
+    if (!start || !end || end <= start) {
+      showToast('End time must be after start time for ' + DAYS[i] + '.', 'error');
+      return;
+    }
+    schedule.push({ day_of_week: i, start_time: start, end_time: end });
+  }
+
+  const btn = document.getElementById('save-schedule-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-availability?op=schedule', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({ trainer_id: trainer.id, schedule })
+    });
+    if (!res.ok) throw new Error();
+    showToast('Schedule saved!');
+  } catch {
+    showToast('Could not save schedule. Try again.', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Schedule';
+  }
+}
+
+function renderOverrides(overrides) {
+  const list = document.getElementById('blocked-dates-list');
+  if (!list) return;
+  const blocked = overrides.filter(o => o.is_blocked);
+  if (blocked.length === 0) {
+    list.innerHTML = '<p style="font-size:12px;color:var(--text-faint);">No blocked dates.</p>';
+    return;
+  }
+  list.innerHTML = blocked.map(o => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;">
+      <span style="font-size:13px;">${o.date}</span>
+      <button onclick="unblockDate('${o.date}')" style="padding:4px 10px;border-radius:6px;background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:11px;cursor:pointer;">Unblock</button>
+    </div>
+  `).join('');
+}
+
+async function blockDate() {
+  const dateInput = document.getElementById('block-date-input');
+  const date = dateInput.value;
+  if (!date) { showToast('Please pick a date.', 'error'); return; }
+
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-availability?op=override', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({ trainer_id: trainer.id, date, is_blocked: true })
+    });
+    if (!res.ok) throw new Error();
+    dateInput.value = '';
+    await loadAvailability();
+    showToast('Date blocked.');
+  } catch {
+    showToast('Could not block date. Try again.', 'error');
+  }
+}
+
+async function unblockDate(date) {
+  try {
+    const res = await fetch(EDGE_BASE + '/manage-availability?op=override', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({ trainer_id: trainer.id, date })
+    });
+    if (!res.ok) throw new Error();
+    await loadAvailability();
+    showToast('Date unblocked.');
+  } catch {
+    showToast('Could not unblock date. Try again.', 'error');
+  }
 }
 
 init();
