@@ -1,9 +1,9 @@
 ---
 /**
  * Dynamic trainer profile route
- * Serves clean URLs: /sarah-al-mansoori → renders the full profile page
- * The slug is injected into window.__TRAINER_SLUG__ so getSlug() in the
- * profile JS picks it up correctly without changing the URL.
+ * Serves clean URLs: /sarah-al-mansoori → renders the full trainer profile page
+ * Astro SSR extracts slug + market config and passes them as props to the
+ * <TrainerProfile client:load /> React island, which handles data fetch + rendering.
  */
 import Base from "../layouts/Base.astro";
 import { getMarket } from "../lib/market.ts";
