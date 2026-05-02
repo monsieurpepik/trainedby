@@ -942,13 +942,15 @@ body {
             }
           }
         );
-        const total = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const rawTotal = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
+        const total = isNaN(rawTotal) ? 0 : rawTotal;
         const reviews = await r.json();
         const el = document.getElementById('reviewsContent');
         if (!el) return;
         el.classList.remove('tb-reviews-loading');
 
-        if (!Array.isArray(reviews) || total === 0) {
+        if (!Array.isArray(reviews) || reviews.length === 0 || total === 0) {
           // Hide the entire reviews section — spec says hide if 0 reviews
           const section = document.getElementById('tb-reviews-section');
           if (section) section.style.display = 'none';
