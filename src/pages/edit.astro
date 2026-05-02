@@ -14,8 +14,8 @@ const brandName = market.brandName;
 :root {
   
   --reps: #00C853; --reps-dim: rgba(0,200,83,0.08); --reps-border: rgba(0,200,83,0.2);
-  --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c; --surface-4: #242424;
-  --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.14);
+  --surface-2: #111; --surface-3: #1c1c1c; --surface-4: #242424;
+  --border-hover: rgba(255,255,255,0.14);
   --text: #fff; --text-muted: rgba(255,255,255,0.5); --text-faint: rgba(255,255,255,0.25);
 }
 html { scroll-behavior: smooth; }
@@ -53,7 +53,7 @@ body {
 }
 .header-btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
 .header-btn-brand { background: var(--brand); color: #fff; }
-.header-btn-brand:hover { background: #e05200; }
+.header-btn-brand:hover { background: var(--brand-hover); }
 .header-btn-brand:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ===== AUTH GATE ===== */
@@ -80,7 +80,7 @@ body {
   border-radius: 12px; font-family: 'DM Sans', sans-serif;
   font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s;
 }
-.auth-btn:hover { background: #e05200; }
+.auth-btn:hover { background: var(--brand-hover); }
 .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .auth-hint { font-size: 11px; color: var(--text-faint); margin-top: 8px; }
 

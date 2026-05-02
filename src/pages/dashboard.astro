@@ -117,17 +117,9 @@ if (tbSession) {
   </Fragment>
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #FFFFFF; --surface: #FAFAF9; --surface-2: #F5F4F3; --surface-3: #E8E5E2; --surface-4: #E0DDD9;
-  --text: #1A1411; --text-muted: #6B6460; --text-faint: rgba(26,20,17,0.4); --border: rgba(0,0,0,0.07);
-  --brand: #FF5C00; --green: #00C853; --reps: #00C853; --reps-dim: rgba(0,200,83,0.1);
-  --danger: #E53935; --danger-dim: rgba(229,57,53,0.1);
-  --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
-  --reps-border: rgba(0,200,83,0.2); --border-hover: rgba(0,0,0,0.14);
-}
 html { scroll-behavior: smooth; }
 body {
-  background: #FAFAF9 !important; color: #1A1411 !important;
+  background: var(--bg) !important; color: var(--text) !important;
   font-family: 'DM Sans', system-ui, sans-serif; font-size: 14px; line-height: 1.6;
   -webkit-font-smoothing: antialiased; min-height: 100vh;
 }
@@ -146,9 +138,9 @@ body {
   .dash-tabs-inner { max-width: 960px; margin: 0 auto; height: 52px; display: flex; align-items: center; padding: 0 32px; }
   .tabs-logo { font-weight: 800; font-size: 15px; color: #1A1411; letter-spacing: -0.03em; text-decoration: none; margin-right: 32px; flex-shrink: 0; }
   .tabs-list { display: flex; flex: 1; height: 52px; }
-  .tab-item { padding: 0 16px; font-size: 13px; font-weight: 500; color: #6B6460; text-decoration: none; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: color 0.15s; }
-  .tab-item:hover { color: #1A1411; }
-  .tab-item.active { color: #1A1411; font-weight: 700; border-bottom-color: #1A1411; }
+  .tab-item { padding: 0 16px; font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: color 0.15s; }
+  .tab-item:hover { color: var(--text); }
+  .tab-item.active { color: var(--text); font-weight: 700; border-bottom-color: var(--text); }
   .tabs-right { margin-left: auto; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
   .tab-view-profile { font-size: 12px; color: #FF5C00; font-weight: 700; text-decoration: none; }
   .tabs-avatar { width: 30px; height: 30px; border-radius: 50%; background: #F5F4F3; border: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #1A1411; }
