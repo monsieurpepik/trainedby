@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 interface AboutProps {
-  bio: string;
+  bio: string | undefined | null;
 }
 
 export default function About({ bio }: AboutProps) {
@@ -18,12 +18,15 @@ export default function About({ bio }: AboutProps) {
       >
         {bio}
       </div>
-      <button
-        className="tb-read-more"
-        onClick={() => setExpanded((prev) => !prev)}
-      >
-        {expanded ? 'Read less' : 'Read more →'}
-      </button>
+      {!expanded && (
+        <button
+          className="tb-read-more"
+          style={{ color: '#9A9290', fontWeight: 400 }}
+          onClick={() => setExpanded(true)}
+        >
+          Read more →
+        </button>
+      )}
     </div>
   );
 }

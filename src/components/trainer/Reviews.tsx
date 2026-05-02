@@ -9,6 +9,8 @@ const STAR_EMPTY = 'rgba(0,0,0,0.12)';
 
 interface ReviewsProps {
   trainerId: string;
+  averageRating: number | null;
+  reviewCount: number;
 }
 
 interface ReviewsState {
@@ -65,7 +67,7 @@ function ReviewCard({ review }: { review: Review }) {
   );
 }
 
-export default function Reviews({ trainerId }: ReviewsProps) {
+export default function Reviews({ trainerId, averageRating, reviewCount }: ReviewsProps) {
   const [state, setState] = useState<ReviewsState>({
     loading: true,
     reviews: [],
@@ -111,29 +113,37 @@ export default function Reviews({ trainerId }: ReviewsProps) {
   }
 
   // Hide section entirely if no reviews (spec requirement)
-  if (state.reviews.length === 0 || state.total === 0) return null;
+  if (state.total === 0) return null;
 
-  const avg = state.reviews.reduce((a, b) => a + (b.rating ?? 0), 0) / state.reviews.length;
+  const displayRating = averageRating ?? 0;
+  const totalCount = state.total || reviewCount;
 
   return (
     <div className="tb-reviews">
       <div className="tb-section-label" style={{ marginBottom: '12px' }}>Reviews</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
         <div style={{ fontSize: '32px', fontWeight: 200, letterSpacing: '-0.02em', color: '#111111', lineHeight: 1 }}>
-          {avg.toFixed(1)}
+          {displayRating.toFixed(1)}
         </div>
         <div>
           <div style={{ display: 'flex', gap: '2px', marginBottom: '3px' }}>
-            <Stars rating={avg} />
+            <Stars rating={displayRating} />
           </div>
           <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-            from {state.total} verified client{state.total !== 1 ? 's' : ''}
+            from {reviewCount} verified client{reviewCount !== 1 ? 's' : ''}
           </div>
         </div>
       </div>
       {state.reviews.map((rv, i) => (
         <ReviewCard key={rv.id ?? i} review={rv} />
       ))}
+      {totalCount > 2 && (
+        <div style={{ marginTop: '8px', textAlign: 'center' }}>
+          <span style={{ fontSize: '12px', color: '#9A9290', cursor: 'pointer' }}>
+            See all {totalCount} reviews →
+          </span>
+        </div>
+      )}
     </div>
   );
 }
