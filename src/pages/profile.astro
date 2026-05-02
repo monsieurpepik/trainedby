@@ -22,6 +22,11 @@ const brandName = market.brandName;
         --border: rgba(0,0,0,0.07);
         --brand: #FF5C00;
         --brand-hover: #e05200;
+        --text-on-brand: #ffffff;
+        --color-whatsapp: #25D366;
+        --color-star: #fbbf24;
+        --color-accent: #818cf8;
+        --color-accent-light: #a5b4fc;
         --nav-logo-by: var(--brand);
       }
     </style>
@@ -33,25 +38,17 @@ const brandName = market.brandName;
     --orange-dim:rgba(255,92,0,0.15);
     --green:#22c55e;
     --green-dim:rgba(34,197,94,0.15);
-    --white:#ffffff;
-    --white-60:rgba(255,255,255,0.6);
-    --white-30:rgba(255,255,255,0.3);
-    --white-10:rgba(255,255,255,0.1);
-    --white-06:rgba(255,255,255,0.06);
-    --black:#000000;
-    --glass:rgba(10,10,10,0.55);
-    --glass-border:rgba(255,255,255,0.12);
     --radius:16px;
     --radius-sm:10px;
     --font:'DM Sans',sans-serif;
   }
   html,body{height:100%;width:100%;overflow-x:hidden}
-  body{font-family:var(--font);background:#0a0a0a;color:var(--white);-webkit-font-smoothing:antialiased}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 
   /* ── FULL BLEED BACKGROUND ── */
   #bg{
     position:fixed;inset:0;z-index:0;
-    background:#0a0a0a;
+    background:var(--bg);
     background-image:url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1400&q=85');
     background-size:cover;background-position:center top;
   }
@@ -74,18 +71,18 @@ const brandName = market.brandName;
     padding-top:max(env(safe-area-inset-top),16px);
     max-width:100%;
   }
-  .tb-logo{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-60)}
+  .tb-logo{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted)}
   .tb-cta{
-    background:rgba(255,255,255,0.12);
-    border:1px solid var(--glass-border);
-    color:var(--white);font-size:12px;font-weight:600;
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:var(--text);font-size:12px;font-weight:600;
     padding:7px 14px;border-radius:20px;
     text-decoration:none;letter-spacing:0.04em;
     backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   }
   .tb-share{
     width:36px;height:36px;border-radius:50%;
-    background:rgba(255,255,255,0.12);border:1px solid var(--glass-border);
+    background:var(--surface);border:1px solid var(--border);
     display:flex;align-items:center;justify-content:center;
     cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   }
@@ -122,14 +119,14 @@ const brandName = market.brandName;
   .avatar-inner{
     position:absolute;inset:3px;
     border-radius:50%;
-    background:#1a1a1a;
+    background:var(--surface-2);
     overflow:hidden;
     display:flex;align-items:center;justify-content:center;
   }
   .avatar-inner img{width:100%;height:100%;object-fit:cover}
   .avatar-initials{font-size:32px;font-weight:800;color:var(--orange)}
   .avatar-inner.no-photo{
-    background:linear-gradient(135deg,#1a1a1a 0%,#2a1500 100%);
+    background:linear-gradient(135deg,var(--surface-2) 0%,var(--surface-3) 100%);
     border:2px solid rgba(255,92,0,0.3);
   }
 
@@ -138,7 +135,7 @@ const brandName = market.brandName;
     display:flex;align-items:center;gap:8px;
     margin-bottom:6px;
   }
-  .trainer-name{font-size:26px;font-weight:800;letter-spacing:-0.02em;color:var(--white)}
+  .trainer-name{font-size:26px;font-weight:800;letter-spacing:-0.02em;color:var(--text)}
   .verified-badge{
     width:22px;height:22px;
     background:var(--orange);border-radius:50%;
@@ -148,14 +145,14 @@ const brandName = market.brandName;
   .verified-badge svg{width:12px;height:12px}
 
   /* Title */
-  .trainer-title{font-size:14px;color:var(--white-60);font-weight:500;margin-bottom:12px;line-height:1.4}
+  .trainer-title{font-size:14px;color:var(--text-muted);font-weight:500;margin-bottom:12px;line-height:1.4}
 
   /* REPs badge row */
   .badge-row{
     display:flex;align-items:center;gap:8px;
     margin-bottom:20px;flex-wrap:wrap;justify-content:center;
   }
-  .reps-num{font-size:12px;color:var(--white-60);font-weight:500;letter-spacing:0.04em}
+  .reps-num{font-size:12px;color:var(--text-muted);font-weight:500;letter-spacing:0.04em}
   .reps-badge{
     display:flex;align-items:center;gap:5px;
     background:var(--green-dim);
@@ -167,14 +164,14 @@ const brandName = market.brandName;
   .pending-badge{
     background:rgba(251,191,36,0.15);
     border:1px solid rgba(251,191,36,0.3);
-    color:#fbbf24;
+    color:var(--color-star);
   }
 
   /* Stats glass pill */
   .stats-pill{
     display:flex;align-items:center;
-    background:var(--glass);
-    border:1px solid var(--glass-border);
+    background:var(--surface);
+    border:1px solid var(--border);
     border-radius:14px;
     padding:14px 0;
     margin-bottom:16px;
@@ -187,60 +184,60 @@ const brandName = market.brandName;
   }
   .stat-item+.stat-item::before{
     content:'';position:absolute;left:0;top:20%;height:60%;
-    width:1px;background:var(--glass-border);
+    width:1px;background:var(--border);
   }
-  .stat-val{font-size:20px;font-weight:800;color:var(--white);line-height:1}
+  .stat-val{font-size:20px;font-weight:800;color:var(--text);line-height:1}
   .stat-val.accept{color:var(--green);font-size:18px}
-  .stat-lbl{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--white-60);margin-top:3px}
+  .stat-lbl{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-top:3px}
 
   /* Training modes */
   .modes-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
   .mode-tag{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.04em;border:1px solid}
   .mode-tag.in-person{background:rgba(255,92,0,0.1);border-color:rgba(255,92,0,0.3);color:var(--orange)}
-  .mode-tag.online{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:#818cf8}
+  .mode-tag.online{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:var(--color-accent)}
   .mode-tag.hybrid{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--green)}
 
   /* Rating row */
   .rating-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px}
   .star-filled{color:var(--orange);font-size:14px}
-  .star-empty{color:rgba(255,255,255,0.2);font-size:14px}
+  .star-empty{color:var(--text-muted);font-size:14px}
   .rating-score{font-size:14px;font-weight:800}
-  .rating-count{font-size:12px;color:var(--white-60)}
+  .rating-count{font-size:12px;color:var(--text-muted)}
 
   /* Video badge on avatar */
-  .avatar-video-btn{position:absolute;bottom:2px;right:2px;width:28px;height:28px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;border:2px solid #0a0a0a;cursor:pointer;z-index:2}
+  .avatar-video-btn{position:absolute;bottom:2px;right:2px;width:28px;height:28px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);cursor:pointer;z-index:2}
 
   /* Reviews */
-  .reviews-summary{display:flex;align-items:center;gap:14px;padding:14px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid var(--glass-border);margin-bottom:12px}
+  .reviews-summary{display:flex;align-items:center;gap:14px;padding:14px;background:var(--surface);border-radius:10px;border:1px solid var(--border);margin-bottom:12px}
   .reviews-big{font-size:44px;font-weight:800;line-height:1}
   .reviews-meta{flex:1}
   .reviews-stars{display:flex;gap:2px;margin-bottom:4px}
-  .reviews-count{font-size:12px;color:var(--white-60)}
-  .review-card{background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:10px;padding:14px;margin-bottom:8px}
+  .reviews-count{font-size:12px;color:var(--text-muted)}
+  .review-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px}
   .review-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
   .review-av{width:34px;height:34px;border-radius:50%;background:var(--orange-dim);border:1px solid rgba(255,92,0,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--orange);flex-shrink:0}
   .review-name{font-size:13px;font-weight:700}
   .review-verified{font-size:10px;color:var(--green);font-weight:600;margin-top:2px}
   .review-stars-sm{display:flex;gap:2px;margin-left:auto}
-  .review-text{font-size:13px;line-height:1.7;color:var(--white-60)}
+  .review-text{font-size:13px;line-height:1.7;color:var(--text-muted)}
   .review-achievement{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:600;color:var(--green)}
 
   /* Reviews empty state */
   .reviews-empty{
     text-align:center;padding:24px 16px;
-    border:1px dashed var(--glass-border);border-radius:12px;
+    border:1px dashed var(--border);border-radius:12px;
   }
   .reviews-empty-icon{font-size:32px;margin-bottom:8px}
-  .reviews-empty-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:4px}
-  .reviews-empty-sub{font-size:12px;color:var(--white-60);line-height:1.6}
+  .reviews-empty-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .reviews-empty-sub{font-size:12px;color:var(--text-muted);line-height:1.6}
 
   /* Transformations */
   .transforms-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .transform-card{border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border)}
+  .transform-card{border-radius:10px;overflow:hidden;background:var(--surface);border:1px solid var(--border)}
   .transform-imgs{display:grid;grid-template-columns:1fr 1fr;gap:1px}
-  .transform-img{aspect-ratio:1;object-fit:cover;width:100%;background:rgba(255,255,255,0.06)}
+  .transform-img{aspect-ratio:1;object-fit:cover;width:100%;background:var(--surface-2)}
   .transform-labels{display:flex;justify-content:space-between;padding:6px 8px 2px}
-  .t-before{font-size:9px;font-weight:700;color:var(--white-60);letter-spacing:0.06em}
+  .t-before{font-size:9px;font-weight:700;color:var(--text-muted);letter-spacing:0.06em}
   .t-after{font-size:9px;font-weight:700;color:var(--green);letter-spacing:0.06em}
   .transform-meta{padding:0 8px 8px;font-size:11px;color:var(--orange);font-weight:700}
 
@@ -253,9 +250,9 @@ const brandName = market.brandName;
   /* Gym tag */
   .gym-tag{
     display:inline-flex;align-items:center;gap:5px;
-    background:var(--white-06);border:1px solid var(--glass-border);
+    background:var(--surface);border:1px solid var(--border);
     border-radius:20px;padding:5px 12px;
-    font-size:12px;color:var(--white-60);font-weight:500;
+    font-size:12px;color:var(--text-muted);font-weight:500;
     margin-bottom:24px;
   }
 
@@ -267,7 +264,7 @@ const brandName = market.brandName;
   .btn-wa-wrap{display:flex;flex-direction:column;gap:10px}
   .btn-wa{
     display:flex;align-items:center;justify-content:center;gap:10px;
-    background:#25D366;color:#fff;
+    background:var(--color-whatsapp);color:var(--text-on-brand);
     font-size:16px;font-weight:700;
     padding:17px 24px;border-radius:14px;
     text-decoration:none;border:none;cursor:pointer;
@@ -278,7 +275,7 @@ const brandName = market.brandName;
   .btn-wa svg{width:22px;height:22px}
   .btn-book{
     display:flex;align-items:center;justify-content:center;gap:10px;
-    background:var(--orange);color:#fff;
+    background:var(--orange);color:var(--text-on-brand);
     font-size:16px;font-weight:700;
     padding:17px 24px;border-radius:14px;
     text-decoration:none;border:none;cursor:pointer;
@@ -294,22 +291,22 @@ const brandName = market.brandName;
   }
   .btn-action{
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-    background:rgba(255,255,255,0.08);
-    border:1px solid var(--glass-border);
+    background:var(--surface);
+    border:1px solid var(--border);
     border-radius:14px;padding:16px 12px;
-    color:var(--white);font-size:13px;font-weight:600;
+    color:var(--text);font-size:13px;font-weight:600;
     cursor:pointer;text-decoration:none;
     backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
     transition:background 0.15s;
   }
-  .btn-action:active{background:rgba(255,255,255,0.14)}
-  .btn-action svg{width:20px;height:20px;color:var(--white-60)}
+  .btn-action:active{background:var(--surface-2)}
+  .btn-action svg{width:20px;height:20px;color:var(--text-muted)}
 
   /* Save contact */
   .btn-save{
     display:flex;align-items:center;justify-content:center;gap:8px;
     background:transparent;border:none;
-    color:var(--white-60);font-size:13px;font-weight:500;
+    color:var(--text-muted);font-size:13px;font-weight:500;
     padding:14px;cursor:pointer;text-decoration:none;
     font-family:var(--font);
   }
@@ -324,8 +321,8 @@ const brandName = market.brandName;
 
   /* Section card */
   .sec-card{
-    background:var(--glass);
-    border:1px solid var(--glass-border);
+    background:var(--surface);
+    border:1px solid var(--border);
     border-radius:var(--radius);
     overflow:hidden;
     backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
@@ -336,14 +333,14 @@ const brandName = market.brandName;
     cursor:pointer;
     user-select:none;
   }
-  .sec-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--white-60)}
-  .sec-arrow{transition:transform 0.25s;color:var(--white-60)}
+  .sec-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted)}
+  .sec-arrow{transition:transform 0.25s;color:var(--text-muted)}
   .sec-arrow.open{transform:rotate(180deg)}
   .sec-body{display:none;padding:0 18px 16px}
   .sec-body.open{display:block}
 
   /* Bio */
-  .bio-text{font-size:14px;line-height:1.7;color:var(--white-60)}
+  .bio-text{font-size:14px;line-height:1.7;color:var(--text-muted)}
 
   /* Tags */
   .tag-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
@@ -353,20 +350,20 @@ const brandName = market.brandName;
     border:1px solid rgba(255,92,0,0.2);
   }
   .cert-tag{
-    background:var(--white-06);color:var(--white-60);
-    border:1px solid var(--glass-border);
+    background:var(--surface-2);color:var(--text-muted);
+    border:1px solid var(--border);
   }
 
   /* Packages - Grand Slam Offer cards */
   .pkg-list{display:flex;flex-direction:column;gap:10px}
   .pkg-card{
-    background:var(--white-06);border:1px solid var(--glass-border);
+    background:var(--surface-2);border:1px solid var(--border);
     border-radius:var(--radius);padding:16px 18px;
     cursor:pointer;transition:background 0.15s,border-color 0.15s;
     text-decoration:none;display:block;
   }
-  .pkg-card:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,92,0,0.3)}
-  .pkg-card:active{background:var(--white-10)}
+  .pkg-card:hover{background:var(--surface-3);border-color:rgba(255,92,0,0.3)}
+  .pkg-card:active{background:var(--surface-3)}
   .pkg-card.featured{
     background:linear-gradient(135deg,rgba(255,92,0,0.12) 0%,rgba(255,92,0,0.04) 100%);
     border-color:rgba(255,92,0,0.4);
@@ -379,8 +376,8 @@ const brandName = market.brandName;
     display:flex;align-items:center;justify-content:center;
     font-size:18px;flex-shrink:0;
   }
-  .pkg-name{font-size:15px;font-weight:800;color:var(--white);letter-spacing:-0.01em}
-  .pkg-sessions{font-size:12px;color:var(--white-60);margin-top:2px}
+  .pkg-name{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.01em}
+  .pkg-sessions{font-size:12px;color:var(--text-muted);margin-top:2px}
   .pkg-badge{
     font-size:10px;font-weight:700;letter-spacing:0.05em;
     background:var(--orange);color:#fff;
@@ -389,12 +386,12 @@ const brandName = market.brandName;
   }
   .pkg-right{text-align:right;flex-shrink:0}
   .pkg-price{font-size:20px;font-weight:800;color:var(--orange);line-height:1}
-  .pkg-unit{font-size:11px;color:var(--white-60);margin-top:2px}
+  .pkg-unit{font-size:11px;color:var(--text-muted);margin-top:2px}
   /* Grand Slam outcome row */
   .pkg-outcome{
-    font-size:13px;font-weight:700;color:var(--white);
+    font-size:13px;font-weight:700;color:var(--text);
     padding:8px 0 6px;
-    border-top:1px solid var(--glass-border);
+    border-top:1px solid var(--border);
     margin-top:8px;
     line-height:1.5;
   }
@@ -413,15 +410,15 @@ const brandName = market.brandName;
   }
   .pkg-bonus-tag{
     font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;
-    background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;
+    background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);color:var(--color-accent-light);
   }
   /* CTA row inside card */
   .pkg-cta-row{
     display:flex;align-items:center;justify-content:space-between;
     margin-top:12px;padding-top:10px;
-    border-top:1px solid var(--glass-border);
+    border-top:1px solid var(--border);
   }
-  .pkg-cta-text{font-size:12px;color:var(--white-60)}
+  .pkg-cta-text{font-size:12px;color:var(--text-muted)}
   .pkg-cta-btn{
     background:var(--orange);color:#fff;
     font-size:12px;font-weight:700;padding:7px 14px;
@@ -430,19 +427,19 @@ const brandName = market.brandName;
   }
 
   /* Assessment */
-  .assess-intro{font-size:13px;color:var(--white-60);margin-bottom:14px;line-height:1.6}
+  .assess-intro{font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6}
   .assess-form{display:flex;flex-direction:column;gap:10px}
   .assess-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .assess-field{display:flex;flex-direction:column;gap:4px}
-  .assess-field label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--white-60)}
+  .assess-field label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)}
   .assess-field input,.assess-field select{
-    background:var(--white-06);border:1px solid var(--glass-border);
+    background:var(--surface-2);border:1px solid var(--border);
     border-radius:9px;padding:10px 12px;
-    color:var(--white);font-size:14px;font-family:var(--font);
+    color:var(--text);font-size:14px;font-family:var(--font);
     outline:none;
   }
   .assess-field input:focus,.assess-field select:focus{border-color:var(--orange)}
-  .assess-field select option{background:#1a1a1a}
+  .assess-field select option{background:var(--surface-2)}
   .btn-assess{
     background:var(--orange);color:#fff;
     font-size:14px;font-weight:700;padding:13px;
@@ -452,7 +449,7 @@ const brandName = market.brandName;
   .assess-result{
     background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
     border-radius:10px;padding:14px;margin-top:8px;
-    font-size:13px;line-height:1.7;color:var(--white);
+    font-size:13px;line-height:1.7;color:var(--text);
     display:none;
   }
 
@@ -471,7 +468,7 @@ const brandName = market.brandName;
     background:var(--orange);
   }
   .philosophy-quote{
-    font-size:14px;line-height:1.75;color:var(--white);font-style:italic;
+    font-size:14px;line-height:1.75;color:var(--text);font-style:italic;
     font-weight:500;
   }
   .philosophy-author{
@@ -494,7 +491,7 @@ const brandName = market.brandName;
   .trust-pill svg{width:13px;height:13px;flex-shrink:0}
   .trust-pill.amber{
     background:rgba(251,191,36,0.12);border-color:rgba(251,191,36,0.2);
-    color:#fbbf24;
+    color:var(--color-star);
   }
 
   /* ── EDITORIAL TRAINER'S STACK ── */
@@ -502,29 +499,29 @@ const brandName = market.brandName;
   .affiliate-list{display:flex;flex-direction:column;gap:8px}
   .affiliate-item{
     display:flex;align-items:center;gap:12px;
-    background:var(--white-06);border:1px solid var(--glass-border);
+    background:var(--surface-2);border:1px solid var(--border);
     border-radius:12px;padding:12px 14px;
     text-decoration:none;transition:background 0.15s;
   }
-  .affiliate-item:hover{background:rgba(255,255,255,0.09)}
+  .affiliate-item:hover{background:var(--surface-3)}
   .affiliate-logo{
     width:40px;height:40px;border-radius:10px;
-    background:var(--white-10);border:1px solid var(--glass-border);
+    background:var(--surface-3);border:1px solid var(--border);
     display:flex;align-items:center;justify-content:center;
     font-size:18px;flex-shrink:0;overflow:hidden;
   }
   .affiliate-logo img{width:100%;height:100%;object-fit:cover;border-radius:10px}
-  .affiliate-name{font-size:13px;font-weight:700;color:var(--white)}
-  .affiliate-cat{font-size:11px;color:var(--white-60);margin-top:1px}
-  .affiliate-arrow{margin-left:auto;color:var(--white-30)}
+  .affiliate-name{font-size:13px;font-weight:700;color:var(--text)}
+  .affiliate-cat{font-size:11px;color:var(--text-muted);margin-top:1px}
+  .affiliate-arrow{margin-left:auto;color:var(--text-muted)}
   .affiliate-editorial-intro{
-    font-size:12px;color:var(--white-60);line-height:1.6;
+    font-size:12px;color:var(--text-muted);line-height:1.6;
     margin-bottom:14px;
     padding:10px 12px;
-    background:var(--white-06);border-radius:10px;
+    background:var(--surface-2);border-radius:10px;
     border-left:3px solid var(--orange);
   }
-  .affiliate-editorial-intro strong{color:var(--white)}
+  .affiliate-editorial-intro strong{color:var(--text)}
   .affiliate-discount{
     font-size:10px;font-weight:700;letter-spacing:0.04em;
     background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
@@ -536,7 +533,7 @@ const brandName = market.brandName;
     width:100%;aspect-ratio:16/9;
     border-radius:14px;overflow:hidden;
     margin-bottom:8px;position:relative;
-    background:var(--white-06);
+    background:var(--surface-2);
   }
   .gallery-hero img{width:100%;height:100%;object-fit:cover}
   .gallery-hero-label{
@@ -551,7 +548,7 @@ const brandName = market.brandName;
   }
   .gallery-img{
     aspect-ratio:1;border-radius:8px;
-    background:var(--white-06);overflow:hidden;
+    background:var(--surface-2);overflow:hidden;
     cursor:pointer;transition:opacity 0.15s;
   }
   .gallery-img:hover{opacity:0.85}
@@ -560,7 +557,7 @@ const brandName = market.brandName;
   /* Powered by */
   .powered{
     text-align:center;padding:16px;
-    font-size:11px;color:var(--white-60);
+    font-size:11px;color:var(--text-muted);
     letter-spacing:0.04em;
   }
   .powered a{color:var(--orange);text-decoration:none;font-weight:600}
@@ -568,14 +565,14 @@ const brandName = market.brandName;
   /* Loading skeleton */
   #loading{
     position:fixed;inset:0;z-index:200;
-    background:#0a0a0a;
+    background:var(--bg);
     display:flex;align-items:center;justify-content:center;
     flex-direction:column;gap:16px;
   }
-  .sk-logo{font-size:18px;font-weight:800;letter-spacing:0.1em;color:var(--white-60)}
+  .sk-logo{font-size:18px;font-weight:800;letter-spacing:0.1em;color:var(--text-muted)}
   .sk-spinner{
     width:32px;height:32px;border-radius:50%;
-    border:2px solid var(--white-10);
+    border:2px solid var(--border);
     border-top-color:var(--orange);
     animation:spin 0.8s linear infinite;
   }
@@ -584,19 +581,19 @@ const brandName = market.brandName;
   #err{
     display:none;
     position:fixed;inset:0;z-index:200;
-    background:#0a0a0a;
+    background:var(--bg);
     align-items:center;justify-content:center;
     flex-direction:column;gap:12px;padding:40px;text-align:center;
   }
   .err-icon{font-size:48px;margin-bottom:8px}
   .err-title{font-size:20px;font-weight:800}
-  .err-sub{font-size:14px;color:var(--white-60);line-height:1.6}
+  .err-sub{font-size:14px;color:var(--text-muted);line-height:1.6}
 
   /* Pending */
   #pending{
     display:none;
     position:fixed;inset:0;z-index:200;
-    background:#0a0a0a;
+    background:var(--bg);
     align-items:center;justify-content:center;
     flex-direction:column;gap:12px;padding:40px;text-align:center;
   }
@@ -610,24 +607,24 @@ const brandName = market.brandName;
   }
   #leadModal.open{display:flex}
   .modal-sheet{
-    background:#111;border:1px solid var(--glass-border);
+    background:var(--surface);border:1px solid var(--border);
     border-radius:24px 24px 0 0;
     padding:28px 24px max(env(safe-area-inset-bottom),24px);
     width:100%;max-width:480px;
   }
-  .modal-handle{width:36px;height:4px;background:var(--white-30);border-radius:2px;margin:0 auto 20px}
+  .modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
   .modal-title{font-size:18px;font-weight:800;margin-bottom:4px}
-  .modal-sub{font-size:13px;color:var(--white-60);margin-bottom:20px}
+  .modal-sub{font-size:13px;color:var(--text-muted);margin-bottom:20px}
   .modal-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
-  .modal-field label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--white-60)}
+  .modal-field label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)}
   .modal-field input{
-    background:var(--white-06);border:1px solid var(--glass-border);
+    background:var(--surface-2);border:1px solid var(--border);
     border-radius:10px;padding:12px 14px;
-    color:var(--white);font-size:15px;font-family:var(--font);outline:none;
+    color:var(--text);font-size:15px;font-family:var(--font);outline:none;
   }
   .modal-field input:focus{border-color:var(--orange)}
   .btn-modal-submit{
-    width:100%;background:var(--orange);color:#fff;
+    width:100%;background:var(--orange);color:var(--text-on-brand);
     font-size:15px;font-weight:700;padding:15px;
     border-radius:12px;border:none;cursor:pointer;
     font-family:var(--font);margin-top:4px;
@@ -635,8 +632,8 @@ const brandName = market.brandName;
   .btn-modal-close{
     position:absolute;top:16px;right:16px;
     width:32px;height:32px;border-radius:50%;
-    background:var(--white-10);border:none;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;color:var(--white);
+    background:var(--surface-2);border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--text);
   }
 
   /* ═══════════════════════════════════════════════
@@ -799,7 +796,7 @@ const brandName = market.brandName;
 <div id="pending">
   <div style="width:72px;height:72px;border-radius:50%;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:8px">⏳</div>
   <div style="font-size:20px;font-weight:800">Verification in Progress</div>
-  <div style="font-size:14px;color:var(--white-60);line-height:1.6;max-width:280px">This trainer's REPs UAE credentials are being verified. Check back shortly.</div>
+  <div style="font-size:14px;color:var(--text-muted);line-height:1.6;max-width:280px">This trainer's REPs UAE credentials are being verified. Check back shortly.</div>
 </div>
 
 <!-- Background -->
@@ -1047,32 +1044,32 @@ const brandName = market.brandName;
         <div id="reviewsBody" class="sec-body open">
           <div id="reviewsContent"></div>
           <!-- Write a Review form -->
-          <div id="writeReviewSection" style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.07);display:none">
-            <button id="writeReviewToggle" onclick="document.getElementById('writeReviewForm').style.display=document.getElementById('writeReviewForm').style.display==='none'?'block':'none'" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.8);transition:all 0.18s">
+          <div id="writeReviewSection" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:none">
+            <button id="writeReviewToggle" onclick="document.getElementById('writeReviewForm').style.display=document.getElementById('writeReviewForm').style.display==='none'?'block':'none'" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:var(--text-muted);transition:all 0.18s">
               <span style="font-size:15px">&#9998;</span> Write a Review
             </button>
             <div id="writeReviewForm" style="display:none;margin-top:12px">
               <div style="margin-bottom:12px">
-                <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Your Name</label>
-                <input id="rvName" type="text" placeholder="e.g. James M." maxlength="60" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none" />
+                <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Your Name</label>
+                <input id="rvName" type="text" placeholder="e.g. James M." maxlength="60" style="width:100%;padding:10px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none" />
               </div>
               <div style="margin-bottom:12px">
-                <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Rating</label>
+                <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Rating</label>
                 <div id="starPicker" style="display:flex;gap:6px">
-                  <span data-v="1" onclick="setRating(1)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span>
-                  <span data-v="2" onclick="setRating(2)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span>
-                  <span data-v="3" onclick="setRating(3)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span>
-                  <span data-v="4" onclick="setRating(4)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span>
-                  <span data-v="5" onclick="setRating(5)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span>
+                  <span data-v="1" onclick="setRating(1)" style="font-size:28px;color:var(--text-muted);cursor:pointer">&#9733;</span>
+                  <span data-v="2" onclick="setRating(2)" style="font-size:28px;color:var(--text-muted);cursor:pointer">&#9733;</span>
+                  <span data-v="3" onclick="setRating(3)" style="font-size:28px;color:var(--text-muted);cursor:pointer">&#9733;</span>
+                  <span data-v="4" onclick="setRating(4)" style="font-size:28px;color:var(--text-muted);cursor:pointer">&#9733;</span>
+                  <span data-v="5" onclick="setRating(5)" style="font-size:28px;color:var(--text-muted);cursor:pointer">&#9733;</span>
                 </div>
               </div>
               <div style="margin-bottom:12px">
-                <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Your Review</label>
-                <textarea id="rvText" rows="4" placeholder="Share your experience with this trainer..." maxlength="600" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none;resize:vertical"></textarea>
+                <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Your Review</label>
+                <textarea id="rvText" rows="4" placeholder="Share your experience with this trainer..." maxlength="600" style="width:100%;padding:10px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;resize:vertical"></textarea>
               </div>
               <div style="margin-bottom:16px">
-                <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Goal Achieved (optional)</label>
-                <input id="rvGoal" type="text" placeholder="e.g. Lost 8kg in 10 weeks" maxlength="80" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none" />
+                <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Goal Achieved (optional)</label>
+                <input id="rvGoal" type="text" placeholder="e.g. Lost 8kg in 10 weeks" maxlength="80" style="width:100%;padding:10px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none" />
               </div>
               <button onclick="submitReview()" style="padding:11px 24px;background:var(--orange);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;width:100%;transition:opacity 0.18s" id="rvSubmitBtn">Submit Review</button>
               <div id="rvMsg" style="margin-top:10px;font-size:13px;display:none"></div>
@@ -1113,7 +1110,7 @@ const brandName = market.brandName;
 
     <!-- Nearby Trainers - Strava-style discovery -->
     <div id="nearbySection" style="display:none;padding:0 20px 20px;">
-      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;">Also in this gym</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;">Also in this gym</div>
       <div id="nearbyList" style="display:flex;flex-direction:column;gap:10px;"></div>
       <a href="/find" style="display:block;text-align:center;margin-top:14px;font-size:12px;color:var(--orange);text-decoration:none;font-weight:600;">Browse all trainers →</a>
     </div>
