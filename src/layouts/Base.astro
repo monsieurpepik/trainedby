@@ -116,6 +116,9 @@ const jsonLd = structuredData ?? defaultStructuredData;
     <!-- ── Structured Data (JSON-LD) ─────────────────────────────────── -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
+    <!-- ── Page-level head additions (fonts, etc.) ───────────────────── -->
+    <slot name="head" />
+
     <!-- ── Global design tokens & critical CSS ───────────────────────── -->
     <style is:global>
       /* Design tokens */

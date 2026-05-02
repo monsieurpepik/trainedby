@@ -128,6 +128,6 @@ Never run `supabase functions deploy` directly without the wrapper.
 ## Key Contacts
 
 - **CEO Bot:** @TrainedByCEO_bot (Telegram) — Founder's executive AI
-- **Admin dashboard:** trainedby.ae/superadmin (password: trainedby-admin-2026)
+- **Admin dashboard:** trainedby.ae/superadmin (password stored in 1Password — ask founder)
 - **Supabase project:** mezhtdbfyvkshpuplqqw
 - **Netlify:** Auto-deploys `main` to production. `staging` branch deploys to staging environment.
