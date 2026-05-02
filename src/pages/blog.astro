@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
 import { getMarket } from '../lib/market.ts';
 import { getLocale, t, BRAND } from '../lib/i18n.ts';
 const market = getMarket(Astro.url.hostname);
@@ -73,52 +74,76 @@ const localeSamplesJson = JSON.stringify(sampleArticles[locale] || sampleArticle
 <Base
   title={`${brandName} Blog - ${blogStrings.title.split('\n')[0]}`}
   description={blogStrings.sub}>
+<Fragment slot="head">
+  <style>
+    :root {
+      --bg: #FFFFFF;
+      --surface: #FAFAF9;
+      --surface-2: #F5F4F3;
+      --surface-3: #E8E5E2;
+      --surface-4: #DEDAD7;
+      --text: #1A1411;
+      --text-2: #4A4240;
+      --text-muted: #6B6460;
+      --text-faint: #9B9290;
+      --border: rgba(0,0,0,0.07);
+      --border-hover: rgba(0,0,0,0.15);
+      --brand: #FF5C00;
+      --brand-hover: #e05200;
+      --brand-dim: rgba(255,92,0,0.08);
+      --brand-border: rgba(255,92,0,0.20);
+      --reps: #16a34a;
+      --reps-dim: rgba(22,163,74,0.08);
+      --reps-border: rgba(22,163,74,0.20);
+    }
+  </style>
+</Fragment>
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  
-  --reps: #00C853; --reps-dim: rgba(0,200,83,0.08); --reps-border: rgba(0,200,83,0.2);
-  --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c; --surface-4: #242424;
-  --border: rgba(255,255,255,0.08); --text: #fff;
-  --text-muted: rgba(255,255,255,0.5); --text-faint: rgba(255,255,255,0.25);
-}
 html { scroll-behavior: smooth; }
 body {
-  background: var(--surface); color: var(--text);
+  background: var(--bg); color: var(--text);
   font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.7;
   -webkit-font-smoothing: antialiased; overflow-x: hidden;
 }
 
-/* Nav */
+/* ── Nav layout (Nav.astro renders the HTML) ─────────────── */
 .nav {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(10,10,10,0.92); backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-}
-.nav-inner {
-  max-width: 1100px; margin: 0 auto;
   display: flex; align-items: center; justify-content: space-between;
-  height: 60px;
+  padding: 0 32px; height: 64px;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.nav.scrolled {
+  background: rgba(255,255,255,0.97);
+  box-shadow: 0 1px 12px rgba(0,0,0,0.07);
 }
 .nav-logo {
-  display: flex; align-items: center; gap: 8px;
-  font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 16px;
-  text-decoration: none; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-weight: 900; font-size: 20px;
+  text-decoration: none; color: var(--text); display: flex; align-items: center;
 }
-.nav-links { display: flex; gap: 8px; align-items: center; }
+.nav-links { display: flex; gap: 24px; align-items: center; }
 .nav-links a {
-  font-size: 13px; font-weight: 600; color: var(--text-muted);
-  text-decoration: none; padding: 6px 12px; border-radius: 20px;
-  transition: color 0.2s;
+  font-size: 14px; font-weight: 500; color: var(--text-muted);
+  text-decoration: none; transition: color 0.2s;
 }
 .nav-links a:hover { color: var(--text); }
-.nav-links a.active { color: var(--brand); }
 .nav-cta {
-  background: var(--brand); color: #fff !important;
-  padding: 8px 16px !important; border-radius: 20px;
+  background: var(--text); color: var(--bg);
+  padding: 9px 18px; border-radius: 20px;
+  font-size: 13px; font-weight: 700; text-decoration: none;
+  transition: opacity 0.2s;
 }
-.nav-cta:hover { background: #e05200; }
+.nav-cta:hover { opacity: 0.85; }
+/* Logo "By" color fix on light nav */
+:global(#nav .nav-logo span) { color: var(--text); }
+:global(#nav .nav-logo span span) { color: var(--brand) !important; }
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav { padding: 0 20px; }
+}
 
 /* Hero */
 .blog-hero {
@@ -302,7 +327,7 @@ body {
   font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800;
   cursor: pointer; text-decoration: none; transition: background 0.2s;
 }
-.sidebar-cta-btn:hover { background: #e05200; }
+.sidebar-cta-btn:hover { background: var(--brand-hover); }
 
 /* Write for us banner */
 .write-banner {
@@ -350,19 +375,7 @@ body {
   </style>
 
 <!-- Nav -->
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">
-      <svg width="28" height="28" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="DM Sans,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
-      {brandName}
-    </a>
-    <div class="nav-links">
-      <a href="/find">{blogStrings.nav_find}</a>
-      <a href="/blog" class="active">{blogStrings.nav_blog}</a>
-      <a href="/join" class="nav-cta">{blogStrings.nav_join_cta}</a>
-    </div>
-  </div>
-</nav>
+<Nav variant="consumer" />
 
 <!-- Hero -->
 <div class="blog-hero">
