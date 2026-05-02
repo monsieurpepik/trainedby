@@ -105,6 +105,22 @@ const jsonLd = {
   description={pageDesc}
   ogImage={'/og/' + slug + '.png'}
 >
+  <Fragment slot="head">
+    <style>
+      :root {
+        --bg: #FFFFFF;
+        --surface: #FAFAF9;
+        --surface-2: #F5F4F3;
+        --surface-3: #E8E5E2;
+        --text: #1A1411;
+        --text-muted: #6B6460;
+        --border: rgba(0,0,0,0.07);
+        --brand: #FF5C00;
+        --brand-hover: #e05200;
+        --nav-logo-by: var(--brand);
+      }
+    </style>
+  </Fragment>
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
   <!-- CSS: global so .tb-* classes match React-rendered HTML -->
@@ -112,27 +128,27 @@ const jsonLd = {
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 body:has(#tb-page) {
-  background: #FFFFFF;
+  background: var(--bg);
   color: #111111;
 }
 
 #tb-page {
   --font: 'DM Sans', system-ui, sans-serif;
   --text-primary:   #111111;
-  --text-secondary: #6B6460;
+  --text-secondary: var(--text-muted);
   --text-muted:     #A8A09A;
   --text-faint:     #B8B0AA;
-  --bg-white:       #FFFFFF;
+  --bg-white:       var(--bg);
   --border:         rgba(0,0,0,0.055);
-  --btn-primary-bg:       #1A1411;
+  --btn-primary-bg:       var(--text);
   --btn-primary-text:     #FFFFFF;
   --btn-secondary-border: rgba(0,0,0,0.10);
   --btn-secondary-text:   #7A7068;
   --tag-bg:   rgba(0,0,0,0.05);
-  --tag-text: #6B6460;
+  --tag-text: var(--text-muted);
   --review-card-bg: #F8F7F5;
   font-family: var(--font);
-  background: #FFFFFF;
+  background: var(--bg);
   color: #111111;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
@@ -148,7 +164,7 @@ body:has(#tb-page) {
 .tb-spinner {
   width: 32px; height: 32px;
   border: 2px solid rgba(0,0,0,0.08);
-  border-top-color: #1A1411;
+  border-top-color: var(--text);
   border-radius: 50%;
   animation: tb-spin 0.75s linear infinite;
 }
@@ -161,7 +177,7 @@ body:has(#tb-page) {
   background: rgba(255,255,255,0.92);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(0,0,0,0.07);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -206,7 +222,7 @@ body:has(#tb-page) {
   background: rgba(255,255,255,0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(0,0,0,0.07);
+  border-top: 1px solid var(--border);
   display: flex;
   align-items: flex-start;
   justify-content: space-around;
@@ -216,10 +232,10 @@ body:has(#tb-page) {
 .nav-item {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
   text-decoration: none; font-size: 10px; font-weight: 500;
-  letter-spacing: 0.03em; color: #6B6460;
+  letter-spacing: 0.03em; color: var(--text-muted);
   cursor: pointer; border: none; background: none; font-family: var(--font);
 }
-.nav-item.active { color: #1A1411; }
+.nav-item.active { color: var(--text); }
 .nav-item svg { width: 24px; height: 24px; }
 
 #profile-mount {
@@ -249,7 +265,7 @@ body:has(#tb-page) {
   position: absolute;
   bottom: 0; left: 0; right: 0;
   height: 220px;
-  background: linear-gradient(to bottom, transparent, #FFFFFF);
+  background: linear-gradient(to bottom, transparent, var(--bg));
   pointer-events: none;
 }
 .tb-hero-controls {
@@ -349,7 +365,7 @@ body:has(#tb-page) {
 .tb-sessions-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 .tb-pkg-card {
   flex: 0 0 240px; scroll-snap-align: start;
-  background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);
+  background: var(--bg); border: 1px solid var(--border);
   border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   padding: 18px 20px; display: flex; flex-direction: column; gap: 6px;
 }
