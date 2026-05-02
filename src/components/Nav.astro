@@ -20,7 +20,7 @@ const { variant = 'landing', activePage = '' } = Astro.props;
   <!-- Consumer homepage nav: Find a Trainer focus -->
   <nav class="nav" id="nav">
     <a href="/" class="nav-logo" data-brand-name>
-      <span>Trained<span style="color:#fff">By</span></span><span
+      <span>Trained<span style="color:var(--nav-logo-by,#fff)">By</span></span><span
         style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:2px;vertical-align:middle;margin-bottom:3px"
       ></span>
     </a>
@@ -36,7 +36,7 @@ const { variant = 'landing', activePage = '' } = Astro.props;
   <!-- For-trainers / SaaS nav -->
   <nav class="nav" id="nav">
     <a href="/" class="nav-logo" data-brand-name>
-      <span>Trained<span style="color:#fff">By</span></span><span
+      <span>Trained<span style="color:var(--nav-logo-by,#fff)">By</span></span><span
         style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:2px;vertical-align:middle;margin-bottom:3px"
       ></span>
     </a>
@@ -51,7 +51,7 @@ const { variant = 'landing', activePage = '' } = Astro.props;
 ) : (
   <header class="app-header">
     <a href="/" class="nav-logo" style="font-family:'DM Sans',sans-serif;font-weight:900;font-size:18px;color:var(--brand);text-decoration:none;">
-      <span data-brand-name>Trained<span style="color:#fff">By</span></span>
+      <span data-brand-name>Trained<span style="color:var(--nav-logo-by,#fff)">By</span></span>
     </a>
     <div class="header-nav">
       <a href="/edit" class={`nav-edit${activePage === 'edit' ? ' active' : ''}`}>Edit</a>

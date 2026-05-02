@@ -95,6 +95,7 @@ const localeSamplesJson = JSON.stringify(sampleArticles[locale] || sampleArticle
       --reps: #16a34a;
       --reps-dim: rgba(22,163,74,0.08);
       --reps-border: rgba(22,163,74,0.20);
+      --nav-logo-by: var(--brand);
     }
   </style>
 </Fragment>
@@ -109,7 +110,7 @@ body {
 
 /* ── Nav layout (Nav.astro renders the HTML) ─────────────── */
 .nav {
-  position: sticky; top: 0; z-index: 100;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 32px; height: 64px;
   background: rgba(255,255,255,0.92); backdrop-filter: blur(16px);
