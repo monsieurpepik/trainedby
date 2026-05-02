@@ -11,6 +11,8 @@ import { getMarket } from "../lib/market.ts";
 const { slug } = Astro.params;
 const market = getMarket(Astro.url.hostname);
 const brandName = market.brandName;
+const paymentEnabled = market.paymentEnabled;
+const currencySymbol = market.currencySymbol;
 
 // Validate slug - only alphanumeric and hyphens
 if (!slug || !/^[a-z0-9-]+$/i.test(slug)) {
@@ -104,8 +106,10 @@ const jsonLd = {
 >
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <!-- Inject the slug server-side so client getSlug() picks it up immediately -->
-  <script define:vars={{ slug }}>
+  <script define:vars={{ slug, paymentEnabled, currencySymbol }}>
     window.__TRAINER_SLUG__ = slug;
+    window.__PAYMENT_ENABLED__ = paymentEnabled;
+    window.__CURRENCY_SYMBOL__ = currencySymbol;
   </script>
 
   <!-- Full profile page content - identical to profile.astro but slug-aware -->
