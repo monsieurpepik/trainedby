@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Review } from './types';
-
-const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string;
+import { SUPABASE_URL, SUPABASE_ANON_KEY as SUPABASE_KEY } from '../../lib/config';
 
 const STAR_FILLED = '#1A1411';
 const STAR_EMPTY = 'rgba(0,0,0,0.12)';
@@ -120,7 +118,6 @@ export default function Reviews({ trainerId, averageRating, reviewCount }: Revie
   if (state.total === 0) return null;
 
   const displayRating = averageRating ?? 0;
-  const totalCount = state.total || reviewCount;
 
   return (
     <div className="tb-reviews">
