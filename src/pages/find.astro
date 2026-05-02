@@ -46,7 +46,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
 /* TOP BAR */
 .top-bar{
   position:sticky;top:0;z-index:100;
-  background:#fff;
+  background:var(--bg);
   border-bottom:1px solid var(--border);
 }
 .top-bar-inner{
@@ -62,7 +62,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
 #search-input{
   width:100%;padding:10px 12px 10px 38px;
   background:var(--surface);border:1px solid var(--border);
-  border-radius:10px;color:var(--text);font-family:var(--font);font-size:14px;
+  border-radius:10px;color:var(--text);font-family:var(--font-body);font-size:14px;
   outline:none;transition:border-color 0.2s;
 }
 #search-input:focus{border-color:rgba(0,0,0,0.2)}
@@ -85,7 +85,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
   flex-shrink:0;padding:6px 14px;border-radius:100px;
   border:1px solid var(--border);background:var(--surface);
   color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;
-  transition:all 0.15s;white-space:nowrap;font-family:var(--font);
+  transition:all 0.15s;white-space:nowrap;font-family:var(--font-body);
 }
 .filter-pill:hover{border-color:var(--border-hover);color:var(--text);background:var(--surface-2)}
 .filter-pill.active{
@@ -104,7 +104,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
 .results-count{font-size:13px;color:var(--text-muted);font-weight:500}
 .sort-select{
   background:var(--surface);border:1px solid var(--border);
-  color:var(--text);font-family:var(--font);font-size:12px;font-weight:600;
+  color:var(--text);font-family:var(--font-body);font-size:12px;font-weight:600;
   padding:6px 10px;border-radius:8px;outline:none;cursor:pointer;
 }
 
@@ -191,7 +191,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
 .load-more-wrap{text-align:center;margin-top:28px}
 .btn-load-more{
   background:var(--surface);border:1px solid var(--border);
-  color:var(--text);font-family:var(--font);font-size:14px;font-weight:600;
+  color:var(--text);font-family:var(--font-body);font-size:14px;font-weight:600;
   padding:12px 28px;border-radius:20px;cursor:pointer;
   transition:border-color 0.2s;
 }
