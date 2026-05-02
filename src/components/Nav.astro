@@ -71,11 +71,13 @@ const { variant = 'landing', activePage = '' } = Astro.props;
   }
 </style>
 
-<script>
-  const nav = document.getElementById('nav');
-  if (nav) {
-    window.addEventListener('scroll', () => {
-      nav.classList.toggle('scrolled', window.scrollY > 20);
-    }, { passive: true });
-  }
-</script>
+{(variant === 'consumer' || variant === 'landing') && (
+  <script>
+    const nav = document.getElementById('nav');
+    if (nav) {
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 20);
+      }, { passive: true });
+    }
+  </script>
+)}
