@@ -493,6 +493,9 @@ const jsonLd = structuredData ?? defaultStructuredData;
         });
       }
     </script>
+
+    <!-- ── Per-page head overrides (fonts, theme-color, light-theme CSS) ── -->
+    <slot name="head" />
   </head>
   <body>
     <slot />

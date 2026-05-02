@@ -28,7 +28,37 @@ const ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 >
   <Fragment slot="head">
     <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#FFFFFF">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+    <!-- Light theme override — must be LAST in <head> to win the CSS cascade over Base.astro dark globals -->
+    <style>
+      :root {
+        --bg: #FFFFFF;
+        --surface: #FAFAF9;
+        --surface-2: #F5F4F3;
+        --surface-3: #E8E5E2;
+        --surface-4: #E0DDD9;
+        --text: #1A1411;
+        --text-2: #6B6460;
+        --text-3: #9B9490;
+        --text-muted: #6B6460;
+        --text-faint: rgba(26,20,17,0.4);
+        --border: rgba(0,0,0,0.07);
+        --border-hover: rgba(0,0,0,0.14);
+        --border-strong: rgba(0,0,0,0.20);
+        --brand: #FF5C00;
+        --brand-hover: #e54e00;
+        --brand-dim: rgba(255,92,0,0.08);
+        --brand-border: rgba(255,92,0,0.2);
+        --font-body: 'DM Sans', system-ui, sans-serif;
+        --font-display: 'DM Sans', system-ui, sans-serif;
+      }
+      body {
+        background: #FFFFFF;
+        color: #1A1411;
+        font-family: 'DM Sans', system-ui, sans-serif;
+      }
+    </style>
   </Fragment>
 
   <style>
