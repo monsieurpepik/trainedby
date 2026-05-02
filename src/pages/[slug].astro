@@ -7,6 +7,7 @@
  */
 import Base from "../layouts/Base.astro";
 import { getMarket } from "../lib/market.ts";
+import TrainerProfile from "../components/TrainerProfile";
 
 const { slug } = Astro.params;
 const market = getMarket(Astro.url.hostname);
@@ -105,53 +106,31 @@ const jsonLd = {
   ogImage={'/og/' + slug + '.png'}
 >
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-  <!-- Inject the slug server-side so client getSlug() picks it up immediately -->
-  <script define:vars={{ slug, paymentEnabled, currencySymbol }}>
-    window.__TRAINER_SLUG__ = slug;
-    window.__PAYMENT_ENABLED__ = paymentEnabled;
-    window.__CURRENCY_SYMBOL__ = currencySymbol;
-  </script>
 
-  <!-- Full profile page content - identical to profile.astro but slug-aware -->
+  <!-- CSS: global so .tb-* classes match React-rendered HTML -->
   <style is:global>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-/* Override Base.astro's dark body background only on the profile page.
-   :has() is scoped to this page's presence — doesn't affect other routes. */
 body:has(#tb-page) {
   background: #FFFFFF;
   color: #111111;
 }
 
-/* ── Profile page scope — vars scoped to #tb-page to avoid leaking
-     into other pages via Astro View Transitions ──────────────────── */
 #tb-page {
   --font: 'DM Sans', system-ui, sans-serif;
-
-  /* Text scale */
   --text-primary:   #111111;
   --text-secondary: #6B6460;
   --text-muted:     #A8A09A;
   --text-faint:     #B8B0AA;
-
-  /* Surfaces */
   --bg-white:       #FFFFFF;
   --border:         rgba(0,0,0,0.055);
-
-  /* Buttons */
   --btn-primary-bg:       #1A1411;
   --btn-primary-text:     #FFFFFF;
   --btn-secondary-border: rgba(0,0,0,0.10);
   --btn-secondary-text:   #7A7068;
-
-  /* Tags */
   --tag-bg:   rgba(0,0,0,0.05);
   --tag-text: #6B6460;
-
-  /* Reviews */
   --review-card-bg: #F8F7F5;
-
-  /* Layout */
   font-family: var(--font);
   background: #FFFFFF;
   color: #111111;
@@ -160,7 +139,6 @@ body:has(#tb-page) {
   overflow-x: hidden;
 }
 
-/* Loading spinner */
 .tb-loading {
   display: flex;
   align-items: center;
@@ -176,7 +154,6 @@ body:has(#tb-page) {
 }
 @keyframes tb-spin { to { transform: rotate(360deg); } }
 
-/* Sticky compact header — hidden until scroll */
 #tb-compact-header {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -219,14 +196,9 @@ body:has(#tb-page) {
 }
 .ch-btn:hover  { background: rgba(0,0,0,0.05); }
 .ch-btn:active { background: rgba(0,0,0,0.10); }
-#tb-compact-header .ch-btn {
-  margin-bottom: 6px;
-}
-#tb-compact-header .ch-name {
-  margin-bottom: 8px;
-}
+#tb-compact-header .ch-btn { margin-bottom: 6px; }
+#tb-compact-header .ch-name { margin-bottom: 8px; }
 
-/* ── Bottom navigation ───────────────────────────────────────── */
 #tb-bottom-nav {
   position: fixed;
   bottom: 0; left: 0; right: 0;
@@ -250,18 +222,15 @@ body:has(#tb-page) {
 .nav-item.active { color: #1A1411; }
 .nav-item svg { width: 24px; height: 24px; }
 
-/* ── Profile mount ───────────────────────────────────────────── */
 #profile-mount {
   padding-bottom: max(84px, calc(84px + env(safe-area-inset-bottom)));
 }
 
-/* ── WhatsApp pulse (kept for message button) ─────────────────── */
 @keyframes wa-pulse {
   0%,100% { box-shadow: 0 0 0 0 rgba(37,211,102,0.4); }
   50%      { box-shadow: 0 0 0 8px rgba(37,211,102,0); }
 }
 
-/* ── Hero ──────────────────────────────────────────────────────── */
 .tb-hero {
   position: relative;
   height: 460px;
@@ -271,17 +240,14 @@ body:has(#tb-page) {
 .tb-hero-img {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   object-fit: cover;
   object-position: top center;
   display: block;
 }
 .tb-hero-fade {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   height: 220px;
   background: linear-gradient(to bottom, transparent, #FFFFFF);
   pointer-events: none;
@@ -289,174 +255,92 @@ body:has(#tb-page) {
 .tb-hero-controls {
   position: absolute;
   top: max(58px, calc(env(safe-area-inset-top) + 16px));
-  left: 0;
-  right: 0;
+  left: 0; right: 0;
   display: flex;
   justify-content: space-between;
   padding: 0 16px;
   z-index: 10;
 }
 .tb-hero-btn {
-  width: 36px;
-  height: 36px;
+  width: 36px; height: 36px;
   border-radius: 50%;
   border: none;
   background: rgba(255,255,255,0.22);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
   color: #ffffff;
   flex-shrink: 0;
 }
 .tb-hero-name-block {
   position: absolute;
-  bottom: 20px;
-  left: 28px;
+  bottom: 20px; left: 28px;
   z-index: 10;
 }
 .tb-hero-name {
-  font-weight: 200;
-  font-size: 36px;
-  letter-spacing: 0.02em;
-  color: #111111;
-  line-height: 1.15;
+  font-weight: 200; font-size: 36px;
+  letter-spacing: 0.02em; color: #111111; line-height: 1.15;
 }
 .tb-hero-tagline {
-  font-weight: 300;
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-top: 4px;
+  font-weight: 300; font-size: 13px;
+  color: var(--text-secondary); margin-top: 4px;
 }
 
-/* ── Identity strip ─────────────────────────────────────────────── */
 .tb-identity {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: flex; align-items: center; gap: 8px;
   flex-wrap: wrap;
   padding: 12px 20px;
   border-bottom: 1px solid var(--border);
 }
 .tb-tag {
-  background: var(--tag-bg);
-  color: var(--tag-text);
-  font-weight: 500;
-  font-size: 10.5px;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  padding: 5px 10px;
-  border-radius: 20px;
+  background: var(--tag-bg); color: var(--tag-text);
+  font-weight: 500; font-size: 10.5px;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 5px 10px; border-radius: 20px;
 }
 .tb-location {
   margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-weight: 300;
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; color: var(--text-secondary); font-weight: 300;
 }
 
-/* ── Stats row ──────────────────────────────────────────────────── */
 .tb-stats {
   display: grid;
   border-bottom: 1px solid var(--border);
 }
 .tb-stat-item {
-  padding: 16px 12px;
-  text-align: center;
+  padding: 16px 12px; text-align: center;
   border-right: 1px solid rgba(0,0,0,0.06);
 }
 .tb-stat-item:last-child { border-right: none; }
-.tb-stat-num {
-  font-weight: 200;
-  font-size: 22px;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  line-height: 1;
-}
-.tb-stat-label {
-  font-weight: 500;
-  font-size: 9.5px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  margin-top: 4px;
-}
+.tb-stat-num { font-weight: 200; font-size: 22px; letter-spacing: -0.02em; color: var(--text-primary); line-height: 1; }
+.tb-stat-label { font-weight: 500; font-size: 9.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); margin-top: 4px; }
 
-/* ── CTA block ──────────────────────────────────────────────────── */
-.tb-cta {
-  padding: 20px 24px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+.tb-cta { padding: 20px 24px 16px; display: flex; flex-direction: column; gap: 10px; }
 .tb-btn-primary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  height: 52px;
-  border-radius: 13px;
-  border: none;
-  background: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
-  font-family: var(--font);
-  font-weight: 500;
-  font-size: 14px;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.20);
-  text-decoration: none;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; height: 52px; border-radius: 13px; border: none;
+  background: var(--btn-primary-bg); color: var(--btn-primary-text);
+  font-family: var(--font); font-weight: 500; font-size: 14px;
+  letter-spacing: 0.04em; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.20); text-decoration: none;
 }
 .tb-btn-secondary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 46px;
-  border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 46px; border-radius: 13px;
   border: 1px solid var(--btn-secondary-border);
-  background: transparent;
-  color: var(--btn-secondary-text);
-  font-family: var(--font);
-  font-weight: 300;
-  font-size: 14px;
-  cursor: pointer;
-  text-decoration: none;
+  background: transparent; color: var(--btn-secondary-text);
+  font-family: var(--font); font-weight: 300; font-size: 14px;
+  cursor: pointer; text-decoration: none;
 }
 
-/* ── Packages carousel ──────────────────────────────────────────── */
-.tb-sessions {
-  padding: 20px 0 20px;
-}
-.tb-sessions-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px 12px;
-}
-.tb-section-label {
-  font-weight: 600;
-  font-size: 10px;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-.tb-see-all {
-  font-size: 12px;
-  font-weight: 400;
-  color: #9A9290;
-  text-decoration: none;
-}
+.tb-sessions { padding: 20px 0 20px; }
+.tb-sessions-header { display: flex; align-items: center; justify-content: space-between; padding: 0 20px 12px; }
+.tb-section-label { font-weight: 600; font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-faint); }
+.tb-see-all { font-size: 12px; font-weight: 400; color: #9A9290; text-decoration: none; }
 .tb-sessions-scroll {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
+  display: flex; gap: 12px; overflow-x: auto;
   scroll-snap-type: x mandatory;
   padding: 4px 20px 12px;
   -webkit-overflow-scrolling: touch;
@@ -464,522 +348,43 @@ body:has(#tb-page) {
 .tb-sessions-scroll::-webkit-scrollbar { display: none; }
 .tb-sessions-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 .tb-pkg-card {
-  flex: 0 0 240px;
-  scroll-snap-align: start;
-  background: #FFFFFF;
-  border: 1px solid rgba(0,0,0,0.07);
-  border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  padding: 18px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex: 0 0 240px; scroll-snap-align: start;
+  background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 18px 20px; display: flex; flex-direction: column; gap: 6px;
 }
-.tb-pkg-name {
-  font-weight: 400;
-  font-size: 15px;
-  color: var(--text-primary);
-}
-.tb-pkg-detail {
-  font-weight: 300;
-  font-size: 11px;
-  color: var(--text-muted);
-}
-.tb-pkg-price {
-  font-weight: 200;
-  font-size: 20px;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  margin-top: auto;
-}
+.tb-pkg-name { font-weight: 400; font-size: 15px; color: var(--text-primary); }
+.tb-pkg-detail { font-weight: 300; font-size: 11px; color: var(--text-muted); }
+.tb-pkg-price { font-weight: 200; font-size: 20px; letter-spacing: -0.02em; color: var(--text-primary); margin-top: auto; }
 .tb-pkg-book {
-  width: 100%;
-  height: 36px;
-  border-radius: 8px;
-  border: none;
-  background: var(--btn-primary-bg);
-  color: #fff;
-  font-family: var(--font);
-  font-weight: 500;
-  font-size: 12px;
-  cursor: pointer;
-  margin-top: 8px;
+  width: 100%; height: 36px; border-radius: 8px; border: none;
+  background: var(--btn-primary-bg); color: #fff;
+  font-family: var(--font); font-weight: 500; font-size: 12px;
+  cursor: pointer; margin-top: 8px;
 }
 
-/* ── About ──────────────────────────────────────────────────────── */
-.tb-about {
-  padding: 20px;
-  border-top: 1px solid var(--border);
-}
+.tb-about { padding: 20px; border-top: 1px solid var(--border); }
 .tb-about-text {
-  font-weight: 300;
-  font-size: 13.5px;
-  color: #4A4440;
-  line-height: 1.68;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  font-weight: 300; font-size: 13.5px; color: #4A4440; line-height: 1.68;
+  overflow: hidden; display: -webkit-box;
+  -webkit-line-clamp: 3; -webkit-box-orient: vertical;
 }
-.tb-about-text.expanded {
-  display: block;
-  -webkit-line-clamp: unset;
-}
+.tb-about-text.expanded { display: block; -webkit-line-clamp: unset; }
 .tb-read-more {
-  display: inline-block;
-  margin-top: 8px;
-  font-size: 13px;
-  font-weight: 400;
-  color: #9A9290;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
+  display: inline-block; margin-top: 8px;
+  font-size: 13px; font-weight: 400; color: #9A9290;
+  background: none; border: none; padding: 0; cursor: pointer;
   font-family: var(--font);
 }
 
-/* ── Reviews shell ──────────────────────────────────────────────── */
-.tb-reviews {
-  padding: 20px;
-  border-top: 1px solid var(--border);
-}
-.tb-reviews-loading {
-  color: var(--text-muted);
-  font-size: 13px;
-  text-align: center;
-  padding: 20px 0;
-}
-</style>
+.tb-reviews { padding: 20px; border-top: 1px solid var(--border); }
+.tb-reviews-loading { color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px 0; }
+  </style>
 
-  <div id="tb-page">
-  <!-- Sticky compact header — appears when hero scrolls out of view -->
-  <div id="tb-compact-header">
-    <button class="ch-btn" id="ch-back" aria-label="Back">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
-    <span class="ch-name" id="ch-trainer-name"></span>
-    <button class="ch-btn" id="ch-share" aria-label="Share">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-    </button>
-  </div>
-
-  <!-- Page content -->
-  <div id="tb-root">
-    <div class="tb-loading" id="tb-loading">
-      <div class="tb-spinner"></div>
-    </div>
-    <div id="profile-mount" style="display:none"></div>
-  </div>
-
-  <!-- Sticky bottom nav (always visible) -->
-  <nav id="tb-bottom-nav" aria-label="Main navigation">
-    <a href="/" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      Discover
-    </a>
-    <a href="/find" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      Search
-    </a>
-    <a href="/dashboard" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Bookings
-    </a>
-    <a href="/dashboard/messages" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      Messages
-    </a>
-    <a href="/dashboard" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Profile
-    </a>
-  </nav>
-  </div><!-- #tb-page -->
-
-  <script>
-    // Load the full profile page JS dynamically
-    // The profile.astro getSlug() reads window.__TRAINER_SLUG__ first (set above),
-    // then falls back to location.pathname, then query params.
-    // We load profile rendering logic from a shared module.
-
-    const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
-
-    function getSlug() {
-      // Priority: injected server-side > pathname > query param
-      if (window.__TRAINER_SLUG__) return window.__TRAINER_SLUG__;
-      const path = location.pathname.replace(/^\//, '').trim();
-      if (path && path !== 'index.html' && path !== 'profile') return path;
-      const q = new URLSearchParams(location.search);
-      return q.get('trainer') || q.get('slug') || '';
-    }
-
-    async function loadTrainer() {
-      const slug = getSlug();
-      if (!slug) { showErr('No trainer specified'); return; }
-
-      try {
-        const r = await fetch(
-          `${SUPABASE_URL}/functions/v1/get-trainer?slug=${encodeURIComponent(slug)}`,
-          { headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY } }
-        );
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const resp = await r.json();
-        if (!resp || resp.error) throw new Error('Trainer not found');
-        // get-trainer returns { trainer, packages }
-        const trainerData = resp.trainer || resp;
-        const pkgs = resp.packages || [];
-        renderProfile(trainerData, pkgs);
-      } catch (e) {
-        showErr('Trainer not found');
-      }
-    }
-
-    function showErr(msg = 'Trainer not found') {
-      const mount = document.getElementById('profile-mount');
-      const loading = document.getElementById('tb-loading');
-      if (loading) loading.style.display = 'none';
-      if (mount) {
-        mount.style.display = 'block';
-        mount.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;gap:24px;padding:32px;text-align:center;font-family:'DM Sans',system-ui,sans-serif">
-        <div style="font-size:64px;font-weight:200;letter-spacing:-0.02em;color:#111111;line-height:1">404</div>
-        <h1 style="font-size:22px;font-weight:300;color:#111111">Trainer not found</h1>
-        <p style="color:#6B6460;max-width:360px;line-height:1.6;font-size:13.5px;font-weight:300">This trainer profile doesn't exist or may have been removed.</p>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-          <a href="/find" style="background:#1A1411;color:#fff;padding:12px 28px;border-radius:13px;text-decoration:none;font-weight:500;font-size:14px;letter-spacing:0.04em">Find a Trainer</a>
-          <a href="/" style="background:transparent;border:1px solid rgba(0,0,0,0.10);color:#7A7068;padding:12px 28px;border-radius:13px;text-decoration:none;font-weight:300;font-size:14px">Go Home</a>
-        </div>
-      </div>`;
-      }
-    }
-
-    function esc(s) {
-      return String(s == null ? '' : s)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function renderProfile(t, packages) {
-      window.__TRAINER_ID__ = t.id;
-      const loading = document.getElementById('tb-loading');
-      const mount = document.getElementById('profile-mount');
-      if (loading) loading.style.display = 'none';
-      if (!mount) return;
-      mount.style.display = 'block';
-
-      // Field name mapping
-      const displayName = t.name || t.full_name || '';
-      const photoUrl = t.avatar_url || t.profile_photo_url || '';
-      const specialties = Array.isArray(t.specialties) ? t.specialties : (t.specialties ? [t.specialties] : ['Personal Trainer']);
-      const rating = t.avg_rating ? parseFloat(t.avg_rating).toFixed(1) : null;
-      const reviewCount = t.review_count || 0;
-      const isVerified = t.reps_verified || t.is_verified || t.verification_status === 'verified';
-      const city = t.city || '';
-      const country = t.country || '';
-      const location = [city, country].filter(Boolean).join(', ');
-      const bio = t.bio || '';
-      const instagram = t.instagram || t.instagram_handle || '';
-      const whatsapp = t.whatsapp || t.phone || '';
-      const certifications = Array.isArray(t.certifications) ? t.certifications : [];
-      const experience = t.experience_years || t.years_experience || null;
-      const clients = t.total_clients || t.client_count || null;
-
-      // Deduplicate packages by name
-      const _rawPkgs = (Array.isArray(packages) ? packages : []).filter(Boolean);
-      const _seenPkgNames = new Set();
-      const pkgList = _rawPkgs.filter(p => {
-        if (_seenPkgNames.has(p.name)) return false;
-        _seenPkgNames.add(p.name);
-        return true;
-      });
-
-      // Update compact header name
-      const chName = document.getElementById('ch-trainer-name');
-      if (chName) chName.textContent = displayName;
-
-      // ── Build stats (only non-null values) ──────────────────────────────
-      const statItems = [];
-      if (rating !== null && reviewCount > 0) {
-        statItems.push({ num: rating, label: 'Rating' });
-        statItems.push({ num: reviewCount, label: reviewCount === 1 ? 'Review' : 'Reviews' });
-      }
-      if (experience) statItems.push({ num: experience + 'y', label: 'Experience' });
-      const goalRate = t.goal_achievement_rate || null;
-      if (goalRate) statItems.push({ num: goalRate + '%', label: 'Goal Rate' });
-      if (clients) statItems.push({ num: clients + '+', label: 'Clients' });
-      const statCols = statItems.length || 1;
-
-      // ── CTA label (payment or free enquiry) ─────────────────────────────
-      const ctaLabel = window.__PAYMENT_ENABLED__ ? 'Book a Session' : 'Request a Session';
-
-      // ── Package price renderer ──────────────────────────────────────────
-      const currSym = window.__CURRENCY_SYMBOL__;
-      function fmtPkgPrice(p) {
-        if (!p.price) return '';
-        const sym = currSym || p.currency || '';
-        return sym ? `${esc(sym)} ${esc(p.price)}` : `${esc(p.price)}`;
-      }
-
-      // ── Tags for identity strip ──────────────────────────────────────────
-      const tagsRaw = [...specialties.slice(0, 3)];
-      if (isVerified) tagsRaw.unshift('Verified');
-      if (certifications.length > 0 && tagsRaw.length < 4) tagsRaw.push(certifications[0]);
-      const cappedTags = [...new Set(tagsRaw)].slice(0, 4);
-
-      mount.innerHTML = `
-        <!-- 1. HERO ────────────────────────────────────────────────────── -->
-        <div class="tb-hero">
-          ${photoUrl ? `<img class="tb-hero-img" src="${photoUrl}" alt="${esc(displayName)}" onerror="this.style.display='none'">` : ''}
-          <div class="tb-hero-fade"></div>
-          <div class="tb-hero-controls">
-            <button class="tb-hero-btn" onclick="history.length>1?history.back():location.href='/find'" aria-label="Back">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            ${'share' in navigator ? `<button class="tb-hero-btn" onclick="shareProfile('${esc(displayName)}')" aria-label="Share">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-            </button>` : '<span></span>'}
-          </div>
-          ${photoUrl ? `
-          <div class="tb-hero-name-block">
-            <div class="tb-hero-name">${esc(displayName)}</div>
-            ${specialties[0] ? `<div class="tb-hero-tagline">${esc(specialties[0])}${location ? ' · ' + esc(location) : ''}</div>` : ''}
-          </div>` : ''}
-          <div id="hero-sentinel"></div>
-        </div>
-
-        <!-- 2. IDENTITY STRIP ───────────────────────────────────────────── -->
-        <div class="tb-identity">
-          ${cappedTags.map(tag => `<span class="tb-tag">${esc(tag)}</span>`).join('')}
-          ${location ? `<span class="tb-location">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            ${esc(location)}
-          </span>` : ''}
-        </div>
-
-        <!-- 3. STATS ROW ────────────────────────────────────────────────── -->
-        ${statItems.length > 0 ? `
-        <div class="tb-stats" style="grid-template-columns:repeat(${statCols},1fr)">
-          ${statItems.map(s => `
-          <div class="tb-stat-item">
-            <div class="tb-stat-num">${s.num}</div>
-            <div class="tb-stat-label">${s.label}</div>
-          </div>`).join('')}
-        </div>` : ''}
-
-        <!-- 4. CTA ──────────────────────────────────────────────────────── -->
-        <div class="tb-cta">
-          ${whatsapp ? `
-          <a href="https://wa.me/${whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent('Hi ' + esc(displayName) + ', I found your profile on TrainedBy and I\'d like to book a session.')}"
-             target="_blank" rel="noopener" class="tb-btn-primary" style="animation:wa-pulse 2s ease infinite">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            ${ctaLabel}
-          </a>` : `
-          <button class="tb-btn-primary" onclick="alert('Booking coming soon!')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            ${ctaLabel}
-          </button>`}
-          <button class="tb-btn-secondary" onclick="
-  const ph = '${whatsapp ? whatsapp.replace(/\D/g,'') : ''}';
-  if(ph) window.open('https://wa.me/'+ph+'?text='+encodeURIComponent('Hi, I\\'d like to get in touch.'),'_blank');
-  else alert('Contact coming soon!');
-">Send a message</button>
-        </div>
-
-        <!-- 5. PACKAGES ─────────────────────────────────────────────────── -->
-        ${pkgList.length > 0 ? `
-        <div class="tb-sessions">
-          <div class="tb-sessions-header">
-            <span class="tb-section-label">Sessions</span>
-            <a href="javascript:void(0)" class="tb-see-all">See all →</a>
-          </div>
-          <div class="tb-sessions-scroll">
-            ${pkgList.map(p => `
-            <div class="tb-pkg-card">
-              <div class="tb-pkg-name">${esc(p.name || p.title || 'Package')}</div>
-              ${p.sessions ? `<div class="tb-pkg-detail">${p.sessions} session${p.sessions > 1 ? 's' : ''}</div>` : ''}
-              ${p.description ? `<div class="tb-pkg-detail">${esc(p.description)}</div>` : ''}
-              ${p.price ? `<div class="tb-pkg-price">${fmtPkgPrice(p)}</div>` : ''}
-              ${whatsapp ? `
-              <button class="tb-pkg-book"
-                data-wa="${whatsapp.replace(/\D/g,'')}"
-                data-msg="${esc('Hi ' + displayName + ', I\'m interested in the ' + (p.name || 'package') + '.')}"
-                onclick="var b=this;window.open('https://wa.me/'+b.dataset.wa+'?text='+encodeURIComponent(b.dataset.msg),'_blank')">
-                Book
-              </button>` : ''}
-            </div>`).join('')}
-          </div>
-        </div>` : ''}
-
-        <!-- 6. ABOUT ────────────────────────────────────────────────────── -->
-        ${bio ? `
-        <div class="tb-about">
-          <div class="tb-section-label" style="margin-bottom:12px">About</div>
-          <div class="tb-about-text" id="tb-about-text">${esc(bio)}</div>
-          <button class="tb-read-more" id="tb-read-more" onclick="toggleBio()">Read more →</button>
-        </div>` : ''}
-
-        <!-- 7. REVIEWS SHELL ─────────────────────────────────────────────── -->
-        <div class="tb-reviews" id="tb-reviews-section">
-          <div class="tb-section-label" style="margin-bottom:12px">Reviews</div>
-          <div id="reviewsContent" class="tb-reviews-loading">Loading reviews...</div>
-        </div>
-      `;
-
-      // Load reviews asynchronously after rendering
-      loadReviews(t.id);
-
-      initStickyHeader();
-      // Wire IntersectionObserver for compact header visibility
-      const sentinel = document.getElementById('hero-sentinel');
-      if (sentinel) {
-        const obs = new IntersectionObserver(([entry]) => {
-          const header = document.getElementById('tb-compact-header');
-          if (header) header.classList.toggle('visible', !entry.isIntersecting);
-        }, { threshold: 0 });
-        obs.observe(sentinel);
-      }
-    }
-
-    // Web Share API
-    function shareProfile(name) {
-      if (navigator.share) {
-        navigator.share({
-          title: name + ' - Verified Personal Trainer',
-          text: 'Check out ' + name + "'s verified trainer profile",
-          url: location.href
-        }).catch(() => {});
-      } else {
-        // Fallback: copy to clipboard
-        navigator.clipboard.writeText(location.href).then(() => {
-          const btn = document.querySelector('[aria-label="Share"]');
-          if (btn) {
-            const orig = btn.innerHTML;
-            btn.textContent = 'Copied!';
-            setTimeout(() => { btn.innerHTML = orig; }, 1500);
-          }
-        }).catch(() => {});
-      }
-    }
-
-    function initStickyHeader() {
-      const chBack = document.getElementById('ch-back');
-      if (chBack && !chBack.dataset.wired) {
-        chBack.dataset.wired = '1';
-        chBack.addEventListener('click', () => {
-          history.length > 1 ? history.back() : (location.href = '/find');
-        });
-      }
-      const chShare = document.getElementById('ch-share');
-      if (chShare && !chShare.dataset.wired) {
-        chShare.dataset.wired = '1';
-        chShare.addEventListener('click', () => {
-          const name = document.getElementById('ch-trainer-name')?.textContent || '';
-          shareProfile(name);
-        });
-      }
-    }
-
-    function toggleBio() {
-      const el = document.getElementById('tb-about-text');
-      const btn = document.getElementById('tb-read-more');
-      if (!el || !btn) return;
-      const expanded = el.classList.toggle('expanded');
-      btn.textContent = expanded ? 'Read less' : 'Read more →';
-    }
-
-    // ── Reviews ──────────────────────────────────────────────────────────────
-    async function loadReviews(trainerId) {
-      if (!trainerId) return;
-      try {
-        // Fetch up to 2 booking-linked reviews + total count
-        const r = await fetch(
-          `${SUPABASE_URL}/rest/v1/reviews?trainer_id=eq.${trainerId}&booking_id=not.is.null&order=created_at.desc&limit=2`,
-          { headers: {
-              'apikey': SUPABASE_KEY,
-              'Authorization': `Bearer ${SUPABASE_KEY}`,
-              'Prefer': 'count=exact'
-            }
-          }
-        );
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const rawTotal = parseInt(r.headers.get('content-range')?.split('/')[1] || '0', 10);
-        const total = isNaN(rawTotal) ? 0 : rawTotal;
-        const reviews = await r.json();
-        const el = document.getElementById('reviewsContent');
-        if (!el) return;
-        el.classList.remove('tb-reviews-loading');
-
-        if (!Array.isArray(reviews) || reviews.length === 0 || total === 0) {
-          // Hide the entire reviews section — spec says hide if 0 reviews
-          const section = document.getElementById('tb-reviews-section');
-          if (section) section.style.display = 'none';
-          return;
-        }
-
-        const avg = reviews.reduce((a, b) => a + (b.rating || 0), 0) / reviews.length;
-        const starFilled = '#1A1411';
-        const starEmpty = 'rgba(0,0,0,0.12)';
-
-        // Rating summary row
-        let starsHtml = '';
-        for (let i = 1; i <= 5; i++) {
-          starsHtml += `<span style="color:${i <= Math.round(avg) ? starFilled : starEmpty};font-size:14px">&#9733;</span>`;
-        }
-        let html = `
-          <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
-            <div style="font-size:32px;font-weight:200;letter-spacing:-0.02em;color:#111111;line-height:1">${avg.toFixed(1)}</div>
-            <div>
-              <div style="display:flex;gap:2px;margin-bottom:3px">${starsHtml}</div>
-              <div style="font-size:12px;color:var(--text-muted)">from ${total} verified client${total !== 1 ? 's' : ''}</div>
-            </div>
-          </div>`;
-
-        // Review cards — up to 2
-        reviews.forEach(rv => {
-          const rvName = esc(rv.client_name || 'Client');
-          const initials = (rv.client_name || 'Cl').substring(0, 2).toUpperCase();
-          const rvText = esc(rv.review_text || '');
-          const dateStr = rv.created_at
-            ? new Date(rv.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
-            : '';
-          let cardStars = '';
-          for (let i = 1; i <= 5; i++) {
-            cardStars += `<span style="color:${i <= (rv.rating || 0) ? starFilled : starEmpty};font-size:12px">&#9733;</span>`;
-          }
-          html += `
-            <div style="background:#F8F7F5;border-radius:12px;padding:16px 18px;margin-bottom:10px">
-              <div style="display:flex;gap:2px;margin-bottom:10px">${cardStars}</div>
-              <div style="font-size:13px;font-weight:300;color:#4A4440;line-height:1.6;margin-bottom:12px">${rvText}</div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-secondary);flex-shrink:0">${initials}</div>
-                <div style="font-size:13px;font-weight:400;color:#111111">${rvName}</div>
-                ${dateStr ? `<div style="font-size:11px;color:var(--text-muted);margin-left:auto">${dateStr}</div>` : ''}
-              </div>
-            </div>`;
-        });
-
-        el.innerHTML = html;
-      } catch (e) {
-        const el = document.getElementById('reviewsContent');
-        if (el) {
-          el.classList.remove('tb-reviews-loading');
-          el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Could not load reviews.</div>`;
-        }
-      }
-    }
-
-    // Wire compact header buttons as soon as DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initStickyHeader);
-    } else {
-      initStickyHeader();
-    }
-
-    // Kick off on load
-    loadTrainer();
-  </script>
+  <TrainerProfile
+    client:load
+    slug={slug}
+    paymentEnabled={paymentEnabled}
+    currencySymbol={currencySymbol}
+  />
 </Base>
