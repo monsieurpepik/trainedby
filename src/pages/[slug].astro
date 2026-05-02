@@ -116,8 +116,16 @@ const jsonLd = {
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-/* ── DM Sans as the only font ───────────────────────────────── */
-:root {
+/* Override Base.astro's dark body background only on the profile page.
+   :has() is scoped to this page's presence — doesn't affect other routes. */
+body:has(#tb-page) {
+  background: #FFFFFF;
+  color: #111111;
+}
+
+/* ── Profile page scope — vars scoped to #tb-page to avoid leaking
+     into other pages via Astro View Transitions ──────────────────── */
+#tb-page {
   --font: 'DM Sans', system-ui, sans-serif;
 
   /* Text scale */
@@ -142,18 +150,14 @@ const jsonLd = {
 
   /* Reviews */
   --review-card-bg: #F8F7F5;
-}
 
-html, body {
-  height: 100%;
-  width: 100%;
-  overflow-x: hidden;
-}
-body {
+  /* Layout */
   font-family: var(--font);
-  background: var(--bg-white);
-  color: var(--text-primary);
+  background: #FFFFFF;
+  color: #111111;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* Loading spinner */
@@ -547,6 +551,7 @@ body {
 }
 </style>
 
+  <div id="tb-page">
   <!-- Sticky compact header — appears when hero scrolls out of view -->
   <div id="tb-compact-header">
     <button class="ch-btn" id="ch-back" aria-label="Back">
@@ -589,6 +594,7 @@ body {
       Profile
     </a>
   </nav>
+  </div><!-- #tb-page -->
 
   <script>
     // Load the full profile page JS dynamically
