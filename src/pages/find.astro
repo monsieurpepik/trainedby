@@ -32,8 +32,8 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
         --font-display: 'DM Sans', system-ui, sans-serif;
       }
       body {
-        background: #FFFFFF;
-        color: #1A1411;
+        background: var(--bg);
+        color: var(--text);
         font-family: 'DM Sans', system-ui, sans-serif;
       }
     </style>
@@ -41,23 +41,7 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#FFFFFF;
-  --surface:#FAFAF9;
-  --surface2:#F5F4F3;
-  --surface3:#E8E5E2;
-  --text:#1A1411;
-  --text-muted:#6B6460;
-  --border:rgba(0,0,0,0.07);
-  --border-hover:rgba(0,0,0,0.14);
-  --brand:#FF5C00;
-  --brand-dim:rgba(255,92,0,0.08);
-  --brand-border:rgba(255,92,0,0.2);
-  --green:#00C853;
-  --radius:14px;
-  --font:'DM Sans',system-ui,sans-serif;
-}
-html,body{min-height:100vh;background:#FFFFFF !important;color:#1A1411 !important;font-family:var(--font);-webkit-font-smoothing:antialiased}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 
 /* TOP BAR */
 .top-bar{
@@ -153,7 +137,7 @@ html,body{min-height:100vh;background:#FFFFFF !important;color:#1A1411 !importan
   outline:2px solid var(--brand);
   outline-offset:2px;
 }
-.tc-photo-wrap{position:relative;aspect-ratio:3/4;background:var(--surface2);overflow:hidden}
+.tc-photo-wrap{position:relative;aspect-ratio:3/4;background:var(--surface-2);overflow:hidden}
 .tc-photo{
   width:100%;height:100%;
   object-fit:cover;object-position:top center;
@@ -196,7 +180,7 @@ html,body{min-height:100vh;background:#FFFFFF !important;color:#1A1411 !importan
   background:var(--surface);border:1px solid var(--border);
   border-radius:16px;overflow:hidden;
 }
-.skel{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+.skel{background:linear-gradient(90deg,var(--surface-2) 25%,var(--surface-3) 50%,var(--surface-2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .skel-cover{height:100px;border-radius:0}
 .skel-body{padding:14px}
