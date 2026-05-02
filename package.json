@@ -21,13 +21,19 @@
   "jest": {
     "testEnvironment": "node",
     "testMatch": [
-      "**/tests/**/*.test.js"
+      "**/tests/**/*.test.js",
+      "**/tests/**/*.test.ts"
     ],
+    "transform": {
+      "^.+\\.(js|ts)$": "babel-jest"
+    },
     "testTimeout": 15000,
     "verbose": true
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "@babel/preset-env": "^7.29.3",
+    "@babel/preset-typescript": "^7.28.5",
     "@jest/globals": "^30.3.0",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/forms": "^0.5.7",
