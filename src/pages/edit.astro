@@ -160,7 +160,7 @@ body {
   width: 28px; height: 28px; border-radius: 50%;
   background: rgba(255,85,85,0.08); border: 1px solid rgba(255,85,85,0.15);
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: #ff5555; font-size: 16px; line-height: 1;
+  cursor: pointer; color: var(--danger); font-size: 16px; line-height: 1;
 }
 
 /* ===== AVAILABILITY TOGGLE ===== */
@@ -181,7 +181,7 @@ body {
 .switch-knob {
   position: absolute; top: 2px; left: 2px;
   width: 18px; height: 18px; border-radius: 50%;
-  background: #fff; transition: left 0.2s;
+  background: var(--bg); transition: left 0.2s;
 }
 .switch.on .switch-knob { left: 22px; }
 
@@ -203,7 +203,7 @@ body {
   width: 22px; height: 22px; border-radius: 50%;
   background: rgba(0,0,0,0.7); border: 1px solid rgba(255,85,85,0.3);
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; color: #ff5555; cursor: pointer;
+  font-size: 12px; color: var(--danger); cursor: pointer;
 }
 .gallery-add {
   aspect-ratio: 1; border-radius: 8px;
@@ -221,12 +221,12 @@ body {
   padding: 16px; border-radius: 12px;
   background: rgba(255,85,85,0.04); border: 1px solid rgba(255,85,85,0.12);
 }
-.danger-title { font-size: 13px; font-weight: 700; color: #ff5555; margin-bottom: 4px; }
+.danger-title { font-size: 13px; font-weight: 700; color: var(--danger); margin-bottom: 4px; }
 .danger-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
 .danger-btn {
   padding: 10px 18px; border-radius: 8px;
   background: transparent; border: 1px solid rgba(255,85,85,0.3);
-  color: #ff5555; font-size: 13px; font-weight: 600; cursor: pointer;
+  color: var(--danger); font-size: 13px; font-weight: 600; cursor: pointer;
   transition: all 0.2s;
 }
 .danger-btn:hover { background: rgba(255,85,85,0.08); }
@@ -243,12 +243,12 @@ body {
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
 .toast.success { background: var(--reps-dim); border-color: var(--reps-border); color: var(--reps); }
-.toast.error { background: rgba(255,85,85,0.08); border-color: rgba(255,85,85,0.2); color: #ff5555; }
+.toast.error { background: rgba(255,85,85,0.08); border-color: rgba(255,85,85,0.2); color: var(--danger); }
 
 /* ===== SPINNER ===== */
 .spinner {
   display: inline-block; width: 14px; height: 14px;
-  border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff;
+  border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--bg);
   border-radius: 50%; animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -276,7 +276,7 @@ body {
       <h2>Sign in to edit</h2>
       <p>Enter your email to receive a magic link - no password needed.</p>
       <input class="auth-field" type="email" id="auth-email" placeholder="your@email.com" autocomplete="email">
-      <div id="auth-error" style="display:none;font-size:12px;color:#ff5555;margin-bottom:10px;max-width:340px;"></div>
+      <div id="auth-error" style="display:none;font-size:12px;color:var(--danger);margin-bottom:10px;max-width:340px;"></div>
       <button class="auth-btn" id="auth-btn" onclick="sendMagicLink()">Send Magic Link</button>
       <div class="auth-hint">Check your inbox - link expires in 15 minutes.</div>
     </div>
@@ -511,7 +511,7 @@ body {
       <div class="section-heading">REPs UAE Verification</div>
       <div class="section-sub">Your verified badge builds client trust.</div>
       <div id="reps-verified-card" class="hidden" style="background:var(--reps-dim);border:1px solid var(--reps-border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="#00C853"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" style="fill: var(--green)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
         <div>
           <div style="font-size:13px;font-weight:700;color:var(--reps);">REPs UAE Verified</div>
           <div id="reps-number-display" style="font-size:11px;color:var(--text-muted);"></div>
@@ -531,7 +531,7 @@ body {
 
     <!-- Section: Danger Zone -->
     <div class="edit-section">
-      <div class="section-heading" style="color:#ff5555;">Danger Zone</div>
+      <div class="section-heading" style="color:var(--danger);">Danger Zone</div>
       <div class="section-sub">These actions are permanent and cannot be undone.</div>
       <div class="danger-zone">
         <div class="danger-title">Delete Profile</div>

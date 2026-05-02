@@ -16,7 +16,7 @@ const brandName = market.brandName;
   --surface-2: #111; --surface-3: #1c1c1c; --surface-4: #242424;
   --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.14);
   --text: #fff; --text-muted: rgba(255,255,255,0.5); --text-faint: rgba(255,255,255,0.25);
-  --danger: #ff4444; --warning: #ffaa00; --success: #00C853;
+  --danger: #ff4444; --warning: #ffaa00; --success: #00C853; --accent: #8888ff;
 }
 .btn-success { background: rgba(0,200,83,0.12); border: 1px solid var(--reps-border); color: var(--reps); }
 .btn-success:hover { background: rgba(0,200,83,0.2); }
@@ -148,7 +148,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .tab:hover { color: var(--text); }
 .tab.active { background: var(--surface-3); color: var(--text); border: 1px solid var(--border); }
 .tab-badge {
-  background: var(--warning); color: #000; border-radius: 10px;
+  background: var(--warning); color: var(--bg); border-radius: 10px;
   padding: 1px 6px; font-size: 10px; font-weight: 800;
 }
 
@@ -203,7 +203,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 }
 .action-btn.view { background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted); }
 .action-btn.view:hover { color: var(--text); border-color: var(--border-hover); }
-.action-btn.email { background: rgba(100,100,255,0.08); border: 1px solid rgba(100,100,255,0.2); color: #8888ff; }
+.action-btn.email { background: rgba(100,100,255,0.08); border: 1px solid rgba(100,100,255,0.2); color: var(--accent); }
 .action-btn.email:hover { background: rgba(100,100,255,0.15); }
 .action-btn.delete { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); color: var(--danger); }
 .action-btn.delete:hover { background: rgba(255,68,68,0.15); }

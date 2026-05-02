@@ -95,7 +95,7 @@ const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
     <div class="gate-sub">Enter your admin password to access all markets</div>
     <input id="gate-input" class="gate-input" type="password" placeholder="Admin password" onkeydown="if(event.key==='Enter')checkGate()" />
     <button class="gate-btn" onclick="checkGate()">Access Dashboard →</button>
-    <div id="gate-error" style="color:#FF3B3B;font-size:12px;margin-top:12px;display:none">Incorrect password</div>
+    <div id="gate-error" style="color:var(--red);font-size:12px;margin-top:12px;display:none">Incorrect password</div>
   </div>
 </div>
 

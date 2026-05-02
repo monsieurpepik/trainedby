@@ -105,6 +105,14 @@ if (tbSession) {
         --brand-dim: rgba(255,92,0,0.10);
         --brand-border: rgba(255,92,0,0.25);
         --green: #00C853;
+        --color-whatsapp: #25D366;
+        --accent: #8888ff;
+        --gold-light: #f5d06b;
+        --gold-dark: #c9a227;
+        --ai-bg: #080810;
+        --ai-indigo: #6366f1;
+        --ai-indigo-light: #818cf8;
+        --ai-indigo-dark: #4f46e5;
         --font-body: 'DM Sans', system-ui, sans-serif;
         --font-display: 'DM Sans', system-ui, sans-serif;
       }
@@ -132,7 +140,7 @@ body {
 .dash-tabs { display: none; }
 @media (min-width: 768px) {
   .dash-header { display: none; }
-  .dash-tabs { display: block; background: #fff; border-bottom: 1px solid rgba(0,0,0,0.07); position: sticky; top: 0; z-index: 50; }
+  .dash-tabs { display: block; background: var(--bg); border-bottom: 1px solid rgba(0,0,0,0.07); position: sticky; top: 0; z-index: 50; }
   .bottom-nav { display: none !important; }
   .dash-wrap { max-width: 960px; padding-bottom: 32px; }
   .dash-tabs-inner { max-width: 960px; margin: 0 auto; height: 52px; display: flex; align-items: center; padding: 0 32px; }
@@ -240,7 +248,7 @@ body {
   font-size: 11px; font-weight: 600; margin-top: 4px;
 }
 .stat-card-change.up { color: var(--reps); }
-.stat-card-change.down { color: #ff5555; }
+.stat-card-change.down { color: var(--danger); }
 
 /* Chart placeholder */
 .chart-section { padding: 24px 0; border-bottom: 1px solid var(--border); }
@@ -317,7 +325,7 @@ body {
   width: 32px; height: 32px; border-radius: 50%;
   background: rgba(37,211,102,0.08); border: 1px solid rgba(37,211,102,0.15);
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; text-decoration: none; color: #25D366;
+  cursor: pointer; text-decoration: none; color: var(--color-whatsapp);
   transition: background 0.2s;
 }
 .lead-wa-btn:hover { background: rgba(37,211,102,0.15); }
@@ -332,7 +340,7 @@ body {
   background: var(--reps-dim); border: 1px solid var(--reps-border); color: var(--reps);
 }
 .lead-type-tag.package {
-  background: rgba(100,100,255,0.08); border: 1px solid rgba(100,100,255,0.2); color: #8888ff;
+  background: rgba(100,100,255,0.08); border: 1px solid rgba(100,100,255,0.2); color: var(--accent);
 }
 
 /* Onboarding checklist */
@@ -379,7 +387,7 @@ body {
 .upgrade-title {
   font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 16px; font-weight: 800;
   margin-bottom: 6px;
-  background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
+  background: var(--pro-gradient, linear-gradient(135deg,var(--gold-dark),var(--gold-light),var(--gold-dark)));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 .upgrade-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
@@ -393,7 +401,7 @@ body {
 .upgrade-feature svg { flex-shrink: 0; }
 .upgrade-btn {
   width: 100%; padding: 14px; border-radius: 12px;
-  background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
+  background: var(--pro-gradient, linear-gradient(135deg,var(--gold-dark),var(--gold-light),var(--gold-dark)));
   color: #0a0a0a; border: none;
   font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 14px; font-weight: 800;
   cursor: pointer; transition: all 0.2s;
@@ -476,7 +484,7 @@ body {
 .ai-panel {
   display: none; flex-direction: column;
   position: fixed; inset: 0; z-index: 50;
-  background: #080810; /* Slightly blue-tinted dark for AI context */
+  background: var(--ai-bg); /* Slightly blue-tinted dark for AI context */
   padding-top: max(0px, env(safe-area-inset-top));
   padding-bottom: max(64px, calc(env(safe-area-inset-bottom) + 64px));
 }
@@ -493,7 +501,7 @@ body {
 }
 .ai-panel-badge {
   font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
-  background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3);
+  background: rgba(99,102,241,0.15); color: var(--ai-indigo-light); border: 1px solid rgba(99,102,241,0.3);
 }
 .ai-panel-close {
   background: var(--surface-3); border: 1px solid var(--border);
@@ -513,7 +521,7 @@ body {
 }
 @keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .ai-msg.user {
-  background: #6366f1; color: #fff;
+  background: var(--ai-indigo); color: #fff;
   border-bottom-right-radius: 4px; align-self: flex-end;
 }
 .ai-msg.bot {
@@ -534,11 +542,11 @@ body {
   color: var(--text-muted); cursor: pointer; transition: all 0.15s;
   white-space: nowrap;
 }
-.ai-chip:hover { border-color: rgba(99,102,241,0.4); color: #818cf8; background: rgba(99,102,241,0.1); }
+.ai-chip:hover { border-color: rgba(99,102,241,0.4); color: var(--ai-indigo-light); background: rgba(99,102,241,0.1); }
 .ai-input-row {
   padding: 12px 20px; border-top: 1px solid rgba(99,102,241,0.15);
   display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0;
-  background: #080810;
+  background: var(--ai-bg);
 }
 .ai-input {
   flex: 1; background: var(--surface-3); border: 1px solid var(--border);
@@ -551,12 +559,12 @@ body {
 .ai-input::placeholder { color: var(--text-faint); }
 .ai-send {
   width: 42px; height: 42px; border-radius: 12px; border: none;
-  background: #6366f1; color: #fff; cursor: pointer;
+  background: var(--ai-indigo); color: #fff; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; transition: all 0.2s;
   box-shadow: 0 2px 12px rgba(99,102,241,0.4);
 }
-.ai-send:hover { background: #4f46e5; box-shadow: 0 4px 20px rgba(99,102,241,0.5); }
+.ai-send:hover { background: var(--ai-indigo-dark); box-shadow: 0 4px 20px rgba(99,102,241,0.5); }
 .ai-send:disabled { opacity: 0.4; cursor: not-allowed; }
 .ai-welcome {
   text-align: center; padding: 32px 20px 16px;
@@ -778,7 +786,7 @@ body {
     <div id="insight-banner" style="display:none;margin:16px 0;background:linear-gradient(135deg,rgba(255,92,0,0.10),rgba(255,92,0,0.04));border:1px solid rgba(255,92,0,0.25);border-radius:14px;padding:14px 16px;">
       <div style="display:flex;align-items:flex-start;gap:10px;">
         <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,92,0,0.15);border:1px solid rgba(255,92,0,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--brand)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         </div>
         <div>
           <div style="font-size:11px;font-weight:700;color:rgba(255,92,0,0.9);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:3px;">Insight</div>
@@ -882,7 +890,7 @@ body {
     <!-- Generate Training Plan - Pro Feature Card -->
     <div class="checklist-section" id="generate-plan-section" style="display:none">
       <div class="checklist-title" style="display:flex;align-items:center;gap:8px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--brand)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
         Generate a Training Plan
       </div>
       <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">
@@ -968,7 +976,7 @@ body {
           </button>
           <div id="tg-link-display" style="display:none;margin-top:12px;background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;">
             <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px;">Open this link on your phone:</div>
-            <a id="tg-link-url" href="#" target="_blank" style="font-size:13px;color:#FF5C00;word-break:break-all;"></a>
+            <a id="tg-link-url" href="#" target="_blank" style="font-size:13px;color:var(--brand);word-break:break-all;"></a>
             <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px;">Link expires in 10 minutes. Tap it to open Telegram and complete the connection.</div>
           </div>
         </div>
@@ -983,7 +991,7 @@ body {
 <div class="ai-panel" id="ai-panel">
   <div class="ai-panel-header">
     <div class="ai-panel-title">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="2"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M12 6v6l4 2"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="stroke: var(--brand)" stroke-width="2"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M12 6v6l4 2"/></svg>
       {t(locale, 'dash.ai_title')}
       <span class="ai-panel-badge">Beta</span>
     </div>
@@ -992,7 +1000,7 @@ body {
   <div class="ai-messages" id="ai-messages">
     <div class="ai-welcome" id="ai-welcome">
       <div class="ai-welcome-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="stroke: var(--brand)" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
       </div>
       <div class="ai-welcome-title">Hey, I'm your AI coach</div>
       <div class="ai-welcome-sub">I know your profile, your market, and your goals. Ask me anything - from writing your bio to building a 12-week programme.</div>
