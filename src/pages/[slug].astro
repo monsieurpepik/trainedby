@@ -931,8 +931,11 @@ body {
         reviews.forEach(rv => {
           let rvStars = '';
           for (let i=1;i<=5;i++) rvStars += `<span style="color:${i<=rv.rating?starColor:starEmpty};font-size:12px">&#9733;</span>`;
-          const initials = (rv.client_name||'?').substring(0,2).toUpperCase();
-          html += `<div style="background:var(--review-card-bg);border-radius:10px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-secondary);flex-shrink:0">${initials}</div><div><div style="font-size:13px;font-weight:400;color:var(--text-primary)">${rv.client_name||'Client'}</div><div style="font-size:10px;color:#22c55e;font-weight:500;margin-top:1px">&#10003; Verified</div></div><div style="display:flex;gap:2px;margin-left:auto">${rvStars}</div></div><div style="font-size:13px;line-height:1.7;color:var(--text-secondary);font-weight:300">${rv.review_text||''}</div>${rv.goal_achieved?`<div style="display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:500;color:#22c55e">${rv.goal_achieved}</div>`:''}</div>`;
+          const rvName = esc(rv.client_name || 'Client');
+          const initials = rvName.substring(0,2).toUpperCase();
+          const rvText = esc(rv.review_text || '');
+          const rvGoal = rv.goal_achieved ? esc(rv.goal_achieved) : null;
+          html += `<div style="background:var(--review-card-bg);border-radius:10px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-secondary);flex-shrink:0">${initials}</div><div><div style="font-size:13px;font-weight:400;color:var(--text-primary)">${rvName}</div><div style="font-size:10px;color:#22c55e;font-weight:500;margin-top:1px">&#10003; Verified</div></div><div style="display:flex;gap:2px;margin-left:auto">${rvStars}</div></div><div style="font-size:13px;line-height:1.7;color:var(--text-secondary);font-weight:300">${rvText}</div>${rvGoal?`<div style="display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:500;color:#22c55e">${rvGoal}</div>`:''}</div>`;
         });
         el.innerHTML = html;
       } catch(e) {
