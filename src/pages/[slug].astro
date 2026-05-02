@@ -695,6 +695,15 @@ body {
       if (heroImg) heroImg.style.display = 'none';
     }
 
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function renderProfile(t, packages) {
       window.__TRAINER_ID__ = t.id;
       const loading = document.getElementById('tb-loading');
@@ -721,7 +730,7 @@ body {
       const clients = t.total_clients || t.client_count || null;
 
       // Deduplicate packages by name
-      const _rawPkgs = Array.isArray(packages) ? packages : [];
+      const _rawPkgs = (Array.isArray(packages) ? packages : []).filter(Boolean);
       const _seenPkgNames = new Set();
       const pkgList = _rawPkgs.filter(p => {
         if (_seenPkgNames.has(p.name)) return false;
@@ -753,42 +762,42 @@ body {
       function fmtPkgPrice(p) {
         if (!p.price) return '';
         const sym = currSym || p.currency || '';
-        return sym ? `${sym} ${p.price}` : `${p.price}`;
+        return sym ? `${esc(sym)} ${esc(p.price)}` : `${esc(p.price)}`;
       }
 
       // ── Tags for identity strip ──────────────────────────────────────────
-      const tags = [...specialties.slice(0, 3)];
-      if (isVerified) tags.unshift('Verified');
-      if (certifications.length > 0 && tags.length < 4) tags.push(certifications[0]);
-      const cappedTags = tags.slice(0, 4);
+      const tagsRaw = [...specialties.slice(0, 3)];
+      if (isVerified) tagsRaw.unshift('Verified');
+      if (certifications.length > 0 && tagsRaw.length < 4) tagsRaw.push(certifications[0]);
+      const cappedTags = [...new Set(tagsRaw)].slice(0, 4);
 
       mount.innerHTML = `
         <!-- 1. HERO ────────────────────────────────────────────────────── -->
         <div class="tb-hero">
-          ${photoUrl ? `<img class="tb-hero-img" src="${photoUrl}" alt="${displayName}" onerror="this.style.display='none'">` : ''}
+          ${photoUrl ? `<img class="tb-hero-img" src="${photoUrl}" alt="${esc(displayName)}" onerror="this.style.display='none'">` : ''}
           <div class="tb-hero-fade"></div>
           <div class="tb-hero-controls">
             <button class="tb-hero-btn" onclick="history.length>1?history.back():location.href='/find'" aria-label="Back">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            ${'share' in navigator ? `<button class="tb-hero-btn" onclick="shareProfile('${displayName.replace(/'/g, "\\'")}')" aria-label="Share">
+            ${'share' in navigator ? `<button class="tb-hero-btn" onclick="shareProfile('${esc(displayName)}')" aria-label="Share">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
             </button>` : '<span></span>'}
           </div>
           ${photoUrl ? `
           <div class="tb-hero-name-block">
-            <div class="tb-hero-name">${displayName}</div>
-            ${specialties[0] ? `<div class="tb-hero-tagline">${specialties[0]}${location ? ' · ' + location : ''}</div>` : ''}
+            <div class="tb-hero-name">${esc(displayName)}</div>
+            ${specialties[0] ? `<div class="tb-hero-tagline">${esc(specialties[0])}${location ? ' · ' + esc(location) : ''}</div>` : ''}
           </div>` : ''}
           <div id="hero-sentinel"></div>
         </div>
 
         <!-- 2. IDENTITY STRIP ───────────────────────────────────────────── -->
         <div class="tb-identity">
-          ${cappedTags.map(tag => `<span class="tb-tag">${tag}</span>`).join('')}
+          ${cappedTags.map(tag => `<span class="tb-tag">${esc(tag)}</span>`).join('')}
           ${location ? `<span class="tb-location">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            ${location}
+            ${esc(location)}
           </span>` : ''}
         </div>
 
@@ -826,14 +835,14 @@ body {
         <div class="tb-sessions">
           <div class="tb-sessions-header">
             <span class="tb-section-label">Sessions</span>
-            <a href="#" class="tb-see-all">See all →</a>
+            <a href="javascript:void(0)" class="tb-see-all">See all →</a>
           </div>
           <div class="tb-sessions-scroll">
             ${pkgList.map(p => `
             <div class="tb-pkg-card">
-              <div class="tb-pkg-name">${p.name || p.title || 'Package'}</div>
+              <div class="tb-pkg-name">${esc(p.name || p.title || 'Package')}</div>
               ${p.sessions ? `<div class="tb-pkg-detail">${p.sessions} session${p.sessions > 1 ? 's' : ''}</div>` : ''}
-              ${p.description ? `<div class="tb-pkg-detail">${p.description}</div>` : ''}
+              ${p.description ? `<div class="tb-pkg-detail">${esc(p.description)}</div>` : ''}
               ${p.price ? `<div class="tb-pkg-price">${fmtPkgPrice(p)}</div>` : ''}
               ${whatsapp ? `
               <button class="tb-pkg-book" onclick="window.open('https://wa.me/${whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent('Hi ' + displayName + ', I\'m interested in the ' + (p.name || 'package') + '.')}','_blank')">
@@ -847,7 +856,7 @@ body {
         ${bio ? `
         <div class="tb-about">
           <div class="tb-section-label" style="margin-bottom:12px">About</div>
-          <div class="tb-about-text" id="tb-about-text">${bio}</div>
+          <div class="tb-about-text" id="tb-about-text">${esc(bio)}</div>
           <button class="tb-read-more" id="tb-read-more" onclick="
             var el=document.getElementById('tb-about-text');
             var btn=document.getElementById('tb-read-more');
