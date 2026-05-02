@@ -85,6 +85,7 @@ const pageDesc = `Find verified personal trainers in ${cityName}. Book sessions,
     .nav-cta { background: var(--text); color: var(--bg); padding: 9px 18px; border-radius: 20px; font-size: 13px; font-weight: 700; text-decoration: none; transition: opacity 0.2s; }
     .nav-cta:hover { opacity: 0.85; }
     :global(#nav .nav-logo span) { color: var(--text); }
+    :global(#nav .nav-logo span span) { color: var(--brand) !important; }
     @media (max-width: 768px) { .nav-links { display: none; } .nav { padding: 0 20px; } }
     .hero { max-width: 900px; margin: 0 auto; padding: 84px 24px 40px; }
     .hero-eyebrow { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
@@ -92,10 +93,10 @@ const pageDesc = `Find verified personal trainers in ${cityName}. Book sessions,
     .hero-sub { font-size: 16px; color: var(--text-muted); line-height: 1.6; margin-bottom: 32px; }
     .trainer-grid { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
     .trainer-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-decoration: none; color: inherit; display: block; transition: border-color 0.2s; }
-    .trainer-card:hover { border-color: rgba(255,92,0,0.3); }
+    .trainer-card:hover { border-color: var(--brand-border); }
     .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-    .card-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #FF5C00, #FF8C42); flex-shrink: 0; object-fit: cover; }
-    .card-avatar-initials { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #FF5C00, #FF8C42); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 18px; color: #fff; }
+    .card-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), #FF8C42); flex-shrink: 0; object-fit: cover; }
+    .card-avatar-initials { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), #FF8C42); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 18px; color: var(--bg); }
     .card-name { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 15px; margin-bottom: 2px; }
     .card-title { font-size: 12px; color: var(--text-muted); }
     .card-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: var(--reps); background: var(--reps-dim); border: 1px solid var(--reps-border); border-radius: 20px; padding: 2px 8px; font-weight: 700; margin-bottom: 10px; }
