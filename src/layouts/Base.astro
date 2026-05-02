@@ -100,26 +100,15 @@ const jsonLd = structuredData ?? defaultStructuredData;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://mezhtdbfyvkshpuplqqw.supabase.co" />
 
-    <!-- ── Fonts: Manrope (display/headings) + Inter (body/UI) ────────── -->
-    <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- ── DM Sans (trainer profile page) ──────────────────────────────── -->
+    <!-- ── Fonts: DM Sans (all weights) ─────────────────────────────── -->
     <link
       rel="preload"
       as="style"
       crossorigin
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap"
       rel="stylesheet"
     />
 
@@ -195,8 +184,8 @@ const jsonLd = structuredData ?? defaultStructuredData;
         --transition: 0.18s ease;
 
         /* Typography */
-        --font-display: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
-        --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-display: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       }
 
       /* ── CoachePar / France - Cobalt Blue ──────────────────────── */
@@ -247,7 +236,7 @@ const jsonLd = structuredData ?? defaultStructuredData;
       }
 
       /* ── Typography hierarchy ─────────────────────────────────────── */
-      /* Display / headings always use Manrope for bold, geometric impact */
+      /* Display / headings use DM Sans bold weights */
       h1, h2, h3, h4, h5, h6,
       .display, .heading {
         font-family: var(--font-display);
@@ -255,11 +244,11 @@ const jsonLd = structuredData ?? defaultStructuredData;
         line-height: 1.1;
         letter-spacing: -0.02em;
       }
-      /* Body text, labels, inputs use Inter for maximum legibility */
+      /* Body text, labels, inputs use DM Sans for legibility */
       p, li, label, span, td, th, input, select, textarea, button {
         font-family: var(--font-body);
       }
-      /* Eyebrows / small caps use Inter with tracked-out uppercase */
+      /* Eyebrows / small caps use DM Sans with tracked-out uppercase */
       .eyebrow, .label-caps {
         font-family: var(--font-body);
         font-size: 11px;
@@ -342,7 +331,7 @@ const jsonLd = structuredData ?? defaultStructuredData;
         z-index: 100;
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        background: rgba(10,10,10,0.8);
+        background: color-mix(in srgb, var(--bg, #0a0a0a) 85%, transparent);
         border-bottom: 1px solid var(--border);
         transition: background 0.2s ease;
       }
@@ -411,7 +400,11 @@ const jsonLd = structuredData ?? defaultStructuredData;
       .truncate {
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       }
-      .visually-hidden { @extend .sr-only; }
+      .visually-hidden {
+        position: absolute; width: 1px; height: 1px;
+        padding: 0; margin: -1px; overflow: hidden;
+        clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
+      }
 
       /* ── Astro View Transitions: app-like page fade ─────────────────── */
       @keyframes vt-fade-in {

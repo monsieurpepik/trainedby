@@ -27,7 +27,7 @@ const brandName = market.brandName;
     --glass-border:rgba(255,255,255,0.12);
     --radius:16px;
     --radius-sm:10px;
-    --font:'Manrope',sans-serif;
+    --font:'DM Sans',sans-serif;
   }
   html,body{height:100%;width:100%;overflow-x:hidden}
   body{font-family:var(--font);background:#0a0a0a;color:var(--white);-webkit-font-smoothing:antialiased}
@@ -1666,14 +1666,14 @@ async function loadNearbyTrainers(trainer) {
       const initials = (t.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
       const avatarHtml = t.avatar_url || t.photo_url
         ? `<img src="${t.avatar_url||t.photo_url}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,92,0,0.3);" alt="${t.name}">`
-        : `<div style="width:40px;height:40px;border-radius:50%;background:var(--surface-3);border:2px solid rgba(255,92,0,0.3);display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--orange);">${initials}</div>`;
+        : `<div style="width:40px;height:40px;border-radius:50%;background:var(--surface-3);border:2px solid rgba(255,92,0,0.3);display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:800;font-size:13px;color:var(--orange);">${initials}</div>`;
       const specs = (t.specialties||[]).slice(0,2).join(' · ');
       const item = document.createElement('a');
       item.href = `/${t.slug}`;
       item.style.cssText = 'display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px;text-decoration:none;color:inherit;transition:border-color 0.2s;';
       item.onmouseenter = () => item.style.borderColor = 'rgba(255,92,0,0.25)';
       item.onmouseleave = () => item.style.borderColor = 'rgba(255,255,255,0.07)';
-      item.innerHTML = `${avatarHtml}<div style="flex:1;min-width:0;"><div style="font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name||''}</div><div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${specs||t.title||'Personal Trainer'}</div></div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
+      item.innerHTML = `${avatarHtml}<div style="flex:1;min-width:0;"><div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name||''}</div><div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${specs||t.title||'Personal Trainer'}</div></div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
       list.appendChild(item);
     });
   } catch(e) {}

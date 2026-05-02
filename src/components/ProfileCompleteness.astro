@@ -43,7 +43,7 @@ const showShare = score === 100;
     <div class="pc-header">
       <div class="pc-ring-wrap">
         <svg class="pc-ring" viewBox="0 0 44 44" fill="none">
-          <circle cx="22" cy="22" r="18" stroke="rgba(255,255,255,0.08)" stroke-width="4"/>
+          <circle cx="22" cy="22" r="18" stroke="rgba(0,0,0,0.08)" stroke-width="4"/>
           <circle id="pc-ring-fill" cx="22" cy="22" r="18"
             stroke={ringStroke} stroke-width="4"
             stroke-linecap="round"
@@ -75,7 +75,7 @@ const showShare = score === 100;
               <svg class="pc-check-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
                 <path d="M20 6L9 17l-5-5"/>
               </svg>
-              <span class="pc-check-empty" style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2)"></span>
+              <span class="pc-check-empty" style="width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,0.15)"></span>
             </div>
             <span class="pc-item-label">{field.label}</span>
             <span class="pc-item-pts">{field.done ? '✓' : `+${field.pts}pts`}</span>
@@ -100,7 +100,7 @@ const showShare = score === 100;
     <div class="pc-header">
       <div class="pc-ring-wrap">
         <svg class="pc-ring" viewBox="0 0 44 44" fill="none">
-          <circle cx="22" cy="22" r="18" stroke="rgba(255,255,255,0.08)" stroke-width="4"/>
+          <circle cx="22" cy="22" r="18" stroke="rgba(0,0,0,0.08)" stroke-width="4"/>
           <circle id="pc-ring-fill" cx="22" cy="22" r="18"
             stroke="#FF5C00" stroke-width="4"
             stroke-linecap="round"
@@ -133,8 +133,8 @@ const showShare = score === 100;
 
 <style>
 .pc-widget {
-  background: #111;
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--surface-2, #F5F4F3);
+  border: 1px solid var(--border, rgba(0,0,0,0.07));
   border-radius: 16px;
   padding: 16px;
   margin-bottom: 16px;
@@ -160,33 +160,33 @@ const showShare = score === 100;
   justify-content: center;
   font-size: 10px;
   font-weight: 800;
-  color: #FF5C00;
-  font-family: 'Manrope', sans-serif;
+  color: var(--text, #1A1411);
+  font-family: 'DM Sans', system-ui, sans-serif;
 }
 .pc-title-block { flex: 1; }
 .pc-title {
   font-size: 12px;
   font-weight: 700;
-  color: rgba(255,255,255,0.9);
+  color: var(--text, #1A1411);
   margin-bottom: 2px;
 }
 .pc-status {
   font-size: 11px;
-  color: rgba(255,255,255,0.4);
+  color: var(--text-muted, #6B6460);
 }
 .pc-toggle {
   background: none;
   border: none;
-  color: rgba(255,255,255,0.4);
+  color: var(--text-muted, #6B6460);
   padding: 4px;
   cursor: pointer;
   transition: color 0.2s;
 }
-.pc-toggle:hover { color: rgba(255,255,255,0.8); }
+.pc-toggle:hover { color: var(--text, #1A1411); }
 .pc-details {
   margin-top: 14px;
   padding-top: 14px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid var(--border, rgba(0,0,0,0.07));
 }
 .pc-details.hidden { display: none; }
 .pc-items { display: flex; flex-direction: column; gap: 8px; }
@@ -196,20 +196,21 @@ const showShare = score === 100;
   gap: 10px;
   padding: 8px 10px;
   border-radius: 10px;
-  background: rgba(255,255,255,0.03);
+  background: var(--surface, #FAFAF9);
+  border: 1px solid var(--border, rgba(0,0,0,0.07));
   cursor: pointer;
   transition: background 0.15s;
   text-decoration: none;
   color: inherit;
 }
-.pc-item:hover { background: rgba(255,255,255,0.06); }
-.pc-item.done { opacity: 0.45; cursor: default; }
-.pc-item.done:hover { background: rgba(255,255,255,0.03); }
+.pc-item:hover { background: var(--surface-3, #E8E5E2); }
+.pc-item.done { opacity: 0.5; cursor: default; }
+.pc-item.done:hover { background: var(--surface, #FAFAF9); }
 .pc-check {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.2);
+  border: 2px solid var(--border-hover, rgba(0,0,0,0.14));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -228,13 +229,14 @@ const showShare = score === 100;
   font-size: 12px;
   font-weight: 600;
   flex: 1;
+  color: var(--text, #1A1411);
 }
 .pc-item-pts {
   font-size: 10px;
   font-weight: 700;
-  color: #FF5C00;
-  background: rgba(255,92,0,0.1);
-  border: 1px solid rgba(255,92,0,0.2);
+  color: var(--text-muted, #6B6460);
+  background: var(--surface-3, #E8E5E2);
+  border: 1px solid var(--border, rgba(0,0,0,0.07));
   padding: 2px 6px;
   border-radius: 6px;
 }
@@ -250,16 +252,16 @@ const showShare = score === 100;
   gap: 10px;
   margin-top: 12px;
   padding: 10px 12px;
-  background: rgba(255,92,0,0.08);
-  border: 1px solid rgba(255,92,0,0.2);
+  background: var(--surface, #FAFAF9);
+  border: 1px solid var(--border, rgba(0,0,0,0.07));
   border-radius: 10px;
 }
 .pc-upgrade-nudge.hidden { display: none; }
-.pc-nudge-text { font-size: 11px; color: rgba(255,255,255,0.6); }
+.pc-nudge-text { font-size: 11px; color: var(--text-muted, #6B6460); }
 .pc-nudge-btn {
   font-size: 11px;
   font-weight: 700;
-  color: #FF5C00;
+  color: var(--text, #1A1411);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -267,8 +269,8 @@ const showShare = score === 100;
   margin-top: 12px;
   width: 100%;
   padding: 10px;
-  background: rgba(0,200,83,0.1);
-  border: 1px solid rgba(0,200,83,0.25);
+  background: rgba(0,200,83,0.08);
+  border: 1px solid rgba(0,200,83,0.2);
   border-radius: 10px;
   color: #00C853;
   font-size: 12px;
@@ -276,7 +278,7 @@ const showShare = score === 100;
   cursor: pointer;
   transition: background 0.15s;
 }
-.pc-share-btn:hover { background: rgba(0,200,83,0.18); }
+.pc-share-btn:hover { background: rgba(0,200,83,0.15); }
 </style>
 
 <script is:inline define:vars={{ slug }}>

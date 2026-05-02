@@ -9,7 +9,7 @@ const { variant = 'landing', activePage = '' } = Astro.props;
 {variant === 'consumer' ? (
   <!-- Consumer homepage nav: Find a Trainer focus -->
   <nav class="nav" id="nav">
-    <a href="/landing" class="nav-logo" data-brand-name>
+    <a href="/" class="nav-logo" data-brand-name>
       <span>Trained<span style="color:#fff">By</span></span><span
         style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:2px;vertical-align:middle;margin-bottom:3px"
       ></span>
@@ -25,7 +25,7 @@ const { variant = 'landing', activePage = '' } = Astro.props;
 ) : variant === 'landing' ? (
   <!-- For-trainers / SaaS nav -->
   <nav class="nav" id="nav">
-    <a href="/landing" class="nav-logo" data-brand-name>
+    <a href="/" class="nav-logo" data-brand-name>
       <span>Trained<span style="color:#fff">By</span></span><span
         style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:2px;vertical-align:middle;margin-bottom:3px"
       ></span>
@@ -40,7 +40,7 @@ const { variant = 'landing', activePage = '' } = Astro.props;
   </nav>
 ) : (
   <header class="app-header">
-    <a href="/landing" class="nav-logo" style="font-family:'Manrope',sans-serif;font-weight:900;font-size:18px;color:var(--brand);text-decoration:none;">
+    <a href="/" class="nav-logo" style="font-family:'DM Sans',sans-serif;font-weight:900;font-size:18px;color:var(--brand);text-decoration:none;">
       <span data-brand-name>Trained<span style="color:#fff">By</span></span>
     </a>
     <div class="header-nav">
