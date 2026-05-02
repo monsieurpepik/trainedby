@@ -142,32 +142,37 @@ nav{
 }
 .tc-hero{position:relative;height:320px;background:#0A0A0A;overflow:hidden}
 .tc-brand{
-  position:absolute;top:22px;left:22px;
+  position:absolute;top:22px;left:22px;z-index:3;
   font-size:9px;letter-spacing:0.2em;text-transform:uppercase;
-  color:rgba(255,255,255,0.14);
+  color:rgba(255,255,255,0.55);
   font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
   font-weight:700;
 }
 .tc-location{
-  position:absolute;top:22px;right:22px;
-  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);
+  position:absolute;top:22px;right:22px;z-index:3;
+  background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.18);
   border-radius:100px;padding:5px 13px;backdrop-filter:blur(12px);
-  font-size:10px;font-weight:700;color:rgba(255,255,255,0.45);
+  font-size:10px;font-weight:700;color:rgba(255,255,255,0.80);
   letter-spacing:0.08em;text-transform:uppercase;
   font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
 }
-.tc-avatar{
-  position:absolute;bottom:24px;left:24px;
-  width:72px;height:72px;border-radius:50%;
-  background:rgba(212,98,42,0.08);border:1.5px solid rgba(212,98,42,0.25);
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
+.tc-photo{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:top center;z-index:0;
 }
-.tc-avatar-initials{
-  font-size:22px;font-weight:800;color:#D4622A;
+.tc-photo-overlay{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(to bottom,rgba(0,0,0,0.08) 0%,rgba(0,0,0,0.55) 100%);
+}
+/* initials fallback shown when no photo */
+.tc-initials{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:0;
+  font-size:80px;font-weight:800;color:rgba(212,98,42,0.18);
   font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
+  letter-spacing:-0.02em;user-select:none;
 }
-.tc-avatar img{width:100%;height:100%;object-fit:cover}
+/* keep legacy .tc-avatar in case referenced elsewhere */
+.tc-avatar{display:none}
 .tc-body{padding:24px}
 .tc-specialty{
   font-size:10px;letter-spacing:0.16em;text-transform:uppercase;
@@ -521,12 +526,16 @@ function trainerCardHTML(t) {
   const arcGlow = `arc-${uid}-glow`;
   const arcSpark = `arc-${uid}-spark`;
 
-  const avatarContent = t.avatar_url
-    ? `<img src="${esc(t.avatar_url)}" alt="${esc(name)}" loading="lazy">`
-    : `<div class="tc-avatar-initials">${initials}</div>`;
+  // Full-bleed photo when available; initials watermark as fallback
+  const heroPhoto = t.avatar_url
+    ? `<img class="tc-photo" src="${esc(t.avatar_url)}" alt="${esc(name)}" loading="lazy" onerror="this.style.display='none'">`
+    : `<div class="tc-initials">${initials}</div>`;
+  const photoOverlay = t.avatar_url
+    ? `<div class="tc-photo-overlay"></div>`
+    : '';
 
   const arc = `
-<svg aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%"
+<svg aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;z-index:2"
      viewBox="0 0 390 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="${arcMass}" x1="-30" y1="320" x2="400" y2="10" gradientUnits="userSpaceOnUse">
@@ -585,10 +594,11 @@ function trainerCardHTML(t) {
   return `
 <a href="/${slug || '#'}" class="trainer-card">
   <div class="tc-hero">
+    ${heroPhoto}
+    ${photoOverlay}
     ${arc}
     <div class="tc-brand">TrainedBy</div>
     ${city ? `<div class="tc-location">${city}</div>` : ''}
-    <div class="tc-avatar">${avatarContent}</div>
   </div>
   <div class="tc-body">
     <div class="tc-specialty">${specialty}</div>
