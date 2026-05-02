@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import type { Review } from './types';
 
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
+const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string;
 
 const STAR_FILLED = '#1A1411';
 const STAR_EMPTY = 'rgba(0,0,0,0.12)';
@@ -77,6 +77,7 @@ export default function Reviews({ trainerId, averageRating, reviewCount }: Revie
 
   useEffect(() => {
     if (!trainerId) return;
+    const controller = new AbortController();
 
     async function fetchReviews() {
       try {
@@ -88,6 +89,7 @@ export default function Reviews({ trainerId, averageRating, reviewCount }: Revie
               Authorization: `Bearer ${SUPABASE_KEY}`,
               Prefer: 'count=exact',
             },
+            signal: controller.signal,
           }
         );
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -95,12 +97,14 @@ export default function Reviews({ trainerId, averageRating, reviewCount }: Revie
         const total = isNaN(rawTotal) ? 0 : rawTotal;
         const reviews: Review[] = await r.json();
         setState({ loading: false, reviews, total, error: false });
-      } catch {
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') return;
         setState({ loading: false, reviews: [], total: 0, error: true });
       }
     }
 
     fetchReviews();
+    return () => controller.abort();
   }, [trainerId]);
 
   if (state.loading) {
@@ -137,13 +141,6 @@ export default function Reviews({ trainerId, averageRating, reviewCount }: Revie
       {state.reviews.map((rv, i) => (
         <ReviewCard key={rv.id ?? i} review={rv} />
       ))}
-      {totalCount > 2 && (
-        <div style={{ marginTop: '8px', textAlign: 'center' }}>
-          <span style={{ fontSize: '12px', color: '#9A9290', cursor: 'pointer' }}>
-            See all {totalCount} reviews →
-          </span>
-        </div>
-      )}
     </div>
   );
 }
