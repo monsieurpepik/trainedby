@@ -249,6 +249,295 @@ body {
   0%,100% { box-shadow: 0 0 0 0 rgba(37,211,102,0.4); }
   50%      { box-shadow: 0 0 0 8px rgba(37,211,102,0); }
 }
+
+/* ── Hero ──────────────────────────────────────────────────────── */
+.tb-hero {
+  position: relative;
+  height: 460px;
+  overflow: hidden;
+  background: linear-gradient(168deg, #18191C, #272A30);
+}
+.tb-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+.tb-hero-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  background: linear-gradient(to bottom, transparent, #FFFFFF);
+  pointer-events: none;
+}
+.tb-hero-controls {
+  position: absolute;
+  top: 58px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 10;
+}
+.tb-hero-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.22);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+.tb-hero-name-block {
+  position: absolute;
+  bottom: 20px;
+  left: 28px;
+  z-index: 10;
+}
+.tb-hero-name {
+  font-weight: 200;
+  font-size: 36px;
+  letter-spacing: 0.02em;
+  color: #111111;
+  line-height: 1.15;
+}
+.tb-hero-tagline {
+  font-weight: 300;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* ── Identity strip ─────────────────────────────────────────────── */
+.tb-identity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.tb-tag {
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  font-weight: 500;
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+.tb-location {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 300;
+}
+
+/* ── Stats row ──────────────────────────────────────────────────── */
+.tb-stats {
+  display: grid;
+  border-bottom: 1px solid var(--border);
+}
+.tb-stat-item {
+  padding: 16px 12px;
+  text-align: center;
+  border-right: 1px solid rgba(0,0,0,0.06);
+}
+.tb-stat-item:last-child { border-right: none; }
+.tb-stat-num {
+  font-weight: 200;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.tb-stat-label {
+  font-weight: 500;
+  font-size: 9.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-top: 4px;
+}
+
+/* ── CTA block ──────────────────────────────────────────────────── */
+.tb-cta {
+  padding: 20px 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tb-btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 52px;
+  border-radius: 13px;
+  border: none;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  font-family: var(--font);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.20);
+  text-decoration: none;
+}
+.tb-btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 46px;
+  border-radius: 13px;
+  border: 1px solid var(--btn-secondary-border);
+  background: transparent;
+  color: var(--btn-secondary-text);
+  font-family: var(--font);
+  font-weight: 300;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* ── Packages carousel ──────────────────────────────────────────── */
+.tb-sessions {
+  padding: 20px 0 20px;
+}
+.tb-sessions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px 12px;
+}
+.tb-section-label {
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.tb-see-all {
+  font-size: 12px;
+  font-weight: 400;
+  color: #9A9290;
+  text-decoration: none;
+}
+.tb-sessions-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 4px 20px 12px;
+  -webkit-overflow-scrolling: touch;
+}
+.tb-sessions-scroll::-webkit-scrollbar { display: none; }
+.tb-sessions-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+.tb-pkg-card {
+  flex: 0 0 240px;
+  scroll-snap-align: start;
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tb-pkg-name {
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+.tb-pkg-detail {
+  font-weight: 300;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.tb-pkg-price {
+  font-weight: 200;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-top: auto;
+}
+.tb-pkg-book {
+  width: 100%;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: var(--btn-primary-bg);
+  color: #fff;
+  font-family: var(--font);
+  font-weight: 500;
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+/* ── About ──────────────────────────────────────────────────────── */
+.tb-about {
+  padding: 20px;
+  border-top: 1px solid var(--border);
+}
+.tb-about-text {
+  font-weight: 300;
+  font-size: 13.5px;
+  color: #4A4440;
+  line-height: 1.68;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.tb-about-text.expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+.tb-read-more {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #9A9290;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+/* ── Reviews shell ──────────────────────────────────────────────── */
+.tb-reviews {
+  padding: 20px;
+  border-top: 1px solid var(--border);
+}
+.tb-reviews-loading {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px 0;
+}
 </style>
 
   <!-- Sticky compact header — appears when hero scrolls out of view -->
@@ -335,23 +624,20 @@ body {
 
     function showErr(msg = 'Trainer not found') {
       const mount = document.getElementById('profile-mount');
-      const loading = document.getElementById('loading-state');
+      const loading = document.getElementById('tb-loading');
       if (loading) loading.style.display = 'none';
       if (mount) {
         mount.style.display = 'block';
         mount.innerHTML = `
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;gap:24px;padding:32px;text-align:center">
-            <div style="font-size:64px;font-weight:900;line-height:1;background:linear-gradient(135deg,#D4622A,#e07840);-webkit-background-clip:text;-webkit-text-fill-color:transparent">404</div>
-            <h1 style="font-size:24px;font-weight:700">Trainer not found</h1>
-            <p style="color:rgba(255,255,255,0.6);max-width:400px;line-height:1.6">This trainer profile doesn't exist or may have been removed.</p>
-            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-              <a href="/find" style="background:#D4622A;color:#fff;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700">Find a Trainer</a>
-              <a href="/" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:600">Go Home</a>
-            </div>
-            <div style="padding:14px 20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;max-width:400px;font-size:13px;color:rgba(255,255,255,0.45);line-height:1.6">
-              <strong style="color:rgba(255,255,255,0.65)">Looking for a specific trainer?</strong> Try searching by name or specialty on the Find page.
-            </div>
-          </div>`;
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;gap:24px;padding:32px;text-align:center;font-family:'DM Sans',system-ui,sans-serif">
+        <div style="font-size:64px;font-weight:200;letter-spacing:-0.02em;color:#111111;line-height:1">404</div>
+        <h1 style="font-size:22px;font-weight:300;color:#111111">Trainer not found</h1>
+        <p style="color:#6B6460;max-width:360px;line-height:1.6;font-size:13.5px;font-weight:300">This trainer profile doesn't exist or may have been removed.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+          <a href="/find" style="background:#1A1411;color:#fff;padding:12px 28px;border-radius:13px;text-decoration:none;font-weight:500;font-size:14px;letter-spacing:0.04em">Find a Trainer</a>
+          <a href="/" style="background:transparent;border:1px solid rgba(0,0,0,0.10);color:#7A7068;padding:12px 28px;border-radius:13px;text-decoration:none;font-weight:300;font-size:14px">Go Home</a>
+        </div>
+      </div>`;
       }
     }
 
@@ -411,60 +697,18 @@ body {
 
     function renderProfile(t, packages) {
       window.__TRAINER_ID__ = t.id;
-      const loading = document.getElementById('loading-state');
+      const loading = document.getElementById('tb-loading');
       const mount = document.getElementById('profile-mount');
       if (loading) loading.style.display = 'none';
       if (!mount) return;
       mount.style.display = 'block';
 
-      // Field name mapping: get-trainer uses name/avatar_url/specialties/instagram/reps_verified
+      // Field name mapping
       const displayName = t.name || t.full_name || '';
       const photoUrl = t.avatar_url || t.profile_photo_url || '';
-
-      // Set background image - premium gradient+initials fallback if image fails or missing
-      const bg = document.getElementById('bg');
-      if (photoUrl) {
-        const testImg = new Image();
-        testImg.onload = () => { if (bg) bg.style.backgroundImage = `url('${photoUrl}')`; };
-        testImg.onerror = () => applyAvatarFallback(displayName);
-        testImg.src = photoUrl;
-      } else {
-        setTimeout(() => applyAvatarFallback(displayName), 50);
-      }
-
-      // Extract dominant color from avatar for ambient bloom effect
-      if (photoUrl) {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = function() {
-          try {
-            const canvas = document.createElement('canvas');
-            canvas.width = 8; canvas.height = 8; // tiny sample
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, 8, 8);
-            const d = ctx.getImageData(0, 0, 8, 8).data;
-            let r = 0, g = 0, b = 0, count = 0;
-            for (let i = 0; i < d.length; i += 4) {
-              // Skip very dark or very light pixels
-              const brightness = (d[i] + d[i+1] + d[i+2]) / 3;
-              if (brightness > 30 && brightness < 230) {
-                r += d[i]; g += d[i+1]; b += d[i+2]; count++;
-              }
-            }
-            if (count > 0) {
-              r = Math.round(r/count); g = Math.round(g/count); b = Math.round(b/count);
-              document.documentElement.style.setProperty('--avatar-color', `${r},${g},${b}`);
-            }
-          } catch(e) { /* CORS or canvas error - use default */ }
-        };
-        img.src = photoUrl;
-      }
-
-      const brand = (window.__BRAND__ && window.__BRAND__.name) ? window.__BRAND__.name : (window.__BRAND__ || 'TrainedBy');
       const specialties = Array.isArray(t.specialties) ? t.specialties : (t.specialties ? [t.specialties] : ['Personal Trainer']);
-      const rating = t.avg_rating ? parseFloat(t.avg_rating).toFixed(1) : '5.0';
-      const reviews = t.review_count || 0;
-      const isPro = t.plan === 'pro' || t.plan === 'elite';
+      const rating = t.avg_rating ? parseFloat(t.avg_rating).toFixed(1) : null;
+      const reviewCount = t.review_count || 0;
       const isVerified = t.reps_verified || t.is_verified || t.verification_status === 'verified';
       const city = t.city || '';
       const country = t.country || '';
@@ -473,7 +717,10 @@ body {
       const instagram = t.instagram || t.instagram_handle || '';
       const whatsapp = t.whatsapp || t.phone || '';
       const certifications = Array.isArray(t.certifications) ? t.certifications : [];
-      // Deduplicate packages by name (guard against duplicate DB rows)
+      const experience = t.experience_years || t.years_experience || null;
+      const clients = t.total_clients || t.client_count || null;
+
+      // Deduplicate packages by name
       const _rawPkgs = Array.isArray(packages) ? packages : [];
       const _seenPkgNames = new Set();
       const pkgList = _rawPkgs.filter(p => {
@@ -481,188 +728,146 @@ body {
         _seenPkgNames.add(p.name);
         return true;
       });
-      const priceFrom = pkgList[0]?.price || null;
-      const priceCurrency = pkgList[0]?.currency || '';
 
-      document.title = `${displayName} - Verified Trainer on ${brand}`;
+      // Update compact header name
+      const chName = document.getElementById('ch-trainer-name');
+      if (chName) chName.textContent = displayName;
+
+      // ── Build stats (only non-null values) ──────────────────────────────
+      const statItems = [];
+      if (rating !== null && reviewCount > 0) {
+        statItems.push({ num: rating, label: 'Rating' });
+        statItems.push({ num: reviewCount, label: reviewCount === 1 ? 'Review' : 'Reviews' });
+      }
+      if (experience) statItems.push({ num: experience + 'y', label: 'Experience' });
+      if (clients) statItems.push({ num: clients + '+', label: 'Clients' });
+      const statCols = statItems.length || 1;
+
+      // ── CTA label (payment or free enquiry) ─────────────────────────────
+      const ctaLabel = window.__PAYMENT_ENABLED__ ? 'Book a Session' : 'Enquire Now';
+
+      // ── Package price renderer ──────────────────────────────────────────
+      const currSym = window.__CURRENCY_SYMBOL__;
+      function fmtPkgPrice(p) {
+        if (!p.price) return '';
+        const sym = currSym || p.currency || '';
+        return sym ? `${sym} ${p.price}` : `${p.price}`;
+      }
+
+      // ── Tags for identity strip ──────────────────────────────────────────
+      const tags = [...specialties.slice(0, 3)];
+      if (isVerified) tags.unshift('Verified');
+      if (certifications.length > 0) tags.push(certifications[0]);
 
       mount.innerHTML = `
-        <div style="max-width:680px;margin:0 auto;padding:24px 16px 80px">
-
-          <!-- Back nav -->
-          <a href="/find" style="display:inline-flex;align-items:center;gap:8px;color:rgba(255,255,255,0.6);text-decoration:none;font-size:14px;margin-bottom:24px;transition:color 0.2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">
-            ← Back to results
-          </a>
-
-          <!-- Hero card -->
-          <div style="background:rgba(10,10,10,0.72);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.10);border-radius:24px;overflow:hidden;margin-bottom:16px;box-shadow:0 8px 48px rgba(0,0,0,0.5)">
-            <div style="position:relative;height:240px;background:#0A0A0A">
-              <svg aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;z-index:0" viewBox="0 0 390 240" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="slug-arc-mass" x1="-40" y1="240" x2="420" y2="0" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
-                    <stop offset="28%" stop-color="rgba(212,98,42,0.16)"/>
-                    <stop offset="65%" stop-color="rgba(212,98,42,0.55)"/>
-                    <stop offset="100%" stop-color="#D4622A"/>
-                  </linearGradient>
-                  <linearGradient id="slug-arc-hair" x1="-40" y1="240" x2="420" y2="0" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
-                    <stop offset="32%" stop-color="rgba(212,98,42,0.42)"/>
-                    <stop offset="100%" stop-color="rgba(212,98,42,0.88)"/>
-                  </linearGradient>
-                  <filter id="slug-arc-glow" x="-100%" y="-100%" width="300%" height="300%">
-                    <feGaussianBlur stdDeviation="6" result="blur"/>
-                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                  </filter>
-                  <filter id="slug-arc-spark" x="-80%" y="-80%" width="260%" height="260%">
-                    <feGaussianBlur stdDeviation="2.5" result="blur"/>
-                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                  </filter>
-                </defs>
-                <path d="M -40 240 Q 120 160 225 90 Q 330 22 420 -5" stroke="url(#slug-arc-mass)" stroke-width="60" fill="none" stroke-linecap="butt"/>
-                <path d="M -40 240 Q 120 160 225 90 Q 330 22 420 -5" stroke="rgba(10,10,10,0.55)" stroke-width="36" fill="none" stroke-linecap="butt"/>
-                <path d="M -40 240 Q 120 160 225 90 Q 330 22 420 -5" stroke="url(#slug-arc-hair)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-                <g filter="url(#slug-arc-glow)">
-                  <circle cx="380" cy="16" r="11" fill="rgba(212,98,42,0.93)"/>
-                  <circle cx="363" cy="26" r="8.5" fill="rgba(212,98,42,0.86)"/>
-                  <circle cx="394" cy="8" r="7.5" fill="rgba(232,120,52,0.88)"/>
-                  <circle cx="370" cy="6" r="6.5" fill="rgba(212,98,42,0.82)"/>
-                  <circle cx="390" cy="36" r="5.5" fill="rgba(212,98,42,0.76)"/>
-                </g>
-                <g filter="url(#slug-arc-spark)">
-                  <circle cx="348" cy="14" r="4.5" fill="rgba(212,98,42,0.66)"/>
-                  <circle cx="365" cy="-4" r="4" fill="rgba(212,98,42,0.60)"/>
-                  <circle cx="345" cy="40" r="4" fill="rgba(212,98,42,0.52)"/>
-                  <circle cx="372" cy="46" r="3.5" fill="rgba(212,98,42,0.46)"/>
-                  <circle cx="330" cy="26" r="3" fill="rgba(212,98,42,0.42)"/>
-                  <circle cx="350" cy="56" r="3" fill="rgba(212,98,42,0.36)"/>
-                  <circle cx="380" cy="-14" r="3" fill="rgba(212,98,42,0.48)"/>
-                </g>
-                <circle cx="314" cy="40" r="2.5" fill="rgba(212,98,42,0.26)"/>
-                <circle cx="325" cy="56" r="2" fill="rgba(212,98,42,0.20)"/>
-                <circle cx="336" cy="68" r="1.5" fill="rgba(212,98,42,0.16)"/>
-                <circle cx="370" cy="-20" r="2" fill="rgba(212,98,42,0.34)"/>
-                <circle cx="382" cy="-30" r="1.5" fill="rgba(212,98,42,0.22)"/>
-              </svg>
-              ${photoUrl ? `<img data-hero="1" src="${photoUrl}" alt="${displayName}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;z-index:1;opacity:0.65" onerror="this.style.display='none';applyAvatarFallback('${displayName.replace(/'/g, "\\'")}')">` : ''}
-              <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.75) 100%);z-index:2"></div>
-              ${isVerified ? `<div style="position:absolute;top:16px;right:16px;background:rgba(34,197,94,0.18);border:1px solid rgba(34,197,94,0.35);color:#22c55e;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;backdrop-filter:blur(12px);letter-spacing:0.03em;z-index:3">✓ Verified</div>` : ''}
-              ${isPro ? `<div style="position:absolute;top:16px;left:16px;background:linear-gradient(135deg,rgba(197,162,39,0.25),rgba(245,208,107,0.15));border:1px solid rgba(197,162,39,0.4);color:#f5d06b;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:800;backdrop-filter:blur(12px);letter-spacing:0.05em;z-index:3">PRO</div>` : ''}
-            </div>
-            <div style="padding:22px">
-              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
-                <div>
-                  <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:700;font-style:italic;margin-bottom:4px;letter-spacing:-0.015em;line-height:1.05;color:#FAFAFA">${displayName}</h1>
-                  <p style="color:rgba(255,255,255,0.55);font-size:14px;font-family:var(--font-body,'Inter',sans-serif)">${specialties.join(' · ')}${location ? ' · ' + location : ''}</p>
-                </div>
-                <div style="text-align:right">
-                  <div style="font-family:var(--font-display,'Manrope',sans-serif);font-size:22px;font-weight:900;color:var(--brand,#D4622A);letter-spacing:-0.02em">${priceFrom ? `From ${priceCurrency} ${priceFrom}` : ''}</div>
-                  <div style="font-size:12px;color:rgba(255,255,255,0.4);font-family:var(--font-body,'Inter',sans-serif)">per session</div>
-                </div>
-              </div>
-
-              ${reviews > 0 ? `
-              <div style="display:flex;align-items:center;gap:6px;margin-top:12px">
-                <span style="color:#f59e0b;font-size:16px">${'★'.repeat(Math.round(parseFloat(rating)))}${'☆'.repeat(5-Math.round(parseFloat(rating)))}</span>
-                <span style="font-weight:700">${rating}</span>
-                <span style="color:rgba(255,255,255,0.5);font-size:13px">(${reviews} reviews)</span>
-              </div>` : ''}
-
-              ${bio ? `<p style="margin-top:16px;color:rgba(255,255,255,0.8);line-height:1.6;font-size:15px">${bio}</p>` : ''}
-            </div>
+        <!-- 1. HERO ────────────────────────────────────────────────────── -->
+        <div class="tb-hero">
+          ${photoUrl ? `<img class="tb-hero-img" src="${photoUrl}" alt="${displayName}" onerror="this.style.display='none'">` : ''}
+          <div class="tb-hero-fade"></div>
+          <div class="tb-hero-controls">
+            <button class="tb-hero-btn" onclick="history.length>1?history.back():location.href='/find'" aria-label="Back">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            ${'share' in navigator ? `<button class="tb-hero-btn" onclick="shareProfile('${displayName.replace(/'/g, "\\'")}')" aria-label="Share">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </button>` : '<span></span>'}
           </div>
-
-          <!-- Certifications -->
-          ${certifications.length > 0 ? `
-          <div style="background:rgba(10,10,10,0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.09);border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:0 4px 24px rgba(0,0,0,0.3)">
-            <h2 style="font-family:var(--font-display,'Manrope',sans-serif);font-size:15px;font-weight:800;margin-bottom:14px;letter-spacing:-0.01em">Certifications</h2>
-            <div style="display:flex;flex-wrap:wrap;gap:8px">
-              ${certifications.map(c => `<span style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#22c55e;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600">${c}</span>`).join('')}
-            </div>
-          </div>` : ''}
-
-          <!-- Packages -->
-          ${pkgList.length > 0 ? `
-          <div style="background:rgba(10,10,10,0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.09);border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:0 4px 24px rgba(0,0,0,0.3)">
-            <h2 style="font-family:var(--font-display,'Manrope',sans-serif);font-size:15px;font-weight:800;margin-bottom:14px;letter-spacing:-0.01em">Training Packages</h2>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              ${pkgList.map(p => `
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px">
-                <div>
-                  <div style="font-weight:700;font-size:15px">${p.name || p.title || 'Package'}</div>
-                  ${p.description ? `<div style="color:rgba(255,255,255,0.5);font-size:13px;margin-top:2px">${p.description}</div>` : ''}
-                </div>
-                <div style="font-family:var(--font-display,'Manrope',sans-serif);font-size:18px;font-weight:900;color:var(--brand,#D4622A);white-space:nowrap;letter-spacing:-0.02em">${p.price ? `${p.currency || ''} ${p.price}`.trim() : ''}</div>
-              </div>`).join('')}
-            </div>
-          </div>` : ''}
-
-          <!-- CTA buttons -->
-          <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
-            ${t.booking_ready ? `
-            <a href="/book/${t.slug}" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#D4622A;color:#fff;padding:16px;border-radius:14px;text-decoration:none;font-weight:700;font-size:16px;">
-              📅 Book a Session
-            </a>` : ''}
-            ${whatsapp ? `
-            <a href="https://wa.me/${whatsapp.replace(/\D/g,'')}?text=Hi ${encodeURIComponent(displayName)}, I found your profile on ${brand} and I'd like to book a session."
-               target="_blank" rel="noopener" class="wa-cta-pulse"
-               style="display:flex;align-items:center;justify-content:center;gap:10px;background:#25D366;color:#fff;padding:16px;border-radius:14px;text-decoration:none;font-weight:700;font-size:16px">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              Book via WhatsApp
-            </a>` : ''}
-            ${instagram ? `
-            <a href="https://instagram.com/${instagram.replace('@','')}"
-               target="_blank" rel="noopener"
-               style="display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:#fff;padding:16px;border-radius:14px;text-decoration:none;font-weight:700;font-size:16px">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-              View on Instagram
-            </a>` : ''}
-            <a href="/find"
-               style="display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);padding:14px;border-radius:14px;text-decoration:none;font-weight:600;font-size:15px">
-              ← Browse all trainers
-            </a>
-            ${'share' in navigator ? `
-            <button onclick="shareProfile('${displayName}')" id="share-btn"
-               style="display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);padding:12px;border-radius:14px;font-weight:600;font-size:14px;cursor:pointer;width:100%;font-family:inherit">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-              Share this profile
-            </button>` : ''}
+          <div class="tb-hero-name-block">
+            <div class="tb-hero-name">${displayName}</div>
+            ${specialties[0] ? `<div class="tb-hero-tagline">${specialties[0]}${location ? ' · ' + location : ''}</div>` : ''}
           </div>
+          <div id="hero-sentinel"></div>
+        </div>
 
-          <!-- Client Reviews -->
-          <div id="reviewsSection" style="background:rgba(10,10,10,0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.09);border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:0 4px 24px rgba(0,0,0,0.3)">
-            <h2 style="font-family:var(--font-display,'Manrope',sans-serif);font-size:15px;font-weight:800;margin-bottom:14px;letter-spacing:-0.01em">Client Reviews</h2>
-            <div id="reviewsContent"><div style="text-align:center;padding:20px;color:rgba(255,255,255,0.3);font-size:13px">Loading reviews...</div></div>
-            <!-- Write a Review -->
-            <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.07)">
-              <button id="writeReviewToggle" onclick="document.getElementById('writeReviewForm').style.display=document.getElementById('writeReviewForm').style.display==='none'?'block':'none'" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.8);cursor:pointer">
-                &#9998; Write a Review
-              </button>
-              <div id="writeReviewForm" style="display:none;margin-top:12px">
-                <div style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Your Name</label><input id="rvName" type="text" placeholder="e.g. James M." maxlength="60" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none" /></div>
-                <div style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Rating</label><div id="starPicker" style="display:flex;gap:6px"><span onclick="setRating(1)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span><span onclick="setRating(2)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span><span onclick="setRating(3)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span><span onclick="setRating(4)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span><span onclick="setRating(5)" style="font-size:28px;color:rgba(255,255,255,0.2);cursor:pointer">&#9733;</span></div></div>
-                <div style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Your Review</label><textarea id="rvText" rows="4" placeholder="Share your experience with this trainer..." maxlength="600" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none;resize:vertical"></textarea></div>
-                <div style="margin-bottom:16px"><label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Goal Achieved (optional)</label><input id="rvGoal" type="text" placeholder="e.g. Lost 8kg in 10 weeks" maxlength="80" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none" /></div>
-                <label id="rvConsentLabel" style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5;"><input type="checkbox" id="rvConsent" style="margin-top:2px;accent-color:#D4622A;width:16px;height:16px;flex-shrink:0;" /><span>I consent to being contacted by this trainer and to my name and review being displayed publicly on their profile.</span></label>
-                <button onclick="submitReview()" id="rvSubmitBtn" style="padding:11px 24px;background:#D4622A;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;width:100%">Submit Review</button>
-                <div id="rvMsg" style="margin-top:10px;font-size:13px;display:none"></div>
-              </div>
-            </div>
-          </div>
+        <!-- 2. IDENTITY STRIP ───────────────────────────────────────────── -->
+        <div class="tb-identity">
+          ${tags.map(tag => `<span class="tb-tag">${tag}</span>`).join('')}
+          ${location ? `<span class="tb-location">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            ${location}
+          </span>` : ''}
+        </div>
 
-          <!-- Powered by footer — viral acquisition badge -->
-          <div style="text-align:center;margin-top:40px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08)">
-            <a href="/join?ref=profile_badge&from=${window.__TRAINER_SLUG__ || t.slug || ''}" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.2);border-radius:20px;padding:8px 16px;transition:all 0.2s" onmouseover="this.style.background='rgba(212,98,42,0.14)'" onmouseout="this.style.background='rgba(212,98,42,0.08)'">
-              <div style="width:20px;height:20px;background:#D4622A;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;font-family:'Manrope',sans-serif;flex-shrink:0">T</div>
-              <span style="font-size:12px;color:rgba(255,255,255,0.5)">Powered by</span>
-              <strong style="font-size:12px;color:#D4622A;font-family:'Manrope',sans-serif;font-weight:800">${brand}</strong>
-              <span style="font-size:11px;color:rgba(212,98,42,0.6);font-weight:600">→ Free for trainers</span>
-            </a>
+        <!-- 3. STATS ROW ────────────────────────────────────────────────── -->
+        ${statItems.length > 0 ? `
+        <div class="tb-stats" style="grid-template-columns:repeat(${statCols},1fr)">
+          ${statItems.map(s => `
+          <div class="tb-stat-item">
+            <div class="tb-stat-num">${s.num}</div>
+            <div class="tb-stat-label">${s.label}</div>
+          </div>`).join('')}
+        </div>` : ''}
+
+        <!-- 4. CTA ──────────────────────────────────────────────────────── -->
+        <div class="tb-cta">
+          ${whatsapp ? `
+          <a href="https://wa.me/${whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent('Hi ' + displayName + ', I found your profile on TrainedBy and I\'d like to book a session.')}"
+             target="_blank" rel="noopener" class="tb-btn-primary" style="animation:wa-pulse 2s ease infinite">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            ${ctaLabel}
+          </a>` : `
+          <button class="tb-btn-primary" onclick="alert('Booking coming soon!')">
+            ${ctaLabel}
+          </button>`}
+          ${instagram ? `
+          <a href="https://instagram.com/${instagram.replace('@','')}" target="_blank" rel="noopener" class="tb-btn-secondary">
+            View on Instagram
+          </a>` : ''}
+        </div>
+
+        <!-- 5. PACKAGES ─────────────────────────────────────────────────── -->
+        ${pkgList.length > 0 ? `
+        <div class="tb-sessions">
+          <div class="tb-sessions-header">
+            <span class="tb-section-label">Training Packages</span>
           </div>
-        </div>`;
+          <div class="tb-sessions-scroll">
+            ${pkgList.map(p => `
+            <div class="tb-pkg-card">
+              <div class="tb-pkg-name">${p.name || p.title || 'Package'}</div>
+              ${p.sessions ? `<div class="tb-pkg-detail">${p.sessions} session${p.sessions > 1 ? 's' : ''}</div>` : ''}
+              ${p.description ? `<div class="tb-pkg-detail">${p.description}</div>` : ''}
+              ${p.price ? `<div class="tb-pkg-price">${fmtPkgPrice(p)}</div>` : ''}
+              ${whatsapp ? `
+              <button class="tb-pkg-book" onclick="window.open('https://wa.me/${whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent('Hi ' + displayName + ', I\'m interested in the ' + (p.name || 'package') + '.')}','_blank')">
+                Book
+              </button>` : ''}
+            </div>`).join('')}
+          </div>
+        </div>` : ''}
+
+        <!-- 6. ABOUT ────────────────────────────────────────────────────── -->
+        ${bio ? `
+        <div class="tb-about">
+          <div class="tb-section-label" style="margin-bottom:12px">About</div>
+          <div class="tb-about-text" id="tb-about-text">${bio}</div>
+          <button class="tb-read-more" id="tb-read-more" onclick="
+            var el=document.getElementById('tb-about-text');
+            var btn=document.getElementById('tb-read-more');
+            if(el.classList.contains('expanded')){el.classList.remove('expanded');btn.textContent='Read more';}
+            else{el.classList.add('expanded');btn.textContent='Read less';}
+          ">Read more</button>
+        </div>` : ''}
+
+        <!-- 7. REVIEWS SHELL ─────────────────────────────────────────────── -->
+        <div class="tb-reviews">
+          <div class="tb-section-label" style="margin-bottom:12px">Reviews</div>
+          <div id="reviewsContent" class="tb-reviews-loading">Loading reviews...</div>
+        </div>
+      `;
 
       // Load reviews asynchronously after rendering
       loadReviews(t.id);
+
+      // Set up IntersectionObserver for compact header
+      const sentinel = document.getElementById('hero-sentinel');
+      if (sentinel) {
+        const obs = new IntersectionObserver(([entry]) => {
+          const header = document.getElementById('tb-compact-header');
+          if (header) header.classList.toggle('visible', !entry.isIntersecting);
+        }, { threshold: 0 });
+        obs.observe(sentinel);
+      }
     }
 
     // Web Share API
@@ -693,24 +898,27 @@ body {
         const reviews = await r.json();
         const el = document.getElementById('reviewsContent');
         if (!el) return;
+        el.classList.remove('tb-reviews-loading');
         if (!Array.isArray(reviews) || reviews.length === 0) {
-          el.innerHTML = `<div style="text-align:center;padding:20px 16px;border:1px dashed rgba(255,255,255,0.1);border-radius:12px"><div style="font-size:28px;margin-bottom:8px">&#11088;</div><div style="font-size:14px;font-weight:700;margin-bottom:4px">No reviews yet</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6">Be the first to train with this trainer and leave a review after your session.</div></div>`;
+          el.innerHTML = `<div style="text-align:center;padding:20px 16px;border:1px dashed rgba(0,0,0,0.08);border-radius:12px;color:var(--text-muted);font-size:13px">No reviews yet — be the first!</div>`;
           return;
         }
         const avg = reviews.reduce((a,b) => a + b.rating, 0) / reviews.length;
+        const starColor = '#F59E0B';
+        const starEmpty = 'rgba(0,0,0,0.12)';
         let starsHtml = '';
-        for (let i = 1; i <= 5; i++) starsHtml += `<span style="color:${i<=Math.round(avg)?'#D4622A':'rgba(255,255,255,0.2)'};font-size:14px">&#9733;</span>`;
-        let html = `<div style="display:flex;align-items:center;gap:14px;padding:14px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.09);margin-bottom:12px"><div style="font-size:44px;font-weight:800;line-height:1">${avg.toFixed(1)}</div><div><div style="display:flex;gap:2px;margin-bottom:4px">${starsHtml}</div><div style="font-size:12px;color:rgba(255,255,255,0.5)">${reviews.length} verified review${reviews.length>1?'s':''}</div></div></div>`;
+        for (let i = 1; i <= 5; i++) starsHtml += `<span style="color:${i<=Math.round(avg)?starColor:starEmpty};font-size:14px">&#9733;</span>`;
+        let html = `<div style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--review-card-bg);border-radius:10px;margin-bottom:12px"><div style="font-size:36px;font-weight:200;letter-spacing:-0.02em;color:var(--text-primary);line-height:1">${avg.toFixed(1)}</div><div><div style="display:flex;gap:2px;margin-bottom:4px">${starsHtml}</div><div style="font-size:12px;color:var(--text-muted)">${reviews.length} verified review${reviews.length>1?'s':''}</div></div></div>`;
         reviews.forEach(rv => {
           let rvStars = '';
-          for (let i=1;i<=5;i++) rvStars += `<span style="color:${i<=rv.rating?'#D4622A':'rgba(255,255,255,0.2)'};font-size:12px">&#9733;</span>`;
+          for (let i=1;i<=5;i++) rvStars += `<span style="color:${i<=rv.rating?starColor:starEmpty};font-size:12px">&#9733;</span>`;
           const initials = (rv.client_name||'?').substring(0,2).toUpperCase();
-          html += `<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:34px;height:34px;border-radius:50%;background:rgba(212,98,42,0.15);border:1px solid rgba(212,98,42,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#D4622A;flex-shrink:0">${initials}</div><div><div style="font-size:13px;font-weight:700">${rv.client_name||'Client'}</div><div style="font-size:10px;color:#22c55e;font-weight:600;margin-top:2px">&#10003; Verified</div></div><div style="display:flex;gap:2px;margin-left:auto">${rvStars}</div></div><div style="font-size:13px;line-height:1.7;color:rgba(255,255,255,0.6)">${rv.review_text||''}</div>${rv.goal_achieved?`<div style="display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:600;color:#22c55e">&#127919; ${rv.goal_achieved}</div>`:''}</div>`;
+          html += `<div style="background:var(--review-card-bg);border-radius:10px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-secondary);flex-shrink:0">${initials}</div><div><div style="font-size:13px;font-weight:400;color:var(--text-primary)">${rv.client_name||'Client'}</div><div style="font-size:10px;color:#22c55e;font-weight:500;margin-top:1px">&#10003; Verified</div></div><div style="display:flex;gap:2px;margin-left:auto">${rvStars}</div></div><div style="font-size:13px;line-height:1.7;color:var(--text-secondary);font-weight:300">${rv.review_text||''}</div>${rv.goal_achieved?`<div style="display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:500;color:#22c55e">${rv.goal_achieved}</div>`:''}</div>`;
         });
         el.innerHTML = html;
       } catch(e) {
         const el = document.getElementById('reviewsContent');
-        if (el) el.innerHTML = `<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.3);font-size:13px">Could not load reviews.</div>`;
+        if (el) { el.classList.remove('tb-reviews-loading'); el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Could not load reviews.</div>`; }
       }
     }
 
@@ -718,7 +926,7 @@ body {
     function setRating(v) {
       _selectedRating = v;
       const stars = document.querySelectorAll('#starPicker span');
-      stars.forEach((s, i) => { s.style.color = i < v ? '#D4622A' : 'rgba(255,255,255,0.2)'; });
+      stars.forEach((s, i) => { s.style.color = i < v ? '#F59E0B' : 'rgba(0,0,0,0.15)'; });
     }
 
     async function submitReview() {
