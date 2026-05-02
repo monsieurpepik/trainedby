@@ -11,7 +11,7 @@ import TrainerProfile from "../components/TrainerProfile";
 
 const { slug } = Astro.params;
 const market = getMarket(Astro.url.hostname);
-const brandName = market.brandName;
+const brandName = market.brandName ?? 'TrainedBy';
 const paymentEnabled = market.paymentEnabled;
 const currencySymbol = market.currencySymbol;
 

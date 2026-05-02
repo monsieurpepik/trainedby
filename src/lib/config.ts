@@ -5,11 +5,11 @@
 
 export const SUPABASE_URL =
   import.meta.env.PUBLIC_SUPABASE_URL ||
-  'https://bvbfkzsslfbumzmpoxjg.supabase.co';
+  'https://mezhtdbfyvkshpuplqqw.supabase.co';
 
 export const SUPABASE_ANON_KEY =
   import.meta.env.PUBLIC_SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2YmZrenNzbGZidW16bXBveGpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyMDI5NTksImV4cCI6MjA1OTc3ODk1OX0.VKkGnSFxcFJGJFbFLBfZHfRdFmQjJJNFkLJlqGBGHhE';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
 
 export const EDGE_BASE = `${SUPABASE_URL}/functions/v1`;
 
