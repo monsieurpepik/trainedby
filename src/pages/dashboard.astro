@@ -163,7 +163,7 @@ body {
 }
 .dash-logo {
   display: flex; align-items: center; gap: 8px;
-  font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 16px;
+  font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 16px;
   text-decoration: none; color: var(--text);
 }
 .header-nav { display: flex; gap: 8px; }
@@ -190,10 +190,10 @@ body {
 .greeting-avatar {
   width: 44px; height: 44px; border-radius: 50%;
   object-fit: cover; background: var(--surface-3);
-  border: 2px solid var(--brand);
+  border: 2px solid var(--border);
 }
 .greeting-name {
-  font-family: 'Manrope', sans-serif; font-size: 18px; font-weight: 800;
+  font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800;
 }
 .greeting-sub { font-size: 12px; color: var(--text-muted); }
 
@@ -204,13 +204,13 @@ body {
   border-radius: 12px; padding: 12px 14px;
 }
 .url-bar-text {
-  flex: 1; font-size: 13px; font-weight: 600; color: var(--brand);
+  flex: 1; font-size: 13px; font-weight: 600; color: var(--text-muted);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .url-copy-btn {
   padding: 6px 12px; border-radius: 8px;
-  background: var(--brand-dim); border: 1px solid var(--brand-border);
-  color: var(--brand); font-size: 11px; font-weight: 700;
+  background: var(--surface-3); border: 1px solid var(--border);
+  color: var(--text-muted); font-size: 11px; font-weight: 700;
   cursor: pointer; flex-shrink: 0;
 }
 
@@ -228,7 +228,7 @@ body {
   border-radius: 14px; padding: 16px;
 }
 .stat-card.brand-card {
-  background: var(--brand-dim); border-color: var(--brand-border);
+  background: var(--text); border-color: var(--text); color: #fff;
 }
 .stat-card-icon {
   width: 32px; height: 32px; border-radius: 8px;
@@ -237,10 +237,10 @@ body {
   margin-bottom: 10px; color: var(--text-muted);
 }
 .stat-card.brand-card .stat-card-icon {
-  background: var(--brand-dim); border-color: var(--brand-border); color: var(--brand);
+  background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.15); color: #fff;
 }
 .stat-card-value {
-  font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 800;
+  font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 800;
   letter-spacing: -0.5px; margin-bottom: 2px;
 }
 .stat-card-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
@@ -277,11 +277,11 @@ body {
 }
 .chart-bar {
   flex: 1; border-radius: 4px 4px 0 0;
-  background: var(--brand-dim); border: 1px solid var(--brand-border);
+  background: var(--surface-3); border: 1px solid var(--border);
   transition: background 0.2s; cursor: pointer; min-height: 4px;
 }
-.chart-bar:hover { background: rgba(255,92,0,0.25); }
-.chart-bar.today { background: var(--brand); border-color: var(--brand); }
+.chart-bar:hover { background: rgba(26,20,17,0.15); }
+.chart-bar.today { background: var(--text); border-color: var(--text); }
 .chart-labels {
   display: flex; gap: 4px; padding: 4px 12px 0;
 }
@@ -301,7 +301,7 @@ body {
   text-transform: uppercase; letter-spacing: 0.08em;
 }
 .leads-count {
-  background: var(--brand); color: #fff;
+  background: var(--text); color: #fff;
   font-size: 10px; font-weight: 700; padding: 2px 8px;
   border-radius: 10px;
 }
@@ -314,7 +314,7 @@ body {
 .lead-avatar {
   width: 36px; height: 36px; border-radius: 50%;
   background: var(--surface-3); display: flex; align-items: center;
-  justify-content: center; font-family: 'Manrope', sans-serif;
+  justify-content: center; font-family: 'DM Sans', sans-serif;
   font-size: 14px; font-weight: 800; color: var(--text-muted);
   flex-shrink: 0;
 }
@@ -334,7 +334,7 @@ body {
   text-transform: uppercase; letter-spacing: 0.04em;
 }
 .lead-type-tag.assessment {
-  background: var(--brand-dim); border: 1px solid var(--brand-border); color: var(--brand);
+  background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted);
 }
 .lead-type-tag.booking {
   background: var(--reps-dim); border: 1px solid var(--reps-border); color: var(--reps);
@@ -366,8 +366,8 @@ body {
 .checklist-sub { font-size: 11px; color: var(--text-muted); }
 .checklist-action {
   margin-left: auto; padding: 6px 12px; border-radius: 8px;
-  background: var(--brand-dim); border: 1px solid var(--brand-border);
-  color: var(--brand); font-size: 11px; font-weight: 700;
+  background: var(--surface-3); border: 1px solid var(--border);
+  color: var(--text-muted); font-size: 11px; font-weight: 700;
   text-decoration: none; cursor: pointer; flex-shrink: 0;
 }
 
@@ -385,7 +385,7 @@ body {
   background: var(--pro-gradient, linear-gradient(90deg,transparent,rgba(245,208,107,0.5),transparent));
 }
 .upgrade-title {
-  font-family: var(--font-display, 'Manrope', sans-serif); font-size: 16px; font-weight: 800;
+  font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 16px; font-weight: 800;
   margin-bottom: 6px;
   background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
@@ -403,7 +403,7 @@ body {
   width: 100%; padding: 14px; border-radius: 12px;
   background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
   color: #0a0a0a; border: none;
-  font-family: var(--font-display, 'Manrope', sans-serif); font-size: 14px; font-weight: 800;
+  font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 14px; font-weight: 800;
   cursor: pointer; transition: all 0.2s;
   box-shadow: 0 4px 20px rgba(197,162,39,0.3);
 }
@@ -418,13 +418,13 @@ body {
   position: relative; overflow: hidden;
 }
 .income-stream-card.active {
-  background: linear-gradient(135deg, rgba(255,92,0,0.10) 0%, var(--surface-2) 100%);
-  border-color: var(--brand-border);
+  background: var(--surface-2);
+  border-color: var(--border-hover);
 }
 .income-stream-card.locked { opacity: 0.55; }
 .income-stream-icon { font-size: 20px; margin-bottom: 8px; }
 .income-stream-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
-.income-stream-value { font-family: 'Manrope', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+.income-stream-value { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
 .income-stream-value.green { color: var(--reps); }
 .income-stream-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
 .income-stream-lock {
@@ -437,24 +437,24 @@ body {
 /* Referral flywheel */
 .referral-section { padding: 24px 0; }
 .referral-card {
-  background: linear-gradient(135deg, rgba(255,92,0,0.08) 0%, var(--surface-2) 100%);
-  border: 1px solid var(--brand-border);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   border-radius: 16px; padding: 18px;
 }
-.referral-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; font-family: 'Manrope', sans-serif; }
+.referral-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; font-family: 'DM Sans', sans-serif; }
 .referral-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
 /* Flywheel progress */
 .flywheel-progress { margin-bottom: 16px; }
 .flywheel-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 6px; }
-.flywheel-label span:last-child { color: var(--brand); }
+.flywheel-label span:last-child { color: var(--text-muted); }
 .flywheel-bar { height: 6px; background: var(--surface-3); border-radius: 3px; overflow: hidden; }
-.flywheel-fill { height: 100%; background: var(--brand); border-radius: 3px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.flywheel-fill { height: 100%; background: var(--text); border-radius: 3px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
 .flywheel-steps { display: flex; gap: 6px; margin-top: 10px; }
 .flywheel-step {
   flex: 1; height: 4px; border-radius: 2px;
   background: var(--surface-3);
 }
-.flywheel-step.done { background: var(--brand); }
+.flywheel-step.done { background: var(--text); }
 .flywheel-reward {
   display: flex; align-items: center; gap: 8px;
   background: rgba(0,200,83,0.06); border: 1px solid rgba(0,200,83,0.15);
@@ -478,7 +478,7 @@ body {
   display: flex; align-items: center; justify-content: center; gap: 5px;
   transition: all 0.2s; text-decoration: none;
 }
-.referral-share-btn:hover { border-color: var(--brand-border); color: var(--brand); }
+.referral-share-btn:hover { border-color: var(--border-hover); color: var(--text); }
 
 /* ── AI Assistant Panel ───────────────────────────────────────────────────────────────────────────── */
 .ai-panel {
@@ -496,7 +496,7 @@ body {
   background: rgba(99,102,241,0.04);
 }
 .ai-panel-title {
-  font-family: var(--font-display, 'Manrope', sans-serif); font-size: 16px; font-weight: 800;
+  font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 16px; font-weight: 800;
   display: flex; align-items: center; gap: 8px;
 }
 .ai-panel-badge {
@@ -578,7 +578,7 @@ body {
   animation: ai-breathe 3s ease-in-out infinite;
 }
 .ai-welcome-title {
-  font-family: var(--font-display, 'Manrope', sans-serif); font-size: 18px; font-weight: 800; margin-bottom: 6px;
+  font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 18px; font-weight: 800; margin-bottom: 6px;
 }
 .ai-welcome-sub { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
 /* AI channel settings */
@@ -618,7 +618,7 @@ body {
   gap: 3px; cursor: pointer; text-decoration: none;
   color: var(--text-faint); transition: color 0.2s;
 }
-.bottom-nav-item.active { color: var(--brand); }
+.bottom-nav-item.active { color: var(--text); }
 .bottom-nav-item span { font-size: 10px; font-weight: 600; }
 
 /* Spinner */
@@ -693,9 +693,9 @@ body {
 
   <!-- Auth gate -->
   <div id="dash-auth" class="hidden" style="text-align:center;padding:60px 0;">
-    <h2 style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Sign in to view your dashboard</h2>
+    <h2 style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Sign in to view your dashboard</h2>
     <p style="font-size:14px;color:var(--text-muted);margin-bottom:24px;">Access your leads, analytics, and profile settings.</p>
-    <a href="/edit" style="display:inline-block;padding:14px 28px;border-radius:12px;background:var(--brand);color:#fff;text-decoration:none;font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;">Sign In →</a>
+    <a href="/edit" style="display:inline-block;padding:14px 28px;border-radius:12px;background:var(--text);color:#fff;text-decoration:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;">Sign In →</a>
   </div>
 
   <!-- Dashboard content -->
@@ -899,7 +899,7 @@ body {
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="field" style="margin-bottom:0">
           <label style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;">Client goal</label>
-          <input type="text" id="plan-goal" placeholder="e.g. Lose 8kg in 12 weeks" style="background:var(--surface-3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;width:100%;outline:none;font-family:'Inter',sans-serif;">
+          <input type="text" id="plan-goal" placeholder="e.g. Lose 8kg in 12 weeks" style="background:var(--surface-3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif;">
         </div>
         <div class="field" style="margin-bottom:0">
           <label style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;">Sessions per week</label>
@@ -918,7 +918,7 @@ body {
             <button class="toggle-pill" id="plan-dur-12" onclick="setPlanDur(12)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">12 wk</button>
           </div>
         </div>
-        <button id="generate-plan-btn" onclick="generatePlan()" style="background:var(--brand);color:#fff;border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <button id="generate-plan-btn" onclick="generatePlan()" style="background:var(--brand);color:#fff;border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Generate Plan
         </button>
@@ -1513,7 +1513,7 @@ init();
     '.tb-chat-btn{position:fixed;bottom:24px;right:20px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#FF5C00;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,92,0,.4);transition:transform .2s,box-shadow .2s}',
     '.tb-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(255,92,0,.5)}',
     '.tb-chat-btn svg{width:24px;height:24px;fill:#fff}',
-    '.tb-chat-window{position:fixed;bottom:88px;right:20px;z-index:9998;width:min(360px,calc(100vw - 40px));background:#111;border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.6);display:none;flex-direction:column;font-family:Inter,sans-serif}',
+    '.tb-chat-window{position:fixed;bottom:88px;right:20px;z-index:9998;width:min(360px,calc(100vw - 40px));background:#111;border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.6);display:none;flex-direction:column;font-family:'DM Sans',sans-serif}',
     '.tb-chat-window.open{display:flex}',
     '.tb-chat-header{padding:14px 16px;background:#FF5C00;display:flex;align-items:center;justify-content:space-between}',
     '.tb-chat-header-title{font-weight:700;font-size:14px;color:#fff}',
