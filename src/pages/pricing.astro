@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
 import { getMarket } from '../lib/market.ts';
 import { getLocale, t, getBrand } from '../lib/i18n.ts';
 const market = getMarket(Astro.url.hostname);
@@ -28,45 +29,76 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
   title={`Pricing - ${brandName}`}
   description={`Simple, transparent pricing for ${brandName}. Free to start. Pro plan with a 30-day ROI guarantee.`}
 >
+  <Fragment slot="head">
+    <style>
+      :root {
+        --bg: #FFFFFF;
+        --surface: #FAFAF9;
+        --surface-2: #F5F4F3;
+        --surface-3: #E8E5E2;
+        --text: #1A1411;
+        --text-2: #4A4240;
+        --text-muted: #6B6460;
+        --text-faint: #9B9290;
+        --border: rgba(0,0,0,0.07);
+        --border-hover: rgba(0,0,0,0.15);
+        --border-strong: rgba(0,0,0,0.20);
+        --brand: #FF5C00;
+        --brand-hover: #e05200;
+        --brand-dim: rgba(255,92,0,0.08);
+        --brand-border: rgba(255,92,0,0.20);
+        --reps: #16a34a;
+        --reps-dim: rgba(22,163,74,0.08);
+        --reps-border: rgba(22,163,74,0.20);
+      }
+    </style>
+  </Fragment>
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  /* Aliases to Base.astro global tokens */
-  --reps: var(--green, #00C853);
-  --reps-dim: var(--green-dim, rgba(0,200,83,0.08));
-  --reps-border: var(--green-border, rgba(0,200,83,0.2));
-  --surface: var(--bg, #0a0a0a);
-  --surface-2: var(--surface, #111);
-  --surface-3: var(--surface-3, #1c1c1c);
-  --text-muted: var(--text-2, rgba(255,255,255,0.55));
-  --text-faint: var(--text-faint, rgba(255,255,255,0.25));
-}
 html { scroll-behavior: smooth; }
 body {
-  background: var(--bg, #0a0a0a); color: var(--text, #f0f0f0);
+  background: var(--bg); color: var(--text);
   font-family: var(--font-body, 'DM Sans', sans-serif); font-size: 15px; line-height: 1.6;
   -webkit-font-smoothing: antialiased; min-height: 100vh;
 }
-nav {
+
+/* ── Nav layout (Nav.astro renders the HTML) ─────────────── */
+.nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-  background: rgba(10,10,10,0.9); backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 64px;
+  background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
+  transition: background 0.3s, box-shadow 0.3s;
 }
-.nav-inner {
-  max-width: 1100px; margin: 0 auto; padding: 0 24px;
-  display: flex; align-items: center; justify-content: space-between; height: 60px;
+.nav.scrolled {
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 1px 12px rgba(0,0,0,0.07);
 }
 .nav-logo {
-  display: flex; align-items: center; gap: 10px;
-  font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 18px;
-  text-decoration: none; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-weight: 900; font-size: 20px;
+  text-decoration: none; color: var(--text); display: flex; align-items: center;
 }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a {
+  font-size: 14px; font-weight: 500; color: var(--text-muted);
+  text-decoration: none; transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
 .nav-cta {
-  padding: 10px 20px; border-radius: 20px; background: var(--brand); color: #fff;
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
-  text-decoration: none; transition: background 0.2s;
+  background: var(--text); color: var(--bg);
+  padding: 9px 18px; border-radius: 20px;
+  font-size: 13px; font-weight: 700; text-decoration: none;
+  transition: opacity 0.2s;
 }
-.nav-cta:hover { background: var(--brand-hover, #e05200); }
+.nav-cta:hover { opacity: 0.85; }
+/* Logo "By" sub-span color on light nav */
+:global(#nav .nav-logo span) { color: var(--text); }
+:global(#nav .nav-logo span span) { color: var(--brand) !important; }
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav { padding: 0 20px; }
+}
 
 .pricing-wrap { max-width: 1000px; margin: 0 auto; padding: 100px 24px 80px; }
 .pricing-header { text-align: center; margin-bottom: 48px; }
@@ -183,7 +215,7 @@ nav {
   transform: translateY(-2px);
 }
 .plan-btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
-.plan-btn-ghost:hover { border-color: rgba(255,255,255,0.2); }
+.plan-btn-ghost:hover { border-color: var(--border-hover); }
 .plan-features { display: flex; flex-direction: column; gap: 10px; }
 .plan-feature {
   display: flex; align-items: flex-start; gap: 10px;
@@ -212,10 +244,10 @@ nav {
 .compare-table td {
   padding: 12px 16px; text-align: center;
   font-size: 13px; color: var(--text-muted);
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--border);
 }
 .compare-table td:first-child { text-align: left; color: var(--text); font-weight: 500; }
-.compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+.compare-table tr:hover td { background: rgba(0,0,0,0.02); }
 .check { color: var(--reps); font-size: 16px; }
 .cross { color: var(--text-faint); font-size: 16px; }
 .plan-highlight { color: var(--brand); font-weight: 700; }
@@ -228,7 +260,6 @@ nav {
   .billing-toggle { flex-wrap: wrap; gap: 8px; }
   .compare-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .compare-table { min-width: 480px; }
-  .nav-inner { padding: 0 16px; }
 }
 
 /* ── Safe area for notched phones ─────────────────────────────────── */
@@ -252,15 +283,7 @@ footer {
 .footer-copy { font-size: 12px; color: var(--text-faint); }
   </style>
 
-<nav>
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">
-      <svg width="30" height="30" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="DM Sans,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
-      {brandName}
-    </a>
-    <a href="/join" class="nav-cta">{t(locale, 'join.submit').replace(' →', '')} →</a>
-  </div>
-</nav>
+<Nav variant="landing" />
 
 <div class="pricing-wrap">
 
@@ -312,19 +335,19 @@ footer {
           {t(locale, 'pricing.f_1_package')}
         </div>
         <div class="plan-feature excluded">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(26,20,17,0.15)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
           {t(locale, 'pricing.f_assessment')}
         </div>
         <div class="plan-feature excluded">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(26,20,17,0.15)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
           {t(locale, 'pricing.f_ai')}
         </div>
         <div class="plan-feature excluded">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(26,20,17,0.15)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
           {t(locale, 'pricing.f_analytics')}
         </div>
         <div class="plan-feature excluded">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(26,20,17,0.15)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
           {t(locale, 'pricing.f_priority')}
         </div>
       </div>
@@ -342,7 +365,7 @@ footer {
       <div class="plan-price-annual" id="pro-annual-note">&nbsp;</div>
       <div class="plan-desc">{t(locale, 'pricing.pro_desc')}</div>
       <button class="plan-btn plan-btn-brand" onclick="startCheckout('pro')">{t(locale, 'pricing.upgrade_pro')}</button>
-      <a href={`/${demoSlug}`} style="display:block;text-align:center;margin-top:10px;font-size:12px;color:rgba(255,255,255,0.4);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">See an example Pro profile</a>
+      <a href={`/${demoSlug}`} style="display:block;text-align:center;margin-top:10px;font-size:12px;color:var(--text-muted);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">See an example Pro profile</a>
       <div class="plan-features">
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
