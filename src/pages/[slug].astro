@@ -118,6 +118,10 @@ const jsonLd = {
         --brand: #FF5C00;
         --brand-hover: #e05200;
         --nav-logo-by: var(--brand);
+        --text-faint: #B8B0AA;
+        --btn-secondary-text: #7A7068;
+        --hero-dark-start: #18191C;
+        --hero-dark-end: #272A30;
       }
     </style>
   </Fragment>
@@ -129,27 +133,24 @@ const jsonLd = {
 
 body:has(#tb-page) {
   background: var(--bg);
-  color: #111111;
+  color: var(--text);
 }
 
 #tb-page {
   --font: 'DM Sans', system-ui, sans-serif;
-  --text-primary:   #111111;
+  --text-primary:   var(--text);
   --text-secondary: var(--text-muted);
-  --text-muted:     #A8A09A;
-  --text-faint:     #B8B0AA;
   --bg-white:       var(--bg);
   --border:         rgba(0,0,0,0.055);
   --btn-primary-bg:       var(--text);
-  --btn-primary-text:     #FFFFFF;
+  --btn-primary-text:     var(--text-on-brand);
   --btn-secondary-border: rgba(0,0,0,0.10);
-  --btn-secondary-text:   #7A7068;
   --tag-bg:   rgba(0,0,0,0.05);
   --tag-text: var(--text-muted);
-  --review-card-bg: #F8F7F5;
+  --review-card-bg: var(--surface-2);
   font-family: var(--font);
   background: var(--bg);
-  color: #111111;
+  color: var(--text);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
   overflow-x: hidden;
@@ -251,7 +252,7 @@ body:has(#tb-page) {
   position: relative;
   height: 460px;
   overflow: hidden;
-  background: linear-gradient(168deg, #18191C, #272A30);
+  background: linear-gradient(168deg, var(--hero-dark-start), var(--hero-dark-end));
 }
 .tb-hero-img {
   position: absolute;
@@ -286,7 +287,7 @@ body:has(#tb-page) {
   -webkit-backdrop-filter: blur(12px);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  color: #ffffff;
+  color: var(--text-on-brand);
   flex-shrink: 0;
 }
 .tb-hero-name-block {
@@ -296,7 +297,7 @@ body:has(#tb-page) {
 }
 .tb-hero-name {
   font-weight: 200; font-size: 36px;
-  letter-spacing: 0.02em; color: #111111; line-height: 1.15;
+  letter-spacing: 0.02em; color: var(--text); line-height: 1.15;
 }
 .tb-hero-tagline {
   font-weight: 300; font-size: 13px;
@@ -354,7 +355,7 @@ body:has(#tb-page) {
 .tb-sessions { padding: 20px 0 20px; }
 .tb-sessions-header { display: flex; align-items: center; justify-content: space-between; padding: 0 20px 12px; }
 .tb-section-label { font-weight: 600; font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-faint); }
-.tb-see-all { font-size: 12px; font-weight: 400; color: #9A9290; text-decoration: none; }
+.tb-see-all { font-size: 12px; font-weight: 400; color: var(--text-muted); text-decoration: none; }
 .tb-sessions-scroll {
   display: flex; gap: 12px; overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -374,21 +375,21 @@ body:has(#tb-page) {
 .tb-pkg-price { font-weight: 200; font-size: 20px; letter-spacing: -0.02em; color: var(--text-primary); margin-top: auto; }
 .tb-pkg-book {
   width: 100%; height: 36px; border-radius: 8px; border: none;
-  background: var(--btn-primary-bg); color: #fff;
+  background: var(--btn-primary-bg); color: var(--text-on-brand);
   font-family: var(--font); font-weight: 500; font-size: 12px;
   cursor: pointer; margin-top: 8px;
 }
 
 .tb-about { padding: 20px; border-top: 1px solid var(--border); }
 .tb-about-text {
-  font-weight: 300; font-size: 13.5px; color: #4A4440; line-height: 1.68;
+  font-weight: 300; font-size: 13.5px; color: var(--text-muted); line-height: 1.68;
   overflow: hidden; display: -webkit-box;
   -webkit-line-clamp: 3; -webkit-box-orient: vertical;
 }
 .tb-about-text.expanded { display: block; -webkit-line-clamp: unset; }
 .tb-read-more {
   display: inline-block; margin-top: 8px;
-  font-size: 13px; font-weight: 400; color: #9A9290;
+  font-size: 13px; font-weight: 400; color: var(--text-muted);
   background: none; border: none; padding: 0; cursor: pointer;
   font-family: var(--font);
 }
