@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
 import { getMarket } from '../lib/market.ts';
 const market = getMarket(Astro.url.hostname);
 const brandName = market.brandName || 'window.__BRAND__||"TrainedBy"';
@@ -11,36 +12,43 @@ const isWaitlist = market.waitlistEnabled === true;
   title={`${brandName} – Link-in-Bio & Booking Hub for Fitness Trainers`}
   description={`Your link-in-bio and booking hub as a personal trainer. Get discovered, capture leads, and manage clients on ${brandName} — free to start.`}
 >
+  <Fragment slot="head">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#FFFFFF">
+    <style>
+      :root {
+        --bg: #FFFFFF;
+        --surface: #FAFAF9;
+        --surface-2: #F5F4F3;
+        --surface-3: #E8E5E2;
+        --surface-4: #D4D1CE;
+        --text: #1A1411;
+        --text-2: #6B6460;
+        --text-3: #9B9490;
+        --text-muted: #6B6460;
+        --text-faint: rgba(26,20,17,0.35);
+        --border: rgba(0,0,0,0.07);
+        --border-2: rgba(0,0,0,0.12);
+        --border-hover: rgba(0,0,0,0.14);
+        --border-strong: rgba(0,0,0,0.2);
+        --brand: #FF5C00;
+        --brand-hover: #e05200;
+        --brand-dim: rgba(255,92,0,0.08);
+        --brand-border: rgba(255,92,0,0.2);
+        --brand-glow: rgba(255,92,0,0.3);
+        --reps: #00C853;
+        --reps-dim: rgba(0,200,83,0.08);
+        --reps-border: rgba(0,200,83,0.2);
+        --max: 1100px;
+        --shadow: 0 4px 24px rgba(0,0,0,0.08);
+        --shadow-lg: 0 8px 48px rgba(0,0,0,0.12);
+      }
+      body { background: var(--bg); color: var(--text); }
+    </style>
+  </Fragment>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --brand: #FF5C00;
-      --brand-dim: rgba(255,92,0,0.10);
-      --brand-border: rgba(255,92,0,0.25);
-      --reps: #00C853;
-      --surface: #0a0a0a;
-      --surface-2: #111111;
-      --surface-3: #1a1a1a;
-      --surface-4: #222222;
-      --border: rgba(255,255,255,0.07);
-      --border-2: rgba(255,255,255,0.12);
-      --text: #f2f2f2;
-      --text-2: #888888;
-      --text-3: #555555;
-      --max: 1100px;
-    }
-    body { background: var(--surface); color: var(--text); font-family: 'DM Sans', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-
-    /* NAV */
-    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 32px; height: 64px; display: flex; align-items: center; gap: 32px; transition: background 0.3s, border-color 0.3s; border-bottom: 1px solid transparent; }
-    .nav.scrolled { background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); border-color: var(--border); }
-    .nav-logo { font-family: 'DM Sans', sans-serif; font-weight: 900; font-size: 20px; color: var(--brand); text-decoration: none; letter-spacing: -0.5px; margin-right: auto; }
-    .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a { color: var(--text-2); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta { display: inline-flex; align-items: center; gap: 6px; padding: 9px 20px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; white-space: nowrap; }
-    .nav-cta:hover { background: #e05200; transform: translateY(-1px); }
-    @media (max-width: 640px) { .nav-links { display: none; } .nav { padding: 0 20px; } }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
     /* HERO */
     .hero { min-height: 88vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
@@ -53,7 +61,7 @@ const isWaitlist = market.waitlistEnabled === true;
     .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
     .btn-primary:hover { background: #e05200; transform: translateY(-2px); }
     .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--border-2); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
-    .btn-ghost:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-2px); }
+    .btn-ghost:hover { border-color: var(--border-strong); transform: translateY(-2px); }
 
     /* PROOF STRIP */
     .proof-strip { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
@@ -102,7 +110,7 @@ const isWaitlist = market.waitlistEnabled === true;
     .pricing-btn-primary { background: var(--brand); color: #fff; }
     .pricing-btn-primary:hover { background: #e05200; transform: translateY(-1px); }
     .pricing-btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border-2); }
-    .pricing-btn-ghost:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-1px); }
+    .pricing-btn-ghost:hover { border-color: var(--border-strong); transform: translateY(-1px); }
 
     /* FAQ */
     .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
@@ -194,16 +202,7 @@ const isWaitlist = market.waitlistEnabled === true;
     }
   </style>
 
-  <!-- NAV -->
-  <nav class="nav" id="nav">
-    <a href="/landing" class="nav-logo">{brandName}</a>
-    <div class="nav-links">
-      <a href="/find">Find a Trainer</a>
-      <a href="/blog">Stories</a>
-      <a href="/for-trainers" style="color:var(--brand);font-weight:700">For Trainers</a>
-    </div>
-    <a href="/join" class="nav-cta">Create your profile →</a>
-  </nav>
+  <Nav variant="landing" />
 
   <!-- HERO -->
   <section class="hero">
@@ -473,12 +472,6 @@ const isWaitlist = market.waitlistEnabled === true;
   </footer>
 
   <script define:vars={{ marketData: { market: market.market, waitlistEnabled: market.waitlistEnabled } }}>
-    // Nav scroll
-    const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => {
-      nav?.classList.toggle('scrolled', window.scrollY > 40);
-    }, { passive: true });
-
     // Live trainer count
     (async function() {
       try {
