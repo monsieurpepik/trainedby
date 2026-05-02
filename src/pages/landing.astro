@@ -103,7 +103,7 @@ const brandName = market.brandName || 'TrainedBy';
       margin-bottom: 20px;
     }
     .hero-eyebrow-dot {
-      width: 6px; height: 6px; border-radius: 50%; background: #00C853;
+      width: 6px; height: 6px; border-radius: 50%; background: var(--green);
     }
     .hero-h1 {
       font-size: 36px;
@@ -258,7 +258,7 @@ const brandName = market.brandName || 'TrainedBy';
     .t-spec { font-size: 11px; color: var(--text-2); margin-bottom: 6px; }
     .t-rating { font-size: 11px; color: var(--text); font-weight: 600; }
     .trainer-card-img { width: 100%; aspect-ratio: 4/3; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 36px; color: var(--text); position: relative; overflow: hidden; }
-    .trainer-card-img .verified-badge { position: absolute; top: 10px; right: 10px; padding: 3px 9px; border-radius: 20px; background: rgba(0,200,83,0.15); border: 1px solid rgba(0,200,83,0.3); color: #00C853; font-size: 10px; font-weight: 700; }
+    .trainer-card-img .verified-badge { position: absolute; top: 10px; right: 10px; padding: 3px 9px; border-radius: 20px; background: rgba(0,200,83,0.15); border: 1px solid rgba(0,200,83,0.3); color: var(--green); font-size: 10px; font-weight: 700; }
     .trainer-card-body { padding: 16px; }
     .trainer-card-name { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 15px; margin-bottom: 3px; }
     .trainer-card-meta { font-size: 12px; color: var(--text-2); margin-bottom: 10px; }
@@ -274,7 +274,7 @@ const brandName = market.brandName || 'TrainedBy';
     .transform-trainer { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
     .transform-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 14px; color: var(--text); flex-shrink: 0; }
     .transform-trainer-name { font-weight: 700; font-size: 13px; }
-    .transform-trainer-cert { font-size: 11px; color: #00C853; font-weight: 600; }
+    .transform-trainer-cert { font-size: 11px; color: var(--green); font-weight: 600; }
     .transform-title { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.3px; margin-bottom: 10px; }
     .transform-body { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
     .transform-stats { display: flex; gap: 0; border-top: 1px solid var(--border); }
@@ -294,7 +294,7 @@ const brandName = market.brandName || 'TrainedBy';
     .blog-card:not(.featured) .blog-title { font-size: 16px; }
     .blog-excerpt { font-size: 14px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
     .blog-author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2); }
-    .blog-author-dot { width: 5px; height: 5px; border-radius: 50%; background: #00C853; }
+    .blog-author-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
     .blog-visual { background: var(--surface-2); border-radius: 12px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 48px; }
     @media (max-width: 720px) { .blog-grid { grid-template-columns: 1fr; } .blog-card.featured { grid-template-columns: 1fr; } }
 
@@ -439,24 +439,24 @@ const brandName = market.brandName || 'TrainedBy';
       <p class="section-eyebrow">Verified Trainers</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
         <h2 class="section-title" style="margin-bottom:0">Top trainers<br>near you.</h2>
-        <a href="/find" style="font-size:14px;font-weight:700;color:#1A1411;text-decoration:none">See all trainers →</a>
+        <a href="/find" style="font-size:14px;font-weight:700;color:var(--text);text-decoration:none">See all trainers →</a>
       </div>
       <p class="section-sub">Hand-picked, {market.certificationBody}-verified trainers with proven track records.</p>
       <div class="trainers-grid" id="featured-trainers">
         <!-- Skeleton loaders -->
-        <div style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.07);border-radius:16px;overflow:hidden">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
           <div class="skeleton" style="height:195px"></div>
           <div style="padding:16px"><div class="skeleton" style="height:14px;width:60%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:80%"></div></div>
         </div>
-        <div style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.07);border-radius:16px;overflow:hidden">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
           <div class="skeleton" style="height:195px"></div>
           <div style="padding:16px"><div class="skeleton" style="height:14px;width:55%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:45%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:70%"></div></div>
         </div>
-        <div style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.07);border-radius:16px;overflow:hidden">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
           <div class="skeleton" style="height:195px"></div>
           <div style="padding:16px"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:35%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:75%"></div></div>
         </div>
-        <div style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.07);border-radius:16px;overflow:hidden">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
           <div class="skeleton" style="height:195px"></div>
           <div style="padding:16px"><div class="skeleton" style="height:14px;width:50%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:42%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:85%"></div></div>
         </div>
@@ -465,12 +465,12 @@ const brandName = market.brandName || 'TrainedBy';
   </div>
 
   <!-- TRANSFORMATIONS -->
-  <div style="border-top:1px solid rgba(0,0,0,0.07);background:#F5F4F3;">
+  <div style="border-top:1px solid var(--border);background:var(--surface);">
     <div class="section">
       <p class="section-eyebrow">Real Results</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
         <h2 class="section-title" style="margin-bottom:0">Transformations<br>that speak for themselves.</h2>
-        <a href="/community?category=transformations" style="font-size:14px;font-weight:700;color:#1A1411;text-decoration:none">See all →</a>
+        <a href="/community?category=transformations" style="font-size:14px;font-weight:700;color:var(--text);text-decoration:none">See all →</a>
       </div>
       <p class="section-sub">Documented by the trainers who made them happen. No filters, no stock photos.</p>
       <div class="transforms-grid" id="transformations-grid">
@@ -534,12 +534,12 @@ const brandName = market.brandName || 'TrainedBy';
   </div>
 
   <!-- BLOG PREVIEW -->
-  <div style="border-top:1px solid rgba(0,0,0,0.07);">
+  <div style="border-top:1px solid var(--border);">
     <div class="section">
       <p class="section-eyebrow">From the Community</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
         <h2 class="section-title" style="margin-bottom:0">Advice from trainers<br>who actually train.</h2>
-        <a href="/blog" style="font-size:14px;font-weight:700;color:#1A1411;text-decoration:none">Read all articles →</a>
+        <a href="/blog" style="font-size:14px;font-weight:700;color:var(--text);text-decoration:none">Read all articles →</a>
       </div>
       <p class="section-sub">No sponsored content. No generic listicles. Written by verified trainers from their own practice.</p>
       <div class="blog-grid" id="blog-preview">
@@ -578,7 +578,7 @@ const brandName = market.brandName || 'TrainedBy';
   </div>
 
   <!-- FOR TRAINERS BANNER -->
-  <div style="padding:60px 0;border-top:1px solid rgba(0,0,0,0.07);">
+  <div style="padding:60px 0;border-top:1px solid var(--border);">
     <div class="trainer-banner" style="max-width:calc(var(--max) - 48px);margin:0 auto">
       <div class="trainer-banner-text">
         <div class="trainer-banner-eyebrow">For Trainers</div>
