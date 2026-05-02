@@ -1,0 +1,123 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  canonical?: string;
+  noIndex?: boolean;
+}
+
+const {
+  title,
+  description,
+  ogImage,
+  canonical,
+  noIndex = false,
+} = Astro.props;
+
+import { getMarket } from '../lib/market.ts';
+import { getLocale, BRAND } from '../lib/i18n.ts';
+import { ClientRouter } from 'astro:transitions';
+
+const market = getMarket(Astro.url.hostname);
+const locale = getLocale(Astro.request);
+
+const marketCanonicalBase = canonical ?? `https://${market.domain}${Astro.url.pathname}`;
+const marketOgLocale = market.locale.replace('-', '_');
+const resolvedDescription = description ?? market.metaDescription;
+const resolvedOgImage = ogImage ?? `https://${market.domain}/og-image.jpg`;
+---
+
+<!doctype html>
+<html lang={market.locale.split('-')[0]} dir="ltr" data-market={market.market}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>{title}</title>
+    <meta name="description" content={resolvedDescription} />
+    <link rel="canonical" href={marketCanonicalBase} />
+    {noIndex && <meta name="robots" content="noindex,nofollow" />}
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="color-scheme" content="light" />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={resolvedDescription} />
+    <meta property="og:image" content={resolvedOgImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content={marketCanonicalBase} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={market.brandName ?? 'TrainedBy'} />
+    <meta property="og:locale" content={marketOgLocale} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={resolvedDescription} />
+    <meta name="twitter:image" content={resolvedOgImage} />
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://mezhtdbfyvkshpuplqqw.supabase.co" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://mezhtdbfyvkshpuplqqw.supabase.co" />
+
+    <link
+      rel="preload"
+      as="style"
+      crossorigin
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <ClientRouter fallback="none" />
+
+    <!-- Light theme tokens (BaseMinimal pages are always light) -->
+    <style is:global>
+      :root {
+        --bg: #FFFFFF;
+        --surface: #FAFAF9;
+        --surface-2: #F5F4F3;
+        --surface-3: #E8E5E2;
+        --surface-4: #D4D1CE;
+        --text: #1A1411;
+        --text-2: #6B6460;
+        --text-muted: #6B6460;
+        --text-faint: rgba(26,20,17,0.35);
+        --border: rgba(0,0,0,0.07);
+        --border-hover: rgba(0,0,0,0.14);
+        --brand: #FF5C00;
+        --brand-hover: #e05200;
+        --brand-dim: rgba(255,92,0,0.08);
+        --brand-border: rgba(255,92,0,0.2);
+        --brand-glow: rgba(255,92,0,0.3);
+        --radius: 12px;
+        --radius-lg: 20px;
+        --radius-xl: 28px;
+        --shadow: 0 4px 24px rgba(0,0,0,0.08);
+        --shadow-lg: 0 8px 48px rgba(0,0,0,0.12);
+        --transition: 0.18s ease;
+        --font-display: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-body);
+        -webkit-font-smoothing: antialiased;
+      }
+    </style>
+
+    <!-- Per-page head overrides -->
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
