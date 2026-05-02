@@ -337,7 +337,7 @@ body{font-family:var(--font);background:#0a0a0a;color:var(--white);-webkit-font-
 
 <script>
 const SUPABASE_URL = "https://mezhtdbfyvkshpuplqqw.supabase.co";
-const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM2MDk3NTQsImV4cCI6MjA1OTE4NTc1NH0.vPDjMbWBCHgHEMkHHJMFCgPPIFbKDMqkfTCUQFGxGaY";
+const SUPABASE_ANON = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 const FN = `${SUPABASE_URL}/functions/v1`;
 
 let ACADEMY = null;

@@ -5,6 +5,7 @@ const market = getMarket(Astro.url.hostname);
 const brandName = market.brandName || 'TrainedBy';
 const isPaid = market.paymentEnabled !== false;
 const isWaitlist = market.waitlistEnabled === true;
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 ---
 
 <Base
@@ -425,7 +426,7 @@ const isWaitlist = market.waitlistEnabled === true;
     <div class="footer-copy">© {new Date().getFullYear()} {brandName}</div>
   </footer>
 
-  <script define:vars={{ marketData: { market: market.market, waitlistEnabled: market.waitlistEnabled } }}>
+  <script define:vars={{ marketData: { market: market.market, waitlistEnabled: market.waitlistEnabled }, SUPABASE_ANON_KEY }}>
     // Nav scroll
     const nav = document.getElementById('nav');
     window.addEventListener('scroll', () => {
@@ -439,7 +440,7 @@ const isWaitlist = market.waitlistEnabled === true;
           'https://mezhtdbfyvkshpuplqqw.supabase.co/rest/v1/trainers?select=id&is_active=eq.true',
           {
             headers: {
-              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo',
+              'apikey': SUPABASE_ANON_KEY,
               'Prefer': 'count=exact'
             }
           }

@@ -204,7 +204,7 @@ import Base from '../layouts/Base.astro';
 
 <script>
   const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MzE5NTIsImV4cCI6MjA2MDIwNzk1Mn0.Yd4OGMBqwvLz5_6vFAFqBNRLNFBMXCRKFiGJFCqQUYI';
+  const SUPABASE_ANON = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   const ADMIN_SECRET = 'trainedby-admin-2026';
 
   let allTrainers = [];

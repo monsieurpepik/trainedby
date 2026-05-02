@@ -295,7 +295,7 @@ body { background: var(--surface); color: var(--text); font-family: 'Inter', san
 
 <script>
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ1NjA1NzcsImV4cCI6MjA2MDEzNjU3N30.YVkNmqTJBfzHFQbVmqYzpqKi_EJkBrHiOh-Lq2zFUGo';
+const SUPABASE_ANON = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 let allPosts = [];
 let activeCategory = 'all';
