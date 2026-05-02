@@ -176,15 +176,16 @@ body {
 #tb-compact-header {
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: 56px;
+  height: calc(56px + env(safe-area-inset-top));
   background: rgba(255,255,255,0.92);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(0,0,0,0.07);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: env(safe-area-inset-top) 20px 0;
+  padding-bottom: 0;
   z-index: 100;
   opacity: 0;
   pointer-events: none;
@@ -214,12 +215,18 @@ body {
 }
 .ch-btn:hover  { background: rgba(0,0,0,0.05); }
 .ch-btn:active { background: rgba(0,0,0,0.10); }
+#tb-compact-header .ch-btn {
+  margin-bottom: 6px;
+}
+#tb-compact-header .ch-name {
+  margin-bottom: 8px;
+}
 
 /* ── Bottom navigation ───────────────────────────────────────── */
 #tb-bottom-nav {
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: 84px;
+  height: calc(84px + env(safe-area-inset-bottom));
   background: rgba(255,255,255,0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -277,7 +284,7 @@ body {
 }
 .tb-hero-controls {
   position: absolute;
-  top: 58px;
+  top: max(58px, calc(env(safe-area-inset-top) + 16px));
   left: 0;
   right: 0;
   display: flex;
@@ -841,10 +848,7 @@ body {
         }).catch(() => {});
       } else {
         // Fallback: copy to clipboard
-        navigator.clipboard.writeText(location.href).then(() => {
-          const btn = document.getElementById('share-btn');
-          if (btn) { btn.textContent = 'Link copied!'; setTimeout(() => { btn.textContent = 'Share this profile'; }, 2000); }
-        });
+        navigator.clipboard.writeText(location.href).catch(() => {});
       }
     }
 
