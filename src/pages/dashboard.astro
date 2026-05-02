@@ -115,6 +115,46 @@ if (tbSession) {
         --ai-indigo-dark: #4f46e5;
         --font-body: 'DM Sans', system-ui, sans-serif;
         --font-display: 'DM Sans', system-ui, sans-serif;
+        --card-dark-tint-sm: rgba(255,255,255,0.12);
+        --card-dark-tint-xs: rgba(255,255,255,0.15);
+        --white-tint-nav: rgba(255,255,255,0.95);
+        --text-tint-sm: rgba(26,20,17,0.2);
+        --whatsapp-dim-sm: rgba(37,211,102,0.08);
+        --whatsapp-dim-md: rgba(37,211,102,0.15);
+        --whatsapp-border-sm: rgba(37,211,102,0.15);
+        --accent-dim-sm: rgba(100,100,255,0.08);
+        --accent-border-sm: rgba(100,100,255,0.2);
+        --green-dim-xs: rgba(0,200,83,0.06);
+        --green-border-xs: rgba(0,200,83,0.15);
+        --shadow-overlay: rgba(0,0,0,0.5);
+        --chart-bar-hover: rgba(26,20,17,0.15);
+        --ai-indigo-tint-xs: rgba(99,102,241,0.04);
+        --ai-indigo-tint-sm: rgba(99,102,241,0.06);
+        --ai-indigo-tint-md: rgba(99,102,241,0.08);
+        --ai-indigo-tint-lg: rgba(99,102,241,0.15);
+        --ai-indigo-border-xxs: rgba(99,102,241,0.2);
+        --ai-indigo-border-xs: rgba(99,102,241,0.15);
+        --ai-indigo-border-sm: rgba(99,102,241,0.2);
+        --ai-indigo-border-md: rgba(99,102,241,0.3);
+        --ai-indigo-border-lg: rgba(99,102,241,0.35);
+        --ai-indigo-glow-xs: rgba(99,102,241,0.2);
+        --ai-indigo-glow-sm: rgba(99,102,241,0.4);
+        --ai-indigo-glow-md: rgba(99,102,241,0.5);
+        --ai-indigo-transparent: rgba(99,102,241,0);
+        --ai-indigo-focus: rgba(99,102,241,0.5);
+        --ai-indigo-focus-ring: rgba(99,102,241,0.08);
+        --white-tint-label: rgba(255,255,255,0.4);
+        --white-tint-text-faint: rgba(255,255,255,0.5);
+        --white-tint-text: rgba(255,255,255,0.9);
+        --white-tint-muted: rgba(255,255,255,0.35);
+        --white-tint-panel: rgba(255,255,255,0.05);
+        --brand-faded: rgba(255,92,0,0.8);
+        --brand-dim-xs: rgba(255,92,0,0.04);
+        --pro-gold-tint-md: rgba(197,162,39,0.10);
+        --pro-gold-tint-xs: rgba(197,162,39,0.04);
+        --pro-gold-shadow-sm: rgba(197,162,39,0.3);
+        --pro-gold-shadow-lg: rgba(197,162,39,0.5);
+        --text-on-gold: #0a0a0a;
       }
       body {
         background: var(--bg);
@@ -140,7 +180,7 @@ body {
 .dash-tabs { display: none; }
 @media (min-width: 768px) {
   .dash-header { display: none; }
-  .dash-tabs { display: block; background: var(--bg); border-bottom: 1px solid rgba(0,0,0,0.07); position: sticky; top: 0; z-index: 50; }
+  .dash-tabs { display: block; background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
   .bottom-nav { display: none !important; }
   .dash-wrap { max-width: 960px; padding-bottom: 32px; }
   .dash-tabs-inner { max-width: 960px; margin: 0 auto; height: 52px; display: flex; align-items: center; padding: 0 32px; }
@@ -151,7 +191,7 @@ body {
   .tab-item.active { color: var(--text); font-weight: 700; border-bottom-color: var(--text); }
   .tabs-right { margin-left: auto; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
   .tab-view-profile { font-size: 12px; color: var(--brand); font-weight: 700; text-decoration: none; }
-  .tabs-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--surface-2); border: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--text); }
+  .tabs-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--text); }
   .stats-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
@@ -177,7 +217,7 @@ body {
 }
 .header-nav .nav-edit:hover { border-color: var(--border-hover); color: var(--text); }
 .header-nav .nav-view {
-  background: var(--brand); color: #fff;
+  background: var(--brand); color: var(--text-on-brand);
 }
 .header-nav .nav-view:hover { background: var(--brand-hover); }
 
@@ -228,7 +268,7 @@ body {
   border-radius: 14px; padding: 16px;
 }
 .stat-card.brand-card {
-  background: var(--text); border-color: var(--text); color: #fff;
+  background: var(--text); border-color: var(--text); color: var(--text-on-brand);
 }
 .stat-card-icon {
   width: 32px; height: 32px; border-radius: 8px;
@@ -237,7 +277,7 @@ body {
   margin-bottom: 10px; color: var(--text-muted);
 }
 .stat-card.brand-card .stat-card-icon {
-  background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.15); color: #fff;
+  background: var(--card-dark-tint-sm); border-color: var(--card-dark-tint-xs); color: var(--text-on-brand);
 }
 .stat-card-value {
   font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 800;
@@ -280,7 +320,7 @@ body {
   background: var(--surface-3); border: 1px solid var(--border);
   transition: background 0.2s; cursor: pointer; min-height: 4px;
 }
-.chart-bar:hover { background: rgba(26,20,17,0.15); }
+.chart-bar:hover { background: var(--chart-bar-hover); }
 .chart-bar.today { background: var(--text); border-color: var(--text); }
 .chart-labels {
   display: flex; gap: 4px; padding: 4px 12px 0;
@@ -301,7 +341,7 @@ body {
   text-transform: uppercase; letter-spacing: 0.08em;
 }
 .leads-count {
-  background: var(--text); color: #fff;
+  background: var(--text); color: var(--text-on-brand);
   font-size: 10px; font-weight: 700; padding: 2px 8px;
   border-radius: 10px;
 }
@@ -323,12 +363,12 @@ body {
 .lead-actions { display: flex; gap: 6px; margin-left: auto; }
 .lead-wa-btn {
   width: 32px; height: 32px; border-radius: 50%;
-  background: rgba(37,211,102,0.08); border: 1px solid rgba(37,211,102,0.15);
+  background: var(--whatsapp-dim-sm); border: 1px solid var(--whatsapp-border-sm);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; text-decoration: none; color: var(--color-whatsapp);
   transition: background 0.2s;
 }
-.lead-wa-btn:hover { background: rgba(37,211,102,0.15); }
+.lead-wa-btn:hover { background: var(--whatsapp-dim-md); }
 .lead-type-tag {
   padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.04em;
@@ -340,7 +380,7 @@ body {
   background: var(--reps-dim); border: 1px solid var(--reps-border); color: var(--reps);
 }
 .lead-type-tag.package {
-  background: rgba(100,100,255,0.08); border: 1px solid rgba(100,100,255,0.2); color: var(--accent);
+  background: var(--accent-dim-sm); border: 1px solid var(--accent-border-sm); color: var(--accent);
 }
 
 /* Onboarding checklist */
@@ -373,7 +413,7 @@ body {
 
 /* Upgrade banner - Pro metallic gold treatment */
 .upgrade-banner {
-  background: linear-gradient(135deg, rgba(197,162,39,0.10) 0%, rgba(197,162,39,0.04) 100%);
+  background: linear-gradient(135deg, var(--pro-gold-tint-md) 0%, var(--pro-gold-tint-xs) 100%);
   border: 1px solid var(--pro-border, rgba(197,162,39,0.35));
   border-radius: 16px; padding: 20px; margin: 24px 0;
   box-shadow: 0 0 32px var(--pro-dim, rgba(197,162,39,0.08));
@@ -402,12 +442,12 @@ body {
 .upgrade-btn {
   width: 100%; padding: 14px; border-radius: 12px;
   background: var(--pro-gradient, linear-gradient(135deg,var(--gold-dark),var(--gold-light),var(--gold-dark)));
-  color: #0a0a0a; border: none;
+  color: var(--text-on-gold); border: none;
   font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 14px; font-weight: 800;
   cursor: pointer; transition: all 0.2s;
-  box-shadow: 0 4px 20px rgba(197,162,39,0.3);
+  box-shadow: 0 4px 20px var(--pro-gold-shadow-sm);
 }
-.upgrade-btn:hover { box-shadow: 0 6px 28px rgba(197,162,39,0.5); transform: translateY(-1px); }
+.upgrade-btn:hover { box-shadow: 0 6px 28px var(--pro-gold-shadow-lg); transform: translateY(-1px); }
 
 /* Income stream cards */
 .income-section { padding: 24px 0; border-bottom: 1px solid var(--border); }
@@ -457,7 +497,7 @@ body {
 .flywheel-step.done { background: var(--text); }
 .flywheel-reward {
   display: flex; align-items: center; gap: 8px;
-  background: rgba(0,200,83,0.06); border: 1px solid rgba(0,200,83,0.15);
+  background: var(--green-dim-xs); border: 1px solid var(--green-border-xs);
   border-radius: 10px; padding: 10px 12px; margin-bottom: 14px;
   font-size: 12px; color: var(--reps); font-weight: 600;
 }
@@ -491,9 +531,9 @@ body {
 .ai-panel.open { display: flex; }
 .ai-panel-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px; border-bottom: 1px solid rgba(99,102,241,0.2);
+  padding: 16px 20px; border-bottom: 1px solid var(--ai-indigo-border-sm);
   flex-shrink: 0;
-  background: rgba(99,102,241,0.04);
+  background: var(--ai-indigo-tint-xs);
 }
 .ai-panel-title {
   font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 16px; font-weight: 800;
@@ -501,7 +541,7 @@ body {
 }
 .ai-panel-badge {
   font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
-  background: rgba(99,102,241,0.15); color: var(--ai-indigo-light); border: 1px solid rgba(99,102,241,0.3);
+  background: var(--ai-indigo-tint-lg); color: var(--ai-indigo-light); border: 1px solid var(--ai-indigo-border-md);
 }
 .ai-panel-close {
   background: var(--surface-3); border: 1px solid var(--border);
@@ -521,16 +561,16 @@ body {
 }
 @keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .ai-msg.user {
-  background: var(--ai-indigo); color: #fff;
+  background: var(--ai-indigo); color: var(--text-on-brand);
   border-bottom-right-radius: 4px; align-self: flex-end;
 }
 .ai-msg.bot {
-  background: rgba(99,102,241,0.08); color: var(--text);
-  border: 1px solid rgba(99,102,241,0.2); border-bottom-left-radius: 4px; align-self: flex-start;
+  background: var(--ai-indigo-tint-md); color: var(--text);
+  border: 1px solid var(--ai-indigo-border-sm); border-bottom-left-radius: 4px; align-self: flex-start;
   white-space: pre-wrap;
 }
 .ai-msg.typing {
-  background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.15);
+  background: var(--ai-indigo-tint-sm); border: 1px solid var(--ai-indigo-border-xs);
   align-self: flex-start; color: var(--text-muted); font-style: italic;
 }
 .ai-quick-prompts {
@@ -542,9 +582,9 @@ body {
   color: var(--text-muted); cursor: pointer; transition: all 0.15s;
   white-space: nowrap;
 }
-.ai-chip:hover { border-color: rgba(99,102,241,0.4); color: var(--ai-indigo-light); background: rgba(99,102,241,0.1); }
+.ai-chip:hover { border-color: var(--ai-indigo-glow-sm); color: var(--ai-indigo-light); background: var(--ai-indigo-tint-md); }
 .ai-input-row {
-  padding: 12px 20px; border-top: 1px solid rgba(99,102,241,0.15);
+  padding: 12px 20px; border-top: 1px solid var(--ai-indigo-border-xs);
   display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0;
   background: var(--ai-bg);
 }
@@ -555,24 +595,24 @@ body {
   max-height: 100px; line-height: 1.5;
   transition: border-color 0.2s;
 }
-.ai-input:focus { border-color: rgba(99,102,241,0.5); box-shadow: 0 0 0 3px rgba(99,102,241,0.08); }
+.ai-input:focus { border-color: var(--ai-indigo-focus); box-shadow: 0 0 0 3px var(--ai-indigo-focus-ring); }
 .ai-input::placeholder { color: var(--text-faint); }
 .ai-send {
   width: 42px; height: 42px; border-radius: 12px; border: none;
-  background: var(--ai-indigo); color: #fff; cursor: pointer;
+  background: var(--ai-indigo); color: var(--text-on-brand); cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; transition: all 0.2s;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.4);
+  box-shadow: 0 2px 12px var(--ai-indigo-glow-sm);
 }
-.ai-send:hover { background: var(--ai-indigo-dark); box-shadow: 0 4px 20px rgba(99,102,241,0.5); }
+.ai-send:hover { background: var(--ai-indigo-dark); box-shadow: 0 4px 20px var(--ai-indigo-glow-md); }
 .ai-send:disabled { opacity: 0.4; cursor: not-allowed; }
 .ai-welcome {
   text-align: center; padding: 32px 20px 16px;
 }
 .ai-welcome-icon {
   width: 56px; height: 56px; border-radius: 16px;
-  background: rgba(99,102,241,0.15);
-  border: 1px solid rgba(99,102,241,0.35);
+  background: var(--ai-indigo-tint-lg);
+  border: 1px solid var(--ai-indigo-border-lg);
   display: flex; align-items: center;
   justify-content: center; margin: 0 auto 16px;
   animation: ai-breathe 3s ease-in-out infinite;
@@ -593,7 +633,7 @@ body {
 .ai-channel-info { padding: 4px 0; }
 .btn-primary {
   display: block; width: 100%; padding: 14px; border-radius: 12px;
-  background: var(--brand); color: #fff; font-size: 14px; font-weight: 700;
+  background: var(--brand); color: var(--text-on-brand); font-size: 14px; font-weight: 700;
   border: none; cursor: pointer; transition: background 0.2s; text-align: center;
 }
 .btn-primary:hover { background: var(--brand-hover); }
@@ -608,7 +648,7 @@ body {
 /* Bottom nav */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  background: var(--white-tint-nav); backdrop-filter: blur(12px);
   border-top: 1px solid var(--border);
   display: flex; padding: 12px 0 max(12px, env(safe-area-inset-bottom));
   z-index: 20;
@@ -624,7 +664,7 @@ body {
 /* Spinner */
 .spinner {
   display: inline-block; width: 14px; height: 14px;
-  border: 2px solid rgba(26,20,17,0.2); border-top-color: var(--text);
+  border: 2px solid var(--text-tint-sm); border-top-color: var(--text);
   border-radius: 50%; animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -637,7 +677,7 @@ body {
   color: var(--text); padding: 12px 20px; border-radius: 24px;
   font-size: 13px; font-weight: 600; z-index: 100;
   transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
-  white-space: nowrap; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  white-space: nowrap; box-shadow: 0 8px 32px var(--shadow-overlay);
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
 .toast.success { background: var(--reps-dim); border-color: var(--reps-border); color: var(--reps); }
@@ -646,8 +686,8 @@ body {
 
 @keyframes pulse{0%,80%,100%{transform:scale(0.6);opacity:0.3}40%{transform:scale(1);opacity:1}}
 @keyframes ai-breathe {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0), 0 0 12px rgba(99,102,241,0.2); }
-  50% { box-shadow: 0 0 0 8px rgba(99,102,241,0.08), 0 0 28px rgba(99,102,241,0.4); }
+  0%, 100% { box-shadow: 0 0 0 0 var(--ai-indigo-transparent), 0 0 12px var(--ai-indigo-glow-xs); }
+  50% { box-shadow: 0 0 0 8px var(--ai-indigo-tint-md), 0 0 28px var(--ai-indigo-glow-sm); }
 }
   </style>
 
@@ -695,7 +735,7 @@ body {
   <div id="dash-auth" class="hidden" style="text-align:center;padding:60px 0;">
     <h2 style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Sign in to view your dashboard</h2>
     <p style="font-size:14px;color:var(--text-muted);margin-bottom:24px;">Access your leads, analytics, and profile settings.</p>
-    <a href="/edit" style="display:inline-block;padding:14px 28px;border-radius:12px;background:var(--text);color:#fff;text-decoration:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;">Sign In →</a>
+    <a href="/edit" style="display:inline-block;padding:14px 28px;border-radius:12px;background:var(--text);color:var(--text-on-brand);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;">Sign In →</a>
   </div>
 
   <!-- Dashboard content -->
@@ -721,21 +761,21 @@ body {
 
     <!-- Booking Setup Card (only shown when setup is incomplete) -->
     {!bookingReady && (
-      <div style="background:rgba(255,92,0,0.06);border:1px solid rgba(255,92,0,0.18);border-radius:14px;padding:16px 18px;margin-bottom:20px;">
-        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);margin-bottom:4px;">Finish setup to accept bookings</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:14px;">Complete these steps to go live.</div>
+      <div style="background:var(--brand-dim);border:1px solid var(--brand-border);border-radius:14px;padding:16px 18px;margin-bottom:20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Finish setup to accept bookings</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Complete these steps to go live.</div>
         <div style="display:flex;flex-direction:column;gap:10px;">
           {bookingSetupSteps.map((step, i) => (
             <a href={step.action} style={`display:flex;align-items:center;gap:10px;text-decoration:none;opacity:${i > 0 && !bookingSetupSteps[i-1].done ? '0.4' : '1'};pointer-events:${i > 0 && !bookingSetupSteps[i-1].done ? 'none' : 'auto'};`}>
-              <div style={`width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${step.done ? '#4CAF50' : 'rgba(255,255,255,0.08)'};border:1.5px solid ${step.done ? '#4CAF50' : 'rgba(255,255,255,0.15)'};`}>
+              <div style={`width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${step.done ? 'var(--green)' : 'var(--border)'};border:1.5px solid ${step.done ? 'var(--green)' : 'var(--border-hover)'};`}>
                 {step.done
-                  ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                  : <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);">{i + 1}</span>
+                  ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-on-brand)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  : <span style="font-size:11px;font-weight:700;color:var(--text-muted);">{i + 1}</span>
                 }
               </div>
-              <span style={`font-size:13px;font-weight:500;color:${step.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)'};text-decoration:${step.done ? 'line-through' : 'none'};`}>{step.label}</span>
+              <span style={`font-size:13px;font-weight:500;color:${step.done ? 'var(--text-faint)' : 'var(--text)'};text-decoration:${step.done ? 'line-through' : 'none'};`}>{step.label}</span>
               {!step.done && (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" style="margin-left:auto;"><path d="M9 18l6-6-6-6"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="2" style="margin-left:auto;"><path d="M9 18l6-6-6-6"/></svg>
               )}
             </a>
           ))}
@@ -783,14 +823,14 @@ body {
     </div>
 
     <!-- WHOOP-style Actionable Insight Banner -->
-    <div id="insight-banner" style="display:none;margin:16px 0;background:linear-gradient(135deg,rgba(255,92,0,0.10),rgba(255,92,0,0.04));border:1px solid rgba(255,92,0,0.25);border-radius:14px;padding:14px 16px;">
+    <div id="insight-banner" style="display:none;margin:16px 0;background:linear-gradient(135deg,var(--brand-dim),var(--brand-dim-xs));border:1px solid var(--brand-border);border-radius:14px;padding:14px 16px;">
       <div style="display:flex;align-items:flex-start;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,92,0,0.15);border:1px solid rgba(255,92,0,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <div style="width:32px;height:32px;border-radius:8px;background:var(--brand-dim);border:1px solid var(--brand-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--brand)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         </div>
         <div>
-          <div style="font-size:11px;font-weight:700;color:rgba(255,92,0,0.9);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:3px;">Insight</div>
-          <div id="insight-text" style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.5;"></div>
+          <div style="font-size:11px;font-weight:700;color:var(--brand);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:3px;">Insight</div>
+          <div id="insight-text" style="font-size:13px;color:var(--text);line-height:1.5;"></div>
           <div id="insight-action" style="margin-top:8px;"></div>
         </div>
       </div>
@@ -898,11 +938,11 @@ body {
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="field" style="margin-bottom:0">
-          <label style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;">Client goal</label>
+          <label style="font-size:11px;font-weight:700;color:var(--white-tint-label);text-transform:uppercase;letter-spacing:0.05em;">Client goal</label>
           <input type="text" id="plan-goal" placeholder="e.g. Lose 8kg in 12 weeks" style="background:var(--surface-3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif;">
         </div>
         <div class="field" style="margin-bottom:0">
-          <label style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;">Sessions per week</label>
+          <label style="font-size:11px;font-weight:700;color:var(--white-tint-label);text-transform:uppercase;letter-spacing:0.05em;">Sessions per week</label>
           <div style="display:flex;gap:8px;">
             <button class="toggle-pill active" id="plan-freq-2" onclick="setPlanFreq(2)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--brand);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;">2×</button>
             <button class="toggle-pill" id="plan-freq-3" onclick="setPlanFreq(3)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">3×</button>
@@ -911,14 +951,14 @@ body {
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;">Duration</label>
+          <label style="font-size:11px;font-weight:700;color:var(--white-tint-label);text-transform:uppercase;letter-spacing:0.05em;">Duration</label>
           <div style="display:flex;gap:8px;">
             <button class="toggle-pill active" id="plan-dur-4" onclick="setPlanDur(4)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--brand);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;">4 wk</button>
             <button class="toggle-pill" id="plan-dur-8" onclick="setPlanDur(8)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">8 wk</button>
             <button class="toggle-pill" id="plan-dur-12" onclick="setPlanDur(12)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">12 wk</button>
           </div>
         </div>
-        <button id="generate-plan-btn" onclick="generatePlan()" style="background:var(--brand);color:#fff;border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <button id="generate-plan-btn" onclick="generatePlan()" style="background:var(--brand);color:var(--text-on-brand);border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Generate Plan
         </button>
@@ -955,29 +995,29 @@ body {
       <!-- WhatsApp setup -->
       <div id="ai-channel-whatsapp" class="ai-channel-info" style="display:none">
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Your AI assistant will reply to messages sent to the platform WhatsApp number from your registered WhatsApp number.</p>
-        <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;font-size:13px;">
-          <div style="color:rgba(255,255,255,0.5);margin-bottom:4px;">Your registered number</div>
-          <div id="wa-registered-number" style="color:rgba(255,255,255,0.9);font-weight:600;">Loading...</div>
+        <div style="background:var(--white-tint-panel);border-radius:10px;padding:12px;font-size:13px;">
+          <div style="color:var(--white-tint-text-faint);margin-bottom:4px;">Your registered number</div>
+          <div id="wa-registered-number" style="color:var(--white-tint-text);font-weight:600;">Loading...</div>
         </div>
-        <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:10px;">To change your number, update it in Edit Profile.</p>
+        <p style="font-size:12px;color:var(--white-tint-muted);margin-top:10px;">To change your number, update it in Edit Profile.</p>
       </div>
 
       <!-- Telegram setup -->
       <div id="ai-channel-telegram" class="ai-channel-info" style="display:none">
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Link your Telegram account to talk to your AI assistant there.</p>
-        <div id="tg-linked-state" style="display:none;background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;font-size:13px;">
-          <div style="color:rgba(255,255,255,0.5);margin-bottom:4px;">Linked account</div>
-          <div id="tg-username" style="color:rgba(255,255,255,0.9);font-weight:600;"></div>
-          <button onclick="unlinkTelegram()" style="margin-top:10px;font-size:12px;color:rgba(255,92,0,0.8);background:none;border:none;cursor:pointer;padding:0;">Unlink</button>
+        <div id="tg-linked-state" style="display:none;background:var(--white-tint-panel);border-radius:10px;padding:12px;font-size:13px;">
+          <div style="color:var(--white-tint-text-faint);margin-bottom:4px;">Linked account</div>
+          <div id="tg-username" style="color:var(--white-tint-text);font-weight:600;"></div>
+          <button onclick="unlinkTelegram()" style="margin-top:10px;font-size:12px;color:var(--brand-faded);background:none;border:none;cursor:pointer;padding:0;">Unlink</button>
         </div>
         <div id="tg-unlinked-state">
           <button class="btn-primary" onclick="generateTelegramLink()" style="width:100%;margin-top:0;">
             Generate Telegram Link
           </button>
-          <div id="tg-link-display" style="display:none;margin-top:12px;background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;">
-            <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px;">Open this link on your phone:</div>
+          <div id="tg-link-display" style="display:none;margin-top:12px;background:var(--white-tint-panel);border-radius:10px;padding:12px;">
+            <div style="font-size:12px;color:var(--white-tint-text-faint);margin-bottom:6px;">Open this link on your phone:</div>
             <a id="tg-link-url" href="#" target="_blank" style="font-size:13px;color:var(--brand);word-break:break-all;"></a>
-            <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px;">Link expires in 10 minutes. Tap it to open Telegram and complete the connection.</div>
+            <div style="font-size:11px;color:var(--white-tint-muted);margin-top:8px;">Link expires in 10 minutes. Tap it to open Telegram and complete the connection.</div>
           </div>
         </div>
       </div>

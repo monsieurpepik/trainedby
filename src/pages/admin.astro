@@ -17,11 +17,21 @@ const brandName = market.brandName;
   --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.14);
   --text: #fff; --text-muted: rgba(255,255,255,0.5); --text-faint: rgba(255,255,255,0.25);
   --danger: #ff4444; --warning: #ffaa00; --success: #00C853; --accent: #8888ff;
+  --danger-dim-sm: rgba(255,68,68,0.08); --danger-dim-md: rgba(255,68,68,0.1);
+  --danger-dim-lg: rgba(255,68,68,0.15); --danger-dim-xl: rgba(255,68,68,0.18);
+  --danger-border-sm: rgba(255,68,68,0.2); --danger-border-md: rgba(255,68,68,0.25);
+  --warning-dim-sm: rgba(255,170,0,0.08); --warning-dim-md: rgba(255,170,0,0.1);
+  --warning-border: rgba(255,170,0,0.2); --warning-border-sm: rgba(255,170,0,0.25);
+  --green-dim-lg: rgba(0,200,83,0.12); --green-dim-xl: rgba(0,200,83,0.2);
+  --accent-dim-sm: rgba(100,100,255,0.08); --accent-dim-md: rgba(100,100,255,0.15);
+  --accent-border: rgba(100,100,255,0.2);
+  --danger-border-lg: rgba(255,68,68,0.3);
+  --overlay-dark-lg: rgba(0,0,0,0.7); --bg-tint-xs: rgba(255,255,255,0.02);
 }
-.btn-success { background: rgba(0,200,83,0.12); border: 1px solid var(--reps-border); color: var(--reps); }
-.btn-success:hover { background: rgba(0,200,83,0.2); }
-.btn-danger { background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.25); color: var(--danger); }
-.btn-danger:hover { background: rgba(255,68,68,0.18); }
+.btn-success { background: var(--green-dim-lg); border: 1px solid var(--reps-border); color: var(--reps); }
+.btn-success:hover { background: var(--green-dim-xl); }
+.btn-danger { background: var(--danger-dim-md); border: 1px solid var(--danger-border-md); color: var(--danger); }
+.btn-danger:hover { background: var(--danger-dim-xl); }
 html { scroll-behavior: smooth; }
 body {
   background: var(--surface); color: var(--text);
@@ -46,7 +56,7 @@ body {
   cursor: pointer; border: none; transition: all 0.2s; text-decoration: none;
   display: inline-flex; align-items: center; gap: 6px;
 }
-.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary { background: var(--brand); color: var(--text-on-brand); }
 .btn-primary:hover { background: var(--brand-hover); }
 .btn-ghost { background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted); }
 .btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
@@ -105,7 +115,7 @@ td {
   font-size: 13px; vertical-align: middle;
 }
 tr:last-child td { border-bottom: none; }
-tr:hover td { background: rgba(255,255,255,0.02); }
+tr:hover td { background: var(--bg-tint-xs); }
 
 /* Trainer cell */
 .trainer-cell { display: flex; align-items: center; gap: 10px; }
@@ -127,12 +137,12 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .badge-pro { background: var(--brand-dim); border: 1px solid var(--brand-border); color: var(--brand); }
 .badge-free { background: var(--surface-3); border: 1px solid var(--border); color: var(--text-faint); }
 .badge-reps { background: var(--reps-dim); border: 1px solid var(--reps-border); color: var(--reps); }
-.badge-pending { background: rgba(255,170,0,0.1); border: 1px solid rgba(255,170,0,0.25); color: var(--warning); }
-.badge-test { background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.2); color: var(--danger); }
-.badge-lapsed { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); color: var(--danger); }
-.badge-high { background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.2); color: var(--reps); }
-.badge-medium { background: rgba(255,170,0,0.1); border: 1px solid rgba(255,170,0,0.25); color: var(--warning); }
-.badge-low { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); color: var(--danger); }
+.badge-pending { background: var(--warning-dim-md); border: 1px solid var(--warning-border-sm); color: var(--warning); }
+.badge-test { background: var(--danger-dim-md); border: 1px solid var(--danger-border-sm); color: var(--danger); }
+.badge-lapsed { background: var(--danger-dim-sm); border: 1px solid var(--danger-border-sm); color: var(--danger); }
+.badge-high { background: var(--reps-dim); border: 1px solid var(--reps-border); color: var(--reps); }
+.badge-medium { background: var(--warning-dim-md); border: 1px solid var(--warning-border-sm); color: var(--warning); }
+.badge-low { background: var(--danger-dim-sm); border: 1px solid var(--danger-border-sm); color: var(--danger); }
 
 /* Tabs */
 .tabs {
@@ -182,7 +192,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   outline: none; margin-bottom: 12px;
 }
 .secret-input:focus { border-color: var(--brand-border); }
-.kpi-card.warn { background: rgba(255,170,0,0.08); border-color: rgba(255,170,0,0.2); }
+.kpi-card.warn { background: var(--warning-dim-sm); border-color: var(--warning-border); }
 .kpi-card.warn .kpi-value { color: var(--warning); }
 
 /* Profile completion bar */
@@ -203,10 +213,10 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 }
 .action-btn.view { background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted); }
 .action-btn.view:hover { color: var(--text); border-color: var(--border-hover); }
-.action-btn.email { background: rgba(100,100,255,0.08); border: 1px solid rgba(100,100,255,0.2); color: var(--accent); }
-.action-btn.email:hover { background: rgba(100,100,255,0.15); }
-.action-btn.delete { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); color: var(--danger); }
-.action-btn.delete:hover { background: rgba(255,68,68,0.15); }
+.action-btn.email { background: var(--accent-dim-sm); border: 1px solid var(--accent-border); color: var(--accent); }
+.action-btn.email:hover { background: var(--accent-dim-md); }
+.action-btn.delete { background: var(--danger-dim-sm); border: 1px solid var(--danger-border-sm); color: var(--danger); }
+.action-btn.delete:hover { background: var(--danger-dim-lg); }
 
 /* Empty state */
 .empty-state {
@@ -226,11 +236,11 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
 .toast.success { border-color: var(--reps-border); color: var(--reps); }
-.toast.error { border-color: rgba(255,68,68,0.3); color: var(--danger); }
+.toast.error { border-color: var(--danger-border-lg); color: var(--danger); }
 
 /* Modal */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  position: fixed; inset: 0; background: var(--overlay-dark-lg);
   display: none; align-items: center; justify-content: center;
   z-index: 9000; padding: 20px;
 }
