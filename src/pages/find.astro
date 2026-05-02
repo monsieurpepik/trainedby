@@ -1,222 +1,203 @@
 ---
 import Base from '../layouts/Base.astro';
-import ArcHeader from '../components/ArcHeader.astro';
 import { getMarket } from '../lib/market.ts';
 const market = getMarket(Astro.url.hostname);
 const brandName = market.brandName;
+const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 ---
 
 <Base
   title={`Find a Verified Trainer | ${brandName}`}
   description={`Browse verified personal trainers on ${brandName}. Filter by speciality, location and training mode.`}
 >
+  <Fragment slot="head">
+    <meta name="color-scheme" content="light">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+  </Fragment>
+
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  /* --brand is inherited from Base.astro global tokens and overridden per market */
-  --orange-dim:var(--brand-dim, rgba(255,92,0,0.12)); /* fallback dim for non-brand uses */
-  --green:#22c55e;--green-dim:rgba(34,197,94,0.12);
-  --white:#fff;--white-60:rgba(255,255,255,0.6);--white-30:rgba(255,255,255,0.3);--white-10:rgba(255,255,255,0.1);--white-06:rgba(255,255,255,0.06);
-  --surface:#0a0a0a;--surface2:#111;--surface3:#1a1a1a;
-  --glass:rgba(255,255,255,0.06);--glass-border:rgba(255,255,255,0.1);
-  --radius:14px;--font:'Manrope',sans-serif;
+  --bg:#FFFFFF;
+  --surface:#FAFAF9;
+  --surface2:#F5F4F3;
+  --surface3:#E8E5E2;
+  --text:#1A1411;
+  --text-muted:#6B6460;
+  --border:rgba(0,0,0,0.07);
+  --border-hover:rgba(0,0,0,0.14);
+  --brand:#FF5C00;
+  --brand-dim:rgba(255,92,0,0.08);
+  --brand-border:rgba(255,92,0,0.2);
+  --green:#00C853;
+  --radius:14px;
+  --font:'DM Sans',system-ui,sans-serif;
 }
-html,body{min-height:100vh;background:var(--surface);color:var(--white);font-family:var(--font);-webkit-font-smoothing:antialiased}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
 
-/* NAV */
-nav{
+/* TOP BAR */
+.top-bar{
   position:sticky;top:0;z-index:100;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 20px;
-  background:rgba(10,10,10,0.9);
-  border-bottom:1px solid var(--glass-border);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  background:#fff;
+  border-bottom:1px solid var(--border);
 }
-.nav-logo{font-size:15px;font-weight:800;letter-spacing:-0.01em;text-decoration:none;color:var(--white)}
-.nav-logo span{color:var(--brand)}
-.nav-cta{
-  background:var(--brand);color:#fff;font-size:13px;font-weight:700;
-  padding:8px 16px;border-radius:20px;text-decoration:none;letter-spacing:0.01em;
+.top-bar-inner{
+  max-width:960px;margin:0 auto;
+  display:flex;align-items:center;gap:12px;
+  padding:10px 16px;
 }
-
-/* ARC HERO */
-.arc-hero{
-  position:relative;height:240px;background:#0A0A0A;overflow:hidden;
-  margin-bottom:0;
-}
-.arc-hero-text{
-  position:absolute;inset:0;padding:28px 24px;
-  display:flex;flex-direction:column;justify-content:flex-end;
-  padding-bottom:28px;
-}
-.arc-hero-brand{
-  font-size:9px;letter-spacing:0.2em;text-transform:uppercase;
-  color:rgba(255,255,255,0.14);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-  font-weight:700;margin-bottom:14px;
-}
-.arc-hero-title{
-  font-size:32px;font-weight:900;color:#FAFAFA;
-  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-  letter-spacing:-0.03em;line-height:1.1;margin-bottom:8px;
-}
-.arc-hero-sub{
-  font-size:12px;color:rgba(255,255,255,0.25);
-  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-}
-
-/* SEARCH BAR */
+.nav-logo{font-size:15px;font-weight:800;letter-spacing:-0.02em;text-decoration:none;color:var(--text);flex-shrink:0}
 .search-wrap{
-  position:relative;max-width:520px;margin:0 auto 20px;
+  flex:1;position:relative;
 }
-.search-wrap svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--white-30);pointer-events:none}
-#searchInput{
-  width:100%;padding:14px 16px 14px 46px;
-  background:var(--surface3);border:1px solid var(--glass-border);
-  border-radius:12px;color:var(--white);font-family:var(--font);font-size:15px;
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none}
+#search-input{
+  width:100%;padding:10px 12px 10px 38px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:var(--font);font-size:14px;
   outline:none;transition:border-color 0.2s;
 }
-#searchInput:focus{border-color:var(--brand)}
-#searchInput::placeholder{color:var(--white-30)}
+#search-input:focus{border-color:var(--brand)}
+#search-input::placeholder{color:var(--text-muted)}
+.result-count{font-size:12px;color:var(--text-muted);font-weight:500;white-space:nowrap;flex-shrink:0}
+.nav-cta{
+  background:var(--brand);color:#fff;font-size:13px;font-weight:700;
+  padding:8px 16px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;
+}
 
 /* FILTERS */
 .filters{
-  display:flex;gap:8px;overflow-x:auto;padding:16px 24px 12px;
+  display:flex;gap:8px;overflow-x:auto;padding:10px 16px;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
-  max-width:900px;margin:0 auto 0;
+  max-width:960px;margin:0 auto;
+  border-bottom:1px solid var(--border);
 }
 .filters::-webkit-scrollbar{display:none}
-.filter-btn{
-  flex-shrink:0;padding:8px 16px;border-radius:100px;
-  border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);
-  color:rgba(255,255,255,0.38);font-size:10px;font-weight:600;cursor:pointer;
-  transition:all 0.15s;white-space:nowrap;
-  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-  letter-spacing:0.06em;text-transform:uppercase;
+.filter-pill{
+  flex-shrink:0;padding:6px 14px;border-radius:100px;
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;
+  transition:all 0.15s;white-space:nowrap;font-family:var(--font);
 }
-.filter-btn:hover{border-color:rgba(212,98,42,0.4);color:rgba(255,255,255,0.65)}
-.filter-btn.active{
-  background:#D4622A;border-color:#D4622A;
-  color:#0A0A0A;font-weight:700;
+.filter-pill:hover{border-color:var(--brand-border);color:var(--brand);background:var(--brand-dim)}
+.filter-pill.active{
+  background:var(--text);border-color:var(--text);
+  color:#fff;font-weight:700;
 }
 
 /* MAIN LAYOUT */
-.main{max-width:900px;margin:0 auto;padding:0 16px 60px}
+.main{max-width:960px;margin:0 auto;padding:20px 16px 60px}
 
 /* RESULTS HEADER */
 .results-header{
   display:flex;align-items:center;justify-content:space-between;
   margin-bottom:16px;
 }
-.results-count{font-size:13px;color:var(--white-60);font-weight:500}
+.results-count{font-size:13px;color:var(--text-muted);font-weight:500}
 .sort-select{
-  background:var(--surface3);border:1px solid var(--glass-border);
-  color:var(--white);font-family:var(--font);font-size:12px;font-weight:600;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text);font-family:var(--font);font-size:12px;font-weight:600;
   padding:6px 10px;border-radius:8px;outline:none;cursor:pointer;
 }
 
 /* TRAINER GRID */
 #trainerGrid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-  gap:20px;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+@media(min-width:768px){
+  #trainerGrid{grid-template-columns:repeat(4,1fr);}
 }
 
-/* TRAINER CARD — premium arc design */
+/* TRAINER CARD — light design */
 .trainer-card{
-  background:#0A0A0A;
-  border-radius:24px;
+  background:var(--surface);
+  border-radius:16px;
   overflow:hidden;
   cursor:pointer;
-  transition:transform 0.15s,box-shadow 0.15s;
-  text-decoration:none;
+  transition:transform 0.15s,box-shadow 0.15s,border-color 0.15s;
   display:block;
-  border:1px solid rgba(255,255,255,0.06);
+  border:1px solid var(--border);
 }
 .trainer-card:hover{
   transform:translateY(-2px);
-  box-shadow:0 8px 32px rgba(0,0,0,0.6);
+  box-shadow:0 4px 16px rgba(0,0,0,0.08);
+  border-color:var(--border-hover);
 }
 .trainer-card:focus-visible{
-  outline:2px solid #D4622A;
+  outline:2px solid var(--brand);
   outline-offset:2px;
 }
-.tc-hero{position:relative;height:320px;background:#0A0A0A;overflow:hidden}
-.tc-brand{
-  position:absolute;top:22px;left:22px;z-index:3;
-  font-size:9px;letter-spacing:0.2em;text-transform:uppercase;
-  color:rgba(255,255,255,0.55);
-  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-  font-weight:700;
-}
-.tc-location{
-  position:absolute;top:22px;right:22px;z-index:3;
-  background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.18);
-  border-radius:100px;padding:5px 13px;backdrop-filter:blur(12px);
-  font-size:10px;font-weight:700;color:rgba(255,255,255,0.80);
-  letter-spacing:0.08em;text-transform:uppercase;
-  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-}
+.tc-photo-wrap{position:relative;aspect-ratio:3/4;background:var(--surface2);overflow:hidden}
 .tc-photo{
-  position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;object-position:top center;z-index:0;
+  width:100%;height:100%;
+  object-fit:cover;object-position:top center;
 }
-.tc-photo-overlay{
-  position:absolute;inset:0;z-index:1;
-  background:linear-gradient(to bottom,rgba(0,0,0,0.08) 0%,rgba(0,0,0,0.55) 100%);
-}
-/* initials fallback shown when no photo */
 .tc-initials{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:0;
-  font-size:80px;font-weight:800;color:rgba(212,98,42,0.18);
-  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-  letter-spacing:-0.02em;user-select:none;
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:48px;font-weight:800;color:rgba(255,92,0,0.15);
+  font-family:'DM Sans',sans-serif;user-select:none;
 }
-/* keep legacy .tc-avatar in case referenced elsewhere */
-.tc-avatar{display:none}
-.tc-body{padding:24px}
-.tc-specialty{
-  font-size:10px;letter-spacing:0.16em;text-transform:uppercase;
-  color:rgba(255,255,255,0.22);margin-bottom:8px;
-  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-  font-weight:600;
+.tc-verified{
+  position:absolute;top:10px;right:10px;
+  background:rgba(0,200,83,0.12);border:1px solid rgba(0,200,83,0.25);
+  border-radius:100px;padding:3px 9px;
+  font-size:10px;font-weight:700;color:#00A844;
 }
-.tc-name{
-  font-size:36px;font-weight:700;color:#FAFAFA;
-  font-family:Georgia,'Times New Roman',serif;
-  letter-spacing:-0.015em;line-height:1.05;
-  font-style:italic;margin-bottom:4px;
+.tc-body{padding:14px}
+.tc-name{font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px;letter-spacing:-0.01em}
+.tc-meta{font-size:12px;color:var(--text-muted);margin-bottom:10px}
+.tc-price{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px}
+.tc-wa-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  background:#25D366;color:#fff;border-radius:10px;
+  padding:10px 14px;font-size:13px;font-weight:700;
+  text-decoration:none;transition:background 0.15s;
 }
-.tc-sep{width:32px;height:1.5px;background:#D4622A;margin:14px 0}
-.tc-meta{
-  font-size:12px;color:rgba(255,255,255,0.24);
-  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-  margin-bottom:20px;
+.tc-wa-btn:hover{background:#1db954}
+.tc-wa-btn svg{flex-shrink:0}
+
+/* EMPTY STATE */
+.empty-state{
+  text-align:center;padding:60px 20px;
+  grid-column:1/-1;
 }
-.tc-stats{
-  display:flex;margin-bottom:24px;
-  border:1px solid rgba(255,255,255,0.06);border-radius:14px;overflow:hidden;
+.empty-icon{font-size:48px;margin-bottom:16px}
+.empty-title{font-size:18px;font-weight:700;margin-bottom:8px}
+.empty-sub{font-size:14px;color:var(--text-muted)}
+
+/* SKELETON */
+.skeleton-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;
 }
-.tc-stat{flex:1;padding:14px 16px;border-right:1px solid rgba(255,255,255,0.06)}
-.tc-stat:last-child{border-right:none}
-.tc-stat-val{
-  font-size:22px;font-weight:800;color:#FAFAFA;
-  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-  letter-spacing:-0.02em;
+.skel{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel-cover{height:100px;border-radius:0}
+.skel-body{padding:14px}
+.skel-line{height:12px;margin-bottom:8px}
+.skel-line.w60{width:60%}.skel-line.w80{width:80%}.skel-line.w40{width:40%}
+
+/* LOAD MORE */
+.load-more-wrap{text-align:center;margin-top:28px}
+.btn-load-more{
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text);font-family:var(--font);font-size:14px;font-weight:600;
+  padding:12px 28px;border-radius:20px;cursor:pointer;
+  transition:border-color 0.2s;
 }
-.tc-stat-val.orange{color:#D4622A}
-.tc-stat-lbl{
-  font-size:9px;color:rgba(255,255,255,0.22);
-  letter-spacing:0.1em;text-transform:uppercase;
-  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-  margin-top:2px;
-}
-.tc-cta{
-  background:#D4622A;color:#0A0A0A;font-size:12px;font-weight:800;
-  text-align:center;padding:16px;border-radius:100px;
-  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-  letter-spacing:0.1em;text-transform:uppercase;
+.btn-load-more:hover{border-color:var(--brand);color:var(--brand)}
+
+/* ── Mobile responsive ────────────────────────────────────────────── */
+@media(max-width:640px){
+  .main{padding:12px 12px max(60px,calc(60px + env(safe-area-inset-bottom)))}
+  .results-header{flex-direction:column;align-items:flex-start;gap:8px}
+  .sort-select{width:100%}
 }
 
+/* ── Safe area ───────────────────────────────────────────────────── */
+.main{padding-bottom:max(60px,calc(60px + env(safe-area-inset-bottom)))}
 /* EMPTY STATE */
 .empty-state{
   text-align:center;padding:60px 20px;
@@ -265,38 +246,30 @@ nav{
 .main{padding-bottom:max(60px,calc(60px + env(safe-area-inset-bottom)))}
   </style>
 
-<nav>
-  <a href="/" class="nav-logo">{brandName}</a>
-  <a href="/join" class="nav-cta">Get Your Page →</a>
-</nav>
-
-<div class="arc-hero">
-  <ArcHeader brandLabel={brandName} />
-  <div class="arc-hero-text">
-    <div class="arc-hero-brand">{brandName}</div>
-    <div class="arc-hero-title">Find your<br>trainer.</div>
-    <div class="arc-hero-sub" id="heroSubCount">Browse verified trainers</div>
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <a href="/" class="nav-logo">{brandName}</a>
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search-input" placeholder="Search by name, specialty or gym…" oninput="filterTrainers()">
+    </div>
+    <span class="result-count" id="result-count"></span>
+    <a href="/join" class="nav-cta">Get Your Page →</a>
   </div>
-</div>
-
-<div class="search-wrap">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-  <input type="text" id="searchInput" placeholder="Search by name, specialty or gym…" data-i18n-placeholder="find.search_placeholder" oninput="filterTrainers()">
-</div>
-
-<div class="filters" id="filters">
-  <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)" data-i18n="find.filter_all">All Trainers</button>
-  <button class="filter-btn" data-filter="in-person" onclick="setFilter('in-person',this)">In-Person</button>
-  <button class="filter-btn" data-filter="online" onclick="setFilter('online',this)" data-i18n="find.filter_online">Online</button>
-  <button class="filter-btn" data-filter="hybrid" onclick="setFilter('hybrid',this)">Hybrid</button>
-  <button class="filter-btn" data-filter="strength" onclick="setFilter('strength',this)">Strength</button>
-  <button class="filter-btn" data-filter="fat-loss" onclick="setFilter('fat-loss',this)">Fat Loss</button>
-  <button class="filter-btn" data-filter="hiit" onclick="setFilter('hiit',this)">HIIT</button>
-  <button class="filter-btn" data-filter="pilates" onclick="setFilter('pilates',this)">Pilates</button>
-  <button class="filter-btn" data-filter="boxing" onclick="setFilter('boxing',this)">Boxing</button>
-  <button class="filter-btn" data-filter="yoga" onclick="setFilter('yoga',this)">Yoga</button>
-  <button class="filter-btn" data-filter="nutrition" onclick="setFilter('nutrition',this)">Nutrition</button>
-  <button class="filter-btn" data-filter="female-only" onclick="setFilter('female-only',this)">Female Trainers</button>
+  <div class="filters" id="filters">
+    <button class="filter-pill active" data-filter="all" onclick="setFilter('all',this)">All Trainers</button>
+    <button class="filter-pill" data-filter="in-person" onclick="setFilter('in-person',this)">In-Person</button>
+    <button class="filter-pill" data-filter="online" onclick="setFilter('online',this)">Online</button>
+    <button class="filter-pill" data-filter="hybrid" onclick="setFilter('hybrid',this)">Hybrid</button>
+    <button class="filter-pill" data-filter="strength" onclick="setFilter('strength',this)">Strength</button>
+    <button class="filter-pill" data-filter="fat-loss" onclick="setFilter('fat-loss',this)">Fat Loss</button>
+    <button class="filter-pill" data-filter="hiit" onclick="setFilter('hiit',this)">HIIT</button>
+    <button class="filter-pill" data-filter="pilates" onclick="setFilter('pilates',this)">Pilates</button>
+    <button class="filter-pill" data-filter="boxing" onclick="setFilter('boxing',this)">Boxing</button>
+    <button class="filter-pill" data-filter="yoga" onclick="setFilter('yoga',this)">Yoga</button>
+    <button class="filter-pill" data-filter="nutrition" onclick="setFilter('nutrition',this)">Nutrition</button>
+    <button class="filter-pill" data-filter="female-only" onclick="setFilter('female-only',this)">Female Trainers</button>
+  </div>
 </div>
 
 <div class="main">
@@ -329,9 +302,8 @@ nav{
   </div>
 </div>
 
-<script is:inline>
+<script is:inline define:vars={{ SUPABASE_KEY }}>
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
 
 let allTrainers = [];
 let filtered = [];
@@ -424,13 +396,13 @@ function getDemoTrainers() {
 
 function setFilter(filter, btn) {
   activeFilter = filter;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   filterTrainers();
 }
 
 function filterTrainers() {
-  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
 
   filtered = allTrainers.filter(t => {
     // Text search
@@ -476,13 +448,12 @@ function renderGrid() {
   const end = (page + 1) * PAGE_SIZE;
   const toShow = filtered.slice(start, end);
 
-  document.getElementById('resultsCount').textContent =
-    filtered.length === 0 ? 'No trainers found' :
+  const countEl = document.getElementById('result-count');
+  if (countEl) countEl.textContent = filtered.length === 0 ? 'No trainers found' :
+    `${filtered.length} trainer${filtered.length !== 1 ? 's' : ''}`;
+  const resultsCountEl = document.getElementById('resultsCount');
+  if (resultsCountEl) resultsCountEl.textContent = filtered.length === 0 ? 'No trainers found' :
     `${filtered.length} verified trainer${filtered.length !== 1 ? 's' : ''}`;
-  const heroSub = document.getElementById('heroSubCount');
-  if (heroSub) heroSub.textContent = filtered.length > 0
-    ? `${filtered.length} verified trainer${filtered.length !== 1 ? 's' : ''} near you`
-    : 'Browse verified trainers';
 
   if (!filtered.length) {
     grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No trainers found</div><div class="empty-sub">Try adjusting your search or filters</div></div>`;
@@ -505,123 +476,37 @@ function esc(s) {
 }
 function trainerCardHTML(t) {
   const name = t.full_name || t.name || 'Trainer';
-  const firstName = esc(name.split(' ')[0] || name);
-  const lastName = esc(name.split(' ').slice(1).join(' ') || '');
-  const initials = esc(name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase());
-  const slug = t.slug || t.id;
+  const initials = name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const slug = esc(t.slug || t.id || '');
   const specialty = esc((t.specialties || [])[0] || 'Personal Trainer');
-  const certStr = (t.certifications || []).slice(0, 2).map(esc).join(' · ');
-  const yearsStr = t.years_experience ? ` · ${t.years_experience} years` : '';
-  const metaLine = [certStr, yearsStr].filter(Boolean).join('');
-  const rating = t.avg_rating ? parseFloat(t.avg_rating).toFixed(1) + '★' : '—';
-  const clients = t.clients_trained || '—';
-  const currency = window.__CURRENCY__ || '';
-  const price = t.min_price ? `${currency} ${t.min_price.toLocaleString()}`.trim() : '—';
   const city = esc(t.city || '');
+  const currency = window.__CURRENCY__ || '';
+  const price = t.min_price ? `From ${currency} ${t.min_price.toLocaleString()}`.trim() : '';
+  const waNum = esc(t.whatsapp || '');
+  const waMsg = encodeURIComponent('Hi, I found your profile on TrainedBy and I\'d like to book a session!');
+  const waHref = waNum ? `https://wa.me/${waNum.replace(/\D/g,'')}?text=${waMsg}` : '';
 
-  // Unique gradient IDs per card to prevent SVG defs collision
-  const uid = t.id || t.slug || `fb-${Math.random().toString(36).slice(2,7)}`;
-  const arcMass = `arc-${uid}-mass`;
-  const arcHair = `arc-${uid}-hair`;
-  const arcGlow = `arc-${uid}-glow`;
-  const arcSpark = `arc-${uid}-spark`;
-
-  // Full-bleed photo when available; initials watermark as fallback
-  const heroPhoto = t.avatar_url
-    ? `<img class="tc-photo" src="${esc(t.avatar_url)}" alt="${esc(name)}" loading="lazy" onerror="this.style.display='none'">`
-    : `<div class="tc-initials">${initials}</div>`;
-  const photoOverlay = t.avatar_url
-    ? `<div class="tc-photo-overlay"></div>`
-    : '';
-
-  const arc = `
-<svg aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;z-index:2"
-     viewBox="0 0 390 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="${arcMass}" x1="-30" y1="320" x2="400" y2="10" gradientUnits="userSpaceOnUse">
-      <stop offset="0%"   stop-color="rgba(212,98,42,0.0)"/>
-      <stop offset="30%"  stop-color="rgba(212,98,42,0.18)"/>
-      <stop offset="65%"  stop-color="rgba(212,98,42,0.58)"/>
-      <stop offset="100%" stop-color="#D4622A"/>
-    </linearGradient>
-    <linearGradient id="${arcHair}" x1="-30" y1="320" x2="400" y2="10" gradientUnits="userSpaceOnUse">
-      <stop offset="0%"   stop-color="rgba(212,98,42,0.0)"/>
-      <stop offset="35%"  stop-color="rgba(212,98,42,0.45)"/>
-      <stop offset="100%" stop-color="rgba(212,98,42,0.90)"/>
-    </linearGradient>
-    <filter id="${arcGlow}" x="-100%" y="-100%" width="300%" height="300%">
-      <feGaussianBlur stdDeviation="7" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="${arcSpark}" x="-80%" y="-80%" width="260%" height="260%">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  <path d="M -30 320 Q 100 240 195 155 Q 295 65 400 18"
-        stroke="url(#${arcMass})" stroke-width="64" fill="none" stroke-linecap="butt"/>
-  <path d="M -30 320 Q 100 240 195 155 Q 295 65 400 18"
-        stroke="rgba(10,10,10,0.58)" stroke-width="38" fill="none" stroke-linecap="butt"/>
-  <path d="M -30 320 Q 100 240 195 155 Q 295 65 400 18"
-        stroke="url(#${arcHair})" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-  <g filter="url(#${arcGlow})">
-    <circle cx="372" cy="24" r="12" fill="rgba(212,98,42,0.95)"/>
-    <circle cx="354" cy="34" r="9"  fill="rgba(212,98,42,0.88)"/>
-    <circle cx="388" cy="14" r="8"  fill="rgba(232,120,52,0.90)"/>
-    <circle cx="362" cy="10" r="7"  fill="rgba(212,98,42,0.84)"/>
-    <circle cx="385" cy="40" r="6"  fill="rgba(212,98,42,0.78)"/>
-  </g>
-  <g filter="url(#${arcSpark})">
-    <circle cx="342" cy="18" r="5"   fill="rgba(212,98,42,0.68)"/>
-    <circle cx="360" cy="2"  r="4.5" fill="rgba(212,98,42,0.62)"/>
-    <circle cx="395" cy="26" r="4"   fill="rgba(212,98,42,0.58)"/>
-    <circle cx="338" cy="44" r="4"   fill="rgba(212,98,42,0.52)"/>
-    <circle cx="370" cy="50" r="3.5" fill="rgba(212,98,42,0.48)"/>
-    <circle cx="325" cy="30" r="3"   fill="rgba(212,98,42,0.44)"/>
-    <circle cx="348" cy="60" r="3"   fill="rgba(212,98,42,0.38)"/>
-    <circle cx="380" cy="-10" r="3"  fill="rgba(212,98,42,0.50)"/>
-    <circle cx="400" cy="48" r="2.5" fill="rgba(212,98,42,0.36)"/>
-  </g>
-  <circle cx="310" cy="42" r="2.5" fill="rgba(212,98,42,0.28)"/>
-  <circle cx="325" cy="58" r="2"   fill="rgba(212,98,42,0.22)"/>
-  <circle cx="338" cy="72" r="2"   fill="rgba(212,98,42,0.18)"/>
-  <circle cx="300" cy="56" r="1.5" fill="rgba(212,98,42,0.16)"/>
-  <circle cx="315" cy="74" r="1.5" fill="rgba(212,98,42,0.12)"/>
-  <circle cx="368" cy="-16" r="2.5" fill="rgba(212,98,42,0.38)"/>
-  <circle cx="382" cy="-28" r="1.5" fill="rgba(212,98,42,0.24)"/>
-</svg>`;
+  const photoHtml = t.avatar_url
+    ? `<img class="tc-photo" src="${esc(t.avatar_url)}" alt="${esc(name)}" loading="lazy">`
+    : `<div class="tc-initials">${esc(initials)}</div>`;
+  const verifiedBadge = t.reps_verified ? `<div class="tc-verified">✓ Verified</div>` : '';
 
   return `
-<a href="/${slug || '#'}" class="trainer-card">
-  <div class="tc-hero">
-    ${heroPhoto}
-    ${photoOverlay}
-    ${arc}
-    <div class="tc-brand">TrainedBy</div>
-    ${city ? `<div class="tc-location">${city}</div>` : ''}
+<div class="trainer-card" onclick="window.location='/${slug}'">
+  <div class="tc-photo-wrap">
+    ${photoHtml}
+    ${verifiedBadge}
   </div>
   <div class="tc-body">
-    <div class="tc-specialty">${specialty}</div>
-    <div class="tc-name">${firstName}${lastName ? '<br>' + lastName : ''}</div>
-    <div class="tc-sep"></div>
-    <div class="tc-meta">${metaLine || specialty}</div>
-    <div class="tc-stats">
-      <div class="tc-stat">
-        <div class="tc-stat-val">${clients}</div>
-        <div class="tc-stat-lbl">Clients</div>
-      </div>
-      <div class="tc-stat">
-        <div class="tc-stat-val">${rating}</div>
-        <div class="tc-stat-lbl">Rating</div>
-      </div>
-      <div class="tc-stat">
-        <div class="tc-stat-val orange">${price}</div>
-        <div class="tc-stat-lbl">/ session</div>
-      </div>
-    </div>
-    <div class="tc-cta">Book a session</div>
+    <div class="tc-name">${esc(name)}</div>
+    <div class="tc-meta">${specialty}${city ? ' · ' + city : ''}</div>
+    ${price ? `<div class="tc-price">${price} / session</div>` : ''}
+    ${waHref ? `<a class="tc-wa-btn" href="${waHref}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+      WhatsApp
+    </a>` : `<a class="tc-wa-btn" href="/${slug}" onclick="event.stopPropagation()">View Profile</a>`}
   </div>
-</a>`;
+</div>`;
 }
 
 loadTrainers();

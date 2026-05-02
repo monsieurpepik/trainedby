@@ -19,145 +19,173 @@ const DEMO_SLUGS: Record<string, string> = {
   'it':    'giulia-romano',
 };
 const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
+const ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 ---
 
 <Base
   title={`${brandName} – Link-in-Bio & Booking Hub for Fitness Trainers`}
   description={`Discover verified personal trainers in ${market.cityName || 'your city'}. Every trainer is ${market.certificationBody}-certified and background-checked. Real results, real people.`}
 >
+  <Fragment slot="head">
+    <meta name="color-scheme" content="light">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+  </Fragment>
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      /* Local aliases that map to Base.astro global tokens */
-      --surface: var(--bg, #0a0a0a);
-      --surface-2: var(--surface, #111111);
-      --surface-3: var(--surface-2, #161616);
-      --surface-4: var(--surface-3, #1c1c1c);
-      --border-2: var(--border-strong, rgba(255,255,255,0.12));
-      --text-2: var(--text-2, #a3a3a3);
-      --text-3: var(--text-3, #666666);
-      --reps: var(--green, #00C853);
+      --bg:         #FFFFFF;
+      --surface:    #FAFAF9;
+      --surface-2:  #F5F4F3;
+      --surface-3:  #E8E5E2;
+      --surface-4:  #E0DDD9;
+      --text:       #1A1411;
+      --text-muted: #6B6460;
+      --border:     rgba(0,0,0,0.07);
+      --brand:      #FF5C00;
+      --border-2: rgba(0,0,0,0.12);
+      --text-2: #6B6460;
+      --text-3: #9B9490;
+      --reps: #00C853;
       --max: 1100px;
+      --brand-dim: rgba(255,92,0,0.08);
+      --brand-border: rgba(255,92,0,0.2);
     }
-    body { background: var(--bg, #0a0a0a); color: var(--text, #f0f0f0); font-family: var(--font-body, 'Inter', sans-serif); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    body { background: var(--bg, #FFFFFF); color: var(--text, #1A1411); font-family: 'DM Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
     /* NAV */
     .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 32px; height: 64px; display: flex; align-items: center; gap: 32px; transition: background 0.3s, border-color 0.3s; border-bottom: 1px solid transparent; }
-    .nav.scrolled { background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); border-color: var(--border); }
-    .nav-logo { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 900; font-size: 20px; color: var(--brand); text-decoration: none; letter-spacing: -0.5px; margin-right: auto; }
+    .nav.scrolled { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-color: var(--border); }
+    .nav-logo { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 20px; color: var(--text); text-decoration: none; letter-spacing: -0.5px; margin-right: auto; }
     .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a { color: var(--text-2); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; font-family: var(--font-body); }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
     .nav-links a:hover { color: var(--text); }
-    .nav-links a.for-trainers { color: var(--brand); font-weight: 700; }
-    .nav-links a.for-trainers:hover { color: var(--brand-hover, #e05200); }
-    .nav-cta { display: inline-flex; align-items: center; gap: 6px; padding: 9px 20px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; white-space: nowrap; font-family: var(--font-body); }
-    .nav-cta:hover { background: var(--brand-hover, #e05200); transform: translateY(-1px); }
+    .nav-links a.for-trainers { color: #FF5C00; font-weight: 700; }
+    .nav-links a.for-trainers:hover { color: #e05200; }
+    .nav-cta { display: inline-flex; align-items: center; gap: 6px; padding: 9px 20px; border-radius: 100px; background: var(--text); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; white-space: nowrap; }
+    .nav-cta:hover { background: #FF5C00; transform: translateY(-1px); }
     @media (max-width: 640px) { .nav-links { display: none; } .nav { padding: 0 20px; } }
 
     /* HERO - Consumer Search */
     .hero { min-height: 92vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
-    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 90% 70% at 50% 30%, rgba(212,98,42,0.06) 0%, transparent 65%); pointer-events: none; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 90% 70% at 50% 30%, rgba(212,98,42,0.04) 0%, transparent 65%); pointer-events: none; }
     /* Arc decoration pinned to bottom of hero */
-    .hero-arc { position: absolute; bottom: 0; left: 0; right: 0; height: 200px; pointer-events: none; z-index: 0; opacity: 0.55; }
+    .hero-arc { position: absolute; bottom: 0; left: 0; right: 0; height: 200px; pointer-events: none; z-index: 0; opacity: 0.25; }
     .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 100px; border: 1px solid var(--brand-border); background: var(--brand-dim); font-size: 12px; font-weight: 700; color: var(--brand); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 28px; position: relative; z-index: 1; }
-    .hero-headline { font-family: var(--font-display, 'Manrope', sans-serif); font-size: clamp(38px, 7vw, 80px); font-weight: 900; line-height: 1.0; letter-spacing: -0.04em; max-width: 820px; margin-bottom: 20px; position: relative; z-index: 1; }
-    .hero-headline em { font-style: italic; font-family: Georgia, 'Times New Roman', serif; color: var(--brand); }
-    .hero-sub { font-size: clamp(15px, 2vw, 17px); color: var(--text-2); max-width: 480px; line-height: 1.7; margin-bottom: 40px; position: relative; z-index: 1; }
-    .hero-headline em { font-style: normal; color: var(--brand); }
-    .hero-sub { font-size: clamp(15px, 2vw, 17px); color: var(--text-2); max-width: 480px; line-height: 1.7; margin-bottom: 40px; }
+    .hero-headline { font-family: 'DM Sans', system-ui, sans-serif; font-size: clamp(38px, 7vw, 80px); font-weight: 800; line-height: 1.0; letter-spacing: -0.04em; max-width: 820px; margin-bottom: 20px; position: relative; z-index: 1; }
+    .hero-headline em { font-style: italic; font-family: Georgia, 'Times New Roman', serif; color: #FF5C00; }
+    .hero-sub { font-size: clamp(15px, 2vw, 17px); color: var(--text-muted); max-width: 480px; line-height: 1.7; margin-bottom: 40px; position: relative; z-index: 1; }
+
+    /* Mobile: hero-left is full width, hero-right hidden */
+    .hero-left { width: 100%; }
+    .hero-right { display: none; }
+
+    /* Desktop split-hero at ≥768px */
+    @media (min-width: 768px) {
+      .hero { min-height: 80vh; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; text-align: left; padding: 100px 48px 80px; max-width: var(--max); margin: 0 auto; }
+      .hero::before { display: none; }
+      .hero-left { width: auto; }
+      .hero-eyebrow { margin-bottom: 20px; }
+      .hero-sub { margin-bottom: 32px; }
+      .search-wrap { max-width: 100%; }
+      .quick-filters { justify-content: flex-start; }
+      .trust-strip { justify-content: flex-start; }
+      .hero-right { position: relative; display: flex; align-items: center; justify-content: center; min-height: 400px; background: var(--surface); border-radius: 24px; border: 1px solid var(--border); overflow: hidden; }
+      .hero-arc { position: absolute; inset: 0; height: 100%; opacity: 0.4; }
+    }
 
     /* SEARCH BAR */
     .search-wrap { width: 100%; max-width: 640px; position: relative; margin-bottom: 24px; z-index: 1; }
-    .search-bar { width: 100%; padding: 18px 140px 18px 56px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text); font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .search-bar { width: 100%; padding: 18px 140px 18px 56px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .search-bar:focus { border-color: var(--brand-border); box-shadow: 0 0 0 3px var(--brand-dim); }
-    .search-bar::placeholder { color: var(--text-3); }
-    .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-2); pointer-events: none; }
-    .search-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); padding: 10px 22px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
-    .search-btn:hover { background: var(--brand-hover, #e05200); }
+    .search-bar::placeholder { color: var(--text-muted); }
+    .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+    .search-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); padding: 10px 22px; border-radius: 100px; background: var(--text); color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+    .search-btn:hover { background: #FF5C00; }
 
     /* QUICK FILTERS */
     .quick-filters { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 56px; position: relative; z-index: 1; }
-    .qf-pill { padding: 8px 16px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text-2); font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.15s; }
+    .qf-pill { padding: 8px 16px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.15s; }
     .qf-pill:hover { border-color: var(--brand-border); color: var(--brand); background: var(--brand-dim); }
 
     /* TRUST STRIP */
     .trust-strip { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; justify-content: center; position: relative; z-index: 1; }
-    .trust-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-2); font-weight: 600; }
+    .trust-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-muted); font-weight: 600; }
     .trust-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--reps); flex-shrink: 0; }
 
     /* SECTION STRUCTURE */
     .section { padding: 80px 24px; max-width: var(--max); margin: 0 auto; }
     .section-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
-    .section-title { font-family: var(--font-display, 'Manrope', sans-serif); font-size: clamp(26px, 4vw, 44px); font-weight: 900; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 16px; }
-    .section-sub { font-size: 15px; color: var(--text-2); line-height: 1.7; max-width: 480px; }
+    .section-title { font-family: 'DM Sans', system-ui, sans-serif; font-size: clamp(26px, 4vw, 44px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 16px; }
+    .section-sub { font-size: 15px; color: var(--text-muted); line-height: 1.7; max-width: 480px; }
 
     /* FEATURED TRAINERS */
     .trainers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 40px; }
-    .trainer-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.2s, transform 0.2s; display: block; }
-    .trainer-card:hover { border-color: var(--border-2); transform: translateY(-2px); }
-    .trainer-card-img { width: 100%; aspect-ratio: 4/3; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 900; font-size: 36px; color: var(--brand); position: relative; overflow: hidden; }
-    .trainer-card-img .verified-badge { position: absolute; top: 10px; right: 10px; padding: 3px 9px; border-radius: 20px; background: rgba(0,200,83,0.15); border: 1px solid rgba(0,200,83,0.3); color: #00C853; font-size: 10px; font-weight: 700; }
+    .trainer-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.2s, transform 0.2s; display: block; }
+    .trainer-card:hover { border-color: rgba(0,0,0,0.14); transform: translateY(-2px); }
+    .trainer-card-img { width: 100%; aspect-ratio: 4/3; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 36px; color: #FF5C00; position: relative; overflow: hidden; }
+    .trainer-card-img .verified-badge { position: absolute; top: 10px; right: 10px; padding: 3px 9px; border-radius: 20px; background: rgba(0,200,83,0.12); border: 1px solid rgba(0,200,83,0.25); color: #00A844; font-size: 10px; font-weight: 700; }
     .trainer-card-body { padding: 16px; }
-    .trainer-card-name { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 800; font-size: 15px; margin-bottom: 3px; }
-    .trainer-card-meta { font-size: 12px; color: var(--text-2); margin-bottom: 10px; }
+    .trainer-card-name { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 15px; margin-bottom: 3px; }
+    .trainer-card-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
     .trainer-card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-    .trainer-tag { padding: 3px 9px; border-radius: 20px; background: var(--surface-3); border: 1px solid var(--border); font-size: 11px; color: var(--text-2); font-weight: 600; }
-    .trainer-card-price { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 800; font-size: 14px; color: var(--text); }
-    .trainer-card-price span { font-size: 11px; font-weight: 500; color: var(--text-2); }
+    .trainer-tag { padding: 3px 9px; border-radius: 20px; background: var(--surface-2); border: 1px solid var(--border); font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    .trainer-card-price { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 14px; color: var(--text); }
+    .trainer-card-price span { font-size: 11px; font-weight: 500; color: var(--text-muted); }
 
     /* TRANSFORMATIONS */
     .transforms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 40px; }
-    .transform-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .transform-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
     .transform-header { padding: 20px 20px 0; }
     .transform-trainer { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-    .transform-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 14px; color: var(--brand); flex-shrink: 0; }
+    .transform-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 14px; color: #FF5C00; flex-shrink: 0; }
     .transform-trainer-name { font-weight: 700; font-size: 13px; }
-    .transform-trainer-cert { font-size: 11px; color: #00C853; font-weight: 600; }
-    .transform-title { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 800; font-size: 17px; letter-spacing: -0.02em; margin-bottom: 10px; }
-    .transform-body { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
+    .transform-trainer-cert { font-size: 11px; color: #00A844; font-weight: 600; }
+    .transform-title { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.02em; margin-bottom: 10px; }
+    .transform-body { font-size: 13px; color: var(--text-muted); line-height: 1.65; margin-bottom: 16px; }
     .transform-stats { display: flex; gap: 0; border-top: 1px solid var(--border); }
     .transform-stat { flex: 1; padding: 14px 16px; text-align: center; border-right: 1px solid var(--border); }
     .transform-stat:last-child { border-right: none; }
-    .transform-stat-val { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 900; font-size: 18px; color: var(--brand); letter-spacing: -0.03em; }
-    .transform-stat-label { font-size: 10px; color: var(--text-2); margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transform-stat-val { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 18px; color: #FF5C00; letter-spacing: -0.03em; }
+    .transform-stat-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
     /* BLOG PREVIEW */
     .blog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 40px; }
     .blog-grid .featured { grid-column: 1 / -1; }
-    .blog-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; text-decoration: none; color: inherit; display: block; transition: border-color 0.2s, transform 0.2s; }
-    .blog-card:hover { border-color: var(--border-2); transform: translateY(-2px); }
+    .blog-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; text-decoration: none; color: inherit; display: block; transition: border-color 0.2s, transform 0.2s; }
+    .blog-card:hover { border-color: rgba(0,0,0,0.14); transform: translateY(-2px); }
     .blog-card.featured { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; }
     .blog-cat { display: inline-block; padding: 4px 12px; border-radius: 100px; background: var(--brand-dim); border: 1px solid var(--brand-border); color: var(--brand); font-size: 11px; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 14px; }
-    .blog-title { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 800; font-size: 20px; letter-spacing: -0.03em; line-height: 1.25; margin-bottom: 10px; }
+    .blog-title { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.03em; line-height: 1.25; margin-bottom: 10px; }
     .blog-card:not(.featured) .blog-title { font-size: 16px; }
-    .blog-excerpt { font-size: 14px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
-    .blog-author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2); }
+    .blog-excerpt { font-size: 14px; color: var(--text-muted); line-height: 1.65; margin-bottom: 16px; }
+    .blog-author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
     .blog-author-dot { width: 5px; height: 5px; border-radius: 50%; background: #00C853; }
-    .blog-visual { background: var(--surface-3); border-radius: 12px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    .blog-visual { background: var(--surface-2); border-radius: 12px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 48px; }
     @media (max-width: 720px) { .blog-grid { grid-template-columns: 1fr; } .blog-card.featured { grid-template-columns: 1fr; } }
 
     /* FOR TRAINERS BANNER */
     .trainer-banner { margin: 0 24px; border-radius: 20px; background: linear-gradient(135deg, var(--brand-dim) 0%, transparent 100%); border: 1px solid var(--brand-border); padding: 56px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
     .trainer-banner-text {}
     .trainer-banner-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
-    .trainer-banner-title { font-family: var(--font-display, 'Manrope', sans-serif); font-size: clamp(22px, 3vw, 36px); font-weight: 900; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 12px; }
-    .trainer-banner-sub { font-size: 15px; color: var(--text-2); line-height: 1.6; max-width: 420px; }
+    .trainer-banner-title { font-family: 'DM Sans', sans-serif; font-size: clamp(22px, 3vw, 36px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 12px; }
+    .trainer-banner-sub { font-size: 15px; color: var(--text-muted); line-height: 1.6; max-width: 420px; }
     .trainer-banner-actions { display: flex; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
-    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
-    .btn-primary:hover { background: var(--brand-hover, #e05200); transform: translateY(-2px); }
-    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--border-2); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
-    .btn-ghost:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-2px); }
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: #FF5C00; color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
+    .btn-primary:hover { background: #e05200; transform: translateY(-2px); }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--border); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
+    .btn-ghost:hover { border-color: rgba(0,0,0,0.2); transform: translateY(-2px); }
 
     /* FOOTER */
     footer { border-top: 1px solid var(--border); padding: 48px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; max-width: var(--max); margin: 0 auto; }
-    .footer-logo { font-family: var(--font-display, 'Manrope', sans-serif); font-weight: 900; font-size: 18px; color: var(--brand); text-decoration: none; }
+    .footer-logo { font-family: 'DM Sans', sans-serif; font-weight: 900; font-size: 18px; color: var(--text); text-decoration: none; }
     .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
-    .footer-links a { color: var(--text-2); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
     .footer-links a:hover { color: var(--text); }
-    .footer-copy { font-size: 12px; color: var(--text-3); }
+    .footer-copy { font-size: 12px; color: var(--text-muted); }
 
     /* SKELETON LOADER */
-    .skeleton { background: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-4) 50%, var(--surface-3) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+    .skeleton { background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
     /* SCROLL FADE-IN */
@@ -190,9 +218,7 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-arc">
-      <ArcHeader brandLabel={brandName} />
-    </div>
+    <div class="hero-left">
     <div class="hero-eyebrow">
       <div style="width:6px;height:6px;border-radius:50%;background:#00C853;flex-shrink:0"></div>
       {market.certificationBody} Verified Trainers · {market.cityName || market.market.toUpperCase()}
@@ -214,9 +240,9 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
     </div>
 
     <!-- EXAMPLE PROFILE LINK -->
-    <p style="margin-top:16px;font-size:13px;color:rgba(255,255,255,0.45)">
+    <p style="margin-top:16px;font-size:13px;color:var(--text-muted)">
       {locale === 'fr' ? 'Pas sûr de ce à quoi ressemble votre profil ?' : locale === 'it' ? 'Non sai come appare il tuo profilo?' : locale === 'es' ? '¿No sabes cómo se ve tu perfil?' : 'Not sure what your profile looks like?'}
-      {' '}<a href={`/${demoSlug}`} style="color:rgba(255,255,255,0.7);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">{locale === 'fr' ? 'Voir un exemple de profil' : locale === 'it' ? 'Vedi un profilo esempio' : locale === 'es' ? 'Ver un perfil de ejemplo' : 'See an example profile'}</a>
+      {' '}<a href={`/${demoSlug}`} style="color:var(--text);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">{locale === 'fr' ? 'Voir un exemple de profil' : locale === 'it' ? 'Vedi un profilo esempio' : locale === 'es' ? 'Ver un perfil de ejemplo' : 'See an example profile'}</a>
     </p>
 
     <!-- QUICK FILTERS -->
@@ -236,6 +262,12 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
       <div class="trust-item"><div class="trust-dot"></div><span>{t(locale, 'trust_profiles')}</span></div>
       <div class="trust-item"><div class="trust-dot"></div><span>{t(locale, 'trust_reviews')}</span></div>
       <div class="trust-item"><div class="trust-dot"></div><span>{t(locale, 'trust_free')}</span></div>
+    </div>
+    </div><!-- end .hero-left -->
+    <div class="hero-right">
+      <div class="hero-arc">
+        <ArcHeader brandLabel={brandName} />
+      </div>
     </div>
   </section>
 
@@ -271,7 +303,7 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
   </div>
 
   <!-- TRANSFORMATIONS -->
-  <div style="border-top:1px solid var(--border);background:var(--surface-2)">
+  <div style="border-top:1px solid var(--border);background:var(--surface)">
     <div class="section reveal reveal-delay-1">
       <p class="section-eyebrow">{t(locale, 'transform_eyebrow')}</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
@@ -391,7 +423,7 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
       <div class="trainer-banner-actions">
         <a href="/for-trainers" class="btn-primary">{t(locale, 'banner_cta_primary')}</a>
         <a href="/join" class="btn-ghost">{t(locale, 'banner_cta_ghost')}</a>
-        <a href={`/${demoSlug}`} style="font-size:13px;color:rgba(255,255,255,0.45);text-decoration:underline;text-underline-offset:3px;margin-top:8px" target="_blank" rel="noopener">{locale === 'fr' ? 'Voir à quoi ressemble votre profil' : locale === 'it' ? 'Guarda come appare il tuo profilo' : locale === 'es' ? 'Ver cómo se ve tu perfil' : 'See what your profile looks like'}</a>
+        <a href={`/${demoSlug}`} style="font-size:13px;color:var(--text-muted);text-decoration:underline;text-underline-offset:3px;margin-top:8px" target="_blank" rel="noopener">{locale === 'fr' ? 'Voir à quoi ressemble votre profil' : locale === 'it' ? 'Guarda come appare il tuo profilo' : locale === 'es' ? 'Ver cómo se ve tu perfil' : 'See what your profile looks like'}</a>
       </div>
     </div>
   </div>
@@ -439,7 +471,7 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
     // Load featured trainers from Supabase
     (async function() {
       const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-      const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
+      const ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 
       try {
         const res = await fetch(
