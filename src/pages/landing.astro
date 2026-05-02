@@ -9,8 +9,13 @@ const brandName = market.brandName || 'TrainedBy';
   title={`${brandName} — Find a Verified Personal Trainer`}
   description={`Discover verified personal trainers in ${market.cityName || 'your city'}. Every trainer is ${market.certificationBody}-certified and background-checked. Real results, real people.`}
 >
+  <Fragment slot="head">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+  </Fragment>
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -40,7 +45,7 @@ const brandName = market.brandName || 'TrainedBy';
 
     /* NAV */
     .nav {
-      background: #FFFFFF;
+      background: var(--bg);
       border-bottom: 1px solid rgba(0,0,0,0.06);
       height: 60px;
       display: flex;
@@ -56,20 +61,20 @@ const brandName = market.brandName || 'TrainedBy';
     .nav-logo {
       font-weight: 800;
       font-size: 17px;
-      color: #1A1411;
+      color: var(--text);
       letter-spacing: -0.03em;
       margin-right: auto;
       text-decoration: none;
     }
     .nav-link {
       font-size: 13px;
-      color: #6B6460;
+      color: var(--text-2);
       font-weight: 500;
       text-decoration: none;
     }
-    .nav-link.trainer { color: #FF5C00; font-weight: 700; } /* orange — trainer-facing */
+    .nav-link.trainer { color: var(--brand); font-weight: 700; } /* orange — trainer-facing */
     .nav-cta {
-      background: #1A1411;
+      background: var(--text);
       color: #fff;
       padding: 8px 18px;
       border-radius: 100px;
@@ -82,7 +87,7 @@ const brandName = market.brandName || 'TrainedBy';
     /* Hero — mobile first */
     .hero {
       padding: 48px 24px;
-      background: #FFFFFF;
+      background: var(--bg);
       margin-top: 60px;
     }
     .hero-eyebrow {
@@ -91,10 +96,10 @@ const brandName = market.brandName || 'TrainedBy';
       gap: 6px;
       padding: 5px 12px;
       border-radius: 100px;
-      background: #F5F4F3;
+      background: var(--surface);
       font-size: 11px;
       font-weight: 700;
-      color: #6B6460;
+      color: var(--text-2);
       margin-bottom: 20px;
     }
     .hero-eyebrow-dot {
@@ -105,7 +110,7 @@ const brandName = market.brandName || 'TrainedBy';
       font-weight: 800;
       letter-spacing: -0.04em;
       line-height: 1.05;
-      color: #1A1411;
+      color: var(--text);
       margin-bottom: 16px;
       font-family: 'DM Sans', system-ui, sans-serif;
     }
@@ -116,7 +121,7 @@ const brandName = market.brandName || 'TrainedBy';
     }
     .hero-sub {
       font-size: 15px;
-      color: #6B6460;
+      color: var(--text-2);
       line-height: 1.65;
       margin-bottom: 28px;
       max-width: 420px;
@@ -129,7 +134,7 @@ const brandName = market.brandName || 'TrainedBy';
       margin-bottom: 28px;
     }
     .btn-dark {
-      background: #1A1411;
+      background: var(--text);
       color: #fff;
       padding: 12px 22px;
       border-radius: 100px;
@@ -139,7 +144,7 @@ const brandName = market.brandName || 'TrainedBy';
       display: inline-block;
     }
     .btn-ghost-orange {
-      color: #FF5C00;
+      color: var(--brand);
       font-size: 13px;
       font-weight: 700;
       text-decoration: none;
@@ -159,7 +164,7 @@ const brandName = market.brandName || 'TrainedBy';
       margin-left: -8px;
     }
     .avatar-init:first-child { margin-left: 0; }
-    .hero-social-text { font-size: 12px; color: #6B6460; font-weight: 500; }
+    .hero-social-text { font-size: 12px; color: var(--text-2); font-weight: 500; }
     .hero-right { display: none; } /* hidden on mobile */
 
     /* Stats grid */
@@ -169,21 +174,21 @@ const brandName = market.brandName || 'TrainedBy';
       gap: 10px;
     }
     .stat-card {
-      background: #F5F4F3;
+      background: var(--surface);
       border-radius: 14px;
       padding: 20px;
     }
-    .stat-card.featured { background: #1A1411; }
+    .stat-card.featured { background: var(--text); }
     .stat-val {
       font-size: 30px;
       font-weight: 800;
-      color: #1A1411;
+      color: var(--text);
       letter-spacing: -0.05em;
       line-height: 1;
       margin-bottom: 4px;
     }
     .stat-card.featured .stat-val { color: #fff; }
-    .stat-label { font-size: 12px; color: #6B6460; font-weight: 500; }
+    .stat-label { font-size: 12px; color: var(--text-2); font-weight: 500; }
     .stat-card.featured .stat-label { color: rgba(255,255,255,0.55); }
 
     /* Desktop hero split — 2 columns */
@@ -203,28 +208,28 @@ const brandName = market.brandName || 'TrainedBy';
 
     /* SEARCH BAR */
     .search-wrap { width: 100%; max-width: 640px; position: relative; margin-bottom: 24px; }
-    .search-bar { width: 100%; padding: 18px 140px 18px 56px; border-radius: 100px; border: 1px solid rgba(0,0,0,0.07); background: #F5F4F3; color: #1A1411; font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .search-bar { width: 100%; padding: 18px 140px 18px 56px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .search-bar:focus { border-color: rgba(0,0,0,0.15); box-shadow: 0 0 0 3px rgba(0,0,0,0.04); }
-    .search-bar::placeholder { color: #6B6460; }
-    .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #6B6460; pointer-events: none; }
-    .search-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); padding: 10px 22px; border-radius: 100px; background: #1A1411; color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+    .search-bar::placeholder { color: var(--text-2); }
+    .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-2); pointer-events: none; }
+    .search-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); padding: 10px 22px; border-radius: 100px; background: var(--text); color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
     .search-btn:hover { background: #333; }
 
     /* QUICK FILTERS */
     .quick-filters { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 56px; }
-    .qf-pill { padding: 8px 16px; border-radius: 100px; border: 1px solid rgba(0,0,0,0.07); background: #F5F4F3; color: #6B6460; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.15s; }
-    .qf-pill:hover { border-color: rgba(0,0,0,0.15); color: #1A1411; background: #E8E5E2; }
+    .qf-pill { padding: 8px 16px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.15s; }
+    .qf-pill:hover { border-color: rgba(0,0,0,0.15); color: var(--text); background: var(--surface-2); }
 
     /* TRUST STRIP */
     .trust-strip { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; justify-content: center; }
-    .trust-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #6B6460; font-weight: 600; }
+    .trust-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-2); font-weight: 600; }
     .trust-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--reps); flex-shrink: 0; }
 
     /* SECTION STRUCTURE */
     .section { padding: 80px 24px; max-width: var(--max); margin: 0 auto; }
-    .section-eyebrow { font-size: 11px; font-weight: 700; color: #1A1411; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+    .section-eyebrow { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
     .section-title { font-family: 'DM Sans', system-ui, sans-serif; font-size: clamp(26px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
-    .section-sub { font-size: 15px; color: #6B6460; line-height: 1.7; max-width: 480px; }
+    .section-sub { font-size: 15px; color: var(--text-2); line-height: 1.7; max-width: 480px; }
 
     /* FEATURED TRAINERS */
     .trainer-strip {
@@ -233,81 +238,80 @@ const brandName = market.brandName || 'TrainedBy';
       padding: 40px;
     }
     .trainers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 40px; }
-    .trainer-card { background: #fff; border: 1px solid rgba(0,0,0,0.07); border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.2s, transform 0.2s; display: block; }
+    .trainer-card { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.2s, transform 0.2s; display: block; }
     .trainer-card:hover { border-color: rgba(0,0,0,0.12); transform: translateY(-2px); }
     .t-card {
-      background: #fff;
-      border: 1px solid rgba(0,0,0,0.07);
+      background: var(--bg);
+      border: 1px solid var(--border);
       border-radius: 14px;
       padding: 14px;
       min-width: 160px;
     }
     .t-avatar {
       width: 44px; height: 44px; border-radius: 50%;
-      background: #F5F4F3;
+      background: var(--surface);
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 800; color: #1A1411;
+      font-size: 16px; font-weight: 800; color: var(--text);
       margin-bottom: 8px;
     }
-    .t-name { font-weight: 700; font-size: 13px; color: #1A1411; margin-bottom: 2px; }
-    .t-spec { font-size: 11px; color: #6B6460; margin-bottom: 6px; }
-    .t-rating { font-size: 11px; color: #1A1411; font-weight: 600; }
-    .trainer-card-img { width: 100%; aspect-ratio: 4/3; background: #E8E5E2; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 36px; color: #1A1411; position: relative; overflow: hidden; }
+    .t-name { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 2px; }
+    .t-spec { font-size: 11px; color: var(--text-2); margin-bottom: 6px; }
+    .t-rating { font-size: 11px; color: var(--text); font-weight: 600; }
+    .trainer-card-img { width: 100%; aspect-ratio: 4/3; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 36px; color: var(--text); position: relative; overflow: hidden; }
     .trainer-card-img .verified-badge { position: absolute; top: 10px; right: 10px; padding: 3px 9px; border-radius: 20px; background: rgba(0,200,83,0.15); border: 1px solid rgba(0,200,83,0.3); color: #00C853; font-size: 10px; font-weight: 700; }
     .trainer-card-body { padding: 16px; }
     .trainer-card-name { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 15px; margin-bottom: 3px; }
-    .trainer-card-meta { font-size: 12px; color: #6B6460; margin-bottom: 10px; }
+    .trainer-card-meta { font-size: 12px; color: var(--text-2); margin-bottom: 10px; }
     .trainer-card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-    .trainer-tag { padding: 3px 9px; border-radius: 20px; background: #F5F4F3; border: 1px solid rgba(0,0,0,0.07); font-size: 11px; color: #6B6460; font-weight: 600; }
-    .trainer-card-price { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 14px; color: #1A1411; }
-    .trainer-card-price span { font-size: 11px; font-weight: 500; color: #6B6460; }
+    .trainer-tag { padding: 3px 9px; border-radius: 20px; background: var(--surface); border: 1px solid var(--border); font-size: 11px; color: var(--text-2); font-weight: 600; }
+    .trainer-card-price { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 14px; color: var(--text); }
+    .trainer-card-price span { font-size: 11px; font-weight: 500; color: var(--text-2); }
 
     /* TRANSFORMATIONS */
     .transforms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 40px; }
-    .transform-card { background: #F5F4F3; border: 1px solid rgba(0,0,0,0.07); border-radius: 16px; overflow: hidden; }
+    .transform-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
     .transform-header { padding: 20px 20px 0; }
     .transform-trainer { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-    .transform-avatar { width: 36px; height: 36px; border-radius: 50%; background: #E8E5E2; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 14px; color: #1A1411; flex-shrink: 0; }
+    .transform-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 14px; color: var(--text); flex-shrink: 0; }
     .transform-trainer-name { font-weight: 700; font-size: 13px; }
     .transform-trainer-cert { font-size: 11px; color: #00C853; font-weight: 600; }
     .transform-title { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.3px; margin-bottom: 10px; }
-    .transform-body { font-size: 13px; color: #6B6460; line-height: 1.65; margin-bottom: 16px; }
-    .transform-stats { display: flex; gap: 0; border-top: 1px solid rgba(0,0,0,0.07); }
-    .transform-stat { flex: 1; padding: 14px 16px; text-align: center; border-right: 1px solid rgba(0,0,0,0.07); }
+    .transform-body { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
+    .transform-stats { display: flex; gap: 0; border-top: 1px solid var(--border); }
+    .transform-stat { flex: 1; padding: 14px 16px; text-align: center; border-right: 1px solid var(--border); }
     .transform-stat:last-child { border-right: none; }
-    .transform-stat-val { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 18px; color: #1A1411; letter-spacing: -0.5px; }
-    .transform-stat-label { font-size: 10px; color: #6B6460; margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transform-stat-val { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 18px; color: var(--text); letter-spacing: -0.5px; }
+    .transform-stat-label { font-size: 10px; color: var(--text-2); margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
     /* BLOG PREVIEW */
     .blog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 40px; }
     .blog-grid .featured { grid-column: 1 / -1; }
-    .blog-card { background: #F5F4F3; border: 1px solid rgba(0,0,0,0.07); border-radius: 16px; padding: 28px; text-decoration: none; color: inherit; display: block; transition: border-color 0.2s, transform 0.2s; }
+    .blog-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; text-decoration: none; color: inherit; display: block; transition: border-color 0.2s, transform 0.2s; }
     .blog-card:hover { border-color: rgba(0,0,0,0.12); transform: translateY(-2px); }
     .blog-card.featured { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; }
-    .blog-cat { display: inline-block; padding: 4px 12px; border-radius: 100px; background: #E8E5E2; border: 1px solid rgba(0,0,0,0.07); color: #1A1411; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 14px; }
+    .blog-cat { display: inline-block; padding: 4px 12px; border-radius: 100px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); font-size: 11px; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 14px; }
     .blog-title { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; line-height: 1.25; margin-bottom: 10px; }
     .blog-card:not(.featured) .blog-title { font-size: 16px; }
-    .blog-excerpt { font-size: 14px; color: #6B6460; line-height: 1.65; margin-bottom: 16px; }
-    .blog-author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6B6460; }
+    .blog-excerpt { font-size: 14px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
+    .blog-author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2); }
     .blog-author-dot { width: 5px; height: 5px; border-radius: 50%; background: #00C853; }
-    .blog-visual { background: #E8E5E2; border-radius: 12px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    .blog-visual { background: var(--surface-2); border-radius: 12px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 48px; }
     @media (max-width: 720px) { .blog-grid { grid-template-columns: 1fr; } .blog-card.featured { grid-template-columns: 1fr; } }
 
     /* FOR TRAINERS BANNER */
     .trainer-banner { margin: 0 24px; border-radius: 20px; background: linear-gradient(135deg, rgba(255,92,0,0.08) 0%, rgba(255,92,0,0.03) 100%); border: 1px solid rgba(255,92,0,0.15); padding: 56px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
-    .trainer-banner-text {}
-    .trainer-banner-eyebrow { font-size: 11px; font-weight: 700; color: #6B6460; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
-    .trainer-banner-title { font-family: 'DM Sans', system-ui, sans-serif; font-size: clamp(22px, 3vw, 36px); font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; color: #1A1411; }
-    .trainer-banner-sub { font-size: 15px; color: #6B6460; line-height: 1.6; max-width: 420px; }
+    .trainer-banner-eyebrow { font-size: 11px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+    .trainer-banner-title { font-family: 'DM Sans', system-ui, sans-serif; font-size: clamp(22px, 3vw, 36px); font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; color: var(--text); }
+    .trainer-banner-sub { font-size: 15px; color: var(--text-2); line-height: 1.6; max-width: 420px; }
     .trainer-banner-actions { display: flex; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
-    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: #1A1411; color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--text); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
     .btn-primary:hover { background: #333; transform: translateY(-2px); }
-    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: #1A1411; font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid rgba(0,0,0,0.12); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid rgba(0,0,0,0.12); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
     .btn-ghost:hover { border-color: rgba(0,0,0,0.25); transform: translateY(-2px); }
 
     /* FOOTER CTA — intentionally dark */
     .footer-cta {
-      background: #1A1411;
+      background: var(--text);
       padding: 56px 40px;
       text-align: center;
     }
@@ -315,7 +319,7 @@ const brandName = market.brandName || 'TrainedBy';
     .footer-cta p { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 24px; }
     .btn-white-pill {
       background: #fff;
-      color: #1A1411;
+      color: var(--text);
       padding: 12px 24px;
       border-radius: 100px;
       font-size: 13px;
@@ -325,15 +329,15 @@ const brandName = market.brandName || 'TrainedBy';
     }
 
     /* FOOTER */
-    footer { border-top: 1px solid rgba(0,0,0,0.07); padding: 48px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; max-width: var(--max); margin: 0 auto; }
-    .footer-logo { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 18px; color: #1A1411; text-decoration: none; }
+    footer { border-top: 1px solid var(--border); padding: 48px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; max-width: var(--max); margin: 0 auto; }
+    .footer-logo { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 18px; color: var(--text); text-decoration: none; }
     .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
-    .footer-links a { color: #6B6460; text-decoration: none; font-size: 13px; transition: color 0.2s; }
-    .footer-links a:hover { color: #1A1411; }
+    .footer-links a { color: var(--text-2); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
     .footer-copy { font-size: 12px; color: rgba(26,20,17,0.4); }
 
     /* SKELETON LOADER */
-    .skeleton { background: linear-gradient(90deg, #E8E5E2 25%, #F5F4F3 50%, #E8E5E2 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+    .skeleton { background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface) 50%, var(--surface-2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   </style>
 
@@ -549,7 +553,7 @@ const brandName = market.brandName || 'TrainedBy';
               <span>By a {market.certificationBody} Level 4 Trainer · 6 min read</span>
             </div>
           </div>
-          <div class="blog-visual">🏋️</div>
+          <div class="blog-visual" aria-hidden="true">🏋️</div>
         </a>
         <a href="/blog" class="blog-card">
           <span class="blog-cat">Nutrition</span>
