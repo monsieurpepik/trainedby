@@ -21,18 +21,37 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
   title={`${market.brandName} – Link-in-Bio & Booking Hub for Fitness Trainers`}
   description={`Create your verified personal trainer profile on ${market.brandName}. ${market.certificationBody} verified. Free to set up in 2 minutes.`}
 >
+  <Fragment slot="head">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#FFFFFF">
+    <style>
+      :root {
+        --bg: #FFFFFF;
+        --surface: #FAFAF9;
+        --surface-2: #F5F4F3;
+        --surface-3: #E8E5E2;
+        --text: #1A1411;
+        --text-2: #6B6460;
+        --text-muted: #6B6460;
+        --text-faint: rgba(26,20,17,0.35);
+        --border: rgba(0,0,0,0.07);
+        --border-hover: rgba(0,0,0,0.14);
+        --brand: #FF5C00;
+        --brand-hover: #e05200;
+        --brand-dim: rgba(255,92,0,0.08);
+        --brand-border: rgba(255,92,0,0.2);
+        --reps: #00C853;
+        --reps-dim: rgba(0,200,83,0.08);
+        --reps-border: rgba(0,200,83,0.2);
+      }
+      body { background: var(--bg); color: var(--text); }
+    </style>
+  </Fragment>
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  
-  --reps: #00C853; --reps-dim: rgba(0,200,83,0.08); --reps-border: rgba(0,200,83,0.2);
-  --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c;
-  --border: rgba(255,255,255,0.08); --text: #fff;
-  --text-muted: rgba(255,255,255,0.5); --text-faint: rgba(255,255,255,0.25);
-}
 html { scroll-behavior: smooth; }
 body {
-  background: var(--surface); color: var(--text);
+  background: var(--bg); color: var(--text);
   font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.6;
   -webkit-font-smoothing: antialiased; overflow-x: hidden; min-height: 100vh;
 }
@@ -456,17 +475,17 @@ body {
         {t(locale, 'join.trust_cert').replace('{cert}', market.certificationBody)}
       </div>
       <div class="trust-item">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(26,20,17,0.3)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
         {t(locale, 'join.trust_free')}
       </div>
       <div class="trust-item">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(26,20,17,0.3)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         {t(locale, 'join.trust_speed')}
       </div>
     </div>
-    <p style="text-align:center;margin-top:20px;font-size:12px;color:rgba(255,255,255,0.35)">
+    <p style="text-align:center;margin-top:20px;font-size:12px;color:var(--text-faint)">
       Wondering what your profile will look like?
-      <a href={`/${demoSlug}`} style="color:rgba(255,255,255,0.55);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">See an example</a>
+      <a href={`/${demoSlug}`} style="color:var(--text-muted);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">See an example</a>
     </p>
   </div>
 
@@ -801,7 +820,7 @@ async function autoBuildFromIG() {
   btn.disabled = true;
   btn.textContent = '...';
   status.textContent = 'Looking up your profile...';
-  status.style.color = 'rgba(255,255,255,0.4)';
+  status.style.color = 'var(--text-faint)';
   try {
     // Use OpenAI to generate a profile stub from the Instagram handle
     // In production this would call a Supabase edge function that scrapes the public IG bio
@@ -844,7 +863,7 @@ function checkSlug(val) {
   slugValid = false;
   if (!clean || clean.length < 2) { status.innerHTML = ''; errEl.classList.add('hidden'); return; }
   clearTimeout(slugCheckTimer);
-  status.innerHTML = '<span style="color:rgba(255,255,255,0.3);font-size:12px;">...</span>';
+  status.innerHTML = '<span style="color:var(--text-faint);font-size:12px;">...</span>';
   slugCheckTimer = setTimeout(async () => {
     try {
       const { data } = await sb.from('trainers').select('id').eq('slug', clean).maybeSingle();
