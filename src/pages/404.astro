@@ -6,46 +6,100 @@ const brandName = market.brandName ?? 'TrainedBy';
 ---
 <Base title={`Page Not Found - ${brandName}`} description={`The page you're looking for doesn't exist on ${brandName}.`}>
   <style>
-    :root{
-      --brand-light:#ff8c42;
-      --text-dim:rgba(240,240,240,0.55);
-      --text-subtle:rgba(240,240,240,0.45);
-      --text-secondary:rgba(240,240,240,0.7);
-      --surface-overlay:rgba(255,255,255,0.04);
-      --ghost-bg:rgba(255,255,255,0.06);
-      --ghost-border:rgba(255,255,255,0.12);
-      --ghost-text:rgba(240,240,240,0.8);
-      --ghost-hover:rgba(255,255,255,0.1);
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-    .container{
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      min-height:100vh;padding:32px;text-align:center;gap:24px;
-    }
-    .code{font-size:96px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--brand),var(--brand-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    h1{font-size:28px;font-weight:800}
-    p{color:var(--text-dim);max-width:420px;line-height:1.6;font-size:16px}
-    .hint{
-      margin-top:8px;padding:16px 24px;
-      background:var(--surface-overlay);border:1px solid var(--border);
-      border-radius:12px;max-width:420px;font-size:14px;color:var(--text-subtle);
-      line-height:1.6;
-    }
-    .hint strong{color:var(--text-secondary)}
-    .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
-    .btn-primary{
-      background:var(--brand);color:var(--text);padding:14px 28px;border-radius:12px;
-      text-decoration:none;font-weight:700;font-size:15px;transition:opacity 0.2s;
-    }
-    .btn-primary:hover{opacity:0.85}
-    .btn-ghost{
-      background:var(--ghost-bg);border:1px solid var(--ghost-border);
-      color:var(--ghost-text);padding:14px 28px;border-radius:12px;
-      text-decoration:none;font-weight:600;font-size:15px;transition:background 0.2s;
-    }
-    .btn-ghost:hover{background:var(--ghost-hover)}
-  </style>
+  :root {
+    --brand-light: #ff8c42;
+  }
+
+  .container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+  }
+
+  .code {
+    font-size: clamp(80px, 20vw, 160px);
+    font-weight: 900;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--brand), var(--brand-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-size: clamp(20px, 4vw, 28px);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 400px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    padding: 12px 28px;
+    background: var(--brand);
+    color: var(--text-on-brand);
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover {
+    background: var(--brand-hover);
+  }
+
+  .btn-ghost {
+    padding: 12px 28px;
+    background: var(--surface-hover);
+    color: var(--text);
+    border: 1px solid var(--border-hover);
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+    opacity: 0.8;
+  }
+
+  .btn-ghost:hover {
+    background: var(--surface-2);
+    opacity: 1;
+  }
+
+  .hint {
+    margin-top: 48px;
+    padding: 16px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    max-width: 480px;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .hint strong {
+    color: var(--text);
+  }
+</style>
 
   <div class="container">
     <div class="code">404</div>
