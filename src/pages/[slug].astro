@@ -848,7 +848,14 @@ body {
         }).catch(() => {});
       } else {
         // Fallback: copy to clipboard
-        navigator.clipboard.writeText(location.href).catch(() => {});
+        navigator.clipboard.writeText(location.href).then(() => {
+          const btn = document.querySelector('[aria-label="Share"]');
+          if (btn) {
+            const orig = btn.innerHTML;
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.innerHTML = orig; }, 1500);
+          }
+        }).catch(() => {});
       }
     }
 
