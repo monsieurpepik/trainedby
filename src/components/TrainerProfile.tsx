@@ -3,7 +3,7 @@ import type { Trainer, Package, TrainerProfileProps } from './trainer/types';
 import { SUPABASE_ANON_KEY as SUPABASE_KEY, EDGE_BASE } from '../lib/config';
 import {
   buildStats, buildTags, dedupePackages,
-  normaliseSpecialties, getDisplayName, getPhotoUrl,
+  normaliseSpecialties, getDisplayName,
   getLocation, getContactNumber, isVerifiedTrainer,
 } from './trainer/utils';
 
@@ -71,7 +71,7 @@ export default function TrainerProfile({ slug, paymentEnabled, currencySymbol }:
           }
         );
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const resp = await r.json();
+        const resp = await r.json() as { trainer?: Trainer; packages?: Package[]; error?: string };
         if (!resp || resp.error) throw new Error('Trainer not found');
         const trainerData: Trainer = resp.trainer || resp;
         const pkgData: Package[] = resp.packages || [];
@@ -88,26 +88,26 @@ export default function TrainerProfile({ slug, paymentEnabled, currencySymbol }:
     return () => controller.abort();
   }, [slug]);
 
+  const displayName = trainer ? getDisplayName(trainer) : '';
+
   const handleBack = useCallback(() => {
-    if (history.length > 1) history.back();
-    else location.href = '/find';
+    if (window.history.length > 1) window.history.back();
+    else window.location.href = '/find';
   }, []);
 
   const handleShare = useCallback(() => {
-    const name = trainer ? getDisplayName(trainer) : '';
     if (navigator.share) {
       navigator.share({
-        title: `${name} - Verified Personal Trainer`,
-        text: `Check out ${name}'s verified trainer profile`,
-        url: location.href,
+        title: `${displayName} - Verified Personal Trainer`,
+        text: `Check out ${displayName}'s verified trainer profile`,
+        url: window.location.href,
       }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(location.href).catch(() => {});
+      navigator.clipboard.writeText(window.location.href).catch(() => {});
     }
-  }, [trainer]);
+  }, [displayName]);
 
-  const displayName = trainer ? getDisplayName(trainer) : '';
-  const specialties = trainer ? normaliseSpecialties(trainer.specialties as string[] | string | undefined) : [];
+  const specialties = trainer ? normaliseSpecialties(trainer.specialties) : [];
   const tags = trainer
     ? buildTags(
         specialties,
@@ -116,7 +116,7 @@ export default function TrainerProfile({ slug, paymentEnabled, currencySymbol }:
       )
     : [];
   const stats = trainer ? buildStats(trainer) : [];
-  const location = trainer ? getLocation(trainer) : '';
+  const trainerLocation = trainer ? getLocation(trainer) : '';
   const whatsappNumber = trainer ? getContactNumber(trainer) : '';
   const bio = trainer?.bio ?? '';
   const averageRating = trainer?.avg_rating != null ? parseFloat(String(trainer.avg_rating)) : null;
@@ -136,7 +136,7 @@ export default function TrainerProfile({ slug, paymentEnabled, currencySymbol }:
         {loadState === 'loaded' && trainer && (
           <div id="profile-mount">
             <Hero trainer={trainer} onBack={handleBack} onShare={handleShare} />
-            <IdentityStrip tags={tags} location={location} />
+            <IdentityStrip tags={tags} location={trainerLocation} />
             <StatsRow stats={stats} />
             <CTABlock
               paymentEnabled={paymentEnabled}
