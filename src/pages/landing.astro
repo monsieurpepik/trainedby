@@ -10,227 +10,449 @@ const brandName = market.brandName || 'TrainedBy';
   description={`Discover verified personal trainers in ${market.cityName || 'your city'}. Every trainer is ${market.certificationBody}-certified and background-checked. Real results, real people.`}
 >
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --brand: #FF5C00;
-      --brand-dim: rgba(255,92,0,0.10);
-      --brand-border: rgba(255,92,0,0.25);
-      --reps: #00C853;
-      --gold: #F5C842;
-      --surface: #0a0a0a;
-      --surface-2: #111111;
-      --surface-3: #1a1a1a;
-      --surface-4: #222222;
-      --border: rgba(255,255,255,0.07);
-      --border-2: rgba(255,255,255,0.12);
-      --text: #f2f2f2;
-      --text-2: #888888;
-      --text-3: #555555;
+      --bg:        #FFFFFF;
+      --surface:   #F5F4F3;
+      --surface-2: #E8E5E2;
+      --text:      #1A1411;
+      --text-2:    #6B6460;
+      --border:    rgba(0,0,0,0.07);
+      --brand:     #FF5C00;
+      --green:     #00C853;
+      --danger:    #E53935;
+      --reps:      #00C853;
+      --reps-dim:  rgba(0,200,83,0.1);
+      --danger-dim: rgba(229,57,53,0.1);
+      --text-muted: #6B6460;
+      --text-faint: rgba(26,20,17,0.4);
       --max: 1100px;
     }
-    body { background: var(--surface); color: var(--text); font-family: 'Manrope', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    body {
+      background: var(--bg, #FFFFFF);
+      color: var(--text, #1A1411);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
 
     /* NAV */
-    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 32px; height: 64px; display: flex; align-items: center; gap: 32px; transition: background 0.3s, border-color 0.3s; border-bottom: 1px solid transparent; }
-    .nav.scrolled { background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); border-color: var(--border); }
-    .nav-logo { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 20px; color: var(--brand); text-decoration: none; letter-spacing: -0.5px; margin-right: auto; }
-    .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a { color: var(--text-2); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--text); }
-    .nav-links a.for-trainers { color: var(--brand); font-weight: 700; }
-    .nav-links a.for-trainers:hover { color: #e05200; }
-    .nav-cta { display: inline-flex; align-items: center; gap: 6px; padding: 9px 20px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; white-space: nowrap; }
-    .nav-cta:hover { background: #e05200; transform: translateY(-1px); }
-    @media (max-width: 640px) { .nav-links { display: none; } .nav { padding: 0 20px; } }
+    .nav {
+      background: #FFFFFF;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      gap: 32px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-weight: 800;
+      font-size: 17px;
+      color: #1A1411;
+      letter-spacing: -0.03em;
+      margin-right: auto;
+      text-decoration: none;
+    }
+    .nav-link {
+      font-size: 13px;
+      color: #6B6460;
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .nav-link.trainer { color: #FF5C00; font-weight: 700; } /* orange — trainer-facing */
+    .nav-cta {
+      background: #1A1411;
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    @media (max-width: 640px) { .nav { padding: 0 20px; } }
 
-    /* HERO — Consumer Search */
-    .hero { min-height: 92vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
-    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 90% 70% at 50% 30%, rgba(255,92,0,0.06) 0%, transparent 65%); pointer-events: none; }
-    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 100px; border: 1px solid var(--brand-border); background: var(--brand-dim); font-size: 12px; font-weight: 700; color: var(--brand); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 28px; }
-    .hero-headline { font-family: 'Manrope', sans-serif; font-size: clamp(38px, 7vw, 80px); font-weight: 900; line-height: 1.0; letter-spacing: -3px; max-width: 820px; margin-bottom: 20px; }
-    .hero-headline em { font-style: normal; color: var(--brand); }
-    .hero-sub { font-size: clamp(15px, 2vw, 17px); color: var(--text-2); max-width: 480px; line-height: 1.7; margin-bottom: 40px; }
+    /* Hero — mobile first */
+    .hero {
+      padding: 48px 24px;
+      background: #FFFFFF;
+      margin-top: 60px;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      background: #F5F4F3;
+      font-size: 11px;
+      font-weight: 700;
+      color: #6B6460;
+      margin-bottom: 20px;
+    }
+    .hero-eyebrow-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: #00C853;
+    }
+    .hero-h1 {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      color: #1A1411;
+      margin-bottom: 16px;
+      font-family: 'DM Sans', system-ui, sans-serif;
+    }
+    .hero-h1 em {
+      font-style: italic;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-weight: 400;
+    }
+    .hero-sub {
+      font-size: 15px;
+      color: #6B6460;
+      line-height: 1.65;
+      margin-bottom: 28px;
+      max-width: 420px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .btn-dark {
+      background: #1A1411;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-ghost-orange {
+      color: #FF5C00;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      padding: 12px 4px;
+    }
+    .hero-social {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar-stack { display: flex; }
+    .avatar-init {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2px solid #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800; color: #fff;
+      margin-left: -8px;
+    }
+    .avatar-init:first-child { margin-left: 0; }
+    .hero-social-text { font-size: 12px; color: #6B6460; font-weight: 500; }
+    .hero-right { display: none; } /* hidden on mobile */
+
+    /* Stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .stat-card {
+      background: #F5F4F3;
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .stat-card.featured { background: #1A1411; }
+    .stat-val {
+      font-size: 30px;
+      font-weight: 800;
+      color: #1A1411;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-card.featured .stat-val { color: #fff; }
+    .stat-label { font-size: 12px; color: #6B6460; font-weight: 500; }
+    .stat-card.featured .stat-label { color: rgba(255,255,255,0.55); }
+
+    /* Desktop hero split — 2 columns */
+    @media (min-width: 768px) {
+      .hero {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+        align-items: center;
+        padding: 72px 40px 64px;
+        max-width: 1000px;
+        margin: 60px auto 0;
+      }
+      .hero-right { display: block; }
+      .hero-h1 { font-size: 48px; }
+    }
 
     /* SEARCH BAR */
     .search-wrap { width: 100%; max-width: 640px; position: relative; margin-bottom: 24px; }
-    .search-bar { width: 100%; padding: 18px 140px 18px 56px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text); font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-    .search-bar:focus { border-color: rgba(255,92,0,0.4); box-shadow: 0 0 0 3px rgba(255,92,0,0.08); }
-    .search-bar::placeholder { color: var(--text-3); }
-    .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-2); pointer-events: none; }
-    .search-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); padding: 10px 22px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
-    .search-btn:hover { background: #e05200; }
+    .search-bar { width: 100%; padding: 18px 140px 18px 56px; border-radius: 100px; border: 1px solid rgba(0,0,0,0.07); background: #F5F4F3; color: #1A1411; font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .search-bar:focus { border-color: rgba(0,0,0,0.15); box-shadow: 0 0 0 3px rgba(0,0,0,0.04); }
+    .search-bar::placeholder { color: #6B6460; }
+    .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #6B6460; pointer-events: none; }
+    .search-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); padding: 10px 22px; border-radius: 100px; background: #1A1411; color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+    .search-btn:hover { background: #333; }
 
     /* QUICK FILTERS */
     .quick-filters { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 56px; }
-    .qf-pill { padding: 8px 16px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text-2); font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.15s; }
-    .qf-pill:hover { border-color: var(--brand-border); color: var(--brand); background: var(--brand-dim); }
+    .qf-pill { padding: 8px 16px; border-radius: 100px; border: 1px solid rgba(0,0,0,0.07); background: #F5F4F3; color: #6B6460; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.15s; }
+    .qf-pill:hover { border-color: rgba(0,0,0,0.15); color: #1A1411; background: #E8E5E2; }
 
     /* TRUST STRIP */
     .trust-strip { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; justify-content: center; }
-    .trust-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-2); font-weight: 600; }
+    .trust-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #6B6460; font-weight: 600; }
     .trust-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--reps); flex-shrink: 0; }
 
     /* SECTION STRUCTURE */
     .section { padding: 80px 24px; max-width: var(--max); margin: 0 auto; }
-    .section-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
-    .section-title { font-family: 'Manrope', sans-serif; font-size: clamp(26px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
-    .section-sub { font-size: 15px; color: var(--text-2); line-height: 1.7; max-width: 480px; }
+    .section-eyebrow { font-size: 11px; font-weight: 700; color: #1A1411; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+    .section-title { font-family: 'DM Sans', system-ui, sans-serif; font-size: clamp(26px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+    .section-sub { font-size: 15px; color: #6B6460; line-height: 1.7; max-width: 480px; }
 
     /* FEATURED TRAINERS */
+    .trainer-strip {
+      background: #FAFAF9;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      padding: 40px;
+    }
     .trainers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 40px; }
-    .trainer-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.2s, transform 0.2s; display: block; }
-    .trainer-card:hover { border-color: var(--border-2); transform: translateY(-2px); }
-    .trainer-card-img { width: 100%; aspect-ratio: 4/3; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 36px; color: var(--brand); position: relative; overflow: hidden; }
+    .trainer-card { background: #fff; border: 1px solid rgba(0,0,0,0.07); border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.2s, transform 0.2s; display: block; }
+    .trainer-card:hover { border-color: rgba(0,0,0,0.12); transform: translateY(-2px); }
+    .t-card {
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.07);
+      border-radius: 14px;
+      padding: 14px;
+      min-width: 160px;
+    }
+    .t-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #F5F4F3;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 800; color: #1A1411;
+      margin-bottom: 8px;
+    }
+    .t-name { font-weight: 700; font-size: 13px; color: #1A1411; margin-bottom: 2px; }
+    .t-spec { font-size: 11px; color: #6B6460; margin-bottom: 6px; }
+    .t-rating { font-size: 11px; color: #1A1411; font-weight: 600; }
+    .trainer-card-img { width: 100%; aspect-ratio: 4/3; background: #E8E5E2; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 36px; color: #1A1411; position: relative; overflow: hidden; }
     .trainer-card-img .verified-badge { position: absolute; top: 10px; right: 10px; padding: 3px 9px; border-radius: 20px; background: rgba(0,200,83,0.15); border: 1px solid rgba(0,200,83,0.3); color: #00C853; font-size: 10px; font-weight: 700; }
     .trainer-card-body { padding: 16px; }
-    .trainer-card-name { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 15px; margin-bottom: 3px; }
-    .trainer-card-meta { font-size: 12px; color: var(--text-2); margin-bottom: 10px; }
+    .trainer-card-name { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 15px; margin-bottom: 3px; }
+    .trainer-card-meta { font-size: 12px; color: #6B6460; margin-bottom: 10px; }
     .trainer-card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-    .trainer-tag { padding: 3px 9px; border-radius: 20px; background: var(--surface-3); border: 1px solid var(--border); font-size: 11px; color: var(--text-2); font-weight: 600; }
-    .trainer-card-price { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 14px; color: var(--text); }
-    .trainer-card-price span { font-size: 11px; font-weight: 500; color: var(--text-2); }
+    .trainer-tag { padding: 3px 9px; border-radius: 20px; background: #F5F4F3; border: 1px solid rgba(0,0,0,0.07); font-size: 11px; color: #6B6460; font-weight: 600; }
+    .trainer-card-price { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 14px; color: #1A1411; }
+    .trainer-card-price span { font-size: 11px; font-weight: 500; color: #6B6460; }
 
     /* TRANSFORMATIONS */
     .transforms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 40px; }
-    .transform-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .transform-card { background: #F5F4F3; border: 1px solid rgba(0,0,0,0.07); border-radius: 16px; overflow: hidden; }
     .transform-header { padding: 20px 20px 0; }
     .transform-trainer { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-    .transform-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 14px; color: var(--brand); flex-shrink: 0; }
+    .transform-avatar { width: 36px; height: 36px; border-radius: 50%; background: #E8E5E2; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 14px; color: #1A1411; flex-shrink: 0; }
     .transform-trainer-name { font-weight: 700; font-size: 13px; }
     .transform-trainer-cert { font-size: 11px; color: #00C853; font-weight: 600; }
-    .transform-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.3px; margin-bottom: 10px; }
-    .transform-body { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
-    .transform-stats { display: flex; gap: 0; border-top: 1px solid var(--border); }
-    .transform-stat { flex: 1; padding: 14px 16px; text-align: center; border-right: 1px solid var(--border); }
+    .transform-title { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.3px; margin-bottom: 10px; }
+    .transform-body { font-size: 13px; color: #6B6460; line-height: 1.65; margin-bottom: 16px; }
+    .transform-stats { display: flex; gap: 0; border-top: 1px solid rgba(0,0,0,0.07); }
+    .transform-stat { flex: 1; padding: 14px 16px; text-align: center; border-right: 1px solid rgba(0,0,0,0.07); }
     .transform-stat:last-child { border-right: none; }
-    .transform-stat-val { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 18px; color: var(--brand); letter-spacing: -0.5px; }
-    .transform-stat-label { font-size: 10px; color: var(--text-2); margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transform-stat-val { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 18px; color: #1A1411; letter-spacing: -0.5px; }
+    .transform-stat-label { font-size: 10px; color: #6B6460; margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
     /* BLOG PREVIEW */
     .blog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 40px; }
     .blog-grid .featured { grid-column: 1 / -1; }
-    .blog-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; text-decoration: none; color: inherit; display: block; transition: border-color 0.2s, transform 0.2s; }
-    .blog-card:hover { border-color: var(--border-2); transform: translateY(-2px); }
+    .blog-card { background: #F5F4F3; border: 1px solid rgba(0,0,0,0.07); border-radius: 16px; padding: 28px; text-decoration: none; color: inherit; display: block; transition: border-color 0.2s, transform 0.2s; }
+    .blog-card:hover { border-color: rgba(0,0,0,0.12); transform: translateY(-2px); }
     .blog-card.featured { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; }
-    .blog-cat { display: inline-block; padding: 4px 12px; border-radius: 100px; background: var(--brand-dim); border: 1px solid var(--brand-border); color: var(--brand); font-size: 11px; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 14px; }
-    .blog-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; line-height: 1.25; margin-bottom: 10px; }
+    .blog-cat { display: inline-block; padding: 4px 12px; border-radius: 100px; background: #E8E5E2; border: 1px solid rgba(0,0,0,0.07); color: #1A1411; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 14px; }
+    .blog-title { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; line-height: 1.25; margin-bottom: 10px; }
     .blog-card:not(.featured) .blog-title { font-size: 16px; }
-    .blog-excerpt { font-size: 14px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
-    .blog-author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2); }
+    .blog-excerpt { font-size: 14px; color: #6B6460; line-height: 1.65; margin-bottom: 16px; }
+    .blog-author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6B6460; }
     .blog-author-dot { width: 5px; height: 5px; border-radius: 50%; background: #00C853; }
-    .blog-visual { background: var(--surface-3); border-radius: 12px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    .blog-visual { background: #E8E5E2; border-radius: 12px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 48px; }
     @media (max-width: 720px) { .blog-grid { grid-template-columns: 1fr; } .blog-card.featured { grid-template-columns: 1fr; } }
 
     /* FOR TRAINERS BANNER */
-    .trainer-banner { margin: 0 24px; border-radius: 20px; background: linear-gradient(135deg, rgba(255,92,0,0.12) 0%, rgba(255,92,0,0.04) 100%); border: 1px solid rgba(255,92,0,0.2); padding: 56px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+    .trainer-banner { margin: 0 24px; border-radius: 20px; background: linear-gradient(135deg, rgba(255,92,0,0.08) 0%, rgba(255,92,0,0.03) 100%); border: 1px solid rgba(255,92,0,0.15); padding: 56px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
     .trainer-banner-text {}
-    .trainer-banner-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
-    .trainer-banner-title { font-family: 'Manrope', sans-serif; font-size: clamp(22px, 3vw, 36px); font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; }
-    .trainer-banner-sub { font-size: 15px; color: var(--text-2); line-height: 1.6; max-width: 420px; }
+    .trainer-banner-eyebrow { font-size: 11px; font-weight: 700; color: #6B6460; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+    .trainer-banner-title { font-family: 'DM Sans', system-ui, sans-serif; font-size: clamp(22px, 3vw, 36px); font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; color: #1A1411; }
+    .trainer-banner-sub { font-size: 15px; color: #6B6460; line-height: 1.6; max-width: 420px; }
     .trainer-banner-actions { display: flex; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
-    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
-    .btn-primary:hover { background: #e05200; transform: translateY(-2px); }
-    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--border-2); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
-    .btn-ghost:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-2px); }
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: #1A1411; color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
+    .btn-primary:hover { background: #333; transform: translateY(-2px); }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: #1A1411; font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid rgba(0,0,0,0.12); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
+    .btn-ghost:hover { border-color: rgba(0,0,0,0.25); transform: translateY(-2px); }
+
+    /* FOOTER CTA — intentionally dark */
+    .footer-cta {
+      background: #1A1411;
+      padding: 56px 40px;
+      text-align: center;
+    }
+    .footer-cta h2 { font-size: 32px; font-weight: 800; color: #fff; letter-spacing: -0.04em; margin-bottom: 12px; }
+    .footer-cta p { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 24px; }
+    .btn-white-pill {
+      background: #fff;
+      color: #1A1411;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-block;
+    }
 
     /* FOOTER */
-    footer { border-top: 1px solid var(--border); padding: 48px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; max-width: var(--max); margin: 0 auto; }
-    .footer-logo { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 18px; color: var(--brand); text-decoration: none; }
+    footer { border-top: 1px solid rgba(0,0,0,0.07); padding: 48px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; max-width: var(--max); margin: 0 auto; }
+    .footer-logo { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 18px; color: #1A1411; text-decoration: none; }
     .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
-    .footer-links a { color: var(--text-2); text-decoration: none; font-size: 13px; transition: color 0.2s; }
-    .footer-links a:hover { color: var(--text); }
-    .footer-copy { font-size: 12px; color: var(--text-3); }
+    .footer-links a { color: #6B6460; text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .footer-links a:hover { color: #1A1411; }
+    .footer-copy { font-size: 12px; color: rgba(26,20,17,0.4); }
 
     /* SKELETON LOADER */
-    .skeleton { background: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-4) 50%, var(--surface-3) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+    .skeleton { background: linear-gradient(90deg, #E8E5E2 25%, #F5F4F3 50%, #E8E5E2 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   </style>
 
   <!-- NAV -->
   <nav class="nav" id="nav">
     <a href="/landing" class="nav-logo" data-i18n="brand">{brandName}</a>
-    <div class="nav-links">
-      <a href="/find" data-i18n="nav_find">Find a Trainer</a>
-      <a href="/blog" data-i18n="nav_blog">Stories</a>
-      <a href="/community" data-i18n="nav_community">Community</a>
-      <a href="/for-trainers" class="for-trainers" data-i18n="nav_for_trainers">For Trainers</a>
-    </div>
+    <a href="/find" class="nav-link" data-i18n="nav_find">Find a Trainer</a>
+    <a href="/blog" class="nav-link" data-i18n="nav_blog">Stories</a>
+    <a href="/community" class="nav-link" data-i18n="nav_community">Community</a>
+    <a href="/for-trainers" class="nav-link trainer" data-i18n="nav_for_trainers">For Trainers →</a>
     <a href="/find" class="nav-cta" data-i18n="nav_cta_find">Find Your Trainer →</a>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-eyebrow">
-      <div style="width:6px;height:6px;border-radius:50%;background:#00C853;flex-shrink:0"></div>
-      {market.certificationBody} Verified Trainers · {market.cityName || market.market.toUpperCase()}
-    </div>
-    <h1 class="hero-headline" data-i18n="hero_headline">
-      Find a trainer<br>who <em>actually</em><br>gets results.
-    </h1>
-    <p class="hero-sub" data-i18n="hero_sub">
-      Every trainer on {brandName} is {market.certificationBody}-certified and verified. Browse real profiles, read real stories, and book the right person for you.
-    </p>
+    <!-- LEFT COLUMN -->
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        <span id="trainer-count-label">{market.certificationBody} Verified Trainers · {market.cityName || market.market.toUpperCase()}</span>
+      </div>
+      <h1 class="hero-h1" data-i18n="hero_headline">Find your perfect<br/><em>personal trainer</em></h1>
+      <p class="hero-sub" data-i18n="hero_sub">Every trainer on {brandName} is {market.certificationBody}-certified and verified. Browse real profiles, read real stories, and book the right person for you.</p>
+      <div class="hero-actions">
+        <a href="/find" class="btn-dark">Find a trainer</a>
+        <a href="/join" class="btn-ghost-orange">Join as trainer →</a>
+      </div>
+      <div class="hero-social" id="hero-social">
+        <div class="avatar-stack">
+          <div class="avatar-init" style="background:#8B7E75;">AK</div>
+          <div class="avatar-init" style="background:#6B5E55;">SL</div>
+          <div class="avatar-init" style="background:#4A3D35;">MR</div>
+        </div>
+        <span class="hero-social-text" id="social-proof-label">Clients trained this month</span>
+      </div>
 
-    <!-- SEARCH -->
-    <div class="search-wrap">
-      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input
-        class="search-bar"
-        id="hero-search"
-        type="text"
-        placeholder={market.market === 'fr' ? 'Rechercher par spécialité, lieu...' :
-                     market.market === 'it' ? 'Cerca per specialità, zona...' :
-                     market.market === 'es' || market.market === 'mx' ? 'Buscar por especialidad, zona...' :
-                     'Search by specialty, area, or name...'}
-        autocomplete="off"
-      />
-      <button class="search-btn" onclick="doSearch()" data-i18n="search_btn">Search</button>
+      <!-- SEARCH -->
+      <div class="search-wrap" style="margin-top:28px;">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input
+          class="search-bar"
+          id="hero-search"
+          type="text"
+          placeholder={market.market === 'fr' ? 'Rechercher par spécialité, lieu...' :
+                       market.market === 'it' ? 'Cerca per specialità, zona...' :
+                       market.market === 'es' || market.market === 'mx' ? 'Buscar por especialidad, zona...' :
+                       'Search by specialty, area, or name...'}
+          autocomplete="off"
+        />
+        <button class="search-btn" onclick="doSearch()" data-i18n="search_btn">Search</button>
+      </div>
+
+      <!-- QUICK FILTERS -->
+      <div class="quick-filters" style="justify-content:flex-start;">
+        <a href="/find?specialty=weight-loss" class="qf-pill" data-i18n="filter_weight_loss">Weight Loss</a>
+        <a href="/find?specialty=strength" class="qf-pill" data-i18n="filter_strength">Strength</a>
+        <a href="/find?specialty=hiit" class="qf-pill">HIIT</a>
+        <a href="/find?specialty=nutrition" class="qf-pill" data-i18n="filter_nutrition">Nutrition</a>
+        <a href="/find?specialty=yoga" class="qf-pill">Yoga</a>
+        <a href="/find?specialty=running" class="qf-pill" data-i18n="filter_running">Running</a>
+        <a href="/find?specialty=boxing" class="qf-pill">Boxing</a>
+      </div>
+
+      <!-- TRUST STRIP -->
+      <div class="trust-strip" style="justify-content:flex-start;margin-top:0;">
+        <div class="trust-item"><div class="trust-dot"></div>{market.certificationBody} Verified Only</div>
+        <div class="trust-item"><div class="trust-dot"></div>Real Trainer Profiles</div>
+        <div class="trust-item"><div class="trust-dot"></div>No Fake Reviews</div>
+        <div class="trust-item"><div class="trust-dot"></div>Free to Browse</div>
+      </div>
     </div>
 
-    <!-- QUICK FILTERS -->
-    <div class="quick-filters">
-      <a href="/find?specialty=weight-loss" class="qf-pill" data-i18n="filter_weight_loss">Weight Loss</a>
-      <a href="/find?specialty=strength" class="qf-pill" data-i18n="filter_strength">Strength</a>
-      <a href="/find?specialty=hiit" class="qf-pill">HIIT</a>
-      <a href="/find?specialty=nutrition" class="qf-pill" data-i18n="filter_nutrition">Nutrition</a>
-      <a href="/find?specialty=yoga" class="qf-pill">Yoga</a>
-      <a href="/find?specialty=running" class="qf-pill" data-i18n="filter_running">Running</a>
-      <a href="/find?specialty=boxing" class="qf-pill">Boxing</a>
-    </div>
-
-    <!-- TRUST STRIP -->
-    <div class="trust-strip">
-      <div class="trust-item"><div class="trust-dot"></div>{market.certificationBody} Verified Only</div>
-      <div class="trust-item"><div class="trust-dot"></div>Real Trainer Profiles</div>
-      <div class="trust-item"><div class="trust-dot"></div>No Fake Reviews</div>
-      <div class="trust-item"><div class="trust-dot"></div>Free to Browse</div>
+    <!-- RIGHT COLUMN: Stats grid -->
+    <div class="hero-right">
+      <div class="stats-grid">
+        <div class="stat-card featured">
+          <div class="stat-val" id="stat-trainer-count">—</div>
+          <div class="stat-label">Verified trainers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-avg-rating">4.9★</div>
+          <div class="stat-label">Average rating</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">10</div>
+          <div class="stat-label">Markets worldwide</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">100%</div>
+          <div class="stat-label">Certified & checked</div>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- FEATURED TRAINERS -->
-  <div style="border-top:1px solid var(--border)">
-    <div class="section">
+  <div class="trainer-strip">
+    <div class="section" style="padding-top:0;padding-bottom:0;">
       <p class="section-eyebrow">Verified Trainers</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
         <h2 class="section-title" style="margin-bottom:0">Top trainers<br>near you.</h2>
-        <a href="/find" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">See all trainers →</a>
+        <a href="/find" style="font-size:14px;font-weight:700;color:#1A1411;text-decoration:none">See all trainers →</a>
       </div>
       <p class="section-sub">Hand-picked, {market.certificationBody}-verified trainers with proven track records.</p>
       <div class="trainers-grid" id="featured-trainers">
         <!-- Skeleton loaders -->
-        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+        <div style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.07);border-radius:16px;overflow:hidden">
           <div class="skeleton" style="height:195px"></div>
           <div style="padding:16px"><div class="skeleton" style="height:14px;width:60%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:80%"></div></div>
         </div>
-        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+        <div style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.07);border-radius:16px;overflow:hidden">
           <div class="skeleton" style="height:195px"></div>
           <div style="padding:16px"><div class="skeleton" style="height:14px;width:55%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:45%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:70%"></div></div>
         </div>
-        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+        <div style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.07);border-radius:16px;overflow:hidden">
           <div class="skeleton" style="height:195px"></div>
           <div style="padding:16px"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:35%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:75%"></div></div>
         </div>
-        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+        <div style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.07);border-radius:16px;overflow:hidden">
           <div class="skeleton" style="height:195px"></div>
           <div style="padding:16px"><div class="skeleton" style="height:14px;width:50%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:42%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:85%"></div></div>
         </div>
@@ -239,12 +461,12 @@ const brandName = market.brandName || 'TrainedBy';
   </div>
 
   <!-- TRANSFORMATIONS -->
-  <div style="border-top:1px solid var(--border);background:var(--surface-2)">
+  <div style="border-top:1px solid rgba(0,0,0,0.07);background:#F5F4F3;">
     <div class="section">
       <p class="section-eyebrow">Real Results</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
         <h2 class="section-title" style="margin-bottom:0">Transformations<br>that speak for themselves.</h2>
-        <a href="/community?category=transformations" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">See all →</a>
+        <a href="/community?category=transformations" style="font-size:14px;font-weight:700;color:#1A1411;text-decoration:none">See all →</a>
       </div>
       <p class="section-sub">Documented by the trainers who made them happen. No filters, no stock photos.</p>
       <div class="transforms-grid" id="transformations-grid">
@@ -308,12 +530,12 @@ const brandName = market.brandName || 'TrainedBy';
   </div>
 
   <!-- BLOG PREVIEW -->
-  <div style="border-top:1px solid var(--border)">
+  <div style="border-top:1px solid rgba(0,0,0,0.07);">
     <div class="section">
       <p class="section-eyebrow">From the Community</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
         <h2 class="section-title" style="margin-bottom:0">Advice from trainers<br>who actually train.</h2>
-        <a href="/blog" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none">Read all articles →</a>
+        <a href="/blog" style="font-size:14px;font-weight:700;color:#1A1411;text-decoration:none">Read all articles →</a>
       </div>
       <p class="section-sub">No sponsored content. No generic listicles. Written by verified trainers from their own practice.</p>
       <div class="blog-grid" id="blog-preview">
@@ -352,7 +574,7 @@ const brandName = market.brandName || 'TrainedBy';
   </div>
 
   <!-- FOR TRAINERS BANNER -->
-  <div style="padding:60px 0;border-top:1px solid var(--border)">
+  <div style="padding:60px 0;border-top:1px solid rgba(0,0,0,0.07);">
     <div class="trainer-banner" style="max-width:calc(var(--max) - 48px);margin:0 auto">
       <div class="trainer-banner-text">
         <div class="trainer-banner-eyebrow">For Trainers</div>
@@ -406,14 +628,19 @@ const brandName = market.brandName || 'TrainedBy';
           `${SUPABASE_URL}/rest/v1/trainers?select=slug,full_name,specialty,location,profile_photo_url,reps_verified,packages&plan=eq.pro&is_active=eq.true&order=created_at.desc&limit=8`,
           { headers: { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY } }
         );
-        const trainers = await res.json();
-        if (!Array.isArray(trainers) || trainers.length === 0) return;
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) return;
+
+        const countEl = document.getElementById('stat-trainer-count');
+        if (countEl && data && data.length) {
+          countEl.textContent = data.length >= 10 ? data.length + '+' : String(data.length);
+        }
 
         const grid = document.getElementById('featured-trainers');
         if (!grid) return;
         grid.innerHTML = '';
 
-        trainers.forEach((t: any) => {
+        data.forEach((t: any) => {
           const initials = (t.full_name || 'T').split(' ').map((n: string) => n[0]).join('').slice(0,2).toUpperCase();
           const specialty = Array.isArray(t.specialty) ? t.specialty[0] : (t.specialty || 'Personal Training');
           const location = t.location || '';
