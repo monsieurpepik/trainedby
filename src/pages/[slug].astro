@@ -860,12 +860,7 @@ body {
         <div class="tb-about">
           <div class="tb-section-label" style="margin-bottom:12px">About</div>
           <div class="tb-about-text" id="tb-about-text">${esc(bio)}</div>
-          <button class="tb-read-more" id="tb-read-more" onclick="
-            var el=document.getElementById('tb-about-text');
-            var btn=document.getElementById('tb-read-more');
-            if(el.classList.contains('expanded')){el.classList.remove('expanded');btn.textContent='Read more';}
-            else{el.classList.add('expanded');btn.textContent='Read less';}
-          ">Read more</button>
+          <button class="tb-read-more" id="tb-read-more" onclick="toggleBio()">Read more →</button>
         </div>` : ''}
 
         <!-- 7. REVIEWS SHELL ─────────────────────────────────────────────── -->
@@ -878,7 +873,8 @@ body {
       // Load reviews asynchronously after rendering
       loadReviews(t.id);
 
-      // Set up IntersectionObserver for compact header
+      initStickyHeader();
+      // Wire IntersectionObserver for compact header visibility
       const sentinel = document.getElementById('hero-sentinel');
       if (sentinel) {
         const obs = new IntersectionObserver(([entry]) => {
@@ -904,6 +900,32 @@ body {
           if (btn) { btn.textContent = 'Link copied!'; setTimeout(() => { btn.textContent = 'Share this profile'; }, 2000); }
         });
       }
+    }
+
+    function initStickyHeader() {
+      const chBack = document.getElementById('ch-back');
+      if (chBack && !chBack.dataset.wired) {
+        chBack.dataset.wired = '1';
+        chBack.addEventListener('click', () => {
+          history.length > 1 ? history.back() : (location.href = '/find');
+        });
+      }
+      const chShare = document.getElementById('ch-share');
+      if (chShare && !chShare.dataset.wired) {
+        chShare.dataset.wired = '1';
+        chShare.addEventListener('click', () => {
+          const name = document.getElementById('ch-trainer-name')?.textContent || '';
+          shareProfile(name);
+        });
+      }
+    }
+
+    function toggleBio() {
+      const el = document.getElementById('tb-about-text');
+      const btn = document.getElementById('tb-read-more');
+      if (!el || !btn) return;
+      const expanded = el.classList.toggle('expanded');
+      btn.textContent = expanded ? 'Read less' : 'Read more →';
     }
 
     // ── Reviews ──────────────────────────────────────────────────────────────
@@ -1002,6 +1024,13 @@ body {
       const el = document.getElementById('rvMsg');
       if (!el) return;
       el.textContent = text; el.style.color = color; el.style.display = 'block';
+    }
+
+    // Wire compact header buttons as soon as DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initStickyHeader);
+    } else {
+      initStickyHeader();
     }
 
     // Kick off on load
