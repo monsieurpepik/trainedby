@@ -1,9 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getMarket } from '../lib/market.ts';
+import { SUPABASE_ANON_KEY } from '../lib/config.ts';
 const market = getMarket(Astro.url.hostname);
 const brandName = market.brandName;
-const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+const SUPABASE_KEY = SUPABASE_ANON_KEY;
 ---
 
 <Base
@@ -14,9 +15,9 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
     <meta name="color-scheme" content="light">
     <meta name="theme-color" content="#FFFFFF">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
-    <!-- Light theme override — must be LAST in <head> to win the CSS cascade over Base.astro dark globals -->
-    <style>
-      :root {
+    <!-- Light theme override — html[data-market] specificity (0,1,0) beats Base.astro :root (0,0,1) regardless of load order -->
+    <style is:inline>
+      html[data-market] {
         --bg: #FFFFFF;
         --surface: #FAFAF9;
         --surface-2: #F5F4F3;
@@ -40,11 +41,8 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
         --whatsapp-hover: #1db954;
         --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
       }
-      body {
-        background: var(--bg);
-        color: var(--text);
-        font-family: 'DM Sans', system-ui, sans-serif;
-      }
+      html[data-market] { background: #FFFFFF; color: #1A1411; }
+      body { background: #FFFFFF !important; color: #1A1411 !important; font-family: 'DM Sans', system-ui, sans-serif; }
     </style>
   </Fragment>
 
@@ -261,7 +259,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
 
   <div id="trainerGrid">
     <!-- Skeletons while loading -->
-    ${Array(6).fill(0).map(() => `
+    <Fragment set:html={Array(6).fill(0).map(() => `
     <div class="skeleton-card">
       <div class="skel skel-cover"></div>
       <div class="skel-body">
@@ -269,7 +267,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
         <div class="skel skel-line w60"></div>
         <div class="skel skel-line w40" style="margin-top:12px"></div>
       </div>
-    </div>`).join('')}
+    </div>`).join('')} />
   </div>
 
   <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
