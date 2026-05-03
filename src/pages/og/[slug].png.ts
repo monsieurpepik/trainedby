@@ -4,8 +4,7 @@ import { initWasm, Resvg } from '@resvg/resvg-wasm';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
+import { SUPABASE_URL, SUPABASE_ANON_KEY as ANON_KEY } from '../../lib/config.ts';
 
 let fontData: ArrayBuffer | null = null;
 let initPromise: Promise<void> | null = null;

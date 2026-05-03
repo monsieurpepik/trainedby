@@ -8,6 +8,7 @@
 import Base from "../layouts/Base.astro";
 import { getMarket } from "../lib/market.ts";
 import TrainerProfile from "../components/TrainerProfile";
+import { SUPABASE_URL as _SUPABASE_URL, SUPABASE_ANON_KEY } from "../lib/config.ts";
 
 const { slug } = Astro.params;
 const market = getMarket(Astro.url.hostname);
@@ -32,8 +33,8 @@ if (RESERVED.has(slug.toLowerCase())) {
 }
 
 // Verify trainer exists before rendering (SSR - runs on server)
-const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
+const SUPABASE_URL = _SUPABASE_URL;
+const ANON_KEY = SUPABASE_ANON_KEY;
 
 let trainerName = '';
 let trainerSpecialty = '';
