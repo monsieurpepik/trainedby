@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { SUPABASE_ANON_KEY } from '../lib/config.ts';
 const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
 ---
 
@@ -210,9 +211,8 @@ const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
   </div>
 </div>
 
-<script>
+<script define:vars={{ SUPABASE_ANON: SUPABASE_ANON_KEY }}>
   const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MzE5NTIsImV4cCI6MjA2MDIwNzk1Mn0.Yd4OGMBqwvLz5_6vFAFqBNRLNFBMXCRKFiGJFCqQUYI';
   const ADMIN_SECRET = document.getElementById('admin-gate-secret')?.dataset.secret ?? '';
 
   let allTrainers = [];
