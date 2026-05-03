@@ -1,6 +1,7 @@
 ---
 import { getMarket } from '../lib/market.ts';
 import { ClientRouter } from 'astro:transitions';
+import CookieConsent from '../components/CookieConsent.astro';
 
 interface Props {
   title: string;
@@ -166,5 +167,6 @@ const resolvedOgImage = ogImage ?? `https://${market.domain}/og-image.jpg`;
   </head>
   <body>
     <slot />
+    <CookieConsent />
   </body>
 </html>
