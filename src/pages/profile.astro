@@ -28,6 +28,51 @@ const brandName = market.brandName;
         --color-accent: #818cf8;
         --color-accent-light: #a5b4fc;
         --nav-logo-by: var(--brand);
+
+        /* ── Brand orange alpha tokens ── */
+        --brand-faintest: rgba(255,92,0,0.03);
+        --brand-dim: rgba(255,92,0,0.04);
+        --brand-dim-2: rgba(255,92,0,0.08);
+        --brand-bg: rgba(255,92,0,0.1);
+        --brand-bg-mid: rgba(255,92,0,0.12);
+        --brand-border-faint: rgba(255,92,0,0.18);
+        --brand-border: rgba(255,92,0,0.2);
+        --brand-border-strong: rgba(255,92,0,0.3);
+        --brand-border-hover: rgba(255,92,0,0.4);
+
+        /* ── Green alpha tokens ── */
+        --green-bg: rgba(34,197,94,0.08);
+        --green-bg-light: rgba(34,197,94,0.1);
+        --green-border: rgba(34,197,94,0.2);
+        --green-border-strong: rgba(34,197,94,0.3);
+
+        /* ── Purple/accent alpha tokens ── */
+        --accent-bg: rgba(99,102,241,0.08);
+        --accent-bg-light: rgba(99,102,241,0.1);
+        --accent-border: rgba(99,102,241,0.2);
+        --accent-border-strong: rgba(99,102,241,0.3);
+
+        /* ── Yellow alpha tokens ── */
+        --yellow-bg: rgba(251,191,36,0.12);
+        --yellow-bg-light: rgba(251,191,36,0.15);
+        --yellow-border: rgba(251,191,36,0.2);
+        --yellow-border-strong: rgba(251,191,36,0.3);
+
+        /* ── White glass tokens ── */
+        --glass-10: rgba(255,255,255,0.1);
+        --glass-70: rgba(255,255,255,0.7);
+
+        /* ── Dark overlay/scrim tokens ── */
+        --scrim-20: rgba(0,0,0,0.2);
+        --scrim-35: rgba(0,0,0,0.35);
+        --scrim-50: rgba(0,0,0,0.5);
+        --scrim-55: rgba(0,0,0,0.55);
+        --scrim-70: rgba(0,0,0,0.7);
+        --scrim-75: rgba(0,0,0,0.75);
+        --scrim-82: rgba(0,0,0,0.82);
+        --scrim-95: rgba(0,0,0,0.95);
+        --scrim-97: rgba(0,0,0,0.97);
+        --scrim-99: rgba(0,0,0,0.99);
       }
     </style>
   </Fragment>
@@ -56,10 +101,10 @@ const brandName = market.brandName;
     content:'';position:absolute;inset:0;
     background:linear-gradient(
       to bottom,
-      rgba(0,0,0,0.35) 0%,
-      rgba(0,0,0,0.5) 40%,
-      rgba(0,0,0,0.82) 70%,
-      rgba(0,0,0,0.97) 100%
+      var(--scrim-35) 0%,
+      var(--scrim-50) 40%,
+      var(--scrim-82) 70%,
+      var(--scrim-97) 100%
     );
   }
 
@@ -127,7 +172,7 @@ const brandName = market.brandName;
   .avatar-initials{font-size:32px;font-weight:800;color:var(--orange)}
   .avatar-inner.no-photo{
     background:linear-gradient(135deg,var(--surface-2) 0%,var(--surface-3) 100%);
-    border:2px solid rgba(255,92,0,0.3);
+    border:2px solid var(--brand-border-strong);
   }
 
   /* Name row */
@@ -156,14 +201,14 @@ const brandName = market.brandName;
   .reps-badge{
     display:flex;align-items:center;gap:5px;
     background:var(--green-dim);
-    border:1px solid rgba(34,197,94,0.3);
+    border:1px solid var(--green-border-strong);
     border-radius:20px;padding:4px 10px;
     font-size:12px;font-weight:600;color:var(--green);
   }
   .reps-badge svg{width:11px;height:11px}
   .pending-badge{
-    background:rgba(251,191,36,0.15);
-    border:1px solid rgba(251,191,36,0.3);
+    background:var(--yellow-bg-light);
+    border:1px solid var(--yellow-border-strong);
     color:var(--color-star);
   }
 
@@ -193,9 +238,9 @@ const brandName = market.brandName;
   /* Training modes */
   .modes-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
   .mode-tag{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.04em;border:1px solid}
-  .mode-tag.in-person{background:rgba(255,92,0,0.1);border-color:rgba(255,92,0,0.3);color:var(--orange)}
-  .mode-tag.online{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:var(--color-accent)}
-  .mode-tag.hybrid{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--green)}
+  .mode-tag.in-person{background:var(--brand-bg);border-color:var(--brand-border-strong);color:var(--orange)}
+  .mode-tag.online{background:var(--accent-bg-light);border-color:var(--accent-border-strong);color:var(--color-accent)}
+  .mode-tag.hybrid{background:var(--green-bg-light);border-color:var(--green-border-strong);color:var(--green)}
 
   /* Rating row */
   .rating-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px}
@@ -215,12 +260,12 @@ const brandName = market.brandName;
   .reviews-count{font-size:12px;color:var(--text-muted)}
   .review-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px}
   .review-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .review-av{width:34px;height:34px;border-radius:50%;background:var(--orange-dim);border:1px solid rgba(255,92,0,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--orange);flex-shrink:0}
+  .review-av{width:34px;height:34px;border-radius:50%;background:var(--orange-dim);border:1px solid var(--brand-border-strong);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--orange);flex-shrink:0}
   .review-name{font-size:13px;font-weight:700}
   .review-verified{font-size:10px;color:var(--green);font-weight:600;margin-top:2px}
   .review-stars-sm{display:flex;gap:2px;margin-left:auto}
   .review-text{font-size:13px;line-height:1.7;color:var(--text-muted)}
-  .review-achievement{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:600;color:var(--green)}
+  .review-achievement{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:20px;font-size:11px;font-weight:600;color:var(--green)}
 
   /* Reviews empty state */
   .reviews-empty{
@@ -242,10 +287,10 @@ const brandName = market.brandName;
   .transform-meta{padding:0 8px 8px;font-size:11px;color:var(--orange);font-weight:700}
 
   /* Video modal */
-  #videoModal{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+  #videoModal{position:fixed;inset:0;background:var(--scrim-95);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
   #videoModal.open{display:flex}
   #videoModal video{max-width:100%;max-height:80vh;border-radius:var(--radius)}
-  .video-close{position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .video-close{position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:50%;background:var(--glass-10);border:none;color:var(--text-on-brand);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
   /* Gym tag */
   .gym-tag{
@@ -347,7 +392,7 @@ const brandName = market.brandName;
   .tag{
     font-size:12px;font-weight:600;padding:5px 11px;border-radius:20px;
     background:var(--orange-dim);color:var(--orange);
-    border:1px solid rgba(255,92,0,0.2);
+    border:1px solid var(--brand-border);
   }
   .cert-tag{
     background:var(--surface-2);color:var(--text-muted);
@@ -362,17 +407,17 @@ const brandName = market.brandName;
     cursor:pointer;transition:background 0.15s,border-color 0.15s;
     text-decoration:none;display:block;
   }
-  .pkg-card:hover{background:var(--surface-3);border-color:rgba(255,92,0,0.3)}
+  .pkg-card:hover{background:var(--surface-3);border-color:var(--brand-border-strong)}
   .pkg-card:active{background:var(--surface-3)}
   .pkg-card.featured{
-    background:linear-gradient(135deg,rgba(255,92,0,0.12) 0%,rgba(255,92,0,0.04) 100%);
-    border-color:rgba(255,92,0,0.4);
+    background:linear-gradient(135deg,var(--brand-bg-mid) 0%,var(--brand-dim) 100%);
+    border-color:var(--brand-border-hover);
   }
   .pkg-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
   .pkg-left{display:flex;align-items:center;gap:12px}
   .pkg-icon{
     width:40px;height:40px;border-radius:10px;
-    background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
+    background:var(--orange-dim);border:1px solid var(--brand-border);
     display:flex;align-items:center;justify-content:center;
     font-size:18px;flex-shrink:0;
   }
@@ -380,7 +425,7 @@ const brandName = market.brandName;
   .pkg-sessions{font-size:12px;color:var(--text-muted);margin-top:2px}
   .pkg-badge{
     font-size:10px;font-weight:700;letter-spacing:0.05em;
-    background:var(--orange);color:#fff;
+    background:var(--orange);color:var(--text-on-brand);
     padding:2px 8px;border-radius:20px;margin-left:6px;
     vertical-align:middle;
   }
@@ -399,7 +444,7 @@ const brandName = market.brandName;
   /* Guarantee badge */
   .pkg-guarantee{
     display:inline-flex;align-items:center;gap:5px;
-    background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);
+    background:var(--green-bg);border:1px solid var(--green-border);
     border-radius:20px;padding:4px 10px;
     font-size:11px;font-weight:600;color:var(--green);
     margin-top:6px;
@@ -410,7 +455,7 @@ const brandName = market.brandName;
   }
   .pkg-bonus-tag{
     font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;
-    background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);color:var(--color-accent-light);
+    background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--color-accent-light);
   }
   /* CTA row inside card */
   .pkg-cta-row{
@@ -420,7 +465,7 @@ const brandName = market.brandName;
   }
   .pkg-cta-text{font-size:12px;color:var(--text-muted)}
   .pkg-cta-btn{
-    background:var(--orange);color:#fff;
+    background:var(--orange);color:var(--text-on-brand);
     font-size:12px;font-weight:700;padding:7px 14px;
     border-radius:8px;border:none;cursor:pointer;
     font-family:var(--font);
@@ -441,13 +486,13 @@ const brandName = market.brandName;
   .assess-field input:focus,.assess-field select:focus{border-color:var(--orange)}
   .assess-field select option{background:var(--surface-2)}
   .btn-assess{
-    background:var(--orange);color:#fff;
+    background:var(--orange);color:var(--text-on-brand);
     font-size:14px;font-weight:700;padding:13px;
     border-radius:10px;border:none;cursor:pointer;
     font-family:var(--font);margin-top:4px;
   }
   .assess-result{
-    background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
+    background:var(--orange-dim);border:1px solid var(--brand-border);
     border-radius:10px;padding:14px;margin-top:8px;
     font-size:13px;line-height:1.7;color:var(--text);
     display:none;
@@ -456,8 +501,8 @@ const brandName = market.brandName;
   /* ── TRAINING PHILOSOPHY ── */
   .philosophy-block{
     position:relative;
-    background:linear-gradient(135deg,rgba(255,92,0,0.08) 0%,rgba(255,92,0,0.03) 100%);
-    border:1px solid rgba(255,92,0,0.18);
+    background:linear-gradient(135deg,var(--brand-dim-2) 0%,var(--brand-faintest) 100%);
+    border:1px solid var(--brand-border-faint);
     border-radius:14px;padding:18px 18px 18px 22px;
     margin-bottom:4px;
   }
@@ -484,13 +529,13 @@ const brandName = market.brandName;
   }
   .trust-pill{
     display:flex;align-items:center;gap:6px;
-    background:var(--green-dim);border:1px solid rgba(34,197,94,0.2);
+    background:var(--green-dim);border:1px solid var(--green-border);
     border-radius:20px;padding:5px 12px;
     font-size:12px;font-weight:600;color:var(--green);
   }
   .trust-pill svg{width:13px;height:13px;flex-shrink:0}
   .trust-pill.amber{
-    background:rgba(251,191,36,0.12);border-color:rgba(251,191,36,0.2);
+    background:var(--yellow-bg);border-color:var(--yellow-border);
     color:var(--color-star);
   }
 
@@ -524,7 +569,7 @@ const brandName = market.brandName;
   .affiliate-editorial-intro strong{color:var(--text)}
   .affiliate-discount{
     font-size:10px;font-weight:700;letter-spacing:0.04em;
-    background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
+    background:var(--orange-dim);border:1px solid var(--brand-border);
     color:var(--orange);padding:2px 7px;border-radius:20px;flex-shrink:0;
   }
 
@@ -539,7 +584,7 @@ const brandName = market.brandName;
   .gallery-hero-label{
     position:absolute;bottom:10px;left:12px;
     font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
-    color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.5);
+    color:var(--glass-70);background:var(--scrim-50);
     padding:3px 8px;border-radius:20px;
     backdrop-filter:blur(6px);
   }
@@ -601,7 +646,7 @@ const brandName = market.brandName;
   /* Lead modal */
   #leadModal{
     display:none;position:fixed;inset:0;z-index:300;
-    background:rgba(0,0,0,0.7);
+    background:var(--scrim-70);
     align-items:flex-end;justify-content:center;
     backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
   }
@@ -654,16 +699,16 @@ const brandName = market.brandName;
     #bg::after {
       background: linear-gradient(
         to right,
-        rgba(0,0,0,0.55) 0%,
-        rgba(0,0,0,0.75) 45%,
-        rgba(0,0,0,0.97) 65%,
-        rgba(0,0,0,0.99) 100%
+        var(--scrim-55) 0%,
+        var(--scrim-75) 45%,
+        var(--scrim-97) 65%,
+        var(--scrim-99) 100%
       ),
       linear-gradient(
         to bottom,
-        rgba(0,0,0,0.2) 0%,
-        rgba(0,0,0,0.5) 60%,
-        rgba(0,0,0,0.95) 100%
+        var(--scrim-20) 0%,
+        var(--scrim-50) 60%,
+        var(--scrim-95) 100%
       );
     }
 
