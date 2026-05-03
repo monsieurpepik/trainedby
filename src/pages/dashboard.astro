@@ -154,6 +154,9 @@ if (tbSession) {
         --pro-gold-tint-xs: rgba(197,162,39,0.04);
         --pro-gold-shadow-sm: rgba(197,162,39,0.3);
         --pro-gold-shadow-lg: rgba(197,162,39,0.5);
+        --pro-border: rgba(197,162,39,0.35);
+        --pro-dim: rgba(197,162,39,0.08);
+        --pro-gradient: linear-gradient(90deg,transparent,rgba(245,208,107,0.5),transparent);
         --text-on-gold: #0a0a0a;
       }
       body {
@@ -414,15 +417,15 @@ body {
 /* Upgrade banner - Pro metallic gold treatment */
 .upgrade-banner {
   background: linear-gradient(135deg, var(--pro-gold-tint-md) 0%, var(--pro-gold-tint-xs) 100%);
-  border: 1px solid var(--pro-border, rgba(197,162,39,0.35));
+  border: 1px solid var(--pro-border);
   border-radius: 16px; padding: 20px; margin: 24px 0;
-  box-shadow: 0 0 32px var(--pro-dim, rgba(197,162,39,0.08));
+  box-shadow: 0 0 32px var(--pro-dim);
   position: relative; overflow: hidden;
 }
 .upgrade-banner::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: var(--pro-gradient, linear-gradient(90deg,transparent,rgba(245,208,107,0.5),transparent));
+  background: var(--pro-gradient);
 }
 .upgrade-title {
   font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 16px; font-weight: 800;
