@@ -18,10 +18,11 @@ const brandName = brand.name;
     <meta name="color-scheme" content="light">
     <meta name="theme-color" content="#FFFFFF">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
-    <!-- Light theme override — is:inline keeps this as a raw <style> tag at slot position (end of <head>),
-         AFTER all Astro-bundled <link> tags, so it correctly wins the cascade over Base.astro dark globals -->
+    <!-- Light theme override.
+         html[data-market] has specificity (0,1,0) vs :root's (0,0,1) —
+         the attribute selector wins over Base.astro's dark :root regardless of CSS source order. -->
     <style is:inline>
-      :root {
+      html[data-market] {
         --bg: #FFFFFF;
         --surface: #FAFAF9;
         --surface-2: #F5F4F3;
@@ -62,7 +63,9 @@ const brandName = brand.name;
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg) !important; color: var(--text) !important; font-family: 'DM Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    /* background/color on html ensures the token values above are already resolved when body reads them */
+    html[data-market] { background: #FFFFFF; color: #1A1411; }
+    body { background: #FFFFFF !important; color: #1A1411 !important; font-family: 'DM Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
     /* NAV */
     .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 32px; height: 64px; display: flex; align-items: center; gap: 32px; transition: background 0.3s, border-color 0.3s; border-bottom: 1px solid transparent; }
