@@ -863,8 +863,8 @@ const brandName = market.brandName;
 <!-- Main page - two-column on desktop via JS-injected wrappers -->
 <div id="page" style="display:none">
 
-  <!-- Left column wrapper (desktop) / inline (mobile) -->
-  <div id="left-col">
+  <!-- Hero banner (desktop: full-bleed 300px; mobile: stacked flex column) -->
+  <div id="profile-hero">
 
     <!-- Hero -->
     <div id="hero">
@@ -968,13 +968,10 @@ const brandName = market.brandName;
       </button>
     </div>
 
-    <!-- Socials (desktop: below CTAs in left col) -->
-    <div id="socials-desktop" style="display:none;gap:10px;padding:0 0 20px;flex-wrap:wrap"></div>
+  </div><!-- /profile-hero -->
 
-  </div><!-- /left-col -->
-
-  <!-- Right column (sections) -->
-  <div id="right-col">
+  <!-- Content grid (white bg on desktop, single-col on mobile) -->
+  <div id="profile-grid">
 
     <!-- Sections -->
     <div id="sections">
@@ -1151,6 +1148,9 @@ const brandName = market.brandName;
 
     </div>
 
+    <!-- Socials desktop (moved from profile-hero) -->
+    <div id="socials-desktop" style="display:none;gap:10px;padding:0 0 20px;flex-wrap:wrap"></div>
+
     <!-- Socials (mobile: below sections) -->
     <div id="socials" style="display:flex;gap:10px;padding:0 20px 20px;flex-wrap:wrap"></div>
 
@@ -1162,7 +1162,7 @@ const brandName = market.brandName;
     </div>
 
     <div class="powered">Powered by <a href="/" id="powered-by-link">TrainedBy</a> · <a href="/find" style="color:var(--orange)">Find a Trainer</a></div>
-  </div><!-- /right-col -->
+  </div><!-- /profile-grid -->
 
 </div><!-- /page -->
 
