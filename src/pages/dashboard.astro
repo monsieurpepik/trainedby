@@ -1058,7 +1058,7 @@ body {
     <button class="ai-chip" onclick="sendChip(this)">Nutrition advice</button>
   </div>
   <div class="ai-input-row">
-    <textarea class="ai-input" id="ai-input" placeholder="{t(locale, 'dash.ai_placeholder')}" rows="1"></textarea>
+    <textarea class="ai-input" id="ai-input" placeholder={t(locale, 'dash.ai_placeholder')} rows="1"></textarea>
     <button class="ai-send" id="ai-send" onclick="sendAI()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
@@ -1073,7 +1073,7 @@ body {
   </a>
   <a href="/edit" class="bottom-nav-item">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-    <span>{t(locale, 'nav_edit')}</span>
+    <span>Edit</span>
   </a>
   <button class="bottom-nav-item" onclick="openAI()" style="background:none;border:none;cursor:pointer;">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
