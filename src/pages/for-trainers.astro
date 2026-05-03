@@ -21,12 +21,9 @@ const isWaitlist = market.waitlistEnabled === true;
         --surface: #FAFAF9;
         --surface-2: #F5F4F3;
         --surface-3: #E8E5E2;
-        --surface-4: #D4D1CE;
         --text: #1A1411;
         --text-2: #6B6460;
         --text-3: #9B9490;
-        --text-muted: #6B6460;
-        --text-faint: rgba(26,20,17,0.35);
         --border: rgba(0,0,0,0.07);
         --border-2: rgba(0,0,0,0.12);
         --border-hover: rgba(0,0,0,0.14);
@@ -43,8 +40,6 @@ const isWaitlist = market.waitlistEnabled === true;
         --reps-dim: rgba(0,200,83,0.08);
         --reps-border: rgba(0,200,83,0.2);
         --max: 1100px;
-        --shadow: 0 4px 24px rgba(0,0,0,0.08);
-        --shadow-lg: 0 8px 48px rgba(0,0,0,0.12);
         --nav-logo-by: var(--brand);
         --text-on-brand: #ffffff;
         /* Phone frame mockup — intentionally dark regardless of page theme */
@@ -54,6 +49,7 @@ const isWaitlist = market.waitlistEnabled === true;
         --mock-phone-glow: rgba(255,255,255,0.04);
         --mock-notch: rgba(255,255,255,0.08);
         --mock-text: #ffffff;
+        /* mock-text-muted (0.5): subtitle; mock-text-faint (0.4): micro-labels */
         --mock-text-muted: rgba(255,255,255,0.5);
         --mock-text-faint: rgba(255,255,255,0.4);
         --mock-stat-bg: rgba(255,255,255,0.04);
@@ -61,7 +57,7 @@ const isWaitlist = market.waitlistEnabled === true;
         --mock-badge-bg: rgba(0,200,83,0.12);
         --mock-badge-border: rgba(0,200,83,0.25);
         --mock-avatar-gradient-end: #FF8C42;
-        --color-whatsapp: #25D366;
+        --whatsapp: #25D366;
       }
       body { background: var(--bg); color: var(--text); }
     </style>
@@ -209,7 +205,7 @@ const isWaitlist = market.waitlistEnabled === true;
     }
     .mock-stat-label { font-size: 9px; color: var(--mock-text-faint); margin-top: 2px; }
     .mock-wa-btn {
-      background: var(--color-whatsapp); border-radius: 10px; padding: 12px;
+      background: var(--whatsapp); border-radius: 10px; padding: 12px;
       text-align: center; font-size: 13px; font-weight: 700; color: var(--mock-text);
       font-family: 'DM Sans', sans-serif;
     }
