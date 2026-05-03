@@ -78,7 +78,7 @@ const resolvedOgImage = ogImage ?? `https://${market.domain}/og-image.jpg`;
 
     <!-- Light theme tokens (BaseMinimal pages are always light) -->
     <style is:global>
-      :root {
+      html[data-market] {
         --bg: #FFFFFF;
         --surface: #FAFAF9;
         --surface-2: #F5F4F3;
