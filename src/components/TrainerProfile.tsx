@@ -136,25 +136,27 @@ export default function TrainerProfile({ slug, paymentEnabled, currencySymbol }:
         {loadState === 'loaded' && trainer && (
           <div id="profile-mount">
             <Hero trainer={trainer} onBack={handleBack} onShare={handleShare} />
-            <IdentityStrip tags={tags} location={trainerLocation} />
-            <StatsRow stats={stats} />
-            <CTABlock
-              paymentEnabled={paymentEnabled}
-              whatsappNumber={whatsappNumber}
-              displayName={displayName}
-            />
-            <PackagesCarousel
-              packages={packages}
-              currencySymbol={currencySymbol}
-              displayName={displayName}
-              whatsappNumber={whatsappNumber}
-            />
-            <About bio={bio} />
-            <Reviews
-              trainerId={trainer.id}
-              averageRating={averageRating}
-              reviewCount={reviewCount}
-            />
+            <div id="tb-content">
+              <IdentityStrip tags={tags} location={trainerLocation} />
+              <StatsRow stats={stats} />
+              <CTABlock
+                paymentEnabled={paymentEnabled}
+                whatsappNumber={whatsappNumber}
+                displayName={displayName}
+              />
+              <PackagesCarousel
+                packages={packages}
+                currencySymbol={currencySymbol}
+                displayName={displayName}
+                whatsappNumber={whatsappNumber}
+              />
+              <About bio={bio} />
+              <Reviews
+                trainerId={trainer.id}
+                averageRating={averageRating}
+                reviewCount={reviewCount}
+              />
+            </div>
           </div>
         )}
       </div>

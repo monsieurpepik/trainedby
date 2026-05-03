@@ -409,6 +409,167 @@ body:has(#tb-page) {
 
 .tb-reviews { padding: 20px; border-top: 1px solid var(--border); }
 .tb-reviews-loading { color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px 0; }
+
+/* ─── Desktop layout (≥768px) ─────────────────────────────────────────── */
+@media (min-width: 768px) {
+  /* Hide mobile-only chrome */
+  #tb-bottom-nav    { display: none; }
+  #tb-compact-header { display: none; }
+
+  /* Remove bottom-nav padding from mount */
+  #profile-mount {
+    position: relative;
+    padding-bottom: 0;
+  }
+
+  /* ── Hero ─────────────────────────────────────────────────────────────── */
+  .tb-hero { height: 300px; }
+
+  /* Shorter white fade — keeps name area on dark photo */
+  .tb-hero-fade {
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--bg));
+  }
+
+  /* Name/tagline: white on dark photo background */
+  .tb-hero-name {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.5);
+  }
+  .tb-hero-tagline {
+    color: rgba(255,255,255,0.75);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  }
+  /* Shift name block to match grid's 48px inset */
+  .tb-hero-name-block { left: 48px; bottom: 36px; }
+
+  /* ── CTA: overlaid at hero bottom-right ──────────────────────────────── */
+  /* Positioned relative to #profile-mount (position: relative) */
+  .tb-cta {
+    position: absolute;
+    top: 172px; /* hero 300px – 36px bottom pad – ~92px button stack */
+    right: 48px;
+    width: 210px;
+    padding: 0;
+    gap: 8px;
+    z-index: 20;
+    flex-direction: column;
+  }
+  .tb-cta .tb-btn-primary {
+    background: var(--brand);
+    height: 44px;
+    border-radius: 10px;
+  }
+  .tb-cta .tb-btn-secondary {
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: rgba(255,255,255,0.95);
+    border-color: rgba(255,255,255,0.3);
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  /* ── Content shelf: 3-col CSS grid ───────────────────────────────────── */
+  #tb-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-areas:
+      "identity  identity"
+      "sessions  stats"
+      "about     reviews";
+    column-gap: 20px;
+    padding: 24px 48px 64px;
+    background: var(--bg);
+  }
+
+  /* Identity strip: full-width header row */
+  .tb-identity {
+    grid-area: identity;
+    padding: 0 0 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+  }
+
+  /* Stats: right sidebar card */
+  .tb-stats {
+    grid-area: stats;
+    display: flex !important;   /* override inline style grid */
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    align-self: start;
+    border-bottom: none;
+  }
+  .tb-stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-right: none;
+    border-bottom: 1px solid var(--border-divider);
+    padding: 12px 0;
+    text-align: left;
+  }
+  .tb-stat-item:last-child { border-bottom: none; }
+  .tb-stat-num  { font-size: 20px; }
+  .tb-stat-label { font-size: 10px; }
+
+  /* Sessions / packages: left main card */
+  .tb-sessions {
+    grid-area: sessions;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    align-self: start;
+  }
+  .tb-sessions-header { padding: 0 0 12px; }
+  /* Packages: 2-col inner grid instead of horizontal scroll */
+  .tb-sessions-scroll {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    overflow-x: visible;
+    scroll-snap-type: none;
+    padding: 0;
+    gap: 12px;
+  }
+  .tb-pkg-card {
+    flex: none;
+    scroll-snap-align: none;
+  }
+
+  /* About: left main card (row 3) */
+  .tb-about {
+    grid-area: about;
+    border-top: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    align-self: start;
+  }
+  /* Expand bio fully — no clamp, no "read more" */
+  .tb-about-text { -webkit-line-clamp: unset !important; display: block !important; }
+  .tb-read-more  { display: none; }
+
+  /* Reviews: right sidebar card (row 3) */
+  .tb-reviews {
+    grid-area: reviews;
+    border-top: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    align-self: start;
+  }
+}
   </style>
 
   <TrainerProfile
