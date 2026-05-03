@@ -122,6 +122,20 @@ const jsonLd = {
         --btn-secondary-text: #7A7068;
         --hero-dark-start: #18191C;
         --hero-dark-end: #272A30;
+        --border-subtle: rgba(0,0,0,0.055);
+        --border-spinner: rgba(0,0,0,0.08);
+        --border-divider: rgba(0,0,0,0.06);
+        --surface-hover: rgba(0,0,0,0.05);
+        --surface-active: rgba(0,0,0,0.10);
+        --btn-secondary-border: rgba(0,0,0,0.10);
+        --tag-bg: rgba(0,0,0,0.05);
+        --nav-bg: rgba(255,255,255,0.92);
+        --bottom-nav-bg: rgba(255,255,255,0.95);
+        --glass-hero-btn: rgba(255,255,255,0.22);
+        --wa-glow: rgba(37,211,102,0.4);
+        --wa-glow-clear: rgba(37,211,102,0);
+        --shadow-btn: 0 4px 20px rgba(0,0,0,0.20);
+        --shadow-card: 0 2px 12px rgba(0,0,0,0.06);
       }
     </style>
   </Fragment>
@@ -141,11 +155,9 @@ body:has(#tb-page) {
   --text-primary:   var(--text);
   --text-secondary: var(--text-muted);
   --bg-white:       var(--bg);
-  --border:         rgba(0,0,0,0.055);
+  --border:         var(--border-subtle);
   --btn-primary-bg:       var(--text);
   --btn-primary-text:     var(--text-on-brand);
-  --btn-secondary-border: rgba(0,0,0,0.10);
-  --tag-bg:   rgba(0,0,0,0.05);
   --tag-text: var(--text-muted);
   --review-card-bg: var(--surface-2);
   font-family: var(--font);
@@ -164,7 +176,7 @@ body:has(#tb-page) {
 }
 .tb-spinner {
   width: 32px; height: 32px;
-  border: 2px solid rgba(0,0,0,0.08);
+  border: 2px solid var(--border-spinner);
   border-top-color: var(--text);
   border-radius: 50%;
   animation: tb-spin 0.75s linear infinite;
@@ -175,7 +187,7 @@ body:has(#tb-page) {
   position: fixed;
   top: 0; left: 0; right: 0;
   height: calc(56px + env(safe-area-inset-top));
-  background: rgba(255,255,255,0.92);
+  background: var(--nav-bg);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
@@ -211,8 +223,8 @@ body:has(#tb-page) {
   flex-shrink: 0;
   transition: background 150ms ease;
 }
-.ch-btn:hover  { background: rgba(0,0,0,0.05); }
-.ch-btn:active { background: rgba(0,0,0,0.10); }
+.ch-btn:hover  { background: var(--surface-hover); }
+.ch-btn:active { background: var(--surface-active); }
 #tb-compact-header .ch-btn { margin-bottom: 6px; }
 #tb-compact-header .ch-name { margin-bottom: 8px; }
 
@@ -220,7 +232,7 @@ body:has(#tb-page) {
   position: fixed;
   bottom: 0; left: 0; right: 0;
   height: calc(84px + env(safe-area-inset-bottom));
-  background: rgba(255,255,255,0.95);
+  background: var(--bottom-nav-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid var(--border);
@@ -244,8 +256,8 @@ body:has(#tb-page) {
 }
 
 @keyframes wa-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(37,211,102,0.4); }
-  50%      { box-shadow: 0 0 0 8px rgba(37,211,102,0); }
+  0%,100% { box-shadow: 0 0 0 0 var(--wa-glow); }
+  50%      { box-shadow: 0 0 0 8px var(--wa-glow-clear); }
 }
 
 .tb-hero {
@@ -282,7 +294,7 @@ body:has(#tb-page) {
   width: 36px; height: 36px;
   border-radius: 50%;
   border: none;
-  background: rgba(255,255,255,0.22);
+  background: var(--glass-hero-btn);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   display: flex; align-items: center; justify-content: center;
@@ -328,7 +340,7 @@ body:has(#tb-page) {
 }
 .tb-stat-item {
   padding: 16px 12px; text-align: center;
-  border-right: 1px solid rgba(0,0,0,0.06);
+  border-right: 1px solid var(--border-divider);
 }
 .tb-stat-item:last-child { border-right: none; }
 .tb-stat-num { font-weight: 200; font-size: 22px; letter-spacing: -0.02em; color: var(--text-primary); line-height: 1; }
@@ -341,7 +353,7 @@ body:has(#tb-page) {
   background: var(--btn-primary-bg); color: var(--btn-primary-text);
   font-family: var(--font); font-weight: 500; font-size: 14px;
   letter-spacing: 0.04em; cursor: pointer;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.20); text-decoration: none;
+  box-shadow: var(--shadow-btn); text-decoration: none;
 }
 .tb-btn-secondary {
   display: flex; align-items: center; justify-content: center;
@@ -367,7 +379,7 @@ body:has(#tb-page) {
 .tb-pkg-card {
   flex: 0 0 240px; scroll-snap-align: start;
   background: var(--bg); border: 1px solid var(--border);
-  border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-radius: 14px; box-shadow: var(--shadow-card);
   padding: 18px 20px; display: flex; flex-direction: column; gap: 6px;
 }
 .tb-pkg-name { font-weight: 400; font-size: 15px; color: var(--text-primary); }
