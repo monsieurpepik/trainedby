@@ -43,6 +43,10 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
         --reps: #00C853;
         --reps-dim: rgba(0,200,83,0.08);
         --reps-border: rgba(0,200,83,0.2);
+        --danger: #ff5555;
+        --text-on-brand: #ffffff;
+        --text-on-brand-dim: rgba(255,255,255,0.2);
+        --reps-badge-bg: rgba(0,200,83,0.12);
       }
       body { background: var(--bg); color: var(--text); }
     </style>
@@ -132,7 +136,7 @@ body {
 .field input::placeholder { color: var(--text-faint); }
 .field-hint { font-size: 11px; color: var(--text-faint); margin-top: 5px; }
 .field-req { color: var(--brand); }
-.field-error { font-size: 12px; color: #ff5555; margin-top: 5px; font-weight: 500; }
+.field-error { font-size: 12px; color: var(--danger); margin-top: 5px; font-weight: 500; }
 
 /* Two-column field row */
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -181,7 +185,7 @@ body {
 }
 .reps-card-icon {
   width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(0,200,83,0.12); border: 1px solid var(--reps-border);
+  background: var(--reps-badge-bg); border: 1px solid var(--reps-border);
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .reps-card-title { font-size: 13px; font-weight: 700; color: var(--reps); }
@@ -213,12 +217,12 @@ body {
 /* Buttons */
 .btn-primary {
   width: 100%; padding: 16px; border-radius: 12px;
-  background: var(--brand); color: #fff;
+  background: var(--brand); color: var(--text-on-brand);
   font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
   border: none; cursor: pointer; transition: background 0.2s, transform 0.1s;
   margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.btn-primary:hover { background: #e05200; }
+.btn-primary:hover { background: var(--brand-hover); }
 .btn-primary:active { transform: scale(0.99); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 .btn-secondary {
@@ -259,7 +263,7 @@ body {
 /* Spinner */
 .spinner {
   display: inline-block; width: 16px; height: 16px;
-  border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff;
+  border: 2px solid var(--text-on-brand-dim); border-top-color: var(--text-on-brand);
   border-radius: 50%; animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -296,10 +300,10 @@ body {
 }
 .url-copy-btn {
   padding: 8px 16px; border-radius: 8px; background: var(--brand);
-  color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer;
+  color: var(--text-on-brand); font-size: 13px; font-weight: 700; border: none; cursor: pointer;
   font-family: 'DM Sans', sans-serif; flex-shrink: 0; transition: background 0.2s;
 }
-.url-copy-btn:hover { background: #e05200; }
+.url-copy-btn:hover { background: var(--brand-hover); }
 
 /* Next steps card */
 .next-steps {
