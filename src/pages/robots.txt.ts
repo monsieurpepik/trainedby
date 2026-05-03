@@ -16,14 +16,12 @@ Disallow: /admin
 Disallow: /superadmin
 Disallow: /dashboard
 Disallow: /edit
-Disallow: /plan-builder
 
 # Allow all trainer profiles and public pages
 Allow: /find
 Allow: /join
 Allow: /pricing
 Allow: /blog
-Allow: /community
 Allow: /for-trainers
 
 # Sitemap — generated dynamically per domain

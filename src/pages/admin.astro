@@ -386,6 +386,18 @@ tr:hover td { background: var(--bg-tint-xs); }
 
 <div class="toast" id="toast"></div>
 
+<!-- Bulk email confirm modal -->
+<div class="modal-overlay" id="welcome-confirm-modal">
+  <div class="modal" style="position:relative;max-width:400px">
+    <div class="modal-title">Send welcome emails?</div>
+    <p id="welcome-confirm-msg" style="font-size:13px;color:var(--text-muted);margin:0 0 20px"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('welcome-confirm-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-primary" id="welcome-confirm-btn">Send emails</button>
+    </div>
+  </div>
+</div>
+
 <script define:vars={{ ANON_KEY: SUPABASE_ANON_KEY }}>
 const EDGE_BASE = 'https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1';
 
@@ -644,12 +656,17 @@ async function sendEmail(id, email, name) {
 async function sendWelcomeAll() {
   const real = allTrainers.filter(t => !isTestTrainer(t) && t.email && t.email.includes('@'));
   if (real.length === 0) { showToast('No real trainers to email', 'error'); return; }
-  if (!confirm(`Send welcome emails to ${real.length} trainer(s)?`)) return;
-  showToast('Sending ' + real.length + ' emails...', '');
-  for (const t of real) {
-    await sendEmail(t.id, t.email, t.name);
-    await new Promise(r => setTimeout(r, 500));
-  }
+  document.getElementById('welcome-confirm-msg').textContent = `Send welcome emails to ${real.length} trainer(s)?`;
+  const modal = document.getElementById('welcome-confirm-modal');
+  modal.classList.add('open');
+  document.getElementById('welcome-confirm-btn').onclick = async () => {
+    modal.classList.remove('open');
+    showToast('Sending ' + real.length + ' emails...', '');
+    for (const t of real) {
+      await sendEmail(t.id, t.email, t.name);
+      await new Promise(r => setTimeout(r, 500));
+    }
+  };
 }
 
 function exportCSV() {
