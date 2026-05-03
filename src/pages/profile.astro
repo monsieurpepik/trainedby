@@ -1173,6 +1173,8 @@ const brandName = market.brandName;
 </div>
 
 <!-- Lead Modal -->
+<div id="profile-toast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;white-space:nowrap"></div>
+
 <div id="leadModal" onclick="if(event.target===this)closeLead()">
   <div class="modal-sheet" style="position:relative">
     <div class="modal-handle"></div>
@@ -1202,6 +1204,15 @@ const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
 const SUPABASE_KEY = window.__SUPABASE_KEY__;
 
 let TRAINER = null;
+
+function showProfileToast(msg) {
+  const t = document.getElementById('profile-toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
 const IS_DESKTOP = window.matchMedia('(min-width: 768px)').matches;
 
 function getSlug() {
@@ -1788,7 +1799,7 @@ async function submitLead() {
   const name = document.getElementById('leadName').value.trim();
   const phone = document.getElementById('leadPhone').value.trim();
   const msg = document.getElementById('leadMsg').value.trim();
-  if (!name || !phone) { alert('Please enter your name and WhatsApp number.'); return; }
+  if (!name || !phone) { const sub = document.getElementById('modalSub'); sub.textContent = '⚠️ Please enter your name and WhatsApp number.'; sub.style.color = 'var(--orange)'; return; }
   const btn = document.querySelector('.btn-modal-submit');
   btn.textContent = 'Sending…'; btn.disabled = true;
   try {
@@ -1802,7 +1813,7 @@ async function submitLead() {
     setTimeout(closeLead, 2000);
   } catch(e) {
     btn.textContent = 'Send Request →'; btn.disabled = false;
-    alert('Something went wrong. Please try WhatsApp instead.');
+    const sub = document.getElementById('modalSub'); sub.textContent = '⚠️ Something went wrong. Please try WhatsApp instead.'; sub.style.color = 'var(--orange)';
   }
 }
 
@@ -1813,7 +1824,7 @@ function runAssessment() {
   const weight = parseFloat(document.getElementById('aWeight').value);
   const goal = document.getElementById('aGoal').value;
   const activity = document.getElementById('aActivity').value;
-  if (!age || !height || !weight) { alert('Please fill in all fields.'); return; }
+  if (!age || !height || !weight) { showProfileToast('Please fill in all fields.'); return; }
 
   const bmi = weight / ((height/100) ** 2);
   const bmiCat = bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Healthy Weight' : bmi < 30 ? 'Overweight' : 'Obese';
@@ -1849,7 +1860,7 @@ function shareProfile() {
   if (navigator.share) {
     navigator.share({ title: document.title, url: location.href });
   } else {
-    navigator.clipboard.writeText(location.href).then(() => alert('Link copied!'));
+    navigator.clipboard.writeText(location.href).then(() => showProfileToast('Link copied!'));
   }
 }
 

@@ -277,7 +277,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
   </div>
 </div>
 
-<script is:inline define:vars={{ SUPABASE_KEY }}>
+<script is:inline define:vars={{ SUPABASE_KEY, BRAND_NAME: brandName }}>
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
 
 let allTrainers = [];
@@ -313,61 +313,14 @@ async function loadTrainers() {
       return { ...t, min_price: minPrice, packages: tPkgs };
     });
 
-    // If no verified trainers, show demo data
-    if (!allTrainers.length) {
-      allTrainers = getDemoTrainers();
-    }
-
     filtered = [...allTrainers];
     renderGrid();
   } catch(e) {
-    allTrainers = getDemoTrainers();
-    filtered = [...allTrainers];
+    filtered = [];
     renderGrid();
   }
 }
 
-function getDemoTrainers() {
-  const mkt = window.__MARKET__ || 'ae';
-  const demos = {
-    ae: [
-      { id:'d1', full_name:'Sarah Al Mansoori', slug:'sarah-al-mansoori', title:'Strength & Fat Loss Coach', city:'Dubai', specialties:['Strength','Fat Loss','HIIT'], certifications:['REPs UAE Level 3','NASM CPT'], years_experience:7, clients_trained:340, avg_rating:4.9, review_count:38, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:350, whatsapp:'+971501234567', avatar_url:'https://images.unsplash.com/photo-1594381898411-846e7d193883?w=400&q=80' },
-      { id:'d2', full_name:'Khalid Rashid', slug:'khalid-rashid', title:'HIIT & Athletic Performance Coach', city:'Dubai', specialties:['HIIT','Athletic Performance','Speed'], certifications:['REPs UAE Level 4','NSCA CSCS'], years_experience:12, clients_trained:420, avg_rating:4.8, review_count:52, reps_verified:true, accepting_clients:true, training_modes:['in-person'], min_price:400, whatsapp:'+971502345678', avatar_url:'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400&q=80' },
-      { id:'d3', full_name:'Nour Haddad', slug:'nour-haddad', title:'Nutrition & Wellness Coach', city:'Abu Dhabi', specialties:['Nutrition','Fat Loss','Womens Health'], certifications:['REPs UAE Level 3','Precision Nutrition L2'], years_experience:5, clients_trained:180, avg_rating:5.0, review_count:29, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:300, whatsapp:'+971503456789', avatar_url:'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&q=80' },
-    ],
-    uk: [
-      { id:'d4', full_name:'James Hartley', slug:'james-hartley', title:'Strength & Mobility Coach', city:'London', specialties:['Strength','Mobility','Injury Rehab'], certifications:['REPs UK Level 3','CIMSPA'], years_experience:9, clients_trained:280, avg_rating:4.9, review_count:41, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:65, whatsapp:'+447700900001', avatar_url:'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80' },
-      { id:'d5', full_name:'Emily Chen', slug:'emily-chen-uk', title:'Olympic Lifting Coach', city:'Manchester', specialties:['Olympic Lifting','Strength','CrossFit'], certifications:['REPs UK Level 4','UKSCA'], years_experience:8, clients_trained:195, avg_rating:4.8, review_count:33, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:70, whatsapp:'+447700900002', avatar_url:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80' },
-      { id:'d6', full_name:'Tom Walsh', slug:'tom-walsh-uk', title:'Running & Endurance Coach', city:'Bristol', specialties:['Running','Endurance','Marathon'], certifications:['UESCA Running Coach','REPs UK Level 3'], years_experience:6, clients_trained:220, avg_rating:4.7, review_count:28, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:55, whatsapp:'+447700900003', avatar_url:'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&q=80' },
-    ],
-    us: [
-      { id:'d7', full_name:'Marcus Johnson', slug:'marcus-johnson', title:'Strength & Body Composition Coach', city:'New York', specialties:['Strength','Body Composition','Performance'], certifications:['NSCA CSCS','NASM CPT'], years_experience:11, clients_trained:510, avg_rating:4.9, review_count:67, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:120, whatsapp:'+12125550001', avatar_url:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80' },
-      { id:'d8', full_name:'Ashley Rivera', slug:'ashley-rivera', title:'Functional Fitness & Pilates Coach', city:'Los Angeles', specialties:['Pilates','Functional Fitness','Womens Health'], certifications:['ACE CPT','Balanced Body Pilates'], years_experience:7, clients_trained:310, avg_rating:5.0, review_count:44, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:100, whatsapp:'+13105550002', avatar_url:'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&q=80', gender:'female' },
-      { id:'d9', full_name:'Derek Kim', slug:'derek-kim', title:'Athletic Performance & Speed Coach', city:'Chicago', specialties:['Athletic Performance','Speed','Power'], certifications:['NSCA CSCS','USAW Level 2'], years_experience:8, clients_trained:260, avg_rating:4.8, review_count:35, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:110, whatsapp:'+13125550003', avatar_url:'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400&q=80' },
-    ],
-    fr: [
-      { id:'d10', full_name:'Thomas Moreau', slug:'thomas-moreau', title:'Coach Force et Conditionnement', city:'Paris', specialties:['Force','Perte de Poids','Conditionnement'], certifications:['BPJEPS AF','STAPS Licence'], years_experience:8, clients_trained:290, avg_rating:4.9, review_count:43, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:75, whatsapp:'+33612345678', avatar_url:'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80' },
-      { id:'d11', full_name:'Camille Dubois', slug:'camille-dubois', title:'Coach Pilates et Bien-etre', city:'Lyon', specialties:['Pilates','Renforcement Musculaire','Sante Feminine'], certifications:['BPJEPS AF','Pilates Reformer'], years_experience:6, clients_trained:175, avg_rating:5.0, review_count:31, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:80, whatsapp:'+33623456789', avatar_url:'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&q=80', gender:'female' },
-      { id:'d12', full_name:'Antoine Leroy', slug:'antoine-leroy', title:'Coach Running et Performance', city:'Bordeaux', specialties:['Running','Endurance','Marathon'], certifications:['BPJEPS AF','FFA Entraineur N2'], years_experience:5, clients_trained:140, avg_rating:4.8, review_count:24, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:65, whatsapp:'+33634567890', avatar_url:'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&q=80' },
-    ],
-    it: [
-      { id:'d13', full_name:'Giulia Romano', slug:'giulia-romano', title:'Coach Composizione Corporea e Forza', city:'Milano', specialties:['Composizione Corporea','Forza Funzionale','Allenamento Femminile'], certifications:['Laurea Scienze Motorie','CONI Personal Trainer'], years_experience:6, clients_trained:180, avg_rating:4.9, review_count:36, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:70, whatsapp:'+39312345678', avatar_url:'https://images.unsplash.com/photo-1594381898411-846e7d193883?w=400&q=80', gender:'female' },
-      { id:'d14', full_name:'Marco Ferrari', slug:'marco-ferrari', title:'Coach Forza e Powerlifting', city:'Roma', specialties:['Powerlifting','Forza Massimale','Tecnica di Sollevamento'], certifications:['FIPE Istruttore','Laurea Scienze Motorie'], years_experience:9, clients_trained:240, avg_rating:4.8, review_count:44, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:65, whatsapp:'+39323456789', avatar_url:'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400&q=80' },
-      { id:'d15', full_name:'Sofia Bianchi', slug:'sofia-bianchi', title:'Coach Nutrizione e Benessere', city:'Torino', specialties:['Nutrizione Sportiva','Perdita di Peso','Salute Femminile'], certifications:['Biologa Nutrizionista','CONI Personal Trainer'], years_experience:5, clients_trained:155, avg_rating:5.0, review_count:27, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:75, whatsapp:'+39334567890', avatar_url:'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&q=80', gender:'female' },
-    ],
-    es: [
-      { id:'d16', full_name:'Lucia Fernandez', slug:'lucia-fernandez', title:'Entrenadora de Fuerza y Composicion Corporal', city:'Madrid', specialties:['Fuerza','Composicion Corporal','HIIT'], certifications:['NSCA-CPT','Licenciatura CAFE'], years_experience:7, clients_trained:260, avg_rating:4.9, review_count:39, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:55, whatsapp:'+34612345678', avatar_url:'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&q=80', gender:'female' },
-      { id:'d17', full_name:'Pablo Garcia', slug:'pablo-garcia', title:'Entrenador de Rendimiento Atletico', city:'Barcelona', specialties:['Rendimiento Atletico','Velocidad','Potencia'], certifications:['NSCA CSCS','Licenciatura CAFE'], years_experience:8, clients_trained:210, avg_rating:4.8, review_count:32, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:60, whatsapp:'+34623456789', avatar_url:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80' },
-      { id:'d18', full_name:'Ana Martinez', slug:'ana-martinez', title:'Entrenadora de Yoga y Bienestar', city:'Valencia', specialties:['Yoga','Movilidad','Bienestar Femenino'], certifications:['RYT 500','ISSA Personal Trainer'], years_experience:6, clients_trained:190, avg_rating:5.0, review_count:33, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:50, whatsapp:'+34634567890', avatar_url:'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80', gender:'female' },
-    ],
-    in: [
-      { id:'d19', full_name:'Arjun Sharma', slug:'arjun-sharma', title:'Strength & Nutrition Coach', city:'Mumbai', specialties:['Strength','Nutrition','Fat Loss'], certifications:['ACE CPT','Precision Nutrition L1'], years_experience:8, clients_trained:310, avg_rating:4.9, review_count:47, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:2500, whatsapp:'+919876543210', avatar_url:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80' },
-      { id:'d20', full_name:'Priya Kapoor', slug:'priya-kapoor', title:'Yoga and Functional Fitness Coach', city:'Delhi', specialties:['Yoga','Functional Fitness','Womens Health'], certifications:['RYT 500','ISSA CPT'], years_experience:6, clients_trained:200, avg_rating:5.0, review_count:34, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:2000, whatsapp:'+919876543211', avatar_url:'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&q=80', gender:'female' },
-      { id:'d21', full_name:'Rohit Verma', slug:'rohit-verma', title:'Athletic Performance Coach', city:'Bangalore', specialties:['Athletic Performance','Cricket Conditioning','Speed'], certifications:['NSCA-CPT','Cricket Conditioning Specialist'], years_experience:7, clients_trained:165, avg_rating:4.8, review_count:26, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:2200, whatsapp:'+919876543212', avatar_url:'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400&q=80' },
-    ],
-  };
-  return demos[mkt] || demos['ae'];
-}
 
 function setFilter(filter, btn) {
   activeFilter = filter;
@@ -458,7 +411,7 @@ function trainerCardHTML(t) {
   const currency = window.__CURRENCY__ || '';
   const price = t.min_price ? `From ${currency} ${t.min_price.toLocaleString()}`.trim() : '';
   const waNum = esc(t.whatsapp || '');
-  const waMsg = encodeURIComponent('Hi, I found your profile on TrainedBy and I\'d like to book a session!');
+  const waMsg = encodeURIComponent(`Hi, I found your profile on ${BRAND_NAME} and I'd like to book a session!`);
   const waHref = waNum ? `https://wa.me/${waNum.replace(/\D/g,'')}?text=${waMsg}` : '';
 
   const photoHtml = t.avatar_url

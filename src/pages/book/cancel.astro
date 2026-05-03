@@ -1,5 +1,7 @@
 ---
 import BaseMinimal from '../../layouts/BaseMinimal.astro';
+import { getMarket } from '../../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
 
 const token = Astro.url.searchParams.get('token');
 
@@ -28,7 +30,7 @@ if (!SUPABASE_URL) {
 }
 ---
 
-<BaseMinimal title="Booking cancellation — TrainedBy">
+<BaseMinimal title={`Booking cancellation — ${market.brandName}`}>
   <div class="center-page">
     <div class="card">
       <div class="logo">Trained<span>By</span></div>

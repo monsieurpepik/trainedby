@@ -13,16 +13,6 @@ const proAnnual = Math.round(proMonthly * 0.8);
 const premiumMonthly = market.currency === 'AED' ? 199 : market.currency === 'GBP' ? 59 : market.currency === 'EUR' ? 59 : market.currency === 'INR' ? 3999 : 59;
 const premiumAnnual = Math.round(premiumMonthly * 0.8);
 const pricingHeadline = t(locale, 'pricing.headline').replace('{price}', `${market.currency} ${proMonthly}`);
-const DEMO_SLUGS: Record<string, string> = {
-  'en-ae': 'sarah-al-mansoori',
-  'en-uk': 'james-hartley',
-  'en-us': 'marcus-johnson',
-  'en-in': 'arjun-sharma',
-  'es':    'lucia-fernandez',
-  'fr':    'thomas-moreau',
-  'it':    'giulia-romano',
-};
-const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
 ---
 
 <Base
@@ -340,7 +330,7 @@ footer {
       <div class="plan-price-annual" id="pro-annual-note">&nbsp;</div>
       <div class="plan-desc">{t(locale, 'pricing.pro_desc')}</div>
       <button class="plan-btn plan-btn-brand" onclick="startCheckout('pro')">{t(locale, 'pricing.upgrade_pro')}</button>
-      <a href={`/${demoSlug}`} style="display:block;text-align:center;margin-top:10px;font-size:12px;color:var(--text-muted);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">See an example Pro profile</a>
+      <a href="/find" style="display:block;text-align:center;margin-top:10px;font-size:12px;color:var(--text-muted);text-decoration:underline;text-underline-offset:3px">See real Pro profiles</a>
       <div class="plan-features">
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -452,10 +442,21 @@ footer {
   </div>
 </footer>
 
-<script is:inline>
+<div id="checkout-error" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:14px 22px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;max-width:440px;width:calc(100% - 48px);text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.35)"></div>
+
+<script is:inline define:vars={{ brandName }}>
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
 const EDGE_BASE = SUPABASE_URL + '/functions/v1';
 let isAnnual = false;
+
+function showError(msg) {
+  const el = document.getElementById('checkout-error');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.style.display = 'none'; }, 6000);
+}
 
 function toggleBilling() { setBilling(isAnnual ? 'monthly' : 'annual'); }
 function setBilling(mode) {
@@ -492,7 +493,7 @@ async function startCheckout(plan) {
       body: JSON.stringify({ token })
     });
     const verifyData = await verifyRes.json();
-    if (!verifyRes.ok || !verifyData.trainer) { alert('Session expired. Please log in again.'); location.href = '/join'; return; }
+    if (!verifyRes.ok || !verifyData.trainer) { showError('Session expired. Please log in again.'); setTimeout(() => { location.href = '/join'; }, 1500); return; }
     const trainer_id = verifyData.trainer.id;
 
     const res = await fetch(EDGE_BASE + '/payment-router', {
@@ -507,19 +508,19 @@ async function startCheckout(plan) {
       })
     });
     const data = await res.json();
-    if (!res.ok) { alert(data.error || 'Could not start checkout.'); return; }
+    if (!res.ok) { showError(data.error || 'Could not start checkout.'); return; }
     if (data.provider === 'stripe' && data.checkout_url) {
       location.href = data.checkout_url;
     } else if (data.provider === 'razorpay') {
       await openRazorpay(data);
     } else {
-      alert('Could not start checkout. Please try again.');
+      showError('Could not start checkout. Please try again.');
     }
   } catch (err) {
     if (err && err.message && err.message.includes('razorpay')) {
-      alert('Payment provider unavailable. Please try again or contact support.');
+      showError('Payment provider unavailable. Please try again or contact support.');
     } else {
-      alert('Could not start checkout. Please try again.');
+      showError('Could not start checkout. Please try again.');
     }
   }
 }
@@ -532,7 +533,7 @@ function openRazorpay(data) {
         amount: data.amount,
         currency: data.currency,
         order_id: data.order_id,
-        name: 'TrainedBy',
+        name: brandName,
         description: data.description,
         prefill: { name: data.trainer_name, email: data.trainer_email },
         handler: () => { resolve(); location.href = location.origin + '/dashboard?upgraded=1'; },

@@ -1093,7 +1093,7 @@ body {
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
-<script is:inline define:vars={{ SUPABASE_ANON_KEY, ANON_KEY }}>
+<script is:inline define:vars={{ SUPABASE_ANON_KEY, ANON_KEY, BRAND_NAME: market.brandName }}>
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
 const EDGE_BASE = SUPABASE_URL + '/functions/v1';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1469,7 +1469,7 @@ function openRazorpay(data) {
         amount: data.amount,
         currency: data.currency,
         order_id: data.order_id,
-        name: 'TrainedBy',
+        name: BRAND_NAME,
         description: data.description,
         prefill: { name: data.trainer_name, email: data.trainer_email },
         handler: () => { resolve(); location.href = location.origin + '/dashboard?upgraded=1'; },

@@ -6,16 +6,6 @@ import { SUPABASE_ANON_KEY } from '../lib/config.ts';
 const market = getMarket(Astro.url.hostname);
 const locale = getLocale(Astro.request);
 const brand = getBrand(locale);
-const DEMO_SLUGS: Record<string, string> = {
-  'en-ae': 'sarah-al-mansoori',
-  'en-uk': 'james-hartley',
-  'en-us': 'marcus-johnson',
-  'en-in': 'arjun-sharma',
-  'es':    'lucia-fernandez',
-  'fr':    'thomas-moreau',
-  'it':    'giulia-romano',
-};
-const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
 ---
 
 <Base
@@ -369,7 +359,7 @@ body {
   <div class="join-header">
     <a href="/" class="join-logo">
       <svg width="28" height="28" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="DM Sans,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
-      <span data-brand-name>TrainedBy</span>
+      <span data-brand-name>{market.brandName}</span>
     </a>
     <a href="/edit" class="join-login-link"><span data-i18n="join.already">Already a member?</span> <span data-i18n="join.login">Sign in</span></a>
   </div>
@@ -411,7 +401,7 @@ body {
 
     <div class="field">
       <label data-i18n="join.name_label">Full Name <span class="field-req">*</span></label>
-      <input type="text" id="s1-name" placeholder="e.g. Sarah Al Mansoori" autocomplete="name">
+      <input type="text" id="s1-name" placeholder="e.g. Alex Jordan" autocomplete="name">
     </div>
 
     <div class="field">
@@ -492,7 +482,7 @@ body {
     </div>
     <p style="text-align:center;margin-top:20px;font-size:12px;color:var(--text-faint)">
       Wondering what your profile will look like?
-      <a href={`/${demoSlug}`} style="color:var(--text-muted);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">See an example</a>
+      <a href="/find" style="color:var(--text-muted);text-decoration:underline;text-underline-offset:3px">See real trainer profiles</a>
     </p>
   </div>
 
@@ -633,7 +623,7 @@ body {
 
     <div class="field-error hidden" id="s3-error"></div>
 
-    <button class="btn-primary" id="s3-btn" onclick="completeStep3()">Finish — Go Live 🚀</button>
+    <button class="btn-primary" id="s3-btn" onclick="completeStep3()">Finish — Go Live</button>
     <button class="btn-ghost" onclick="showStep(2)">← Back</button>
   </div>
 
@@ -1053,7 +1043,7 @@ async function verifyAndCreate() {
     showErr(errEl, e.message || 'Verification failed. Please check your code and try again.');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = 'Verify &amp; Go Live 🚀';
+    btn.innerHTML = 'Verify &amp; Go Live';
   }
 }
 
@@ -1273,7 +1263,7 @@ async function completeStep3() {
   } catch(e) {
     _step3Submitting = false;
     if (errEl) { errEl.textContent = e.message || 'Something went wrong. Please try again.'; errEl.classList.remove('hidden'); }
-    if (btn) { btn.disabled = false; btn.innerHTML = 'Finish — Go Live 🚀'; }
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Finish — Go Live'; }
   }
 }
 

@@ -8,18 +8,6 @@ const locale = getLocale(Astro.request);
 const brand = getBrand(locale);
 const brandName = brand.name;
 
-// Demo profile slug per locale - links to the example trainer for this market
-const DEMO_SLUGS: Record<string, string> = {
-  'en-ae': 'sarah-al-mansoori',
-  'en-uk': 'james-hartley',
-  'en-us': 'marcus-johnson',
-  'en-in': 'arjun-sharma',
-  'es':    'lucia-fernandez',
-  'fr':    'thomas-moreau',
-  'it':    'giulia-romano',
-};
-const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
-const ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 ---
 
 <Base
@@ -264,7 +252,7 @@ const ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
     <!-- EXAMPLE PROFILE LINK -->
     <p style="margin-top:16px;font-size:13px;color:var(--text-muted)">
       {locale === 'fr' ? 'Pas sûr de ce à quoi ressemble votre profil ?' : locale === 'it' ? 'Non sai come appare il tuo profilo?' : locale === 'es' ? '¿No sabes cómo se ve tu perfil?' : 'Not sure what your profile looks like?'}
-      {' '}<a href={`/${demoSlug}`} style="color:var(--text);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">{locale === 'fr' ? 'Voir un exemple de profil' : locale === 'it' ? 'Vedi un profilo esempio' : locale === 'es' ? 'Ver un perfil de ejemplo' : 'See an example profile'}</a>
+      {' '}<a href="/find" style="color:var(--text);text-decoration:underline;text-underline-offset:3px">{locale === 'fr' ? 'Voir les profils de formateurs' : locale === 'it' ? 'Vedi i profili dei trainer' : locale === 'es' ? 'Ver perfiles de entrenadores' : 'Browse trainer profiles'}</a>
     </p>
 
     <!-- QUICK FILTERS -->
@@ -319,72 +307,6 @@ const ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
         <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
           <div class="skeleton" style="height:195px"></div>
           <div style="padding:16px"><div class="skeleton" style="height:14px;width:50%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:42%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:85%"></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TRANSFORMATIONS -->
-  <div style="border-top:1px solid var(--border);background:var(--surface)">
-    <div class="section reveal reveal-delay-1">
-      <p class="section-eyebrow">{t(locale, 'transform_eyebrow')}</p>
-      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
-        <h2 class="section-title" style="margin-bottom:0">{t(locale, 'transform_title')}</h2>
-        <a href="/find" style="font-size:14px;font-weight:700;color:var(--text);text-decoration:none">{t(locale, 'featured_cta')}</a>
-      </div>
-      <p class="section-sub">{t(locale, 'blog_sub')}</p>
-      <div class="transforms-grid" id="transformations-grid">
-        <!-- Static seed cards - replaced by live data when available -->
-        <div class="transform-card">
-          <div class="transform-header">
-            <div class="transform-trainer">
-              <div class="transform-avatar">S</div>
-              <div>
-                <div class="transform-trainer-name">Sarah Al Mansoori</div>
-                <div class="transform-trainer-cert">{market.certificationBody} Level 3 · Strength Coach</div>
-              </div>
-            </div>
-            <div class="transform-title">{t(locale, 'transform_story1_title')}</div>
-            <p class="transform-body">{t(locale, 'transform_story1_body')}</p>
-          </div>
-          <div class="transform-stats">
-            <div class="transfo            <div class="transform-stat-val">14</div><div class="transform-stat-label">{t(locale, 'transform_stat_weeks')}</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">8kg</div><div class="transform-stat-label">{t(locale, 'transform_stat_lost')}</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">10k</div><div class="transform-stat-label">{t(locale, 'transform_stat_race')}</div></div>        </div>
-        </div>
-        <div class="transform-card">
-          <div class="transform-header">
-            <div class="transform-trainer">
-              <div class="transform-avatar">K</div>
-              <div>
-                <div class="transform-trainer-name">Khalid Rashid</div>
-                <div class="transform-trainer-cert">{market.certificationBody} Level 4 · HIIT Specialist</div>
-              </div>
-            </div>
-            <div class="transform-title">{t(locale, 'transform_story2_title')}</div>
-            <p class="transform-body">{t(locale, 'transform_story2_body')}</p>
-          </div>
-          <div class="transform-stats">
-            <div class="transform-stat            <div class="transform-stat-val">20</div><div class="transform-stat-label">{t(locale, 'transform_stat_weeks')}</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">14kg</div><div class="transform-stat-label">{t(locale, 'transform_stat_lost')}</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">1st</div><div class="transform-stat-label">{t(locale, 'transform_stat_race')}</div></div> </div>
-        </div>
-        <div class="transform-card">
-          <div class="transform-header">
-            <div class="transform-trainer">
-              <div class="transform-avatar">N</div>
-              <div>
-                <div class="transform-trainer-name">Nour Haddad</div>
-                <div class="transform-trainer-cert">{market.certificationBody} Level 3 · Nutrition & Wellness</div>
-              </div>
-            </div>
-            <div class="transform-title">{t(locale, 'transform_story3_title')}</div>
-            <p class="transform-body">{t(locale, 'transform_story3_body')}</p>
-          </div>
-          <div class="transform-stats">
-            <div class="transfo            <div class="transform-stat-val">24</div><div class="transform-stat-label">{t(locale, 'transform_stat_weeks')}</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">0</div><div class="transform-stat-label">{t(locale, 'transform_stat_pain')}</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">BW</div><div class="transform-stat-label">{t(locale, 'transform_stat_deadlift')}</div></div>        </div>
         </div>
       </div>
     </div>
@@ -445,7 +367,7 @@ const ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
       <div class="trainer-banner-actions">
         <a href="/for-trainers" class="btn-primary">{t(locale, 'banner_cta_primary')}</a>
         <a href="/join" class="btn-ghost">{t(locale, 'banner_cta_ghost')}</a>
-        <a href={`/${demoSlug}`} style="font-size:13px;color:var(--text-muted);text-decoration:underline;text-underline-offset:3px;margin-top:8px" target="_blank" rel="noopener">{locale === 'fr' ? 'Voir à quoi ressemble votre profil' : locale === 'it' ? 'Guarda come appare il tuo profilo' : locale === 'es' ? 'Ver cómo se ve tu perfil' : 'See what your profile looks like'}</a>
+        <a href="/find" style="font-size:13px;color:var(--text-muted);text-decoration:underline;text-underline-offset:3px;margin-top:8px">{locale === 'fr' ? 'Découvrir les profils de formateurs' : locale === 'it' ? 'Scopri i profili dei trainer' : locale === 'es' ? 'Explorar perfiles de entrenadores' : 'Explore trainer profiles'}</a>
       </div>
     </div>
   </div>

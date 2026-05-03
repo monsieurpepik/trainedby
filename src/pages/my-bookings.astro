@@ -1,6 +1,8 @@
 ---
 // src/pages/my-bookings.astro
 import BaseMinimal from '../layouts/BaseMinimal.astro';
+import { getMarket } from '../lib/market.ts';
+const market = getMarket(Astro.url.hostname);
 
 const token = Astro.url.searchParams.get('token');
 
@@ -54,7 +56,7 @@ const scheduled = credits.filter(c => c.status === 'scheduled');
 const used = credits.filter(c => c.status === 'used');
 ---
 
-<BaseMinimal title="My Bookings — TrainedBy" description="View and manage your personal training sessions">
+<BaseMinimal title={`My Bookings — ${market.brandName}`} description="View and manage your personal training sessions">
   <Fragment slot="head">
     <style>
       .page { max-width: 480px; margin: 0 auto; padding: 40px 20px; }
