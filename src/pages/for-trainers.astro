@@ -43,29 +43,27 @@ const isWaitlist = market.waitlistEnabled === true;
         --shadow: 0 4px 24px rgba(0,0,0,0.08);
         --shadow-lg: 0 8px 48px rgba(0,0,0,0.12);
         --nav-logo-by: var(--brand);
+        --text-on-brand: #ffffff;
+        /* Phone frame mockup — intentionally dark regardless of page theme */
+        --mock-phone-bg: #111111;
+        --mock-phone-border: rgba(255,255,255,0.12);
+        --mock-phone-shadow: rgba(0,0,0,0.6);
+        --mock-phone-glow: rgba(255,255,255,0.04);
+        --mock-notch: rgba(255,255,255,0.08);
+        --mock-text: #ffffff;
+        --mock-text-muted: rgba(255,255,255,0.5);
+        --mock-text-faint: rgba(255,255,255,0.4);
+        --mock-stat-bg: rgba(255,255,255,0.04);
+        --mock-stat-border: rgba(255,255,255,0.06);
+        --mock-badge-bg: rgba(0,200,83,0.12);
+        --mock-badge-border: rgba(0,200,83,0.25);
+        --mock-avatar-gradient-end: #FF8C42;
+        --color-whatsapp: #25D366;
       }
       body { background: var(--bg); color: var(--text); }
     </style>
   </Fragment>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-
-    /* NAV */
-    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 32px; height: 64px; display: flex; align-items: center; gap: 32px; transition: background 0.3s, border-color 0.3s; border-bottom: 1px solid transparent; }
-    .nav.scrolled { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-color: var(--border); }
-    .nav-logo { font-family: 'DM Sans', -apple-system, sans-serif; font-weight: 900; font-size: 20px; color: var(--text); text-decoration: none; letter-spacing: -0.5px; margin-right: auto; }
-    .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a { color: var(--text-2); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta { display: inline-flex; align-items: center; gap: 6px; padding: 9px 20px; border-radius: 100px; background: var(--text); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; white-space: nowrap; }
-    .nav-cta:hover { background: #333; transform: translateY(-1px); }
-    @media (max-width: 640px) { .nav-links { display: none; } .nav { padding: 0 20px; } }
-
-    /* NAV logo color override for light nav */
-    :global(#nav .nav-logo span) { color: var(--text); }
-    :global(#nav .nav-logo span span) { color: var(--brand) !important; }
-
     /* HERO */
     .hero { min-height: 88vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
     .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255,92,0,0.07) 0%, transparent 65%); pointer-events: none; }
@@ -75,7 +73,7 @@ const isWaitlist = market.waitlistEnabled === true;
     .hero-sub { font-size: clamp(15px, 2vw, 17px); color: var(--text-2); max-width: 480px; line-height: 1.7; margin-bottom: 40px; }
     .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 56px; }
     .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
-    .btn-primary:hover { background: #e05200; transform: translateY(-2px); }
+    .btn-primary:hover { background: var(--brand-hover); transform: translateY(-2px); }
     .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--border-2); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
     .btn-ghost:hover { border-color: var(--border-strong); transform: translateY(-2px); }
 
@@ -97,7 +95,7 @@ const isWaitlist = market.waitlistEnabled === true;
     .feature-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--brand-dim); border: 1px solid var(--brand-border); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 18px; }
     .feature-title { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 17px; margin-bottom: 8px; }
     .feature-desc { font-size: 14px; color: var(--text-2); line-height: 1.65; }
-    .feature-badge { display: inline-block; margin-top: 12px; padding: 3px 10px; border-radius: 20px; background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.2); color: #00C853; font-size: 11px; font-weight: 700; }
+    .feature-badge { display: inline-block; margin-top: 12px; padding: 3px 10px; border-radius: 20px; background: var(--reps-dim); border: 1px solid var(--reps-border); color: var(--reps); font-size: 11px; font-weight: 700; }
 
     /* HOW IT WORKS */
     .steps { display: flex; flex-direction: column; gap: 0; margin-top: 48px; }
@@ -112,19 +110,19 @@ const isWaitlist = market.waitlistEnabled === true;
     .pricing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 48px; }
     .pricing-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px; padding: 32px; position: relative; }
     .pricing-card.featured { border-color: rgba(255,92,0,0.3); background: linear-gradient(135deg, rgba(255,92,0,0.06), var(--surface-2)); }
-    .pricing-popular { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); padding: 4px 16px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .pricing-popular { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); padding: 4px 16px; border-radius: 100px; background: var(--brand); color: var(--text-on-brand); font-size: 11px; font-weight: 700; white-space: nowrap; }
     .pricing-tier { font-size: 12px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
     .pricing-price { font-family: 'DM Sans', sans-serif; font-weight: 900; font-size: 40px; letter-spacing: -2px; margin-bottom: 4px; }
     .pricing-price span { font-size: 14px; font-weight: 500; color: var(--text-2); letter-spacing: 0; }
     .pricing-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
     .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
     .pricing-features li { font-size: 13px; color: var(--text-2); display: flex; align-items: flex-start; gap: 8px; }
-    .pricing-features li::before { content: '✓'; color: #00C853; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .pricing-features li::before { content: '✓'; color: var(--reps); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
     .pricing-features li.muted { color: var(--text-3); }
     .pricing-features li.muted::before { color: var(--text-3); }
     .pricing-btn { display: block; text-align: center; padding: 13px 24px; border-radius: 100px; font-size: 14px; font-weight: 700; text-decoration: none; transition: all 0.2s; }
-    .pricing-btn-primary { background: var(--brand); color: #fff; }
-    .pricing-btn-primary:hover { background: #e05200; transform: translateY(-1px); }
+    .pricing-btn-primary { background: var(--brand); color: var(--text-on-brand); }
+    .pricing-btn-primary:hover { background: var(--brand-hover); transform: translateY(-1px); }
     .pricing-btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border-2); }
     .pricing-btn-ghost:hover { border-color: var(--border-strong); transform: translateY(-1px); }
 
@@ -162,37 +160,37 @@ const isWaitlist = market.waitlistEnabled === true;
       position: relative;
     }
     .phone-frame {
-      background: #111;
-      border: 2px solid rgba(255,255,255,0.12);
+      background: var(--mock-phone-bg);
+      border: 2px solid var(--mock-phone-border);
       border-radius: 32px;
       overflow: hidden;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+      box-shadow: 0 40px 80px var(--mock-phone-shadow), 0 0 0 1px var(--mock-phone-glow);
       padding: 20px;
     }
     .phone-notch {
-      width: 80px; height: 6px; background: rgba(255,255,255,0.08);
+      width: 80px; height: 6px; background: var(--mock-notch);
       border-radius: 3px; margin: 0 auto 20px;
     }
     .mock-avatar {
       width: 64px; height: 64px; border-radius: 50%;
-      background: linear-gradient(135deg, #FF5C00, #FF8C42);
+      background: linear-gradient(135deg, var(--brand), var(--mock-avatar-gradient-end));
       margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;
-      font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 800; color: #fff;
+      font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 800; color: var(--mock-text);
     }
     .mock-name {
       text-align: center; font-family: 'DM Sans', sans-serif;
-      font-size: 17px; font-weight: 800; color: #fff; margin-bottom: 4px;
+      font-size: 17px; font-weight: 800; color: var(--mock-text); margin-bottom: 4px;
     }
     .mock-title {
-      text-align: center; font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 12px;
+      text-align: center; font-size: 12px; color: var(--mock-text-muted); margin-bottom: 12px;
     }
     .mock-badge {
       display: flex; align-items: center; justify-content: center;
       gap: 6px; margin-bottom: 16px;
     }
     .mock-badge-pill {
-      background: rgba(0,200,83,0.12); border: 1px solid rgba(0,200,83,0.25);
-      color: #00C853; font-size: 10px; font-weight: 700; border-radius: 20px;
+      background: var(--mock-badge-bg); border: 1px solid var(--mock-badge-border);
+      color: var(--reps); font-size: 10px; font-weight: 700; border-radius: 20px;
       padding: 3px 10px; font-family: 'DM Sans', sans-serif;
     }
     .mock-stats {
@@ -200,16 +198,16 @@ const isWaitlist = market.waitlistEnabled === true;
       gap: 8px; margin-bottom: 16px;
     }
     .mock-stat {
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+      background: var(--mock-stat-bg); border: 1px solid var(--mock-stat-border);
       border-radius: 10px; padding: 10px 6px; text-align: center;
     }
     .mock-stat-val {
-      font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 800; color: #fff;
+      font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 800; color: var(--mock-text);
     }
-    .mock-stat-label { font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+    .mock-stat-label { font-size: 9px; color: var(--mock-text-faint); margin-top: 2px; }
     .mock-wa-btn {
-      background: #25D366; border-radius: 10px; padding: 12px;
-      text-align: center; font-size: 13px; font-weight: 700; color: #fff;
+      background: var(--color-whatsapp); border-radius: 10px; padding: 12px;
+      text-align: center; font-size: 13px; font-weight: 700; color: var(--mock-text);
       font-family: 'DM Sans', sans-serif;
     }
     .mockup-label {
@@ -223,7 +221,7 @@ const isWaitlist = market.waitlistEnabled === true;
   <!-- HERO -->
   <section class="hero">
     <div class="hero-eyebrow">
-      <div style="width:6px;height:6px;border-radius:50%;background:#00C853;flex-shrink:0"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--reps);flex-shrink:0"></div>
       For Personal Trainers · {market.certificationBody} Verified Platform
     </div>
     <h1 class="hero-headline">
@@ -454,7 +452,7 @@ const isWaitlist = market.waitlistEnabled === true;
           <input id="wl-email" type="email" required placeholder="Your email" class="waitlist-input" />
           <button type="button" onclick="submitWaitlist()" class="btn-primary" style="padding:12px 24px;font-size:14px;">Join the Waitlist →</button>
         </div>
-        <div id="wl-success" style="display:none;margin-top:20px;padding:12px 24px;border-radius:100px;background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.2);color:#00C853;font-size:14px;font-weight:600;">
+        <div id="wl-success" style="display:none;margin-top:20px;padding:12px 24px;border-radius:100px;background:var(--reps-dim);border:1px solid var(--reps-border);color:var(--reps);font-size:14px;font-weight:600;">
           ✓ You're on the list! We'll email you when we launch.
         </div>
       </div>
