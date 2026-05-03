@@ -423,7 +423,7 @@ const brandName = brand.name;
 
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/trainers?select=slug,full_name,specialty,location,profile_photo_url,reps_verified,packages&plan=eq.pro&is_active=eq.true&order=created_at.desc&limit=8`,
+          `${SUPABASE_URL}/rest/v1/trainers?select=slug,name,specialties,city,avatar_url,reps_verified,packages&plan=eq.pro&is_active=eq.true&order=created_at.desc&limit=8`,
           { headers: { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY } }
         );
         const trainers = await res.json();
@@ -434,9 +434,9 @@ const brandName = brand.name;
         grid.innerHTML = '';
 
         trainers.forEach((t: any) => {
-          const initials = (t.full_name || 'T').split(' ').map((n: string) => n[0]).join('').slice(0,2).toUpperCase();
-          const specialty = Array.isArray(t.specialty) ? t.specialty[0] : (t.specialty || 'Personal Training');
-          const location = t.location || '';
+          const initials = (t.name || 'T').split(' ').map((n: string) => n[0]).join('').slice(0,2).toUpperCase();
+          const specialty = Array.isArray(t.specialties) ? t.specialties[0] : (t.specialties || 'Personal Training');
+          const location = t.city || '';
           const packages = Array.isArray(t.packages) ? t.packages : [];
           const lowestPrice = packages.length > 0
             ? Math.min(...packages.map((p: any) => p.price || 0).filter((p: number) => p > 0))
@@ -447,13 +447,13 @@ const brandName = brand.name;
           card.className = 'trainer-card';
           card.innerHTML = `
             <div class="trainer-card-img">
-              ${t.profile_photo_url
-                ? `<img src="${t.profile_photo_url}" alt="${t.full_name}" style="width:100%;height:100%;object-fit:cover">`
+              ${t.avatar_url
+                ? `<img src="${t.avatar_url}" alt="${t.name}" style="width:100%;height:100%;object-fit:cover">`
                 : `<span>${initials}</span>`}
               ${t.reps_verified ? '<span class="verified-badge">✓ Verified</span>' : ''}
             </div>
             <div class="trainer-card-body">
-              <div class="trainer-card-name">${t.full_name || 'Trainer'}</div>
+              <div class="trainer-card-name">${t.name || 'Trainer'}</div>
               <div class="trainer-card-meta">${specialty}${location ? ' · ' + location : ''}</div>
               <div class="trainer-card-price">${lowestPrice ? 'From ' + lowestPrice : 'Contact for pricing'} <span>/ session</span></div>
             </div>
