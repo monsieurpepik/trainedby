@@ -4,7 +4,7 @@ import Nav from '../components/Nav.astro';
 import { getMarket } from '../lib/market.ts';
 import { SUPABASE_ANON_KEY } from '../lib/config.ts';
 const market = getMarket(Astro.url.hostname);
-const brandName = market.brandName || 'window.__BRAND__||"TrainedBy"';
+const brandName = market.brandName;
 const isPaid = market.paymentEnabled !== false;
 const isWaitlist = market.waitlistEnabled === true;
 ---

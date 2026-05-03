@@ -1866,7 +1866,7 @@ function shareProfile() {
 
 function saveContact() {
   if (!TRAINER) return;
-  const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${TRAINER.name}\nTITLE:${TRAINER.title || 'Personal Trainer'}\nTEL:${TRAINER.whatsapp || ''}\nURL:${location.href}\nNOTE:Verified Personal Trainer on ' + (window.__BRAND__?.name || 'TrainedBy') + '\nEND:VCARD`;
+  const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${TRAINER.name}\nTITLE:${TRAINER.title || 'Personal Trainer'}\nTEL:${TRAINER.whatsapp || ''}\nURL:${location.href}\nNOTE:Verified Personal Trainer on ${window.__BRAND__?.name || 'TrainedBy'}\nEND:VCARD`;
   const blob = new Blob([vcard], {type:'text/vcard'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
