@@ -1,6 +1,8 @@
 ---
 // src/pages/book/[slug].astro
 import { getMarket } from '../../lib/market.ts';
+import BaseMinimal from '../../layouts/BaseMinimal.astro';
+import Nav from '../../components/Nav.astro';
 
 const { slug } = Astro.params;
 const market = getMarket(Astro.url.hostname);
@@ -66,69 +68,8 @@ function savePct(pkg: SessionType): number | null {
 const pageTitle = `Book a session with ${trainer!.name}`;
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{pageTitle}</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0a0a0a; color: #fff; font-family: 'DM Sans', -apple-system, sans-serif; min-height: 100vh; }
-    .page { max-width: 480px; margin: 0 auto; padding: 32px 20px 80px; }
-    .trainer-header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
-    .trainer-avatar { width: 44px; height: 44px; border-radius: 50%; background: #222; object-fit: cover; }
-    .trainer-name { font-size: 15px; font-weight: 700; }
-    .trainer-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
-    .step { margin-bottom: 24px; }
-    .step[hidden] { display: none; }
-    .step-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-    .session-card { background: #111; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 14px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
-    .session-card:hover, .session-card.selected { border-color: #FF5C00; background: #0d0d0d; }
-    .session-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-    .session-name { font-size: 13px; font-weight: 600; }
-    .session-meta { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 3px; }
-    .session-price { font-size: 14px; font-weight: 700; color: #FF5C00; margin-top: 6px; }
-    .session-price .original { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.3); text-decoration: line-through; margin-left: 6px; }
-    .save-badge { background: #FF5C00; color: #fff; font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 4px; flex-shrink: 0; }
-    /* Calendar */
-    .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .cal-nav button { background: none; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px; }
-    .cal-month { font-size: 13px; font-weight: 600; }
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-    .cal-day-label { font-size: 9px; color: rgba(255,255,255,0.2); text-align: center; padding: 4px 0; }
-    .cal-day { font-size: 11px; text-align: center; padding: 7px 0; border-radius: 6px; cursor: pointer; }
-    .cal-day.available { background: #1e1e1e; color: #fff; }
-    .cal-day.available:hover, .cal-day.selected { background: #FF5C00; color: #fff; font-weight: 700; }
-    .cal-day.unavailable { color: rgba(255,255,255,0.15); cursor: default; }
-    .cal-day.empty { background: transparent; cursor: default; }
-    .slots-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; margin: 14px 0 8px; }
-    .slots-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    .slot { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 10px; text-align: center; font-size: 12px; cursor: pointer; }
-    .slot:hover, .slot.selected { background: #FF5C00; border-color: #FF5C00; font-weight: 700; }
-    .slot.booked { background: #111; border-color: rgba(255,255,255,0.04); color: rgba(255,255,255,0.2); cursor: default; }
-    /* Step 3 */
-    .booking-summary { background: #111; border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: rgba(255,255,255,0.6); }
-    .field { margin-bottom: 14px; }
-    .field label { display: block; font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 5px; }
-    .field input, .field textarea { width: 100%; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px 12px; font-size: 13px; color: #fff; outline: none; font-family: inherit; }
-    .field input:focus, .field textarea:focus { border-color: #FF5C00; }
-    .field textarea { min-height: 64px; resize: vertical; }
-    .order-summary { background: #111; border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
-    .order-row { display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px; }
-    .order-total { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; color: #fff; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
-    #stripe-element { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 12px; margin-bottom: 16px; }
-    .pay-btn { width: 100%; background: #FF5C00; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
-    .pay-btn:disabled { opacity: .5; cursor: default; }
-    .cancel-note { font-size: 11px; color: rgba(255,255,255,0.25); text-align: center; margin-top: 8px; }
-    .error-msg { color: #ff4444; font-size: 12px; margin-top: 8px; }
-    /* Success */
-    #success-screen { text-align: center; padding: 40px 20px; }
-    #success-screen h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
-    #success-screen p { font-size: 14px; color: rgba(255,255,255,0.6); }
-  </style>
-</head>
-<body>
+<BaseMinimal title={pageTitle} description={`Book a session with ${trainer!.name} on TrainedBy`}>
+  <Nav variant="minimal" />
   <div class="page">
     <!-- Trainer header -->
     <div class="trainer-header">
@@ -208,7 +149,7 @@ const pageTitle = `Book a session with ${trainer!.name}`;
         <input type="tel" id="f-phone" placeholder="+1 555 000 1234" autocomplete="tel" />
       </div>
       <div class="field">
-        <label>Your goal <span style="color:rgba(255,255,255,0.25)">(optional)</span></label>
+        <label>Your goal <span style="color: var(--text-muted)">(optional)</span></label>
         <textarea id="f-goal" placeholder="e.g. Lose 10kg, no injuries, intermediate level"></textarea>
       </div>
       <div class="order-summary" id="order-summary"></div>
@@ -472,5 +413,59 @@ const pageTitle = `Book a session with ${trainer!.name}`;
       }
     });
   </script>
-</body>
-</html>
+</BaseMinimal>
+
+<style>
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', -apple-system, sans-serif; min-height: 100vh; }
+  .page { max-width: 480px; margin: 0 auto; padding: 32px 20px 80px; }
+  .trainer-header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+  .trainer-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--surface-3); object-fit: cover; }
+  .trainer-name { font-size: 15px; font-weight: 700; }
+  .trainer-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .step { margin-bottom: 24px; }
+  .step[hidden] { display: none; }
+  .step-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
+  .session-card:hover, .session-card.selected { border-color: var(--brand); background: var(--surface-2); }
+  .session-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .session-name { font-size: 13px; font-weight: 600; }
+  .session-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .session-price { font-size: 14px; font-weight: 700; color: var(--brand); margin-top: 6px; }
+  .session-price .original { font-size: 11px; font-weight: 400; color: var(--text-muted); text-decoration: line-through; margin-left: 6px; }
+  .save-badge { background: var(--brand); color: var(--text-on-brand); font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 4px; flex-shrink: 0; }
+  /* Calendar */
+  .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .cal-nav button { background: none; border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px; }
+  .cal-month { font-size: 13px; font-weight: 600; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-day-label { font-size: 9px; color: var(--text-muted); text-align: center; padding: 4px 0; }
+  .cal-day { font-size: 11px; text-align: center; padding: 7px 0; border-radius: 6px; cursor: pointer; }
+  .cal-day.available { background: var(--surface-2); color: var(--text); }
+  .cal-day.available:hover, .cal-day.selected { background: var(--brand); color: var(--text-on-brand); font-weight: 700; }
+  .cal-day.unavailable { color: var(--text-muted); cursor: default; }
+  .cal-day.empty { background: transparent; cursor: default; }
+  .slots-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 14px 0 8px; }
+  .slots-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .slot { background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 10px; text-align: center; font-size: 12px; cursor: pointer; }
+  .slot:hover, .slot.selected { background: var(--brand); border-color: var(--brand); font-weight: 700; }
+  .slot.booked { background: var(--surface); border-color: var(--border); color: var(--text-muted); cursor: default; }
+  /* Step 3 */
+  .booking-summary { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: var(--text-muted); }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
+  .field input, .field textarea { width: 100%; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; font-size: 13px; color: var(--text); outline: none; font-family: inherit; }
+  .field input:focus, .field textarea:focus { border-color: var(--brand); }
+  .field textarea { min-height: 64px; resize: vertical; }
+  .order-summary { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+  .order-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+  .order-total { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; color: var(--text); padding-top: 10px; border-top: 1px solid var(--border); }
+  #stripe-element { background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin-bottom: 16px; }
+  .pay-btn { width: 100%; background: var(--brand); color: var(--text-on-brand); border: none; border-radius: 8px; padding: 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .pay-btn:disabled { opacity: .5; cursor: default; }
+  .cancel-note { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 8px; }
+  .error-msg { color: var(--danger); font-size: 12px; margin-top: 8px; }
+  /* Success */
+  #success-screen { text-align: center; padding: 40px 20px; }
+  #success-screen h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+  #success-screen p { font-size: 14px; color: var(--text-muted); }
+</style>
