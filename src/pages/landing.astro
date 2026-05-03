@@ -18,8 +18,9 @@ const brandName = brand.name;
     <meta name="color-scheme" content="light">
     <meta name="theme-color" content="#FFFFFF">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
-    <!-- Light theme override — must be LAST in <head> to win the CSS cascade over Base.astro dark globals -->
-    <style>
+    <!-- Light theme override — is:inline keeps this as a raw <style> tag at slot position (end of <head>),
+         AFTER all Astro-bundled <link> tags, so it correctly wins the cascade over Base.astro dark globals -->
+    <style is:inline>
       :root {
         --bg: #FFFFFF;
         --surface: #FAFAF9;
