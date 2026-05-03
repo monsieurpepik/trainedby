@@ -684,78 +684,68 @@ const brandName = market.brandName;
 
   /* ═══════════════════════════════════════════════
      DESKTOP LAYOUT - 768px and above
-     Two-column: hero/CTAs left, sections right
+     Full-bleed hero banner + 3-column content grid
   ═══════════════════════════════════════════════ */
   @media (min-width: 768px) {
+
     /* Topbar gets a max-width container */
     #topbar {
-      padding-left: max(calc(50vw - 560px), 32px);
-      padding-right: max(calc(50vw - 560px), 32px);
+      padding-left: max(calc(50vw - 600px), 32px);
+      padding-right: max(calc(50vw - 600px), 32px);
     }
 
-    /* Background: shift image to left half */
+    /* Background: vertical gradient for cinematic hero (not left-right) */
     #bg {
-      background-position: 30% top;
+      background-position: center top;
     }
     #bg::after {
       background: linear-gradient(
-        to right,
-        var(--scrim-55) 0%,
-        var(--scrim-75) 45%,
-        var(--scrim-97) 65%,
-        var(--scrim-99) 100%
-      ),
-      linear-gradient(
         to bottom,
-        var(--scrim-20) 0%,
-        var(--scrim-50) 60%,
-        var(--scrim-95) 100%
+        rgba(0,0,0,0.15) 0%,
+        rgba(0,0,0,0.4) 50%,
+        rgba(0,0,0,0.85) 100%
       );
     }
 
-    /* Page becomes a two-column grid */
+    /* Page: block (not flex row) */
     #page {
-      flex-direction: row;
-      align-items: flex-start;
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 80px 32px 48px;
-      gap: 0;
-      min-height: 100vh;
+      display: block !important;
     }
 
-    /* Left column: hero + CTAs (sticky) */
-    #left-col {
-      width: 360px;
-      flex-shrink: 0;
-      position: sticky;
-      top: 80px;
+    /* ── HERO BANNER ── */
+    #profile-hero {
+      position: relative;
+      height: 300px;
       display: flex;
-      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 48px 36px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    /* Right column: sections */
-    #right-col {
-      flex: 1;
-      min-width: 0;
-      padding-left: 40px;
-    }
-
+    /* Hero identity: left-anchored */
     #hero {
-      padding: 0 0 24px 0;
+      padding: 0;
       text-align: left;
       align-items: flex-start;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
     }
 
     .avatar-wrap {
-      width: 120px;
-      height: 120px;
+      width: 88px;
+      height: 88px;
     }
 
-    .trainer-name { font-size: 30px; }
+    .trainer-name {
+      font-size: 32px;
+      color: #fff;
+    }
 
-    .stats-pill {
-      max-width: 100%;
+    .trainer-title {
+      color: rgba(255,255,255,0.7);
     }
 
     .badge-row {
@@ -770,23 +760,82 @@ const brandName = market.brandName;
       justify-content: flex-start;
     }
 
+    .stats-pill {
+      max-width: 100%;
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .stat-val, .stat-lbl {
+      color: #fff;
+    }
+
+    .gym-tag {
+      color: rgba(255,255,255,0.65);
+    }
+
+    /* CTAs: right-anchored vertical stack in hero */
     #ctas {
-      padding: 0 0 24px 0;
-    }
-
-    #sections {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 200px;
+      flex-shrink: 0;
       padding: 0;
-      margin-bottom: 48px;
+      margin-left: 32px;
     }
 
-    #socials {
-      padding: 0 0 20px 0 !important;
+    /* Hide secondary CTAs inside the hero on desktop */
+    #ctas .action-grid {
+      display: none;
+    }
+    #ctas .btn-save {
+      display: none;
     }
 
-    .powered {
-      text-align: left;
-      padding: 16px 0;
+    /* Book button: full width within cta stack */
+    #ctas .btn-book {
+      width: 100%;
     }
+
+    /* WA button: full width within cta stack */
+    #ctas .btn-wa-wrap {
+      width: 100%;
+    }
+    #ctas .btn-wa {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* ── CONTENT GRID ── */
+    #profile-grid {
+      background: var(--bg);
+      padding: 40px 48px 64px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* Sections participates in grid as transparent wrapper */
+    #sections {
+      display: contents;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Card grid spans */
+    #pkgsCard       { grid-column: span 2; order: 1; }
+    #bioCard        { grid-column: span 2; order: 2; }
+    #philosophyCard { grid-column: span 1; order: 3; }
+    #transformsCard { grid-column: 1 / -1; order: 4; }
+    #reviewsCard    { grid-column: 1 / -1; order: 5; }
+    #affiliateCard  { grid-column: span 1; order: 6; }
+    #galleryCard    { grid-column: 1 / -1; order: 7; }
+
+    /* Assessment card (no ID — targets the only .sec-card without an ID) */
+    #sections > .sec-card:not([id]) { grid-column: span 1; order: 3; }
 
     /* Sections open by default on desktop */
     .sec-body {
@@ -803,6 +852,27 @@ const brandName = market.brandName;
       grid-template-columns: repeat(4, 1fr);
     }
 
+    /* Nearby section and socials: span full width in grid */
+    #nearbySection {
+      grid-column: 1 / -1;
+      padding: 0 0 20px;
+    }
+
+    #socials {
+      grid-column: 1 / -1;
+      padding: 0 0 20px;
+    }
+
+    #socials-desktop {
+      grid-column: 1 / -1;
+    }
+
+    .powered {
+      grid-column: 1 / -1;
+      text-align: left;
+      padding: 16px 0;
+    }
+
     /* Lead modal centered on desktop */
     #leadModal {
       align-items: center;
@@ -812,15 +882,14 @@ const brandName = market.brandName;
     }
   }
 
-  /* Large desktop */
   @media (min-width: 1024px) {
-    #left-col {
-      width: 400px;
+    #profile-hero {
+      padding: 0 64px 40px;
     }
-    #right-col {
-      padding-left: 56px;
+    #profile-grid {
+      padding: 48px 64px 80px;
     }
-    .trainer-name { font-size: 34px; }
+    .trainer-name { font-size: 36px; }
   }
   </style>
 
