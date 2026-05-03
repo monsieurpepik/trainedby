@@ -8,3 +8,9 @@ scripts/run_schema.py
 supabase/.temp/
 .DS_Store
 *.log
+
+# Local Netlify folder
+.netlify
+
+# Build output
+dist/
