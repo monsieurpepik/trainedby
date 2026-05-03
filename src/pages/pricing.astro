@@ -51,6 +51,10 @@ const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
         --reps-dim: rgba(22,163,74,0.08);
         --reps-border: rgba(22,163,74,0.20);
         --nav-logo-by: var(--brand);
+        --gold-faintest: rgba(245,208,107,0.04);
+        --gold-text: #0a0a0a;
+        --table-hover-bg: rgba(0,0,0,0.02);
+        --brand-faintest: rgba(255,92,0,0.04);
       }
     </style>
   </Fragment>
@@ -63,43 +67,6 @@ body {
   -webkit-font-smoothing: antialiased; min-height: 100vh;
 }
 
-/* ── Nav layout (Nav.astro renders the HTML) ─────────────── */
-.nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 32px; height: 64px;
-  background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  transition: background 0.3s, box-shadow 0.3s;
-}
-.nav.scrolled {
-  background: rgba(255,255,255,0.95);
-  box-shadow: 0 1px 12px rgba(0,0,0,0.07);
-}
-.nav-logo {
-  font-family: 'DM Sans', sans-serif; font-weight: 900; font-size: 20px;
-  text-decoration: none; color: var(--text); display: flex; align-items: center;
-}
-.nav-links { display: flex; gap: 28px; }
-.nav-links a {
-  font-size: 14px; font-weight: 500; color: var(--text-muted);
-  text-decoration: none; transition: color 0.2s;
-}
-.nav-links a:hover { color: var(--text); }
-.nav-cta {
-  background: var(--text); color: var(--bg);
-  padding: 9px 18px; border-radius: 20px;
-  font-size: 13px; font-weight: 700; text-decoration: none;
-  transition: opacity 0.2s;
-}
-.nav-cta:hover { opacity: 0.85; }
-/* Logo "By" sub-span color on light nav */
-:global(#nav .nav-logo span) { color: var(--text); }
-:global(#nav .nav-logo span span) { color: var(--brand) !important; }
-@media (max-width: 768px) {
-  .nav-links { display: none; }
-  .nav { padding: 0 20px; }
-}
 
 .pricing-wrap { max-width: 1000px; margin: 0 auto; padding: 100px 24px 80px; }
 .pricing-header { text-align: center; margin-bottom: 48px; }
@@ -131,7 +98,7 @@ body {
 .toggle-knob {
   position: absolute; top: 3px; left: 3px;
   width: 18px; height: 18px; border-radius: 50%;
-  background: #fff; transition: left 0.2s;
+  background: var(--bg); transition: left 0.2s;
 }
 .toggle-switch.annual .toggle-knob { left: 25px; }
 .billing-save {
@@ -162,13 +129,13 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 24px;
-  background: linear-gradient(135deg, rgba(245,208,107,0.04) 0%, transparent 55%);
+  background: linear-gradient(135deg, var(--gold-faintest) 0%, transparent 55%);
   pointer-events: none;
 }
 .popular-badge {
   position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
   background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
-  color: #0a0a0a;
+  color: var(--gold-text);
   font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 11px; font-weight: 800;
   padding: 4px 14px; border-radius: 20px; white-space: nowrap;
   letter-spacing: 0.06em; text-transform: uppercase;
@@ -207,7 +174,7 @@ body {
 /* Pro CTA button: metallic gold */
 .plan-card.popular .plan-btn-brand {
   background: var(--pro-gradient, linear-gradient(135deg,#c9a227,#f5d06b,#c9a227));
-  color: #0a0a0a;
+  color: var(--gold-text);
   box-shadow: 0 4px 20px rgba(197,162,39,0.35);
 }
 .plan-card.popular .plan-btn-brand:hover {
@@ -248,7 +215,7 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .compare-table td:first-child { text-align: left; color: var(--text); font-weight: 500; }
-.compare-table tr:hover td { background: rgba(0,0,0,0.02); }
+.compare-table tr:hover td { background: var(--table-hover-bg); }
 .check { color: var(--reps); font-size: 16px; }
 .cross { color: var(--text-faint); font-size: 16px; }
 .plan-highlight { color: var(--brand); font-weight: 700; }
@@ -372,9 +339,9 @@ footer {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
           {t(locale, 'pricing.f_everything_free')}
         </div>
-        <div class="plan-feature included" style="background:rgba(255,92,0,0.04);border-radius:8px;padding:6px 8px;margin:-2px 0">
+        <div class="plan-feature included" style="background:var(--brand-faintest);border-radius:8px;padding:6px 8px;margin:-2px 0">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5C00"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          <strong style="color:#FF5C00">📊 {t(locale, 'pricing.f_analytics')}</strong>
+          <strong style="color:var(--brand)">📊 {t(locale, 'pricing.f_analytics')}</strong>
         </div>
         <div class="plan-feature included">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
