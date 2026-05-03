@@ -96,6 +96,16 @@ const localeSamplesJson = JSON.stringify(sampleArticles[locale] || sampleArticle
       --reps-dim: rgba(22,163,74,0.08);
       --reps-border: rgba(22,163,74,0.20);
       --nav-logo-by: var(--brand);
+      --text-on-brand: #ffffff;
+      --brand-faintest: rgba(255,92,0,0.04);
+      --brand-glow: rgba(255,92,0,0.3);
+      --brand-hover-border: rgba(255,92,0,0.25);
+      --reps-faintest: rgba(0,200,83,0.02);
+      --reps-badge-bg: rgba(0,200,83,0.15);
+      --reps-badge-border: rgba(0,200,83,0.3);
+      --reps-hover-bg: rgba(0,200,83,0.25);
+      --reps-bright-dim: rgba(0,200,83,0.08);
+      --reps-bright-border: rgba(0,200,83,0.2);
     }
   </style>
 </Fragment>
@@ -106,44 +116,6 @@ body {
   background: var(--bg); color: var(--text);
   font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.7;
   -webkit-font-smoothing: antialiased; overflow-x: hidden;
-}
-
-/* ── Nav layout (Nav.astro renders the HTML) ─────────────── */
-.nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 32px; height: 64px;
-  background: rgba(255,255,255,0.92); backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  transition: background 0.3s, box-shadow 0.3s;
-}
-.nav.scrolled {
-  background: rgba(255,255,255,0.97);
-  box-shadow: 0 1px 12px rgba(0,0,0,0.07);
-}
-.nav-logo {
-  font-family: 'DM Sans', sans-serif; font-weight: 900; font-size: 20px;
-  text-decoration: none; color: var(--text); display: flex; align-items: center;
-}
-.nav-links { display: flex; gap: 24px; align-items: center; }
-.nav-links a {
-  font-size: 14px; font-weight: 500; color: var(--text-muted);
-  text-decoration: none; transition: color 0.2s;
-}
-.nav-links a:hover { color: var(--text); }
-.nav-cta {
-  background: var(--text); color: var(--bg);
-  padding: 9px 18px; border-radius: 20px;
-  font-size: 13px; font-weight: 700; text-decoration: none;
-  transition: opacity 0.2s;
-}
-.nav-cta:hover { opacity: 0.85; }
-/* Logo "By" color fix on light nav */
-:global(#nav .nav-logo span) { color: var(--text); }
-:global(#nav .nav-logo span span) { color: var(--brand) !important; }
-@media (max-width: 768px) {
-  .nav-links { display: none; }
-  .nav { padding: 0 20px; }
 }
 
 /* Hero */
@@ -185,7 +157,7 @@ body {
   color: var(--text-muted); transition: all 0.2s; font-family: 'DM Sans', sans-serif;
 }
 .filter-pill:hover { border-color: var(--brand-border); color: var(--text); }
-.filter-pill.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+.filter-pill.active { background: var(--brand); border-color: var(--brand); color: var(--text-on-brand); }
 
 /* Main layout */
 .blog-main {
@@ -207,7 +179,7 @@ body {
   border-radius: 20px; overflow: hidden; margin-bottom: 32px;
   cursor: pointer; transition: border-color 0.2s, transform 0.2s;
 }
-.featured-article:hover { border-color: rgba(255,92,0,0.3); transform: translateY(-2px); }
+.featured-article:hover { border-color: var(--brand-glow); transform: translateY(-2px); }
 .featured-img {
   width: 100%; aspect-ratio: 16/7; object-fit: cover;
   background: var(--surface-3);
@@ -263,7 +235,7 @@ body {
   border-radius: 16px; overflow: hidden; cursor: pointer;
   transition: border-color 0.2s, transform 0.2s;
 }
-.article-card:hover { border-color: rgba(255,92,0,0.25); transform: translateY(-2px); }
+.article-card:hover { border-color: var(--brand-hover-border); transform: translateY(-2px); }
 .article-card-img {
   width: 100%; aspect-ratio: 16/9; object-fit: cover;
   background: var(--surface-3);
@@ -312,7 +284,7 @@ body {
 .sidebar-trainer-name { font-size: 13px; font-weight: 600; }
 .sidebar-trainer-spec { font-size: 11px; color: var(--text-faint); }
 .sidebar-cta {
-  background: linear-gradient(135deg, var(--brand-dim), rgba(255,92,0,0.04));
+  background: linear-gradient(135deg, var(--brand-dim), var(--brand-faintest));
   border: 1px solid var(--brand-border); border-radius: 16px;
   padding: 20px; text-align: center;
 }
@@ -323,7 +295,7 @@ body {
 .sidebar-cta-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
 .sidebar-cta-btn {
   display: block; width: 100%;
-  background: var(--brand); color: #fff;
+  background: var(--brand); color: var(--text-on-brand);
   border: none; border-radius: 10px; padding: 12px;
   font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800;
   cursor: pointer; text-decoration: none; transition: background 0.2s;
@@ -332,8 +304,8 @@ body {
 
 /* Write for us banner */
 .write-banner {
-  background: linear-gradient(135deg, rgba(0,200,83,0.08), rgba(0,200,83,0.02));
-  border: 1px solid rgba(0,200,83,0.2); border-radius: 16px;
+  background: linear-gradient(135deg, var(--reps-bright-dim), var(--reps-faintest));
+  border: 1px solid var(--reps-bright-border); border-radius: 16px;
   padding: 20px; margin-bottom: 32px;
 }
 .write-banner-title {
@@ -343,12 +315,12 @@ body {
 .write-banner-sub { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
 .write-banner-btn {
   display: inline-block; padding: 9px 18px;
-  background: rgba(0,200,83,0.15); border: 1px solid rgba(0,200,83,0.3);
+  background: var(--reps-badge-bg); border: 1px solid var(--reps-badge-border);
   color: var(--reps); border-radius: 10px;
   font-size: 12px; font-weight: 700; text-decoration: none;
   transition: background 0.2s;
 }
-.write-banner-btn:hover { background: rgba(0,200,83,0.25); }
+.write-banner-btn:hover { background: var(--reps-hover-bg); }
 
 /* Empty state */
 .empty-state {
