@@ -17,7 +17,7 @@ graph LR
     Netlify -->|payments| PaymentRouter["payment-router fn<br/>Stripe / Razorpay"]
     PaymentRouter -->|AE COM UK FR IT ES MX CA| Stripe["Stripe"]
     PaymentRouter -->|IN| Razorpay["Razorpay"]
-    Stripe & Razorpay -->|webhooks| EdgeFunctions["56 Edge Functions<br/>(Deno)"]
+    Stripe & Razorpay -->|webhooks| EdgeFunctions["55 Edge Functions<br/>(Deno)"]
     EdgeFunctions -->|email| Resend["Resend"]
     EdgeFunctions -->|AI| Claude["Claude API"]
     EdgeFunctions -->|ops| Telegram["@TrainedByCEO_bot"]
@@ -34,8 +34,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for full technical design and rationale.
 | Dimension | Value |
 |-----------|-------|
 | Markets | 10 domains, 4 languages (EN, FR, IT, ES) |
-| Payment providers | Stripe (9 markets) + Razorpay (India) |
-| Edge functions | 56 (auth, payments, AI agents, platform ops) |
+| Payment providers | Stripe (9 domains) + Razorpay (India) |
+| Edge functions | 55 (auth, payments, AI agents, platform ops) |
 | Backend | One Supabase project serves all markets |
 
 ---
@@ -79,7 +79,7 @@ src/
   components/  — Astro + React components
   layouts/     — Base.astro (head, OG, SW, analytics)
 supabase/
-  functions/   — 56 Deno edge functions
+  functions/   — 55 Deno edge functions
   migrations/  — All DB schema migrations
 scripts/       — deploy_functions.sh, seed scripts
 docs/
@@ -107,5 +107,5 @@ docs/
 | Netlify | Pro — auto-deploys `main` to production |
 | Sentry | Developer — frontend + edge function error tracking |
 | Resend | Scale — transactional email |
-| Stripe | Live — 9 markets |
+| Stripe | Live — 9 domains |
 | Razorpay | Live — India |
