@@ -58,6 +58,16 @@ const STRIPE_PRICES: Record<string, Record<string, Record<string, string>>> = {
       annual: Deno.env.get('STRIPE_PRICE_PREMIUM_ANNUAL') || '',
     },
   },
+  com: {
+    pro: {
+      monthly: Deno.env.get('STRIPE_PRICE_COM_PRO_MONTHLY') || Deno.env.get('STRIPE_PRICE_PRO_MONTHLY') || '',
+      annual: Deno.env.get('STRIPE_PRICE_COM_PRO_ANNUAL') || Deno.env.get('STRIPE_PRICE_PRO_ANNUAL') || '',
+    },
+    premium: {
+      monthly: Deno.env.get('STRIPE_PRICE_COM_PREMIUM_MONTHLY') || Deno.env.get('STRIPE_PRICE_PREMIUM_MONTHLY') || '',
+      annual: Deno.env.get('STRIPE_PRICE_COM_PREMIUM_ANNUAL') || Deno.env.get('STRIPE_PRICE_PREMIUM_ANNUAL') || '',
+    },
+  },
 };
 
 // Razorpay plan amounts (in paise)
