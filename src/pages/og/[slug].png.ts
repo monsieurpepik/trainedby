@@ -21,7 +21,10 @@ async function ensureInit() {
       );
       if (!fontRes.ok) throw new Error(`Font fetch failed: ${fontRes.status}`);
       fontData = await fontRes.arrayBuffer();
-    })();
+    })().catch((err) => {
+      initPromise = null;
+      throw err;
+    });
   }
   await initPromise;
 }
