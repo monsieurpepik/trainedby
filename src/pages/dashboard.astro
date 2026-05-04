@@ -39,6 +39,15 @@ if (tbSession) {
       .gt('expires_at', new Date().toISOString())
       .single();
 
+    // Extend session for 7 days on each valid dashboard load
+    if (link?.trainer_id) {
+      const newExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      await svc.from('magic_links')
+        .update({ expires_at: newExpiry })
+        .eq('token', tbSession)
+        .eq('used', false);
+    }
+
     if (link?.trainer_id) {
       const [{ data: trainer }, { count: pkgCount }, { count: sessionTypeCount }, { count: availabilityCount }, { data: bookingsData }] = await Promise.all([
         svc.from('trainers').select('avatar_url, bio, instagram_handle, reps_verified, verification_status, plan, slug, stripe_connect_onboarded').eq('id', link.trainer_id).single(),
