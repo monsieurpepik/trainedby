@@ -124,22 +124,33 @@ export const GET: APIRoute = async ({ params }) => {
   const { slug } = params;
   if (!slug) return new Response('Not found', { status: 404 });
 
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/trainers?slug=eq.${encodeURIComponent(slug)}&select=name,specialties,avatar_url,avg_rating,review_count&limit=1`,
-    { headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` } }
-  );
-  if (!res.ok) return new Response('Not found', { status: 404 });
-  const data = await res.json();
-  if (!Array.isArray(data) || data.length === 0) return new Response('Not found', { status: 404 });
+  let name = 'Personal Trainer';
+  let specialty = 'Personal Training';
+  let avatar: string | null = null;
+  let rating: string | null = null;
+  let reviewCount = 0;
 
-  const trainer = data[0];
-  const name: string = trainer.name || 'Trainer';
-  const specialty: string = Array.isArray(trainer.specialties)
-    ? trainer.specialties[0]
-    : (trainer.specialties || 'Personal Trainer');
-  const avatar: string | null = trainer.avatar_url || null;
-  const rating: string | null = trainer.avg_rating != null ? Number(trainer.avg_rating).toFixed(1) : null;
-  const reviewCount: number = trainer.review_count ?? 0;
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/trainers?slug=eq.${encodeURIComponent(slug)}&select=name,specialties,avatar_url,avg_rating,review_count&limit=1`,
+      { headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` } }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        const trainer = data[0];
+        name = trainer.name || 'Personal Trainer';
+        specialty = Array.isArray(trainer.specialties)
+          ? trainer.specialties[0]
+          : (trainer.specialties || 'Personal Training');
+        avatar = trainer.avatar_url || null;
+        rating = trainer.avg_rating != null ? Number(trainer.avg_rating).toFixed(1) : null;
+        reviewCount = trainer.review_count ?? 0;
+      }
+    }
+  } catch {
+    // Use fallback values — still render a valid image
+  }
 
   await ensureInit();
 
