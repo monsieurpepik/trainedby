@@ -7,6 +7,10 @@ on:
       - 'supabase/functions/**'
       - 'scripts/deploy_functions.sh'
 
+concurrency:
+  group: deploy-edge-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
     name: Deploy changed edge functions
