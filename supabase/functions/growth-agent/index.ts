@@ -281,7 +281,7 @@ async function sendDigestEmail(to: string, memo: Record<string, unknown>): Promi
   <div style="background:#111;border:1px solid #222;padding:16px;border-radius:8px;margin-bottom:24px;">
     <p style="color:#ccc;font-size:14px;margin:0;">New trainers: <strong style="color:#fff;">${memo.new_trainers}</strong> (${(memo.new_trainers_delta as number) >= 0 ? '+' : ''}${memo.new_trainers_delta}) &nbsp;·&nbsp; New leads: <strong style="color:#fff;">${memo.new_leads}</strong> (${(memo.new_leads_delta as number) >= 0 ? '+' : ''}${memo.new_leads_delta})</p>
   </div>
-  <p style="color:#555;font-size:12px;text-align:center;margin-top:32px;">TrainedBy Growth Agent · <a href="${getMarketBaseUrl('ae')}" style="color:#FF5C00;">trainedby.ae</a></p>
+  <p style="color:#555;font-size:12px;text-align:center;margin-top:32px;">TrainedBy Growth Agent · <a href="${getMarketBaseUrl('com')}" style="color:#FF5C00;">trainedby.com</a></p>
 </body>
 </html>`;
 
@@ -290,7 +290,7 @@ async function sendDigestEmail(to: string, memo: Record<string, unknown>): Promi
       method: 'POST',
       headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: Deno.env.get('GROWTH_FROM_EMAIL') ?? 'TrainedBy Growth Agent <growth@trainedby.ae>',
+        from: Deno.env.get('GROWTH_FROM_EMAIL') ?? 'TrainedBy Growth Agent <growth@trainedby.com>',
         to: [to],
         subject: `TrainedBy Weekly: ${memo.overall_conversion_pct}% conversion, ${memo.new_trainers} new trainers`,
         html,
