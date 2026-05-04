@@ -97,9 +97,13 @@ supabase functions logs payment-router --project-ref mezhtdbfyvkshpuplqqw | head
 
 ### 8. CI pipeline blocking PRs
 
-- [ ] Open a test PR to `staging`
-- [ ] GitHub Actions CI workflow appears in the PR Checks section
-- [ ] If CI fails, PR is blocked (merge button greyed out)
+✅ `.github/workflows/ci.yml` exists and triggers on PRs to `staging` and `main`. Runs `astro check` + `pnpm test:ci`.
+
+Remaining manual step: verify branch protection rules are configured in GitHub repo Settings → Branches → staging and main → require status checks.
+
+- [x] CI workflow file exists and is correctly configured
+- [ ] Open a test PR to `staging` — confirm CI checks appear in PR
+- [ ] Confirm merge is blocked when CI fails (branch protection enabled)
 
 **Evidence:** Screenshot of PR with CI checks visible.
 
@@ -116,6 +120,6 @@ supabase functions logs payment-router --project-ref mezhtdbfyvkshpuplqqw | head
 | WhatsApp OG card | ⬜ | — |
 | Stripe currency | ⬜ | — |
 | Sentry live | ⬜ | — |
-| CI pipeline | ⬜ | — |
+| CI pipeline | 🔶 Partial — workflow configured, branch protection needs manual verify | — |
 
 **All gates ✅ → open signups → LinkedIn post**
