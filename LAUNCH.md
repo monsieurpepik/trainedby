@@ -13,7 +13,7 @@ All 8 items must be ✅ before signups open. See [docs/runbooks/launch-verificat
 | WhatsApp OG card shows trainer branding | ⬜ | — | — |
 | Stripe shows correct currency per market | ⬜ | — | — |
 | Sentry has ≥ 1 confirmed live event | ⬜ | — | — |
-| CI pipeline blocks failing PRs | ⬜ | — | — |
+| CI pipeline blocks failing PRs | ✅ | Claude Code | 2026-05-04 |
 
 ---
 
