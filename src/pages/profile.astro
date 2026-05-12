@@ -1171,6 +1171,11 @@ function render(t) {
     } : undefined,
     priceRange: t.session_packages?.length > 0 ? '££' : undefined,
     sameAs: [t.instagram ? `https://instagram.com/${t.instagram.replace('@','')}` : null].filter(Boolean),
+    worksFor: {
+      '@type': 'Organization',
+      name: 'TrainedBy',
+      url: window.location.origin,
+    },
   };
   // Remove undefined fields
   const cleanSchema = JSON.parse(JSON.stringify(schemaLd));
