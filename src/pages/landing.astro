@@ -349,19 +349,19 @@ const brandName = market.brandName || 'TrainedBy';
     .blog-excerpt { font-size: 14px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
     .blog-author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2); }
     .blog-author-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
-    .blog-visual { background: var(--surface-2); border-radius: 12px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    .blog-visual { background: var(--surface-2); border-radius: 12px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; }
     @media (max-width: 720px) { .blog-grid { grid-template-columns: 1fr; } .blog-card.featured { grid-template-columns: 1fr; } }
 
     /* FOR TRAINERS BANNER */
-    .trainer-banner { margin: 0 24px; border-radius: 20px; background: linear-gradient(135deg, rgba(255,92,0,0.08) 0%, rgba(255,92,0,0.03) 100%); border: 1px solid rgba(255,92,0,0.15); padding: 56px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
-    .trainer-banner-eyebrow { font-size: 11px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
-    .trainer-banner-title { font-family: 'DM Sans', system-ui, sans-serif; font-size: clamp(22px, 3vw, 36px); font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; color: var(--text); }
-    .trainer-banner-sub { font-size: 15px; color: var(--text-2); line-height: 1.6; max-width: 420px; }
+    .trainer-banner { margin: 0 24px; border-radius: 20px; background: #1A1411; border: none; padding: 56px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+    .trainer-banner-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+    .trainer-banner-title { font-family: 'DM Sans', system-ui, sans-serif; font-size: clamp(22px, 3vw, 36px); font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; color: #ffffff; }
+    .trainer-banner-sub { font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.6; max-width: 420px; }
     .trainer-banner-actions { display: flex; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
-    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--text); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
-    .btn-primary:hover { background: #333; transform: translateY(-2px); }
-    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid rgba(0,0,0,0.12); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
-    .btn-ghost:hover { border-color: rgba(0,0,0,0.25); transform: translateY(-2px); }
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
+    .btn-primary:hover { background: #e05200; transform: translateY(-2px); }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.45); transform: translateY(-2px); }
 
     /* FOOTER CTA — intentionally dark */
     .footer-cta {
@@ -602,7 +602,7 @@ const brandName = market.brandName || 'TrainedBy';
               <span>By a {market.certificationBody} Level 4 Trainer · 6 min read</span>
             </div>
           </div>
-          <div class="blog-visual" aria-hidden="true">🏋️</div>
+          <div class="blog-visual" style="background:linear-gradient(135deg,#F5F4F3 0%,#E8E5E2 100%)" aria-hidden="true"></div>
         </a>
         <a href="/blog" class="blog-card">
           <span class="blog-cat">Nutrition</span>
