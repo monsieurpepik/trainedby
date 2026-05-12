@@ -678,7 +678,7 @@ const brandName = market.brandName || 'TrainedBy';
 
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/trainers?select=slug,full_name,specialty,location,profile_photo_url,reps_verified,packages&plan=eq.pro&is_active=eq.true&order=created_at.desc&limit=8`,
+          `${SUPABASE_URL}/rest/v1/trainers?select=slug,name,specialties,city,avatar_url,reps_verified,packages&plan=eq.pro&is_active=eq.true&order=created_at.desc&limit=8`,
           { headers: { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY } }
         );
         const data = await res.json();
