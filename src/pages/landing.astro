@@ -465,23 +465,30 @@ const brandName = market.brandName || 'TrainedBy';
 
     <!-- RIGHT COLUMN: Stats grid -->
     <div class="hero-right">
-      <div class="stats-grid">
-        <div class="stat-card featured">
-          <div class="stat-val" id="stat-trainer-count">—</div>
-          <div class="stat-label">Verified trainers</div>
+      <a href="/sarah-al-mansoori" class="ecard ecard-hero" id="hero-trainer-card">
+        <div class="ecard-bg ecard-fallback-a" id="hero-card-bg"></div>
+        <div class="ecard-overlay"></div>
+        <div class="ecard-top">
+          <div class="ecard-badge">
+            <div class="ecard-badge-dot"></div>
+            {market.certificationBody} Verified
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-val" id="stat-avg-rating">4.9★</div>
-          <div class="stat-label">Average rating</div>
+        <div class="ecard-bottom">
+          <div class="ecard-name" id="hero-card-name">Sarah Al-Mansoori</div>
+          <div class="ecard-meta" id="hero-card-meta">Strength &amp; HIIT · Dubai Marina</div>
+          <div class="ecard-row">
+            <div class="ecard-price" id="hero-card-price">
+              {market.currencySymbol} 350 <span>/ session</span>
+            </div>
+            <button class="ecard-cta">View profile</button>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-val">10</div>
-          <div class="stat-label">Markets worldwide</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-val">100%</div>
-          <div class="stat-label">Certified & checked</div>
-        </div>
+      </a>
+      <div class="card-dots">
+        <div class="card-dot card-dot-on"></div>
+        <div class="card-dot card-dot-off"></div>
+        <div class="card-dot card-dot-off"></div>
       </div>
     </div>
   </section>
@@ -725,8 +732,47 @@ const brandName = market.brandName || 'TrainedBy';
           grid.appendChild(card);
         });
       } catch(e) {
-        // Silently fail — skeleton loaders remain
+        // Silently fail — empty state handled in Task 5
       }
     })();
+
+    // Rotate hero card through loaded trainers
+    window._heroRotate = function(trainers: any[]) {
+      if (!trainers || trainers.length === 0) return;
+      let idx = 0;
+      const fallbacks = ['ecard-fallback-a','ecard-fallback-b','ecard-fallback-c'];
+      function show(t: any) {
+        const bg = document.getElementById('hero-card-bg');
+        const name = document.getElementById('hero-card-name');
+        const meta = document.getElementById('hero-card-meta');
+        const price = document.getElementById('hero-card-price');
+        const link = document.getElementById('hero-trainer-card');
+        if (!bg || !name || !meta || !price || !link) return;
+        if (t.avatar_url) {
+          (bg as HTMLElement).style.backgroundImage = `url(${t.avatar_url})`;
+          bg.className = 'ecard-bg';
+        } else {
+          bg.className = 'ecard-bg ' + fallbacks[idx % 3];
+          (bg as HTMLElement).style.backgroundImage = '';
+        }
+        name.textContent = t.name || '';
+        const specialty = Array.isArray(t.specialties) ? t.specialties[0] : (t.specialties || 'Personal Training');
+        meta.textContent = specialty + (t.city ? ' · ' + t.city : '');
+        const packages = Array.isArray(t.packages) ? t.packages : [];
+        const lowest = packages.length > 0 ? Math.min(...packages.map((p: any) => p.price || 0).filter(Boolean)) : null;
+        price.innerHTML = lowest ? `${lowest} <span>/ session</span>` : 'Contact for pricing';
+        if (link instanceof HTMLAnchorElement) link.href = '/' + t.slug;
+      }
+      show(trainers[0]);
+      if (trainers.length > 1) {
+        setInterval(() => {
+          idx = (idx + 1) % trainers.length;
+          show(trainers[idx]);
+          document.querySelectorAll('.card-dot').forEach((d, i) => {
+            d.className = 'card-dot ' + (i === idx % 3 ? 'card-dot-on' : 'card-dot-off');
+          });
+        }, 4000);
+      }
+    };
   </script>
 </Base>
