@@ -304,5 +304,53 @@ const jsonLd = structuredData ?? defaultStructuredData;
         });
       });
     </script>
+
+    <!-- Cookie consent banner (Gate 2) -->
+    <div id="cookie-banner" style="
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      background:#1A1411;color:#fff;
+      border-radius:12px;padding:16px 20px;
+      display:none;align-items:center;gap:16px;flex-wrap:wrap;
+      font-family:'DM Sans',system-ui,sans-serif;font-size:13px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.25);
+      z-index:9999;max-width:560px;width:calc(100% - 32px);
+      border:1px solid rgba(255,255,255,0.08);
+    " role="dialog" aria-label="Cookie consent">
+      <span style="flex:1;line-height:1.5;color:rgba(255,255,255,0.8)">
+        We use cookies to improve your experience.
+        <a href="/cookie-policy" style="color:#FF5C00;text-decoration:underline;text-underline-offset:3px">Learn more</a>
+      </span>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button id="cookie-decline" style="
+          background:transparent;color:rgba(255,255,255,0.5);
+          border:1px solid rgba(255,255,255,0.15);border-radius:100px;
+          padding:8px 16px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
+        ">Decline</button>
+        <button id="cookie-accept" style="
+          background:#FF5C00;color:#fff;border:none;border-radius:100px;
+          padding:8px 16px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;
+        ">Accept</button>
+      </div>
+    </div>
+
+    <script is:inline>
+    (function() {
+      var consent = localStorage.getItem('cookie_consent');
+      if (!consent) {
+        var banner = document.getElementById('cookie-banner');
+        if (banner) {
+          banner.style.display = 'flex';
+          document.getElementById('cookie-accept').addEventListener('click', function() {
+            localStorage.setItem('cookie_consent', 'accepted');
+            banner.style.display = 'none';
+          });
+          document.getElementById('cookie-decline').addEventListener('click', function() {
+            localStorage.setItem('cookie_consent', 'declined');
+            banner.style.display = 'none';
+          });
+        }
+      }
+    })();
+    </script>
   </body>
 </html>
