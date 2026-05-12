@@ -9,7 +9,7 @@ All 8 items must be ✅ before signups open.
 | Legal pages render | ✅ | Claude Code | 2026-05-12 |
 | Cookie consent banner | ✅ | Claude Code | 2026-05-12 |
 | Consent checkboxes on /join and lead forms | ✅ | Claude Code | 2026-05-12 |
-| Google Rich Results Test passes | ⬜ | — | — |
+| Google Rich Results Test passes | ✅ | Manual | 2026-05-12 |
 | WhatsApp OG card shows trainer branding | ⬜ | — | — |
 | Stripe shows correct currency per market | ⬜ | — | — |
 | Sentry has ≥ 1 confirmed live event | ✅ | Claude Code | 2026-05-12 |
