@@ -231,6 +231,34 @@ const jsonLd = structuredData ?? defaultStructuredData;
         });
       }
     </script>
+  <!-- Sentry browser error tracking -->
+  <script is:inline>
+    (function() {
+      var dsn = 'https://245841971f38b0798c021fe5019aeefa@o4511110584926208.ingest.us.sentry.io/4511378618187776';
+      window.__sentryDsn = dsn;
+      window.onerror = function(msg, src, line, col, err) {
+        if (!dsn) return;
+        var u = new URL(dsn);
+        var key = u.username;
+        var proj = u.pathname.replace('/','');
+        fetch(u.protocol+'//'+u.host+'/api/'+proj+'/store/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Sentry-Auth': 'Sentry sentry_version=7, sentry_key='+key },
+          body: JSON.stringify({
+            event_id: ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,function(c){return(c^(crypto.getRandomValues(new Uint8Array(1))[0]&(15>>c/4))).toString(16)}),
+            timestamp: new Date().toISOString(),
+            platform: 'javascript',
+            level: 'error',
+            environment: 'production',
+            exception: { values: [{ type: err ? err.name : 'Error', value: msg, stacktrace: { frames: [] } }] }
+          })
+        }).catch(function(){});
+      };
+      window.addEventListener('unhandledrejection', function(e) {
+        window.onerror(e.reason && e.reason.message ? e.reason.message : String(e.reason), '', 0, 0, e.reason instanceof Error ? e.reason : new Error(String(e.reason)));
+      });
+    })();
+  </script>
   </head>
   <body>
     <slot />
@@ -303,6 +331,54 @@ const jsonLd = structuredData ?? defaultStructuredData;
           url: window.location.href,
         });
       });
+    </script>
+
+    <!-- Cookie consent banner (Gate 2) -->
+    <div id="cookie-banner" style="
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      background:#1A1411;color:#fff;
+      border-radius:12px;padding:16px 20px;
+      display:none;align-items:center;gap:16px;flex-wrap:wrap;
+      font-family:'DM Sans',system-ui,sans-serif;font-size:13px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.25);
+      z-index:9999;max-width:560px;width:calc(100% - 32px);
+      border:1px solid rgba(255,255,255,0.08);
+    " role="dialog" aria-label="Cookie consent">
+      <span style="flex:1;line-height:1.5;color:rgba(255,255,255,0.8)">
+        We use cookies to improve your experience.
+        <a href="/cookie-policy" style="color:#FF5C00;text-decoration:underline;text-underline-offset:3px">Learn more</a>
+      </span>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button id="cookie-decline" style="
+          background:transparent;color:rgba(255,255,255,0.5);
+          border:1px solid rgba(255,255,255,0.15);border-radius:100px;
+          padding:8px 16px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
+        ">Decline</button>
+        <button id="cookie-accept" style="
+          background:#FF5C00;color:#fff;border:none;border-radius:100px;
+          padding:8px 16px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;
+        ">Accept</button>
+      </div>
+    </div>
+
+    <script is:inline>
+    (function() {
+      var consent = localStorage.getItem('cookie_consent');
+      if (!consent) {
+        var banner = document.getElementById('cookie-banner');
+        if (banner) {
+          banner.style.display = 'flex';
+          document.getElementById('cookie-accept').addEventListener('click', function() {
+            localStorage.setItem('cookie_consent', 'accepted');
+            banner.style.display = 'none';
+          });
+          document.getElementById('cookie-decline').addEventListener('click', function() {
+            localStorage.setItem('cookie_consent', 'declined');
+            banner.style.display = 'none';
+          });
+        }
+      }
+    })();
     </script>
   </body>
 </html>

@@ -404,6 +404,11 @@ body {
 
     <div class="field-error hidden" id="s1-error"></div>
 
+    <label id="consent-label" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:16px;font-size:13px;color:var(--text-muted);line-height:1.5;">
+      <input type="checkbox" id="consent-checkbox" style="width:16px;height:16px;margin-top:2px;accent-color:var(--brand);flex-shrink:0;" />
+      <span>I agree to the <a href="/privacy" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">Privacy Policy</a> and <a href="/terms" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">Terms of Service</a>.</span>
+    </label>
+
     <button class="btn-primary" id="s1-btn" onclick="step1Next()">
       Continue →
     </button>
@@ -701,6 +706,7 @@ async function step1Next() {
   if (!slug || slug.length < 2) { showErr(errEl, 'Please choose a profile URL (min 2 characters).'); return; }
   if (!email || !email.includes('@')) { showErr(errEl, 'Please enter a valid email address.'); return; }
   if (!phone) { showErr(errEl, 'Please enter your WhatsApp number.'); return; }
+  if (!document.getElementById('consent-checkbox').checked) { showErr(errEl, 'Please agree to the Privacy Policy and Terms of Service to continue.'); return; }
 
   errEl.classList.add('hidden');
   const btn = document.getElementById('s1-btn');

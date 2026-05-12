@@ -19,8 +19,8 @@ const brandName = market.brandName || 'TrainedBy';
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:        #FFFFFF;
-      --surface:   #F5F4F3;
+      --bg:        #EDECEA;
+      --surface:   #F7F5F3;
       --surface-2: #E8E5E2;
       --text:      #1A1411;
       --text-2:    #6B6460;
@@ -36,8 +36,8 @@ const brandName = market.brandName || 'TrainedBy';
       --max: 1100px;
     }
     body {
-      background: var(--bg, #FFFFFF);
-      color: var(--text, #1A1411);
+      background: #EDECEA !important;
+      color: #1A1411 !important;
       font-family: 'DM Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
@@ -237,9 +237,72 @@ const brandName = market.brandName || 'TrainedBy';
       border-top: 1px solid rgba(0,0,0,0.06);
       padding: 40px;
     }
-    .trainers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 40px; }
-    .trainer-card { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.2s, transform 0.2s; display: block; }
-    .trainer-card:hover { border-color: rgba(0,0,0,0.12); transform: translateY(-2px); }
+    .trainers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 40px; }
+    /* EDITORIAL TRAINER CARD */
+    .ecard {
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.ecard-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center top;
+  transition: transform 0.4s ease;
+  background-color: #2c1810;
+}
+.ecard:hover .ecard-bg { transform: scale(1.04); }
+.ecard-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0.72) 100%);
+}
+.ecard-top {
+  position: absolute; top: 14px; left: 14px; right: 14px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  z-index: 2;
+}
+.ecard-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.16);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 100px; padding: 5px 10px;
+  font-size: 10px; font-weight: 600; color: #fff;
+}
+.ecard-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: #00C853; flex-shrink: 0; }
+.ecard-bottom {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 18px 18px 20px;
+  z-index: 2;
+}
+.ecard-name {
+  font-weight: 700; font-size: 17px; color: #fff;
+  letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 4px;
+}
+.ecard-meta { font-size: 12px; color: rgba(255,255,255,0.65); margin-bottom: 14px; }
+.ecard-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ecard-price { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); letter-spacing: -0.02em; }
+.ecard-price span { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.5); }
+.ecard-cta {
+  background: #fff; color: #111; border: none; border-radius: 100px;
+  padding: 9px 18px; font-family: 'DM Sans', system-ui;
+  font-size: 12px; font-weight: 700; letter-spacing: -0.01em;
+  cursor: pointer; flex-shrink: 0; white-space: nowrap;
+  text-decoration: none; display: inline-block;
+}
+.ecard-hero { aspect-ratio: 3/4; }
+.ecard-grid { aspect-ratio: 2/3; }
+.ecard-fallback-a { background: linear-gradient(160deg, #2c1810 0%, #7a3010 30%, #c55a1e 60%, #e8824a 85%, #f5a875 100%); }
+.ecard-fallback-b { background: linear-gradient(160deg, #0f0c08 0%, #3d2010 35%, #8a4a1e 65%, #cc7040 100%); }
+.ecard-fallback-c { background: linear-gradient(160deg, #0a0e12 0%, #1a2a3a 35%, #2e4a6a 65%, #4a7090 100%); }
+/* Slide indicator dots */
+.card-dots { display: flex; gap: 5px; justify-content: center; margin-top: 14px; }
+.card-dot { height: 3px; border-radius: 100px; }
+.card-dot-on { width: 22px; background: var(--text); }
+.card-dot-off { width: 6px; background: var(--surface-3); }
     .t-card {
       background: var(--bg);
       border: 1px solid var(--border);
@@ -257,15 +320,6 @@ const brandName = market.brandName || 'TrainedBy';
     .t-name { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 2px; }
     .t-spec { font-size: 11px; color: var(--text-2); margin-bottom: 6px; }
     .t-rating { font-size: 11px; color: var(--text); font-weight: 600; }
-    .trainer-card-img { width: 100%; aspect-ratio: 4/3; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 900; font-size: 36px; color: var(--text); position: relative; overflow: hidden; }
-    .trainer-card-img .verified-badge { position: absolute; top: 10px; right: 10px; padding: 3px 9px; border-radius: 20px; background: rgba(0,200,83,0.15); border: 1px solid rgba(0,200,83,0.3); color: var(--green); font-size: 10px; font-weight: 700; }
-    .trainer-card-body { padding: 16px; }
-    .trainer-card-name { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 15px; margin-bottom: 3px; }
-    .trainer-card-meta { font-size: 12px; color: var(--text-2); margin-bottom: 10px; }
-    .trainer-card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-    .trainer-tag { padding: 3px 9px; border-radius: 20px; background: var(--surface); border: 1px solid var(--border); font-size: 11px; color: var(--text-2); font-weight: 600; }
-    .trainer-card-price { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; font-size: 14px; color: var(--text); }
-    .trainer-card-price span { font-size: 11px; font-weight: 500; color: var(--text-2); }
 
     /* TRANSFORMATIONS */
     .transforms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 40px; }
@@ -295,19 +349,19 @@ const brandName = market.brandName || 'TrainedBy';
     .blog-excerpt { font-size: 14px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
     .blog-author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2); }
     .blog-author-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
-    .blog-visual { background: var(--surface-2); border-radius: 12px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    .blog-visual { background: var(--surface-2); border-radius: 12px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; }
     @media (max-width: 720px) { .blog-grid { grid-template-columns: 1fr; } .blog-card.featured { grid-template-columns: 1fr; } }
 
     /* FOR TRAINERS BANNER */
-    .trainer-banner { margin: 0 24px; border-radius: 20px; background: linear-gradient(135deg, rgba(255,92,0,0.08) 0%, rgba(255,92,0,0.03) 100%); border: 1px solid rgba(255,92,0,0.15); padding: 56px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
-    .trainer-banner-eyebrow { font-size: 11px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
-    .trainer-banner-title { font-family: 'DM Sans', system-ui, sans-serif; font-size: clamp(22px, 3vw, 36px); font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; color: var(--text); }
-    .trainer-banner-sub { font-size: 15px; color: var(--text-2); line-height: 1.6; max-width: 420px; }
+    .trainer-banner { margin: 0 24px; border-radius: 20px; background: #1A1411; border: none; padding: 56px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+    .trainer-banner-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+    .trainer-banner-title { font-family: 'DM Sans', system-ui, sans-serif; font-size: clamp(22px, 3vw, 36px); font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; color: #ffffff; }
+    .trainer-banner-sub { font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.6; max-width: 420px; }
     .trainer-banner-actions { display: flex; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
-    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--text); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
-    .btn-primary:hover { background: #333; transform: translateY(-2px); }
-    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid rgba(0,0,0,0.12); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
-    .btn-ghost:hover { border-color: rgba(0,0,0,0.25); transform: translateY(-2px); }
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; white-space: nowrap; }
+    .btn-primary:hover { background: #e05200; transform: translateY(-2px); }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; background: transparent; color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); transition: border-color 0.2s, transform 0.2s; white-space: nowrap; }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.45); transform: translateY(-2px); }
 
     /* FOOTER CTA — intentionally dark */
     .footer-cta {
@@ -402,33 +456,39 @@ const brandName = market.brandName || 'TrainedBy';
       </div>
 
       <!-- TRUST STRIP -->
-      <div class="trust-strip" style="justify-content:flex-start;margin-top:0;">
-        <div class="trust-item"><div class="trust-dot"></div>{market.certificationBody} Verified Only</div>
-        <div class="trust-item"><div class="trust-dot"></div>Real Trainer Profiles</div>
-        <div class="trust-item"><div class="trust-dot"></div>No Fake Reviews</div>
-        <div class="trust-item"><div class="trust-dot"></div>Free to Browse</div>
+      <div class="trust-strip">
+        <div class="trust-item"><div class="trust-dot"></div><span>{market.certificationBody} Certified only</span></div>
+        <div class="trust-item"><div class="trust-dot"></div><span>Background checked</span></div>
+        <div class="trust-item"><div class="trust-dot"></div><span>Free to browse</span></div>
       </div>
     </div>
 
     <!-- RIGHT COLUMN: Stats grid -->
     <div class="hero-right">
-      <div class="stats-grid">
-        <div class="stat-card featured">
-          <div class="stat-val" id="stat-trainer-count">—</div>
-          <div class="stat-label">Verified trainers</div>
+      <a href="/sarah-al-mansoori" class="ecard ecard-hero" id="hero-trainer-card">
+        <div class="ecard-bg ecard-fallback-a" id="hero-card-bg"></div>
+        <div class="ecard-overlay"></div>
+        <div class="ecard-top">
+          <div class="ecard-badge">
+            <div class="ecard-badge-dot"></div>
+            {market.certificationBody} Verified
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-val" id="stat-avg-rating">4.9★</div>
-          <div class="stat-label">Average rating</div>
+        <div class="ecard-bottom">
+          <div class="ecard-name" id="hero-card-name">Sarah Al-Mansoori</div>
+          <div class="ecard-meta" id="hero-card-meta">Strength &amp; HIIT · Dubai Marina</div>
+          <div class="ecard-row">
+            <div class="ecard-price" id="hero-card-price">
+              {market.currencySymbol} 350 <span>/ session</span>
+            </div>
+            <button class="ecard-cta">View profile</button>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-val">10</div>
-          <div class="stat-label">Markets worldwide</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-val">100%</div>
-          <div class="stat-label">Certified & checked</div>
-        </div>
+      </a>
+      <div class="card-dots">
+        <div class="card-dot card-dot-on"></div>
+        <div class="card-dot card-dot-off"></div>
+        <div class="card-dot card-dot-off"></div>
       </div>
     </div>
   </section>
@@ -443,22 +503,11 @@ const brandName = market.brandName || 'TrainedBy';
       </div>
       <p class="section-sub">Hand-picked, {market.certificationBody}-verified trainers with proven track records.</p>
       <div class="trainers-grid" id="featured-trainers">
-        <!-- Skeleton loaders -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-          <div class="skeleton" style="height:195px"></div>
-          <div style="padding:16px"><div class="skeleton" style="height:14px;width:60%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:80%"></div></div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-          <div class="skeleton" style="height:195px"></div>
-          <div style="padding:16px"><div class="skeleton" style="height:14px;width:55%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:45%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:70%"></div></div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-          <div class="skeleton" style="height:195px"></div>
-          <div style="padding:16px"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:35%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:75%"></div></div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-          <div class="skeleton" style="height:195px"></div>
-          <div style="padding:16px"><div class="skeleton" style="height:14px;width:50%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:42%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:85%"></div></div>
+        <div id="trainers-empty-state" style="grid-column:1/-1;text-align:center;padding:48px 0;display:none">
+          <p style="font-size:15px;color:var(--text-2);margin-bottom:16px">No trainers listed yet.</p>
+          <a href="/for-trainers" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--text);color:#fff;border-radius:100px;font-size:13px;font-weight:700;text-decoration:none">
+            Be the first verified trainer →
+          </a>
         </div>
       </div>
     </div>
@@ -553,7 +602,7 @@ const brandName = market.brandName || 'TrainedBy';
               <span>By a {market.certificationBody} Level 4 Trainer · 6 min read</span>
             </div>
           </div>
-          <div class="blog-visual" aria-hidden="true">🏋️</div>
+          <div class="blog-visual" style="background:linear-gradient(135deg,#F5F4F3 0%,#E8E5E2 100%)" aria-hidden="true"></div>
         </a>
         <a href="/blog" class="blog-card">
           <span class="blog-cat">Nutrition</span>
@@ -601,6 +650,9 @@ const brandName = market.brandName || 'TrainedBy';
       <a href="/community">Community</a>
       <a href="/for-trainers">For Trainers</a>
       <a href="/join">Join as Trainer</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/cookie-policy">Cookies</a>
     </div>
     <div class="footer-copy">© {new Date().getFullYear()} {brandName}</div>
   </footer>
@@ -629,11 +681,15 @@ const brandName = market.brandName || 'TrainedBy';
 
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/trainers?select=slug,full_name,specialty,location,profile_photo_url,reps_verified,packages&plan=eq.pro&is_active=eq.true&order=created_at.desc&limit=8`,
+          `${SUPABASE_URL}/rest/v1/trainers?select=slug,name,specialties,city,avatar_url,reps_verified,packages&plan=eq.pro&is_active=eq.true&order=created_at.desc&limit=8`,
           { headers: { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY } }
         );
         const data = await res.json();
-        if (!Array.isArray(data) || data.length === 0) return;
+        if (!Array.isArray(data) || data.length === 0) {
+          const empty = document.getElementById('trainers-empty-state');
+          if (empty) empty.style.display = 'block';
+          return;
+        }
 
         const countEl = document.getElementById('stat-trainer-count');
         if (countEl && data && data.length) {
@@ -645,35 +701,79 @@ const brandName = market.brandName || 'TrainedBy';
         grid.innerHTML = '';
 
         data.forEach((t: any) => {
-          const initials = (t.full_name || 'T').split(' ').map((n: string) => n[0]).join('').slice(0,2).toUpperCase();
-          const specialty = Array.isArray(t.specialty) ? t.specialty[0] : (t.specialty || 'Personal Training');
-          const location = t.location || '';
+          const specialty = Array.isArray(t.specialties) ? t.specialties[0] : (t.specialties || 'Personal Training');
+          const location = t.city || '';
           const packages = Array.isArray(t.packages) ? t.packages : [];
           const lowestPrice = packages.length > 0
             ? Math.min(...packages.map((p: any) => p.price || 0).filter((p: number) => p > 0))
             : null;
+          const fallbacks = ['ecard-fallback-a', 'ecard-fallback-b', 'ecard-fallback-c'];
+          const fallback = fallbacks[grid.children.length % 3];
+          const bgStyle = t.avatar_url ? `background-image:url(${t.avatar_url})` : '';
+          const bgClass = t.avatar_url ? 'ecard-bg' : `ecard-bg ${fallback}`;
 
           const card = document.createElement('a');
+          card.className = 'ecard ecard-grid';
           card.href = '/' + t.slug;
-          card.className = 'trainer-card';
           card.innerHTML = `
-            <div class="trainer-card-img">
-              ${t.profile_photo_url
-                ? `<img src="${t.profile_photo_url}" alt="${t.full_name}" style="width:100%;height:100%;object-fit:cover">`
-                : `<span>${initials}</span>`}
-              ${t.reps_verified ? '<span class="verified-badge">✓ Verified</span>' : ''}
-            </div>
-            <div class="trainer-card-body">
-              <div class="trainer-card-name">${t.full_name || 'Trainer'}</div>
-              <div class="trainer-card-meta">${specialty}${location ? ' · ' + location : ''}</div>
-              <div class="trainer-card-price">${lowestPrice ? 'From ' + lowestPrice : 'Contact for pricing'} <span>/ session</span></div>
-            </div>
-          `;
+  <div class="${bgClass}" style="${bgStyle}"></div>
+  <div class="ecard-overlay"></div>
+  <div class="ecard-top">
+    ${t.reps_verified ? '<div class="ecard-badge"><div class="ecard-badge-dot"></div>Verified</div>' : ''}
+  </div>
+  <div class="ecard-bottom">
+    <div class="ecard-name" style="font-size:15px">${t.name || 'Trainer'}</div>
+    <div class="ecard-meta">${specialty}${location ? ' · ' + location : ''}</div>
+    <div class="ecard-price" style="font-size:12px">
+      ${lowestPrice ? lowestPrice + ' <span>/ session</span>' : 'Contact for pricing'}
+    </div>
+  </div>
+`;
           grid.appendChild(card);
         });
+        if (typeof (window as any)._heroRotate === 'function') (window as any)._heroRotate(data);
       } catch(e) {
-        // Silently fail — skeleton loaders remain
+        // Silently fail — empty state handled in Task 5
       }
     })();
+
+    // Rotate hero card through loaded trainers
+    window._heroRotate = function(trainers: any[]) {
+      if (!trainers || trainers.length === 0) return;
+      let idx = 0;
+      const fallbacks = ['ecard-fallback-a','ecard-fallback-b','ecard-fallback-c'];
+      function show(t: any) {
+        const bg = document.getElementById('hero-card-bg');
+        const name = document.getElementById('hero-card-name');
+        const meta = document.getElementById('hero-card-meta');
+        const price = document.getElementById('hero-card-price');
+        const link = document.getElementById('hero-trainer-card');
+        if (!bg || !name || !meta || !price || !link) return;
+        if (t.avatar_url) {
+          (bg as HTMLElement).style.backgroundImage = `url(${t.avatar_url})`;
+          bg.className = 'ecard-bg';
+        } else {
+          bg.className = 'ecard-bg ' + fallbacks[idx % 3];
+          (bg as HTMLElement).style.backgroundImage = '';
+        }
+        name.textContent = t.name || '';
+        const specialty = Array.isArray(t.specialties) ? t.specialties[0] : (t.specialties || 'Personal Training');
+        meta.textContent = specialty + (t.city ? ' · ' + t.city : '');
+        const packages = Array.isArray(t.packages) ? t.packages : [];
+        const lowest = packages.length > 0 ? Math.min(...packages.map((p: any) => p.price || 0).filter(Boolean)) : null;
+        price.innerHTML = lowest ? `${lowest} <span>/ session</span>` : 'Contact for pricing';
+        if (link instanceof HTMLAnchorElement) link.href = '/' + t.slug;
+      }
+      show(trainers[0]);
+      if (trainers.length > 1) {
+        setInterval(() => {
+          idx = (idx + 1) % trainers.length;
+          show(trainers[idx]);
+          document.querySelectorAll('.card-dot').forEach((d, i) => {
+            d.className = 'card-dot ' + (i === idx % 3 ? 'card-dot-on' : 'card-dot-off');
+          });
+        }, 4000);
+      }
+    };
   </script>
 </Base>
