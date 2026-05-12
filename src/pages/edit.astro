@@ -1,33 +1,25 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getMarket } from '../lib/market.ts';
-import { SUPABASE_ANON_KEY } from '../lib/config.ts';
-const market = getMarket(Astro.url.hostname);
-const brandName = market.brandName;
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 ---
 
 <Base
-  title={`Edit Profile - ${brandName}`}
-  description={`Edit your ${brandName} trainer profile, packages, and settings.`}
+  title="Edit Profile — TrainedBy"
+  description="Edit your TrainedBy trainer profile, packages, and settings."
 >
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html[data-market] {
-
+:root {
+  --brand: #FF5C00; --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
   --reps: #00C853; --reps-dim: rgba(0,200,83,0.08); --reps-border: rgba(0,200,83,0.2);
-  --surface-2: #111; --surface-3: #1c1c1c; --surface-4: #242424;
-  --border-hover: rgba(255,255,255,0.14);
+  --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c; --surface-4: #242424;
+  --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.14);
   --text: #fff; --text-muted: rgba(255,255,255,0.5); --text-faint: rgba(255,255,255,0.25);
-  --danger-dim-xs: rgba(255,85,85,0.04); --danger-dim-sm: rgba(255,85,85,0.08);
-  --danger-dim-md: rgba(255,85,85,0.12); --danger-dim-lg: rgba(255,85,85,0.15);
-  --danger-border-sm: rgba(255,85,85,0.2); --danger-border-md: rgba(255,85,85,0.3);
-  --overlay-dark-sm: rgba(0,0,0,0.5); --overlay-dark-lg: rgba(0,0,0,0.7);
-  --white-tint-sm: rgba(255,255,255,0.2); --shadow-overlay: rgba(0,0,0,0.5);
 }
 html { scroll-behavior: smooth; }
 body {
   background: var(--surface); color: var(--text);
-  font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.6;
+  font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6;
   -webkit-font-smoothing: antialiased; min-height: 100vh;
 }
 
@@ -44,13 +36,13 @@ body {
 }
 .edit-logo {
   display: flex; align-items: center; gap: 8px;
-  font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 16px;
+  font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 16px;
   text-decoration: none; color: var(--text);
 }
 .header-actions { display: flex; align-items: center; gap: 10px; }
 .header-btn {
   padding: 8px 16px; border-radius: 20px;
-  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
+  font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 700;
   cursor: pointer; transition: all 0.2s; border: none;
 }
 .header-btn-ghost {
@@ -58,8 +50,8 @@ body {
   border: 1px solid var(--border);
 }
 .header-btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
-.header-btn-brand { background: var(--brand); color: var(--text-on-brand); }
-.header-btn-brand:hover { background: var(--brand-hover); }
+.header-btn-brand { background: var(--brand); color: #fff; }
+.header-btn-brand:hover { background: #e05200; }
 .header-btn-brand:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ===== AUTH GATE ===== */
@@ -68,25 +60,25 @@ body {
   padding: 60px 0; text-align: center;
 }
 .auth-gate h2 {
-  font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 800;
+  font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800;
   margin-bottom: 8px;
 }
 .auth-gate p { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; max-width: 280px; line-height: 1.6; }
 .auth-field {
   width: 100%; max-width: 340px; padding: 14px 16px;
   background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: 12px; color: var(--text); font-family: 'DM Sans', sans-serif;
+  border-radius: 12px; color: var(--text); font-family: 'Inter', sans-serif;
   font-size: 15px; outline: none; margin-bottom: 12px;
   transition: border-color 0.2s;
 }
 .auth-field:focus { border-color: var(--brand); }
 .auth-btn {
   width: 100%; max-width: 340px; padding: 15px;
-  background: var(--brand); color: var(--text-on-brand); border: none;
-  border-radius: 12px; font-family: 'DM Sans', sans-serif;
+  background: var(--brand); color: #fff; border: none;
+  border-radius: 12px; font-family: 'Manrope', sans-serif;
   font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s;
 }
-.auth-btn:hover { background: var(--brand-hover); }
+.auth-btn:hover { background: #e05200; }
 .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .auth-hint { font-size: 11px; color: var(--text-faint); margin-top: 8px; }
 
@@ -96,7 +88,7 @@ body {
 }
 .edit-section:last-child { border-bottom: none; }
 .section-heading {
-  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 800;
+  font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 800;
   margin-bottom: 4px;
 }
 .section-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
@@ -112,7 +104,7 @@ body {
   width: 100%; padding: 13px 15px;
   background: var(--surface-2); border: 1px solid var(--border);
   border-radius: 12px; color: var(--text);
-  font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+  font-family: 'Inter', sans-serif; font-size: 14px; outline: none;
   transition: border-color 0.2s;
 }
 .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--brand); }
@@ -132,7 +124,7 @@ body {
   width: 100%; height: 100%; object-fit: cover;
 }
 .avatar-edit-overlay {
-  position: absolute; inset: 0; background: var(--overlay-dark-sm);
+  position: absolute; inset: 0; background: rgba(0,0,0,0.5);
   display: flex; align-items: center; justify-content: center;
   opacity: 0; transition: opacity 0.2s;
 }
@@ -164,9 +156,9 @@ body {
 }
 .package-delete {
   width: 28px; height: 28px; border-radius: 50%;
-  background: var(--danger-dim-sm); border: 1px solid var(--danger-dim-lg);
+  background: rgba(255,85,85,0.08); border: 1px solid rgba(255,85,85,0.15);
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--danger); font-size: 16px; line-height: 1;
+  cursor: pointer; color: #ff5555; font-size: 16px; line-height: 1;
 }
 
 /* ===== AVAILABILITY TOGGLE ===== */
@@ -187,7 +179,7 @@ body {
 .switch-knob {
   position: absolute; top: 2px; left: 2px;
   width: 18px; height: 18px; border-radius: 50%;
-  background: var(--bg); transition: left 0.2s;
+  background: #fff; transition: left 0.2s;
 }
 .switch.on .switch-knob { left: 22px; }
 
@@ -207,9 +199,9 @@ body {
 .gallery-item-delete {
   position: absolute; top: 4px; right: 4px;
   width: 22px; height: 22px; border-radius: 50%;
-  background: var(--overlay-dark-lg); border: 1px solid var(--danger-border-md);
+  background: rgba(0,0,0,0.7); border: 1px solid rgba(255,85,85,0.3);
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; color: var(--danger); cursor: pointer;
+  font-size: 12px; color: #ff5555; cursor: pointer;
 }
 .gallery-add {
   aspect-ratio: 1; border-radius: 8px;
@@ -225,17 +217,17 @@ body {
 /* ===== DANGER ZONE ===== */
 .danger-zone {
   padding: 16px; border-radius: 12px;
-  background: var(--danger-dim-xs); border: 1px solid var(--danger-dim-md);
+  background: rgba(255,85,85,0.04); border: 1px solid rgba(255,85,85,0.12);
 }
-.danger-title { font-size: 13px; font-weight: 700; color: var(--danger); margin-bottom: 4px; }
+.danger-title { font-size: 13px; font-weight: 700; color: #ff5555; margin-bottom: 4px; }
 .danger-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
 .danger-btn {
   padding: 10px 18px; border-radius: 8px;
-  background: transparent; border: 1px solid var(--danger-border-md);
-  color: var(--danger); font-size: 13px; font-weight: 600; cursor: pointer;
+  background: transparent; border: 1px solid rgba(255,85,85,0.3);
+  color: #ff5555; font-size: 13px; font-weight: 600; cursor: pointer;
   transition: all 0.2s;
 }
-.danger-btn:hover { background: var(--danger-dim-sm); }
+.danger-btn:hover { background: rgba(255,85,85,0.08); }
 
 /* ===== TOAST ===== */
 .toast {
@@ -245,16 +237,16 @@ body {
   color: var(--text); padding: 12px 20px; border-radius: 24px;
   font-size: 13px; font-weight: 600; z-index: 100;
   transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
-  white-space: nowrap; box-shadow: 0 8px 32px var(--shadow-overlay);
+  white-space: nowrap; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
 .toast.success { background: var(--reps-dim); border-color: var(--reps-border); color: var(--reps); }
-.toast.error { background: var(--danger-dim-sm); border-color: var(--danger-border-sm); color: var(--danger); }
+.toast.error { background: rgba(255,85,85,0.08); border-color: rgba(255,85,85,0.2); color: #ff5555; }
 
 /* ===== SPINNER ===== */
 .spinner {
   display: inline-block; width: 14px; height: 14px;
-  border: 2px solid var(--white-tint-sm); border-top-color: var(--bg);
+  border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff;
   border-radius: 50%; animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -266,7 +258,7 @@ body {
   <!-- Header -->
   <div class="edit-header">
     <a href="/" class="edit-logo">
-      <svg width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" style="fill: var(--brand)"/><text x="16" y="23" font-family="DM Sans,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
+      <svg width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
       Edit Profile
     </a>
     <div class="header-actions">
@@ -280,15 +272,15 @@ body {
     <div class="auth-gate">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" style="margin-bottom:20px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
       <h2>Sign in to edit</h2>
-      <p>Enter your email to receive a magic link - no password needed.</p>
+      <p>Enter your email to receive a magic link — no password needed.</p>
       <input class="auth-field" type="email" id="auth-email" placeholder="your@email.com" autocomplete="email">
-      <div id="auth-error" style="display:none;font-size:12px;color:var(--danger);margin-bottom:10px;max-width:340px;"></div>
+      <div id="auth-error" style="display:none;font-size:12px;color:#ff5555;margin-bottom:10px;max-width:340px;"></div>
       <button class="auth-btn" id="auth-btn" onclick="sendMagicLink()">Send Magic Link</button>
-      <div class="auth-hint">Check your inbox - link expires in 15 minutes.</div>
+      <div class="auth-hint">Check your inbox — link expires in 15 minutes.</div>
     </div>
     <div id="auth-sent" class="hidden" style="text-align:center;padding:40px 0;">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="1.5" style="margin-bottom:16px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-      <h2 style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Check your inbox</h2>
+      <h2 style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Check your inbox</h2>
       <p style="font-size:14px;color:var(--text-muted);max-width:280px;margin:0 auto;">We sent a magic link to <strong id="auth-sent-email" style="color:var(--brand);"></strong>. Click it to sign in.</p>
     </div>
   </div>
@@ -330,7 +322,7 @@ body {
         <input type="text" id="e-title" placeholder="e.g. Strength & Conditioning Coach" maxlength="60">
       </div>
       <div class="field">
-        <label style="display:flex;align-items:center;justify-content:space-between;">Bio <button type="button" onclick="generateAIBio()" style="background:var(--brand-dim);border:1px solid var(--brand-border);color:var(--brand);font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;" id="ai-bio-btn">✦ Write with AI</button></label>
+        <label style="display:flex;align-items:center;justify-content:space-between;">Bio <button type="button" onclick="generateAIBio()" style="background:var(--brand-dim);border:1px solid var(--brand-border);color:var(--brand);font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:'Manrope',sans-serif;" id="ai-bio-btn">✦ Write with AI</button></label>
         <textarea id="e-bio" maxlength="400" oninput="document.getElementById('bio-count').textContent=this.value.length"></textarea>
         <div class="field-hint"><span id="bio-count">0</span>/400 characters</div>
       </div>
@@ -349,7 +341,7 @@ body {
     <!-- Section: Specialties -->
     <div class="edit-section">
       <div class="section-heading">Specialties</div>
-      <div class="section-sub">Select all that apply - shown as pills on your profile.</div>
+      <div class="section-sub">Select all that apply — shown as pills on your profile.</div>
       <div class="toggle-row" id="spec-row">
         <div class="toggle-pill" onclick="togglePill(this,'spec','Strength')">Strength</div>
         <div class="toggle-pill" onclick="togglePill(this,'spec','Fat Loss')">Fat Loss</div>
@@ -391,68 +383,6 @@ body {
       </button>
     </div>
 
-    <!-- Section: Book Sessions -->
-    <div class="edit-section" id="sessions-section">
-      <div class="section-heading">Book Sessions</div>
-      <div class="section-sub">Set up session types that clients can book and pay for online.</div>
-      <div id="session-types-list" style="margin-bottom:14px;"></div>
-      <button onclick="showAddSessionForm()" id="add-session-btn" style="width:100%;padding:12px;border-radius:10px;background:transparent;border:1px dashed var(--border);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
-        + Add Session Type
-      </button>
-      <div id="add-session-form" style="display:none;margin-top:14px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px;">
-        <div class="field">
-          <label>Session Name</label>
-          <input type="text" id="new-session-name" placeholder="e.g. 1:1 Strength Session" maxlength="80">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div class="field">
-            <label>Price (USD)</label>
-            <input type="number" id="new-session-price" placeholder="75" min="1" step="1" inputmode="numeric">
-          </div>
-          <div class="field">
-            <label>Duration (min)</label>
-            <input type="number" id="new-session-duration" placeholder="60" min="15" step="15" inputmode="numeric">
-          </div>
-        </div>
-        <div class="field">
-          <label>Type</label>
-          <select id="new-session-package">
-            <option value="single">Single session</option>
-            <option value="4">4-session pack</option>
-            <option value="8">8-session pack</option>
-            <option value="12">12-session pack</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:4px;">
-          <button onclick="saveNewSessionType()" style="flex:1;padding:12px;border-radius:10px;background:var(--brand);color:var(--text-on-brand);border:none;font-size:13px;font-weight:700;cursor:pointer;" id="save-session-btn">Save</button>
-          <button onclick="cancelAddSession()" style="padding:12px 20px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:13px;cursor:pointer;">Cancel</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section: Booking Availability -->
-    <div class="edit-section" id="booking-avail-section">
-      <div class="section-heading">Booking Availability</div>
-      <div class="section-sub">Set which days and hours clients can book you. Block specific dates when you're unavailable.</div>
-
-      <!-- Weekly schedule -->
-      <div style="margin-bottom:20px;">
-        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Weekly Schedule</div>
-        <div id="avail-days-grid"></div>
-        <button onclick="saveSchedule()" style="margin-top:12px;width:100%;padding:12px;border-radius:10px;background:var(--brand);color:var(--text-on-brand);border:none;font-size:13px;font-weight:700;cursor:pointer;" id="save-schedule-btn">Save Schedule</button>
-      </div>
-
-      <!-- Date overrides -->
-      <div>
-        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Block a Date</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <input type="date" id="block-date-input" style="flex:1;padding:11px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none;" onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'">
-          <button onclick="blockDate()" style="padding:11px 16px;border-radius:10px;background:var(--surface-3);border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">Block Day</button>
-        </div>
-        <div id="blocked-dates-list" style="margin-top:12px;"></div>
-      </div>
-    </div>
-
     <!-- Section: Transformation Gallery -->
     <div class="edit-section">
       <div class="section-heading">Transformation Gallery</div>
@@ -480,7 +410,7 @@ body {
     <!-- Section: Video Intro -->
     <div class="edit-section">
       <div class="section-heading">Video Intro</div>
-      <div class="section-sub">Add a short intro video - YouTube or Instagram Reel link. Clients who watch a video are 3× more likely to book.</div>
+      <div class="section-sub">Add a short intro video — YouTube or Instagram Reel link. Clients who watch a video are 3× more likely to book.</div>
       <div class="field">
         <label>Video URL</label>
         <input type="url" id="e-video-intro" placeholder="https://youtube.com/shorts/... or https://instagram.com/reel/...">
@@ -517,7 +447,7 @@ body {
       <div class="section-heading">REPs UAE Verification</div>
       <div class="section-sub">Your verified badge builds client trust.</div>
       <div id="reps-verified-card" class="hidden" style="background:var(--reps-dim);border:1px solid var(--reps-border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-        <svg width="24" height="24" viewBox="0 0 24 24" style="fill: var(--green)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#00C853"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
         <div>
           <div style="font-size:13px;font-weight:700;color:var(--reps);">REPs UAE Verified</div>
           <div id="reps-number-display" style="font-size:11px;color:var(--text-muted);"></div>
@@ -526,7 +456,7 @@ body {
       <div id="reps-unverified-card">
         <div class="field">
           <label>REPs UAE Number</label>
-          <input type="text" id="e-reps" placeholder="REP-12345" style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.05em;">
+          <input type="text" id="e-reps" placeholder="REP-12345" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.05em;">
           <div class="field-hint">Find your number at repsuae.com/searcht</div>
         </div>
         <button onclick="submitRepsVerification()" style="padding:12px 20px;border-radius:10px;background:var(--reps-dim);border:1px solid var(--reps-border);color:var(--reps);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;">
@@ -537,7 +467,7 @@ body {
 
     <!-- Section: Danger Zone -->
     <div class="edit-section">
-      <div class="section-heading" style="color:var(--danger);">Danger Zone</div>
+      <div class="section-heading" style="color:#ff5555;">Danger Zone</div>
       <div class="section-sub">These actions are permanent and cannot be undone.</div>
       <div class="danger-zone">
         <div class="danger-title">Delete Profile</div>
@@ -553,25 +483,9 @@ body {
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- Delete confirmation modal -->
-<div id="delete-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--surface);border:1px solid var(--danger-border-md);border-radius:16px;padding:28px;max-width:380px;width:100%">
-    <div style="font-size:16px;font-weight:800;color:var(--danger);margin-bottom:8px">Delete profile?</div>
-    <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.6">This permanently removes your profile, all leads, and data. This cannot be undone.</div>
-    <div style="display:flex;gap:10px">
-      <button onclick="document.getElementById('delete-modal').style.display='none'" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
-      <button onclick="executeDelete()" style="flex:1;padding:11px;border-radius:8px;border:none;background:var(--danger);color:#fff;font-size:13px;font-weight:700;cursor:pointer">Yes, delete everything</button>
-    </div>
-  </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
-<script define:vars={{ SUPABASE_ANON_KEY }}>
-window.__SUPABASE_ANON_KEY__ = SUPABASE_ANON_KEY;
-</script>
-<script is:inline>
+<script is:inline define:vars={{ SUPABASE_ANON_KEY }}>
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-const SUPABASE_ANON_KEY = window.__SUPABASE_ANON_KEY__;
 const EDGE_BASE = SUPABASE_URL + '/functions/v1';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -710,10 +624,6 @@ function populateForm(t) {
   if (t.gallery_urls) {
     t.gallery_urls.forEach(url => addGalleryItem(url));
   }
-
-  // Session types
-  loadSessionTypes();
-  loadAvailability();
 }
 
 // ===== AVAILABILITY =====
@@ -783,7 +693,7 @@ function addEditPackage(pkg = null) {
       <div style="flex:2;"><div style="font-size:10px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;">Name</div>
       <input type="text" placeholder="e.g. Monthly Pack" value="${pkg?.name || ''}" style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;"></div>
       <div style="flex:1;"><div style="font-size:10px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;">AED</div>
-      <input type="number" placeholder="350" value="${pkg?.price || ''}" inputmode="numeric" style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;font-family:'DM Sans',sans-serif;font-weight:700;"></div>
+      <input type="number" placeholder="350" value="${pkg?.price || ''}" inputmode="numeric" style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;font-family:'Manrope',sans-serif;font-weight:700;"></div>
     </div>
     <div style="display:flex;gap:10px;">
       <div style="flex:1;"><div style="font-size:10px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;">Duration</div>
@@ -875,7 +785,7 @@ async function submitRepsVerification() {
       'Authorization': 'Bearer ' + getAuthToken() },
     body: JSON.stringify({ trainer_id: trainer.id, reps_number: reps })
   });
-  if (res.ok) showToast('Verification submitted - we\'ll confirm within 24h', 'success');
+  if (res.ok) showToast('Verification submitted — we\'ll confirm within 24h', 'success');
   else showToast('Failed to submit. Please try again.', 'error');
 }
 
@@ -915,262 +825,15 @@ async function saveAll() {
 
 // ===== DELETE =====
 function confirmDelete() {
-  document.getElementById('delete-modal').style.display = 'flex';
-}
-
-function executeDelete() {
+  if (!confirm('Are you sure? This permanently deletes your profile and all data.')) return;
   fetch(EDGE_BASE + '/update-trainer', {
     method: 'POST', headers: { 'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + getAuthToken() },
     body: JSON.stringify({ action: 'delete', trainer_id: trainer.id })
   }).then(r => {
     if (r.ok) { clearAuthToken(); location.href = '/'; }
-    else {
-      document.getElementById('delete-modal').style.display = 'none';
-      showToast('Delete failed. Please try again.', 'error');
-    }
+    else showToast('Delete failed. Please try again.', 'error');
   });
-}
-
-// ===== SESSION TYPES =====
-let sessionTypes = [];
-
-async function loadSessionTypes() {
-  try {
-    const res = await fetch(EDGE_BASE + '/manage-session-types', {
-      headers: { 'Authorization': 'Bearer ' + getAuthToken() }
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-    sessionTypes = data.session_types || [];
-    renderSessionTypes();
-  } catch {}
-}
-
-function renderSessionTypes() {
-  const list = document.getElementById('session-types-list');
-  if (!list) return;
-  if (sessionTypes.length === 0) {
-    list.innerHTML = '<p style="font-size:13px;color:var(--text-faint);text-align:center;padding:16px 0;">No session types yet. Add one below.</p>';
-    return;
-  }
-  list.innerHTML = sessionTypes.map(st => `
-    <div style="background:var(--surface-3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${st.name}</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
-          $${(st.price_cents / 100).toFixed(0)} · ${st.duration_min}min${st.package_count ? ' · Pack of ' + st.package_count : ''}
-        </div>
-      </div>
-      <button onclick="toggleSessionType('${st.id}', ${!st.is_active})" style="padding:6px 12px;border-radius:8px;border:1px solid ${st.is_active ? 'var(--border)' : 'var(--brand)'};background:${st.is_active ? 'transparent' : 'var(--brand)'};color:${st.is_active ? 'var(--text-muted)' : '#fff'};font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">
-        ${st.is_active ? 'Deactivate' : 'Activate'}
-      </button>
-    </div>
-  `).join('');
-}
-
-function showAddSessionForm() {
-  document.getElementById('add-session-form').style.display = 'block';
-  document.getElementById('add-session-btn').style.display = 'none';
-}
-
-function cancelAddSession() {
-  document.getElementById('add-session-form').style.display = 'none';
-  document.getElementById('add-session-btn').style.display = '';
-  document.getElementById('new-session-name').value = '';
-  document.getElementById('new-session-price').value = '';
-  document.getElementById('new-session-duration').value = '';
-  document.getElementById('new-session-package').value = 'single';
-}
-
-async function saveNewSessionType() {
-  const name = document.getElementById('new-session-name').value.trim();
-  const priceInput = parseFloat(document.getElementById('new-session-price').value);
-  const durationMin = parseInt(document.getElementById('new-session-duration').value);
-  const packageVal = document.getElementById('new-session-package').value;
-
-  if (!name) { showToast('Please enter a session name.', 'error'); return; }
-  if (!priceInput || priceInput < 1) { showToast('Please enter a valid price.', 'error'); return; }
-  if (!durationMin || durationMin < 15) { showToast('Duration must be at least 15 minutes.', 'error'); return; }
-
-  const priceCents = Math.round(priceInput * 100);
-  const packageCount = packageVal === 'single' ? null : parseInt(packageVal);
-
-  const btn = document.getElementById('save-session-btn');
-  btn.disabled = true; btn.textContent = 'Saving...';
-
-  try {
-    const res = await fetch(EDGE_BASE + '/manage-session-types', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
-      body: JSON.stringify({ trainer_id: trainer.id, name, price_cents: priceCents, duration_min: durationMin, package_count: packageCount })
-    });
-    if (!res.ok) throw new Error();
-    await loadSessionTypes();
-    cancelAddSession();
-    showToast('Session type added!');
-  } catch {
-    showToast('Could not save session type. Try again.', 'error');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Save';
-  }
-}
-
-async function toggleSessionType(id, newActive) {
-  try {
-    const res = await fetch(EDGE_BASE + '/manage-session-types', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
-      body: JSON.stringify({ id, trainer_id: trainer.id, is_active: newActive })
-    });
-    if (!res.ok) throw new Error();
-    await loadSessionTypes();
-    showToast(newActive ? 'Session type activated.' : 'Session type deactivated.');
-  } catch {
-    showToast('Could not update session type. Try again.', 'error');
-  }
-}
-
-// ===== BOOKING AVAILABILITY =====
-const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-let scheduleState = {}; // key: day_of_week (0-6), value: { start_time, end_time } | null
-
-async function loadAvailability() {
-  try {
-    const res = await fetch(EDGE_BASE + '/manage-availability', {
-      headers: { 'Authorization': 'Bearer ' + getAuthToken() }
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-    // Build scheduleState map
-    scheduleState = {};
-    (data.schedule || []).forEach(s => {
-      scheduleState[s.day_of_week] = { start_time: s.start_time, end_time: s.end_time };
-    });
-    renderSchedule();
-    renderOverrides(data.overrides || []);
-  } catch {}
-}
-
-function renderSchedule() {
-  const grid = document.getElementById('avail-days-grid');
-  if (!grid) return;
-  grid.innerHTML = DAYS.map((day, i) => {
-    const on = !!scheduleState[i];
-    const start = scheduleState[i]?.start_time || '09:00';
-    const end = scheduleState[i]?.end_time || '17:00';
-    return `
-      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);" id="day-row-${i}">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0;width:110px;">
-          <input type="checkbox" id="day-check-${i}" ${on ? 'checked' : ''} onchange="toggleDay(${i})" style="width:16px;height:16px;accent-color:var(--brand);cursor:pointer;">
-          <span style="font-size:13px;font-weight:600;">${day}</span>
-        </label>
-        <div style="display:flex;align-items:center;gap:6px;flex:1;${on ? '' : 'opacity:0.3;pointer-events:none;'}" id="day-times-${i}">
-          <input type="time" id="day-start-${i}" value="${start}" style="flex:1;padding:7px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;outline:none;min-width:0;">
-          <span style="font-size:11px;color:var(--text-muted);">to</span>
-          <input type="time" id="day-end-${i}" value="${end}" style="flex:1;padding:7px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;outline:none;min-width:0;">
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function toggleDay(i) {
-  const checked = document.getElementById('day-check-' + i).checked;
-  const timesDiv = document.getElementById('day-times-' + i);
-  timesDiv.style.opacity = checked ? '1' : '0.3';
-  timesDiv.style.pointerEvents = checked ? '' : 'none';
-  if (checked) {
-    scheduleState[i] = {
-      start_time: document.getElementById('day-start-' + i).value || '09:00',
-      end_time: document.getElementById('day-end-' + i).value || '17:00'
-    };
-  } else {
-    delete scheduleState[i];
-  }
-}
-
-async function saveSchedule() {
-  const schedule = [];
-  for (let i = 0; i < 7; i++) {
-    const checked = document.getElementById('day-check-' + i)?.checked;
-    if (!checked) continue;
-    const start = document.getElementById('day-start-' + i)?.value;
-    const end = document.getElementById('day-end-' + i)?.value;
-    if (!start || !end || end <= start) {
-      showToast('End time must be after start time for ' + DAYS[i] + '.', 'error');
-      return;
-    }
-    schedule.push({ day_of_week: i, start_time: start, end_time: end });
-  }
-
-  const btn = document.getElementById('save-schedule-btn');
-  btn.disabled = true; btn.textContent = 'Saving...';
-
-  try {
-    const res = await fetch(EDGE_BASE + '/manage-availability?op=schedule', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
-      body: JSON.stringify({ trainer_id: trainer.id, schedule })
-    });
-    if (!res.ok) throw new Error();
-    showToast('Schedule saved!');
-  } catch {
-    showToast('Could not save schedule. Try again.', 'error');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Save Schedule';
-  }
-}
-
-function renderOverrides(overrides) {
-  const list = document.getElementById('blocked-dates-list');
-  if (!list) return;
-  const blocked = overrides.filter(o => o.is_blocked);
-  if (blocked.length === 0) {
-    list.innerHTML = '<p style="font-size:12px;color:var(--text-faint);">No blocked dates.</p>';
-    return;
-  }
-  list.innerHTML = blocked.map(o => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;">
-      <span style="font-size:13px;">${o.date}</span>
-      <button onclick="unblockDate('${o.date}')" style="padding:4px 10px;border-radius:6px;background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:11px;cursor:pointer;">Unblock</button>
-    </div>
-  `).join('');
-}
-
-async function blockDate() {
-  const dateInput = document.getElementById('block-date-input');
-  const date = dateInput.value;
-  if (!date) { showToast('Please pick a date.', 'error'); return; }
-
-  try {
-    const res = await fetch(EDGE_BASE + '/manage-availability?op=override', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
-      body: JSON.stringify({ trainer_id: trainer.id, date, is_blocked: true })
-    });
-    if (!res.ok) throw new Error();
-    dateInput.value = '';
-    await loadAvailability();
-    showToast('Date blocked.');
-  } catch {
-    showToast('Could not block date. Try again.', 'error');
-  }
-}
-
-async function unblockDate(date) {
-  try {
-    const res = await fetch(EDGE_BASE + '/manage-availability?op=override', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
-      body: JSON.stringify({ trainer_id: trainer.id, date })
-    });
-    if (!res.ok) throw new Error();
-    await loadAvailability();
-    showToast('Date unblocked.');
-  } catch {
-    showToast('Could not unblock date. Try again.', 'error');
-  }
 }
 
 init();

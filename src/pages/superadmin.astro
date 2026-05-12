@@ -1,37 +1,29 @@
 ---
 import Base from '../layouts/Base.astro';
-import { SUPABASE_ANON_KEY } from '../lib/config.ts';
-const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
 ---
 
-<Base title="TrainedBy - Global Command Centre" description="Super admin dashboard for all markets">
+<Base title="TrainedBy — Global Command Centre" description="Super admin dashboard for all markets">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html[data-market] {
-    --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
-    --surface-2: #111; --surface-3: #1a1a1a; --surface-4: #222;
+  :root {
+    --brand: #FF5C00; --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
+    --surface: #0a0a0a; --surface-2: #111; --surface-3: #1a1a1a; --surface-4: #222;
     --border: rgba(255,255,255,0.07); --border-2: rgba(255,255,255,0.12);
     --text: #f2f2f2; --text-2: #888; --green: #00C853; --red: #FF3B3B; --gold: #F5C842;
-    --brand-dim-sm: rgba(255,92,0,0.12); --brand-border-xs: rgba(255,92,0,0.15);
-    --brand-border-sm: rgba(255,92,0,0.2);
-    --green-dim-sm: rgba(0,200,83,0.1); --green-border-sm: rgba(0,200,83,0.2);
-    --red-dim-sm: rgba(255,59,59,0.1);
-    --bg-tint-xs: rgba(255,255,255,0.06);
-    --overlay-bg: rgba(10,10,10,0.95);
   }
-  body { background: var(--surface); color: var(--text); font-family: 'DM Sans', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
-  .topbar { position: sticky; top: 0; z-index: 100; background: var(--overlay-bg); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; gap: 24px; }
-  .topbar-logo { font-family: 'DM Sans',sans-serif; font-weight: 900; font-size: 18px; color: var(--brand); margin-right: auto; }
-  .topbar-badge { padding: 3px 10px; border-radius: 100px; background: var(--brand-dim-sm); border: 1px solid var(--brand-border); color: var(--brand); font-size: 11px; font-weight: 700; }
+  body { background: var(--surface); color: var(--text); font-family: 'Manrope', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+  .topbar { position: sticky; top: 0; z-index: 100; background: rgba(10,10,10,0.95); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; gap: 24px; }
+  .topbar-logo { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 18px; color: var(--brand); margin-right: auto; }
+  .topbar-badge { padding: 3px 10px; border-radius: 100px; background: rgba(255,92,0,0.12); border: 1px solid rgba(255,92,0,0.25); color: var(--brand); font-size: 11px; font-weight: 700; }
   .topbar-time { font-size: 12px; color: var(--text-2); }
   .gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
   .gate-box { background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 20px; padding: 48px; max-width: 400px; width: 100%; text-align: center; }
-  .gate-title { font-family: 'DM Sans',sans-serif; font-weight: 900; font-size: 24px; margin-bottom: 8px; }
+  .gate-title { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 24px; margin-bottom: 8px; }
   .gate-sub { font-size: 14px; color: var(--text-2); margin-bottom: 28px; }
   .gate-input { width: 100%; padding: 12px 18px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--surface-3); color: var(--text); font-size: 14px; outline: none; margin-bottom: 12px; }
-  .gate-btn { width: 100%; padding: 12px; border-radius: 100px; background: var(--brand); color: var(--text-on-brand); font-size: 14px; font-weight: 700; border: none; cursor: pointer; }
+  .gate-btn { width: 100%; padding: 12px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 700; border: none; cursor: pointer; }
   .main { display: none; padding: 32px; max-width: 1400px; margin: 0 auto; }
-  .page-title { font-family: 'DM Sans',sans-serif; font-weight: 900; font-size: 32px; letter-spacing: -1px; margin-bottom: 4px; }
+  .page-title { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 32px; letter-spacing: -1px; margin-bottom: 4px; }
   .page-sub { font-size: 14px; color: var(--text-2); margin-bottom: 32px; }
 
   /* GLOBAL KPIs */
@@ -39,28 +31,28 @@ const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
   .kpi { background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
   .kpi.highlight { border-color: var(--brand-border); background: var(--brand-dim); }
   .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
-  .kpi-value { font-family: 'DM Sans',sans-serif; font-weight: 900; font-size: 28px; letter-spacing: -1px; }
+  .kpi-value { font-family: 'Manrope',sans-serif; font-weight: 900; font-size: 28px; letter-spacing: -1px; }
   .kpi-sub { font-size: 11px; color: var(--text-2); margin-top: 4px; }
 
   /* MARKET GRID */
   .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin-bottom: 40px; }
   .market-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
-  .market-card.live { border-color: var(--green-border-sm); }
-  .market-card.waitlist { border-color: var(--brand-border-xs); }
+  .market-card.live { border-color: rgba(0,200,83,0.2); }
+  .market-card.waitlist { border-color: rgba(255,92,0,0.15); }
   .market-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
   .market-flag { font-size: 24px; }
-  .market-name { font-family: 'DM Sans',sans-serif; font-weight: 800; font-size: 18px; }
+  .market-name { font-family: 'Manrope',sans-serif; font-weight: 800; font-size: 18px; }
   .market-domain { font-size: 12px; color: var(--text-2); }
   .market-status { margin-left: auto; padding: 3px 10px; border-radius: 100px; font-size: 10px; font-weight: 700; }
-  .status-live { background: var(--green-dim-sm); border: 1px solid var(--green-border-sm); color: var(--green); }
-  .status-waitlist { background: var(--brand-dim); border: 1px solid var(--brand-border-sm); color: var(--brand); }
+  .status-live { background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.2); color: var(--green); }
+  .status-waitlist { background: rgba(255,92,0,0.1); border: 1px solid rgba(255,92,0,0.2); color: var(--brand); }
   .market-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   .mstat { background: var(--surface-3); border-radius: 10px; padding: 12px; text-align: center; }
-  .mstat-val { font-family: 'DM Sans',sans-serif; font-weight: 800; font-size: 20px; }
+  .mstat-val { font-family: 'Manrope',sans-serif; font-weight: 800; font-size: 20px; }
   .mstat-label { font-size: 10px; color: var(--text-2); margin-top: 2px; }
   .market-revenue { margin-top: 12px; padding: 12px; background: var(--surface-3); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
   .rev-label { font-size: 11px; color: var(--text-2); }
-  .rev-value { font-family: 'DM Sans',sans-serif; font-weight: 800; font-size: 16px; color: var(--brand); }
+  .rev-value { font-family: 'Manrope',sans-serif; font-weight: 800; font-size: 16px; color: var(--brand); }
 
   /* TABS */
   .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 0; }
@@ -76,15 +68,15 @@ const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
   td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   tr:hover td { background: var(--surface-3); }
   .badge { display: inline-flex; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; }
-  .badge-green { background: var(--green-dim-sm); color: var(--green); }
-  .badge-orange { background: var(--brand-dim); color: var(--brand); }
-  .badge-gray { background: var(--bg-tint-xs); color: var(--text-2); }
-  .badge-red { background: var(--red-dim-sm); color: var(--red); }
+  .badge-green { background: rgba(0,200,83,0.1); color: var(--green); }
+  .badge-orange { background: rgba(255,92,0,0.1); color: var(--brand); }
+  .badge-gray { background: rgba(255,255,255,0.06); color: var(--text-2); }
+  .badge-red { background: rgba(255,59,59,0.1); color: var(--red); }
 
   /* WAITLIST TABLE */
   .waitlist-filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
   .filter-btn { padding: 6px 14px; border-radius: 100px; border: 1px solid var(--border-2); background: none; color: var(--text-2); font-size: 12px; cursor: pointer; }
-  .filter-btn.active { background: var(--brand); border-color: var(--brand); color: var(--text-on-brand); }
+  .filter-btn.active { background: var(--brand); border-color: var(--brand); color: #fff; }
 
   /* REFRESH */
   .refresh-btn { padding: 8px 16px; border-radius: 100px; background: var(--surface-3); border: 1px solid var(--border-2); color: var(--text-2); font-size: 12px; font-weight: 600; cursor: pointer; }
@@ -94,7 +86,6 @@ const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
 </style>
 
 <!-- AUTH GATE -->
-<span id="admin-gate-secret" data-secret={adminSecret} style="display:none"></span>
 <div id="gate" class="gate">
   <div class="gate-box">
     <div style="font-size:32px;margin-bottom:16px">🌍</div>
@@ -102,7 +93,7 @@ const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
     <div class="gate-sub">Enter your admin password to access all markets</div>
     <input id="gate-input" class="gate-input" type="password" placeholder="Admin password" onkeydown="if(event.key==='Enter')checkGate()" />
     <button class="gate-btn" onclick="checkGate()">Access Dashboard →</button>
-    <div id="gate-error" style="color:var(--red);font-size:12px;margin-top:12px;display:none">Incorrect password</div>
+    <div id="gate-error" style="color:#FF3B3B;font-size:12px;margin-top:12px;display:none">Incorrect password</div>
   </div>
 </div>
 
@@ -121,12 +112,12 @@ const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
 
   <!-- GLOBAL KPIs -->
   <div class="global-kpis" id="global-kpis">
-    <div class="kpi highlight"><div class="kpi-label">Total Trainers</div><div class="kpi-value" id="g-trainers"> - </div><div class="kpi-sub">across all markets</div></div>
-    <div class="kpi"><div class="kpi-label">Pro Subscribers</div><div class="kpi-value" id="g-pro"> - </div><div class="kpi-sub">paying trainers</div></div>
-    <div class="kpi"><div class="kpi-label">Verified</div><div class="kpi-value" id="g-verified"> - </div><div class="kpi-sub">cert verified</div></div>
-    <div class="kpi"><div class="kpi-label">Waitlist</div><div class="kpi-value" id="g-waitlist"> - </div><div class="kpi-sub">across 4 markets</div></div>
-    <div class="kpi"><div class="kpi-label">New This Week</div><div class="kpi-value" id="g-week"> - </div><div class="kpi-sub">trainer signups</div></div>
-    <div class="kpi highlight"><div class="kpi-label">Est. MRR</div><div class="kpi-value" id="g-mrr"> - </div><div class="kpi-sub">all markets</div></div>
+    <div class="kpi highlight"><div class="kpi-label">Total Trainers</div><div class="kpi-value" id="g-trainers">—</div><div class="kpi-sub">across all markets</div></div>
+    <div class="kpi"><div class="kpi-label">Pro Subscribers</div><div class="kpi-value" id="g-pro">—</div><div class="kpi-sub">paying trainers</div></div>
+    <div class="kpi"><div class="kpi-label">Verified</div><div class="kpi-value" id="g-verified">—</div><div class="kpi-sub">cert verified</div></div>
+    <div class="kpi"><div class="kpi-label">Waitlist</div><div class="kpi-value" id="g-waitlist">—</div><div class="kpi-sub">across 4 markets</div></div>
+    <div class="kpi"><div class="kpi-label">New This Week</div><div class="kpi-value" id="g-week">—</div><div class="kpi-sub">trainer signups</div></div>
+    <div class="kpi highlight"><div class="kpi-label">Est. MRR</div><div class="kpi-value" id="g-mrr">—</div><div class="kpi-sub">all markets</div></div>
   </div>
 
   <!-- TABS -->
@@ -211,16 +202,17 @@ const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
   </div>
 </div>
 
-<script define:vars={{ SUPABASE_ANON: SUPABASE_ANON_KEY }}>
+<script>
   const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-  const ADMIN_SECRET = document.getElementById('admin-gate-secret')?.dataset.secret ?? '';
+  const SUPABASE_ANON = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const ADMIN_SECRET = 'trainedby-admin-2026';
 
   let allTrainers = [];
   let allWaitlist = [];
   let currentWaitlistFilter = 'all';
 
   const MARKET_META = {
-    ae: { flag: '🇦🇪', name: 'TrainedBy UAE', domain: 'window.location.hostname', live: true, currency: 'AED', proPrice: 149 },
+    ae: { flag: '🇦🇪', name: 'TrainedBy UAE', domain: 'trainedby.ae', live: true, currency: 'AED', proPrice: 149 },
     uk: { flag: '🇬🇧', name: 'TrainedBy UK', domain: 'trainedby.uk', live: true, currency: 'GBP', proPrice: 9.99 },
     com: { flag: '🌍', name: 'TrainedBy Global', domain: 'trainedby.com', live: true, currency: 'USD', proPrice: 19 },
     in: { flag: '🇮🇳', name: 'TrainedBy India', domain: 'trainedby.in', live: false, currency: 'INR', proPrice: 499 },
@@ -359,7 +351,7 @@ const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
                        '<span class="badge badge-gray">Unverified</span>';
       const joined = new Date(t.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'2-digit' });
       return `<tr>
-        <td><div style="font-weight:600">${t.full_name || ' - '}</div><div style="font-size:11px;color:var(--text-2)">${t.email || ''}</div></td>
+        <td><div style="font-weight:600">${t.full_name || '—'}</div><div style="font-size:11px;color:var(--text-2)">${t.email || ''}</div></td>
         <td>${m.flag} ${m.name}</td>
         <td>${planBadge}</td>
         <td>${verBadge}</td>
@@ -396,10 +388,10 @@ const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
       const roleBadge = w.role === 'trainer' ? '<span class="badge badge-orange">Trainer</span>' : '<span class="badge badge-gray">Client</span>';
       return `<tr>
         <td style="font-weight:500">${w.email}</td>
-        <td style="color:var(--text-2)">${w.name || ' - '}</td>
+        <td style="color:var(--text-2)">${w.name || '—'}</td>
         <td>${m.flag} ${m.name}</td>
         <td>${roleBadge}</td>
-        <td style="font-size:11px;color:var(--text-2)">${w.source_domain || ' - '}</td>
+        <td style="font-size:11px;color:var(--text-2)">${w.source_domain || '—'}</td>
         <td style="color:var(--text-2)">${joined}</td>
       </tr>`;
     }).join('');
@@ -445,7 +437,7 @@ const adminSecret = import.meta.env.ADMIN_SECRET ?? '';
         <td>${m.currency}</td>
         <td style="text-align:center">${stats.pro}</td>
         <td style="font-weight:700;color:var(--brand)">${m.currency} ${mrr.toLocaleString()}</td>
-        <td style="color:var(--text-2)"> - </td>
+        <td style="color:var(--text-2)">—</td>
         <td style="font-weight:700">${m.currency} ${mrr.toLocaleString()}</td>
         <td>${payStatus}</td>
       </tr>`;

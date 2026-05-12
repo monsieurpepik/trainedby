@@ -19,14 +19,11 @@ const {
 } = Astro.props;
 
 import { getMarket } from '../lib/market.ts';
-import { getLocale, TRANSLATIONS, BRAND, UNDERSCORE_KEYS_EXPORT } from '../lib/i18n.ts';
-import CookieConsent from '../components/CookieConsent.astro';
-import { ClientRouter } from 'astro:transitions';
+import { getLocale, TRANSLATIONS, BRAND, getLocaleScript } from '../lib/i18n.ts';
 const market = getMarket(Astro.url.hostname);
 const locale = getLocale(Astro.request);
 const brand = BRAND[locale];
-// Merge dot-notation and underscore-style keys so all data-i18n attributes resolve
-const i18nStrings = { ...TRANSLATIONS[locale], ...(UNDERSCORE_KEYS_EXPORT?.[locale] ?? {}) };
+const i18nStrings = TRANSLATIONS[locale];
 
 // Market-aware canonical URL
 const marketCanonicalBase = canonical ?? `https://${market.domain}${Astro.url.pathname}`;
@@ -100,15 +97,15 @@ const jsonLd = structuredData ?? defaultStructuredData;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://mezhtdbfyvkshpuplqqw.supabase.co" />
 
-    <!-- ── Fonts: DM Sans (all weights) ─────────────────────────────── -->
+    <!-- ── Fonts: preload critical weights, then full load ───────────── -->
+    <!-- Preload the 700 weight used in headings for fastest LCP -->
     <link
       rel="preload"
       as="style"
-      crossorigin
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
 
@@ -119,105 +116,34 @@ const jsonLd = structuredData ?? defaultStructuredData;
     <!-- ── Structured Data (JSON-LD) ─────────────────────────────────── -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
-    <!-- ── View Transitions: app-like page navigation ─────────────────── -->
-    <ClientRouter fallback="none" />
+    <!-- ── Page-level head additions (fonts, etc.) ───────────────────── -->
+    <slot name="head" />
 
-       <!-- ── Global design tokens & critical CSS ──────────────────── -->
+    <!-- ── Global design tokens & critical CSS ───────────────────────── -->
     <style is:global>
-      /* ================================================================
-         DESIGN TOKEN SYSTEM
-         Base tokens are defined on :root (TrainedBy / English markets).
-         Per-brand overrides are applied via [data-market] attribute on
-         <html>, which is already set by Base.astro from market.market.
-         This means EVERY page automatically inherits the correct brand
-         color with zero additional code.
-         ================================================================ */
-
-      /* ── Base tokens (TrainedBy / en-ae / en-uk / en-us / en-in) ──── */
+      /* Design tokens */
       :root {
-        /* Brand accent - Electric Orange */
         --brand: #FF5C00;
-        --brand-hover: #e05200;
-        --brand-dim: rgba(255,92,0,0.10);
+        --brand-dim: rgba(255,92,0,0.12);
         --brand-border: rgba(255,92,0,0.25);
-        --brand-glow: rgba(255,92,0,0.4);
-
-        /* Pro / Premium tier - metallic gold gradient */
-        --pro-gradient: linear-gradient(135deg, #c9a227 0%, #f5d06b 40%, #c9a227 70%, #a07c1a 100%);
-        --pro-color: #f5d06b;
-        --pro-dim: rgba(197,162,39,0.12);
-        --pro-border: rgba(197,162,39,0.35);
-        --pro-glow: rgba(197,162,39,0.45);
-
-        /* Surfaces */
         --bg: #0a0a0a;
         --surface: #111111;
         --surface-2: #161616;
         --surface-3: #1c1c1c;
-        --surface-4: #222222;
-
-        /* Borders */
         --border: rgba(255,255,255,0.07);
         --border-hover: rgba(255,255,255,0.14);
-        --surface-hover: rgba(255,255,255,0.06);
-        --border-strong: rgba(255,255,255,0.2);
-
-        /* Text */
         --text: #f0f0f0;
-        --text-2: #a3a3a3;
-        --text-3: #666666;
+        --text-2: #a0a0a0;
+        --text-3: #606060;
         --text-muted: #808080;
-        --text-faint: rgba(255,255,255,0.35);
-        --text-on-brand: #ffffff;
-
-        /* Semantic colors */
         --green: #00C853;
         --green-dim: rgba(0,200,83,0.08);
         --green-border: rgba(0,200,83,0.2);
         --red: #ff5555;
-        --danger: #ff5555;
-        --gold: #F5C842;
-
-        /* Spacing & shape */
         --radius: 12px;
         --radius-lg: 20px;
-        --radius-xl: 28px;
         --shadow: 0 4px 24px rgba(0,0,0,0.4);
-        --shadow-lg: 0 8px 48px rgba(0,0,0,0.6);
         --transition: 0.18s ease;
-
-        /* Typography */
-        --font-display: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-        --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      }
-
-      /* ── CoachePar / France - Cobalt Blue ──────────────────────── */
-      /* html[data-market] has higher specificity than :root in page-level <style> blocks */
-      html[data-market="fr"], html[data-market="fr"] :root {
-        --brand: #2563EB;
-        --brand-hover: #1d4ed8;
-        --brand-dim: rgba(37,99,235,0.12);
-        --brand-border: rgba(37,99,235,0.30);
-        --brand-glow: rgba(37,99,235,0.45);
-      }
-
-      /* ── AllenatoCon / Italy - Scuderia Red ───────────────────── */
-      html[data-market="it"], html[data-market="it"] :root {
-        --brand: #DC2626;
-        --brand-hover: #b91c1c;
-        --brand-dim: rgba(220,38,38,0.12);
-        --brand-border: rgba(220,38,38,0.30);
-        --brand-glow: rgba(220,38,38,0.45);
-      }
-
-      /* ── EntrenaCon / Spain & LatAm - Solar Yellow ──────────────── */
-      html[data-market="es"], html[data-market="mx"],
-      html[data-market="es"] :root, html[data-market="mx"] :root {
-        --brand: #D97706;
-        --brand-hover: #b45309;
-        --brand-dim: rgba(217,119,6,0.12);
-        --brand-border: rgba(217,119,6,0.30);
-        --brand-glow: rgba(217,119,6,0.45);
       }
 
       /* Reset */
@@ -228,7 +154,7 @@ const jsonLd = structuredData ?? defaultStructuredData;
         text-rendering: optimizeLegibility;
       }
       body {
-        font-family: var(--font-body);
+        font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         background: var(--bg);
         color: var(--text);
         line-height: 1.6;
@@ -238,34 +164,11 @@ const jsonLd = structuredData ?? defaultStructuredData;
         overflow-x: hidden;
       }
 
-      /* ── Typography hierarchy ─────────────────────────────────────── */
-      /* Display / headings use DM Sans bold weights */
-      h1, h2, h3, h4, h5, h6,
-      .display, .heading {
-        font-family: var(--font-display);
-        font-weight: 800;
-        line-height: 1.1;
-        letter-spacing: -0.02em;
-      }
-      /* Body text, labels, inputs use DM Sans for legibility */
-      p, li, label, span, td, th, input, select, textarea, button {
-        font-family: var(--font-body);
-      }
-      /* Eyebrows / small caps use DM Sans with tracked-out uppercase */
-      .eyebrow, .label-caps {
-        font-family: var(--font-body);
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--brand);
-      }
-
-      /* Images - lazy loading by default */
+      /* Images — lazy loading by default */
       img {
         max-width: 100%;
         height: auto;
-        loading: lazy; /* CSS hint - JS sets the attribute */
+        loading: lazy; /* CSS hint — JS sets the attribute */
       }
 
       /* Links & interactive elements */
@@ -287,104 +190,7 @@ const jsonLd = structuredData ?? defaultStructuredData;
       /* Selection */
       ::selection { background: var(--brand-dim); color: var(--text); }
 
-      /* ── Mobile UX: eliminate tap delay, remove tap highlight ─────── */
-      a, button, [role="button"], input[type="submit"], input[type="button"], label {
-        -webkit-tap-highlight-color: transparent;
-        touch-action: manipulation;
-      }
-
-      /* ── Mobile UX: prevent iOS zoom on input focus (min 16px) ─────── */
-      input, select, textarea {
-        font-size: max(16px, 1em);
-      }
-
-      /* ── Button press feedback (Apple-style) ────────────────────────── */
-      button:active, a[role="button"]:active {
-        transform: scale(0.97);
-        transition: transform 0.08s ease;
-      }
-
-      /* ── Scroll-triggered fade-in utility ──────────────────────────── */
-      .fade-in-up {
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.5s ease, transform 0.5s ease;
-      }
-      .fade-in-up.visible {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      /* ── Skeleton loading utility ───────────────────────────────────── */
-      .skeleton {
-        background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
-        background-size: 200% 100%;
-        animation: skeleton-shimmer 1.4s ease infinite;
-        border-radius: var(--radius);
-      }
-      @keyframes skeleton-shimmer {
-        0% { background-position: 200% 0; }
-        100% { background-position: -200% 0; }
-      }
-
-      /* ── Sticky header with blur ─────────────────────────────────────── */
-      .nav-sticky {
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        background: color-mix(in srgb, var(--bg, #0a0a0a) 85%, transparent);
-        border-bottom: 1px solid var(--border);
-        transition: background 0.2s ease;
-      }
-
-      /* ── Pulse animation for primary CTA ──────────────────────────── */
-      @keyframes cta-pulse {
-        0%, 100% { box-shadow: 0 0 0 0 var(--brand-glow); }
-        50% { box-shadow: 0 0 0 8px transparent; }
-      }
-      .btn-pulse { animation: cta-pulse 2.5s ease infinite; }
-
-      /* ── Pro tier badge ──────────────────────────────────────────── */
-      .badge-pro {
-        background: var(--pro-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-weight: 800;
-      }
-      .card-pro {
-        border-color: var(--pro-border) !important;
-        box-shadow: 0 0 0 1px var(--pro-border), 0 0 32px var(--pro-dim);
-      }
-      .card-pro::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        background: linear-gradient(135deg, rgba(197,162,39,0.06) 0%, transparent 60%);
-        pointer-events: none;
-      }
-
-      /* ── AI presence animation ───────────────────────────────────── */
-      @keyframes ai-breathe {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.0), 0 0 12px rgba(99,102,241,0.15); }
-        50% { box-shadow: 0 0 0 4px rgba(99,102,241,0.0), 0 0 28px rgba(99,102,241,0.35); }
-      }
-      .ai-presence {
-        animation: ai-breathe 3s ease-in-out infinite;
-        border-color: rgba(99,102,241,0.4) !important;
-      }
-      @keyframes ai-typing {
-        0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
-        30% { opacity: 1; transform: translateY(-3px); }
-      }
-      .ai-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #6366f1; animation: ai-typing 1.2s ease infinite; }
-      .ai-dot:nth-child(2) { animation-delay: 0.2s; }
-      .ai-dot:nth-child(3) { animation-delay: 0.4s; }
-
-      /* ── Reduced motion */
+      /* Reduced motion */
       @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after {
           animation-duration: 0.01ms !important;
@@ -403,76 +209,12 @@ const jsonLd = structuredData ?? defaultStructuredData;
       .truncate {
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       }
-      .visually-hidden {
-        position: absolute; width: 1px; height: 1px;
-        padding: 0; margin: -1px; overflow: hidden;
-        clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
-      }
-
-      /* ── Astro View Transitions: app-like page fade ─────────────────── */
-      @keyframes vt-fade-in {
-        from { opacity: 0; transform: translateY(6px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes vt-fade-out {
-        from { opacity: 1; transform: translateY(0); }
-        to   { opacity: 0; transform: translateY(-6px); }
-      }
-      ::view-transition-old(root) {
-        animation: vt-fade-out 0.18s ease forwards;
-      }
-      ::view-transition-new(root) {
-        animation: vt-fade-in 0.22s ease forwards;
-      }
-      /* Respect reduced motion */
-      @media (prefers-reduced-motion: reduce) {
-        ::view-transition-old(root), ::view-transition-new(root) {
-          animation: none;
-        }
-      }
+      .visually-hidden { @extend .sr-only; }
     </style>
-
-    <!-- ── Per-market brand token override (server-rendered, highest priority) ── -->
-    <!-- This runs after all <style is:global> and page <style> blocks, so it always wins -->
-    {market.market === 'fr' && (
-      <style set:html={`
-        :root {
-          --brand: #2563EB !important;
-          --brand-hover: #1d4ed8 !important;
-          --brand-dim: rgba(37,99,235,0.12) !important;
-          --brand-border: rgba(37,99,235,0.30) !important;
-          --brand-glow: rgba(37,99,235,0.45) !important;
-        }
-      `} />
-    )}
-    {market.market === 'it' && (
-      <style set:html={`
-        :root {
-          --brand: #DC2626 !important;
-          --brand-hover: #b91c1c !important;
-          --brand-dim: rgba(220,38,38,0.12) !important;
-          --brand-border: rgba(220,38,38,0.30) !important;
-          --brand-glow: rgba(220,38,38,0.45) !important;
-        }
-      `} />
-    )}
-    {(market.market === 'es' || market.market === 'mx') && (
-      <style set:html={`
-        :root {
-          --brand: #D97706 !important;
-          --brand-hover: #b45309 !important;
-          --brand-dim: rgba(217,119,6,0.12) !important;
-          --brand-border: rgba(217,119,6,0.30) !important;
-          --brand-glow: rgba(217,119,6,0.45) !important;
-        }
-      `} />
-    )}
 
     <!-- ── i18n: locale + brand + translation strings ─────────────────── -->
     <script is:inline set:html={`
       window.__LOCALE__ = '${locale}';
-      window.__MARKET__ = '${market.market}';
-      window.__CURRENCY__ = '${market.currencySymbol}';
       window.__BRAND__ = ${JSON.stringify(brand)};
       window.__I18N__ = ${JSON.stringify(i18nStrings)};
     `} />
@@ -489,9 +231,34 @@ const jsonLd = structuredData ?? defaultStructuredData;
         });
       }
     </script>
-
-    <!-- ── Per-page head overrides (fonts, theme-color, light-theme CSS) ── -->
-    <slot name="head" />
+  <!-- Sentry browser error tracking -->
+  <script is:inline>
+    (function() {
+      var dsn = 'https://245841971f38b0798c021fe5019aeefa@o4511110584926208.ingest.us.sentry.io/4511378618187776';
+      window.__sentryDsn = dsn;
+      window.onerror = function(msg, src, line, col, err) {
+        if (!dsn) return;
+        var u = new URL(dsn);
+        var key = u.username;
+        var proj = u.pathname.replace('/','');
+        fetch(u.protocol+'//'+u.host+'/api/'+proj+'/store/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Sentry-Auth': 'Sentry sentry_version=7, sentry_key='+key },
+          body: JSON.stringify({
+            event_id: ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,function(c){return(c^(crypto.getRandomValues(new Uint8Array(1))[0]&(15>>c/4))).toString(16)}),
+            timestamp: new Date().toISOString(),
+            platform: 'javascript',
+            level: 'error',
+            environment: 'production',
+            exception: { values: [{ type: err ? err.name : 'Error', value: msg, stacktrace: { frames: [] } }] }
+          })
+        }).catch(function(){});
+      };
+      window.addEventListener('unhandledrejection', function(e) {
+        window.onerror(e.reason && e.reason.message ? e.reason.message : String(e.reason), '', 0, 0, e.reason instanceof Error ? e.reason : new Error(String(e.reason)));
+      });
+    })();
+  </script>
   </head>
   <body>
     <slot />
@@ -539,18 +306,6 @@ const jsonLd = structuredData ?? defaultStructuredData;
       })();
     </script>
 
-    <!-- ── Cookie Consent Banner ───────────────────────────────────────── -->
-    <CookieConsent />
-
-    <!-- ── Service Worker registration ─────────────────────────────────── -->
-    <script is:inline>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('/sw.js').catch(function() {});
-        });
-      }
-    </script>
-
     <!-- ── Error boundary: catch unhandled errors and log them ─────────── -->
     <script is:inline>
       window.addEventListener('error', function(e) {
@@ -576,6 +331,54 @@ const jsonLd = structuredData ?? defaultStructuredData;
           url: window.location.href,
         });
       });
+    </script>
+
+    <!-- Cookie consent banner (Gate 2) -->
+    <div id="cookie-banner" style="
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      background:#1A1411;color:#fff;
+      border-radius:12px;padding:16px 20px;
+      display:none;align-items:center;gap:16px;flex-wrap:wrap;
+      font-family:'DM Sans',system-ui,sans-serif;font-size:13px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.25);
+      z-index:9999;max-width:560px;width:calc(100% - 32px);
+      border:1px solid rgba(255,255,255,0.08);
+    " role="dialog" aria-label="Cookie consent">
+      <span style="flex:1;line-height:1.5;color:rgba(255,255,255,0.8)">
+        We use cookies to improve your experience.
+        <a href="/cookie-policy" style="color:#FF5C00;text-decoration:underline;text-underline-offset:3px">Learn more</a>
+      </span>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button id="cookie-decline" style="
+          background:transparent;color:rgba(255,255,255,0.5);
+          border:1px solid rgba(255,255,255,0.15);border-radius:100px;
+          padding:8px 16px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
+        ">Decline</button>
+        <button id="cookie-accept" style="
+          background:#FF5C00;color:#fff;border:none;border-radius:100px;
+          padding:8px 16px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;
+        ">Accept</button>
+      </div>
+    </div>
+
+    <script is:inline>
+    (function() {
+      var consent = localStorage.getItem('cookie_consent');
+      if (!consent) {
+        var banner = document.getElementById('cookie-banner');
+        if (banner) {
+          banner.style.display = 'flex';
+          document.getElementById('cookie-accept').addEventListener('click', function() {
+            localStorage.setItem('cookie_consent', 'accepted');
+            banner.style.display = 'none';
+          });
+          document.getElementById('cookie-decline').addEventListener('click', function() {
+            localStorage.setItem('cookie_consent', 'declined');
+            banner.style.display = 'none';
+          });
+        }
+      }
+    })();
     </script>
   </body>
 </html>

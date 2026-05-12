@@ -1,0 +1,89 @@
+<h2>Landing page — what's the hero focus?</h2>
+<p class="subtitle">The landing page is the first thing new visitors see. What should it lead with?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="search-first" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fff;padding:16px;font-family:'DM Sans',system-ui,sans-serif;border-bottom:1px solid #eee;">
+      <div style="text-align:center;padding:8px 0;">
+        <div style="font-size:11px;font-weight:700;color:#1A1411;letter-spacing:-0.02em;margin-bottom:4px;">TrainedBy</div>
+        <div style="font-size:16px;font-weight:800;color:#1A1411;letter-spacing:-0.04em;line-height:1.1;margin-bottom:8px;">Find your perfect<br/>personal trainer</div>
+        <div style="background:#F5F4F3;border-radius:20px;padding:8px 14px;display:flex;align-items:center;gap:6px;max-width:260px;margin:0 auto 8px;">
+          <span style="color:#999;font-size:11px;">🔍</span>
+          <span style="color:#999;font-size:11px;">Search trainers, location…</span>
+          <span style="background:#1A1411;color:#fff;padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;margin-left:auto;">Search</span>
+        </div>
+        <div style="display:flex;gap:5px;justify-content:center;">
+          <span style="padding:3px 8px;background:#F5F4F3;border-radius:20px;font-size:9px;color:#6B6460;">Strength</span>
+          <span style="padding:3px 8px;background:#F5F4F3;border-radius:20px;font-size:9px;color:#6B6460;">Weight Loss</span>
+          <span style="padding:3px 8px;background:#F5F4F3;border-radius:20px;font-size:9px;color:#6B6460;">Yoga</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Search-first (consumer)</h3>
+      <p>Big search bar front and center. Trainer cards below. Same structure as now but light, clean, with a proper desktop layout. Airbnb-style.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="split-hero" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fff;padding:16px;font-family:'DM Sans',system-ui,sans-serif;border-bottom:1px solid #eee;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center;">
+        <div>
+          <div style="font-size:14px;font-weight:800;color:#1A1411;letter-spacing:-0.04em;line-height:1.1;margin-bottom:6px;">The best PTs,<br/>verified.</div>
+          <div style="font-size:9px;color:#6B6460;line-height:1.5;margin-bottom:8px;">Book certified personal trainers. Guaranteed results or your money back.</div>
+          <div style="display:flex;gap:5px;">
+            <span style="background:#1A1411;color:#fff;padding:5px 10px;border-radius:20px;font-size:9px;font-weight:700;">Find a trainer</span>
+            <span style="border:1px solid #eee;color:#6B6460;padding:5px 10px;border-radius:20px;font-size:9px;">For trainers →</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+          <div style="background:#F5F4F3;border-radius:8px;padding:8px;text-align:center;">
+            <div style="font-size:16px;font-weight:800;color:#1A1411;">4.9★</div>
+            <div style="font-size:8px;color:#6B6460;">avg rating</div>
+          </div>
+          <div style="background:#F5F4F3;border-radius:8px;padding:8px;text-align:center;">
+            <div style="font-size:16px;font-weight:800;color:#1A1411;">500+</div>
+            <div style="font-size:8px;color:#6B6460;">trainers</div>
+          </div>
+          <div style="background:#F5F4F3;border-radius:8px;padding:8px;text-align:center;">
+            <div style="font-size:16px;font-weight:800;color:#1A1411;">10</div>
+            <div style="font-size:8px;color:#6B6460;">markets</div>
+          </div>
+          <div style="background:#F5F4F3;border-radius:8px;padding:8px;text-align:center;">
+            <div style="font-size:16px;font-weight:800;color:#1A1411;">100%</div>
+            <div style="font-size:8px;color:#6B6460;">certified</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Split hero (two-sided)</h3>
+      <p>Left: headline + two CTAs (Find a trainer / For trainers). Right: trust stats grid. Appeals to both consumers and trainers. Modern SaaS look.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="minimal-editorial" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fff;padding:16px;font-family:'DM Sans',system-ui,sans-serif;border-bottom:1px solid #eee;">
+      <div style="text-align:center;padding:4px 0;">
+        <div style="display:inline-block;padding:3px 10px;background:#F5F4F3;border-radius:20px;font-size:8px;font-weight:700;color:#6B6460;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">Verified trainers in Dubai</div>
+        <div style="font-size:18px;font-weight:800;color:#1A1411;letter-spacing:-0.05em;line-height:1.0;margin-bottom:6px;">Train smarter.<br/><em style="font-style:italic;font-family:Georgia,serif;">Look better.</em></div>
+        <div style="font-size:9px;color:#6B6460;margin-bottom:10px;">Every trainer background-checked & certified.</div>
+        <div style="display:flex;gap:6px;justify-content:center;margin-bottom:10px;">
+          <span style="background:#1A1411;color:#fff;padding:6px 14px;border-radius:20px;font-size:9px;font-weight:700;">Browse trainers</span>
+        </div>
+        <div style="display:flex;gap:4px;justify-content:center;">
+          <div style="width:36px;height:36px;background:#e0dedd;border-radius:50%;border:2px solid #fff;"></div>
+          <div style="width:36px;height:36px;background:#c8c4c0;border-radius:50%;border:2px solid #fff;margin-left:-10px;"></div>
+          <div style="width:36px;height:36px;background:#d4d0cc;border-radius:50%;border:2px solid #fff;margin-left:-10px;"></div>
+          <div style="font-size:9px;color:#6B6460;align-self:center;margin-left:4px;">500+ trainers</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Minimal editorial</h3>
+      <p>Headline-led, editorial feel. Big typography, stacked trainer avatar row, single CTA. Like a premium product launch page. Cleaner but higher-impact.</p>
+    </div>
+  </div>
+
+</div>

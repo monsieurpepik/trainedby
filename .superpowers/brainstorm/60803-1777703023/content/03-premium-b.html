@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrainedBy — Premium Profile</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #080808;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    color: #fff;
+    padding: 28px 20px 60px;
+  }
+
+  .page-title {
+    text-align: center;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #444; margin-bottom: 6px;
+  }
+  .page-sub {
+    text-align: center; font-size: 13px; color: #666; margin-bottom: 36px; line-height: 1.5;
+  }
+  .page-sub strong { color: #D4622A; }
+
+  /* ======= MAIN LAYOUT: before / after ======= */
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 28px; max-width: 820px; margin: 0 auto;
+    align-items: start;
+  }
+
+  .col-label {
+    text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 14px; padding: 6px 14px;
+    border-radius: 20px; display: inline-block;
+  }
+  .col-label.before { background: rgba(255,255,255,0.04); color: #555; border: 1px solid #222; }
+  .col-label.after { background: rgba(212,98,42,0.1); color: #D4622A; border: 1px solid rgba(212,98,42,0.25); }
+  .col-header { text-align: center; margin-bottom: 16px; }
+
+  /* ======= BEFORE: Option B original ======= */
+  .profile-before {
+    background: #0a0a0a;
+    border-radius: 20px;
+    border: 1px solid #1e1e1e;
+    overflow: hidden;
+    opacity: 0.55;
+  }
+  .before-hero {
+    position: relative; height: 180px;
+    background: linear-gradient(160deg, #2d1200 0%, #0a0a0a 100%);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+  }
+  .before-av {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, #D4622A, #ff8c42);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; color: #fff;
+    border: 3px solid #0a0a0a;
+    margin-bottom: 10px;
+  }
+  .before-name { font-size: 16px; font-weight: 800; }
+  .before-cert { font-size: 9px; color: #D4622A; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
+  .before-body { padding: 18px; }
+  .before-link {
+    display: block; border-radius: 50px; padding: 10px 14px;
+    text-align: center; font-size: 11px; font-weight: 600;
+    margin-bottom: 7px; color: #fff;
+  }
+  .before-link.cta { background: #D4622A; }
+  .before-link.ghost { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); }
+  .before-ai {
+    background: rgba(212,98,42,0.07); border: 1px solid rgba(212,98,42,0.2);
+    border-radius: 10px; padding: 10px 12px;
+    font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 10px;
+    line-height: 1.45;
+  }
+  .before-ai-label { font-size: 8px; color: rgba(212,98,42,0.6); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+
+  /* ANNOTATION MARKS */
+  .ann {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #ef4444; color: #fff;
+    font-size: 10px; font-weight: 700;
+    margin-right: 4px; flex-shrink: 0;
+  }
+  .ann-list { margin-top: 16px; padding: 14px 16px; background: #0e0e0e; border-radius: 12px; border: 1px solid #1e1e1e; }
+  .ann-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 10px; color: #666; line-height: 1.5; margin-bottom: 8px;
+  }
+  .ann-item:last-child { margin-bottom: 0; }
+
+  /* ======= AFTER: PREMIUM ======= */
+  .profile-after {
+    background: #0a0a0a;
+    border-radius: 20px;
+    border: 2px solid rgba(212,98,42,0.35);
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(212,98,42,0.08);
+  }
+
+  /* TOP STRIP — TrainedBy brand bar */
+  .tb-bar {
+    background: #0a0a0a;
+    padding: 10px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .tb-wordmark {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+  }
+  .tb-wordmark span { color: #D4622A; }
+  .tb-verified {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(212,98,42,0.75);
+    border: 1px solid rgba(212,98,42,0.25);
+    padding: 3px 8px; border-radius: 20px;
+  }
+  .tb-verified::before { content: '✦'; font-size: 8px; }
+
+  /* HERO — arc + dark bg */
+  .p-hero {
+    position: relative; height: 200px; overflow: hidden;
+    background: #0a0a0a;
+  }
+  /* Subtle ambient glow — not photo, just quality */
+  .p-hero-glow {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 50% 0%, rgba(212,98,42,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 80% 20%, rgba(212,98,42,0.1) 0%, transparent 60%);
+  }
+  /* Grain texture */
+  .p-hero-grain {
+    position: absolute; inset: 0; opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  /* Arc — placed in hero */
+  .p-arc {
+    position: absolute; inset: 0; z-index: 2;
+  }
+  .p-arc svg { width: 100%; height: 100%; }
+
+  /* PHOTO CIRCLE — anchored center of hero */
+  .p-photo-ring {
+    position: absolute; bottom: -48px; left: 50%; transform: translateX(-50%);
+    z-index: 6;
+    /* Gradient ring */
+    width: 108px; height: 108px; border-radius: 50%;
+    background: conic-gradient(
+      #D4622A 0deg,
+      #ff9c5a 90deg,
+      rgba(212,98,42,0.2) 180deg,
+      rgba(212,98,42,0.08) 270deg,
+      #D4622A 360deg
+    );
+    padding: 2.5px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .p-photo-inner {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: #1a1a1a;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    border: 2px solid #0a0a0a;
+  }
+  .p-photo-initials {
+    font-size: 32px; font-weight: 900; color: rgba(212,98,42,0.6);
+    font-family: Georgia, 'Times New Roman', serif;
+    letter-spacing: -0.02em;
+  }
+
+  /* BODY */
+  .p-body {
+    padding: 60px 22px 28px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  /* Name — serif for gravitas */
+  .p-name {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 24px; font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  /* Credential line — single, tasteful */
+  .p-creds {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .p-cred {
+    font-size: 10px; color: rgba(255,255,255,0.4);
+    letter-spacing: 0.06em;
+  }
+  .p-dot { width: 2px; height: 2px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+
+  /* Location */
+  .p-location {
+    font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 0.04em;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .p-location::before { content: '◈'; color: #D4622A; font-size: 8px; }
+
+  /* Divider thin */
+  .p-rule { width: 40px; height: 1px; background: rgba(212,98,42,0.3); margin: 0 auto 16px; }
+
+  /* Tagline — serif italic */
+  .p-tagline {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 13px; color: rgba(255,255,255,0.45);
+    text-align: center; line-height: 1.55;
+    margin-bottom: 20px;
+    max-width: 240px;
+  }
+
+  /* STATS ROW */
+  .p-stats {
+    display: flex; gap: 0; width: 100%; margin-bottom: 22px;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px; overflow: hidden;
+  }
+  .p-stat {
+    flex: 1; padding: 12px 8px; text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .p-stat:last-child { border-right: none; }
+  .p-stat-val {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 18px; font-weight: 700; color: #fff;
+    line-height: 1;
+  }
+  .p-stat-lbl {
+    font-size: 8px; color: rgba(255,255,255,0.28); letter-spacing: 0.08em;
+    text-transform: uppercase; margin-top: 3px;
+  }
+
+  /* BUTTONS — no emoji, no pill, clean */
+  .p-btn {
+    display: block; width: 100%;
+    padding: 13px 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+    transition: opacity 0.15s;
+    cursor: pointer;
+  }
+  .p-btn.primary {
+    background: #D4622A; color: #fff;
+    box-shadow: 0 4px 20px rgba(212,98,42,0.3);
+  }
+  .p-btn.secondary {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.75);
+  }
+  .p-btn.whatsapp {
+    background: transparent;
+    border: 1px solid rgba(37,211,102,0.2);
+    color: rgba(37,211,102,0.8);
+  }
+
+  /* SPECIALTIES */
+  .p-specs {
+    display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0;
+    justify-content: center;
+  }
+  .p-spec {
+    font-size: 9px; padding: 4px 10px; border-radius: 4px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+
+  /* SECTION DIVIDER */
+  .p-section-div {
+    width: 100%; height: 1px; background: rgba(255,255,255,0.05);
+    margin: 16px 0;
+    position: relative;
+  }
+  .p-section-div::before {
+    content: '◈';
+    position: absolute; left: 50%; transform: translateX(-50%) translateY(-50%);
+    color: rgba(212,98,42,0.3); font-size: 10px;
+    background: #0a0a0a; padding: 0 8px;
+  }
+
+  /* CONCIERGE — no AI mention */
+  .p-concierge {
+    width: 100%;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 16px;
+  }
+  .p-conc-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(212,98,42,0.6); margin-bottom: 8px;
+  }
+  .p-conc-body {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.6;
+  }
+  .p-conc-cta {
+    margin-top: 10px;
+    font-size: 10px; font-weight: 700; color: #D4622A;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  /* SOCIALS */
+  .p-socials {
+    display: flex; gap: 12px; justify-content: center; margin-top: 16px;
+  }
+  .p-social {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: rgba(255,255,255,0.3);
+  }
+
+  /* BOTTOM — subtle wordmark */
+  .p-footer {
+    padding: 14px; text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    font-size: 9px; color: rgba(255,255,255,0.12); letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ======= ANNOTATIONS ======= */
+  .ann-upgrade { margin-top: 16px; display: flex; flex-direction: column; gap: 0; }
+  .ann-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 11px 14px;
+    border-bottom: 1px solid #141414;
+  }
+  .ann-row:last-child { border-bottom: none; }
+  .ann-icon {
+    width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    background: rgba(212,98,42,0.1); border: 1px solid rgba(212,98,42,0.2);
+  }
+  .ann-text { font-size: 10px; color: #777; line-height: 1.5; }
+  .ann-text strong { color: #aaa; display: block; margin-bottom: 1px; font-size: 11px; }
+  .ann-upgrade-wrap {
+    background: #0e0e0e; border-radius: 14px; border: 1px solid #1a1a1a;
+    overflow: hidden;
+    margin-top: 14px;
+  }
+  .ann-upgrade-title {
+    padding: 12px 14px 10px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: #D4622A; border-bottom: 1px solid #1a1a1a;
+  }
+
+  /* VOTE */
+  .vote-section { max-width: 820px; margin: 40px auto 0; }
+  .vote-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .vote-btn {
+    padding: 13px; border-radius: 12px;
+    font-size: 13px; font-weight: 700; text-align: center;
+    cursor: pointer; border: 2px solid; background: transparent; color: #fff;
+    transition: all 0.15s;
+  }
+  .vote-btn.yes { border-color: #D4622A; }
+  .vote-btn.yes:hover { background: #D4622A; }
+  .vote-btn.more { border-color: #334155; }
+  .vote-btn.more:hover { background: #334155; }
+  .vote-note { text-align: center; font-size: 11px; color: #444; margin-top: 12px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<p class="page-title">Premium Profile — Before vs After</p>
+<p class="page-sub">Same <strong>Option B</strong> structure — redesigned to feel like a <strong>serious, expensive company</strong></p>
+
+<div class="compare">
+
+  <!-- ===== BEFORE ===== -->
+  <div>
+    <div class="col-header"><span class="col-label before">Before — Option B</span></div>
+    <div class="profile-before">
+      <div class="before-hero">
+        <div class="before-av">MJ</div>
+        <div class="before-name">Marcus Johnson</div>
+        <div class="before-cert">NASM · Elite Strength · Dubai</div>
+      </div>
+      <div class="before-body">
+        <a class="before-link cta">Book Free Consultation</a>
+        <a class="before-link ghost">💬 WhatsApp</a>
+        <a class="before-link ghost">View Packages & Pricing</a>
+        <div class="before-ai">
+          <div class="before-ai-label">✦ AI Training Plan</div>
+          Based on your profile, Marcus recommends a 12-week hybrid strength program. Tap to get your personalised plan →
+        </div>
+      </div>
+    </div>
+    <div class="ann-list" style="margin-top:12px;">
+      <div class="ann-item"><span class="ann">1</span> Photo missing — just initials in circle, no visual hook</div>
+      <div class="ann-item"><span class="ann">2</span> "AI Training Plan" label — feels like a chatbot feature, not premium</div>
+      <div class="ann-item"><span class="ann">3</span> Emoji in buttons (💬) — never on a serious brand</div>
+      <div class="ann-item"><span class="ann">4</span> No serif — name reads like a SaaS dashboard, not a person</div>
+      <div class="ann-item"><span class="ann">5</span> No stats — trainer's credentials not visible above fold</div>
+      <div class="ann-item"><span class="ann">6</span> "Free Consultation" — premium trainers don't give things away</div>
+    </div>
+  </div>
+
+  <!-- ===== AFTER ===== -->
+  <div>
+    <div class="col-header"><span class="col-label after">After — Premium</span></div>
+    <div class="profile-after">
+
+      <!-- Brand bar -->
+      <div class="tb-bar">
+        <div class="tb-wordmark">Trained<span>By</span></div>
+        <div class="tb-verified">Verified Trainer</div>
+      </div>
+
+      <!-- Hero with arc -->
+      <div class="p-hero">
+        <div class="p-hero-glow"></div>
+        <div class="p-hero-grain"></div>
+        <div class="p-arc">
+          <svg viewBox="0 0 300 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="ag1" x1="-20" y1="200" x2="310" y2="-5" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="rgba(212,98,42,0)"/>
+                <stop offset="35%" stop-color="rgba(212,98,42,0.18)"/>
+                <stop offset="70%" stop-color="rgba(212,98,42,0.52)"/>
+                <stop offset="100%" stop-color="#D4622A"/>
+              </linearGradient>
+            </defs>
+            <path d="M -20 200 Q 80 130 160 68 Q 230 16 310 -5"
+                  stroke="url(#ag1)" stroke-width="46" fill="none" stroke-linecap="butt"/>
+            <path d="M -20 200 Q 80 130 160 68 Q 230 16 310 -5"
+                  stroke="rgba(8,8,8,0.52)" stroke-width="27" fill="none" stroke-linecap="butt"/>
+            <path d="M -20 200 Q 80 130 160 68 Q 230 16 310 -5"
+                  stroke="rgba(212,98,42,0.7)" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+            <circle cx="278" cy="10" r="9" fill="rgba(212,98,42,0.92)"/>
+            <circle cx="262" cy="20" r="7.5" fill="rgba(212,98,42,0.84)"/>
+            <circle cx="289" cy="3" r="6.5" fill="rgba(232,120,52,0.88)"/>
+            <circle cx="268" cy="1" r="5" fill="rgba(212,98,42,0.7)"/>
+            <circle cx="247" cy="12" r="4" fill="rgba(212,98,42,0.52)"/>
+            <circle cx="258" cy="-6" r="3" fill="rgba(212,98,42,0.4)"/>
+          </svg>
+        </div>
+        <!-- Circle photo ring — premium gradient border -->
+        <div class="p-photo-ring">
+          <div class="p-photo-inner">
+            <div class="p-photo-initials">MJ</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-body">
+        <!-- Name in serif -->
+        <div class="p-name">Marcus Johnson</div>
+        <!-- Credentials — restrained, one line -->
+        <div class="p-creds">
+          <span class="p-cred">NASM-CPT</span>
+          <div class="p-dot"></div>
+          <span class="p-cred">Strength & Conditioning</span>
+          <div class="p-dot"></div>
+          <span class="p-cred">8 yrs</span>
+        </div>
+        <div class="p-location">Dubai Marina, UAE</div>
+        <div class="p-rule"></div>
+        <!-- Tagline — serif italic, not a slogan -->
+        <div class="p-tagline">"I build athletes. Results measured, not promised."</div>
+
+        <!-- Stats — not a dashboard, a résumé -->
+        <div class="p-stats">
+          <div class="p-stat">
+            <div class="p-stat-val">142</div>
+            <div class="p-stat-lbl">Clients</div>
+          </div>
+          <div class="p-stat">
+            <div class="p-stat-val">4.9</div>
+            <div class="p-stat-lbl">Rating</div>
+          </div>
+          <div class="p-stat">
+            <div class="p-stat-val">8yr</div>
+            <div class="p-stat-lbl">Experience</div>
+          </div>
+        </div>
+
+        <!-- Buttons — no emoji, clean language -->
+        <a class="p-btn primary">Request a Consultation</a>
+        <a class="p-btn secondary">View Programmes & Pricing</a>
+        <a class="p-btn whatsapp">Connect on WhatsApp</a>
+
+        <!-- Specialties — quiet, not badges -->
+        <div class="p-specs">
+          <span class="p-spec">Strength</span>
+          <span class="p-spec">Body Recomposition</span>
+          <span class="p-spec">Sports Nutrition</span>
+          <span class="p-spec">Athletic Performance</span>
+        </div>
+
+        <div class="p-section-div"></div>
+
+        <!-- Intelligent concierge — NO "AI" mention -->
+        <div class="p-concierge">
+          <div class="p-conc-label">Programme Recommendation</div>
+          <div class="p-conc-body">
+            Based on your goals, Marcus recommends a 12-week strength and recomposition programme — designed specifically for your training history and schedule.
+          </div>
+          <div class="p-conc-cta">See your programme →</div>
+        </div>
+
+        <!-- Social -->
+        <div class="p-socials">
+          <div class="p-social">IG</div>
+          <div class="p-social">YT</div>
+          <div class="p-social">𝕏</div>
+        </div>
+      </div>
+
+      <div class="p-footer">TrainedBy.ae · @marcus-johnson</div>
+
+    </div>
+
+    <!-- WHAT CHANGED -->
+    <div class="ann-upgrade-wrap" style="margin-top:12px;">
+      <div class="ann-upgrade-title">What makes it premium</div>
+      <div class="ann-upgrade">
+        <div class="ann-row">
+          <div class="ann-icon">◎</div>
+          <div class="ann-text"><strong>Gradient ring on circle photo</strong>Conic gradient border (orange → light orange → fade) — expensive signal, not a plain border</div>
+        </div>
+        <div class="ann-row">
+          <div class="ann-icon">T</div>
+          <div class="ann-text"><strong>Serif name (Georgia)</strong>Psychological signal of authority and permanence — how law firms, private banks, luxury brands print names</div>
+        </div>
+        <div class="ann-row">
+          <div class="ann-icon">✦</div>
+          <div class="ann-text"><strong>"Verified Trainer" bar at top</strong>Like a Michelin star — TrainedBy vouches for this person. Not a Twitter checkmark, a quality stamp.</div>
+        </div>
+        <div class="ann-row">
+          <div class="ann-icon">"</div>
+          <div class="ann-text"><strong>Serif italic personal quote</strong>Gives the trainer a voice, makes them human. Expensive profiles show personality, not features.</div>
+        </div>
+        <div class="ann-row">
+          <div class="ann-icon">—</div>
+          <div class="ann-text"><strong>No emoji anywhere</strong>Luxury brands never use emoji. Buttons say "Request a Consultation" not "📅 Book Free"</div>
+        </div>
+        <div class="ann-row">
+          <div class="ann-icon">◈</div>
+          <div class="ann-text"><strong>"Programme Recommendation" not "AI"</strong>Intelligence is invisible. It feels like the trainer knows you — not a chatbot feature.</div>
+        </div>
+        <div class="ann-row">
+          <div class="ann-icon">▦</div>
+          <div class="ann-text"><strong>Stats as résumé, not dashboard</strong>3 numbers in a quiet bordered row. Restrained. Same data, zero "gamification" feel.</div>
+        </div>
+        <div class="ann-row">
+          <div class="ann-icon">░</div>
+          <div class="ann-text"><strong>Grain texture + ambient glow in hero</strong>Subtle film grain + radial orange light = depth and warmth. Used by Loewe, Equinox, Brunello Cucinelli sites.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="vote-section">
+  <div class="vote-row">
+    <button class="vote-btn yes" onclick="vote('approve')">Yes — this is the direction</button>
+    <button class="vote-btn more" onclick="vote('tweak')">Good, but I want to tweak something</button>
+  </div>
+  <p class="vote-note">Once approved, I'll write the spec and implementation plan for the profile redesign.</p>
+</div>
+
+<script>
+function vote(v) {
+  fetch('/event', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({type:'choice', value:v, question:'premium-profile-direction', ts:Date.now()})
+  });
+  document.querySelectorAll('.vote-btn').forEach(b => b.style.opacity = '0.4');
+  document.querySelector('.vote-btn.' + (v === 'approve' ? 'yes' : 'more')).style.opacity = '1';
+}
+</script>
+</body>
+</html>

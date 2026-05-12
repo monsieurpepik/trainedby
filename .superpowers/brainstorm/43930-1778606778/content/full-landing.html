@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #EDECEA;
+  --surface: #F7F5F3;
+  --canvas: #ffffff;
+  --hairline: #E0DDD9;
+  --ink: #1A1411;
+  --muted: #9B9490;
+  --charcoal: #6B6460;
+  --brand: #FF5C00;
+  --verified: #00C853;
+  --max: 1100px;
+}
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(237,236,234,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--hairline);
+  height: 60px;
+  display: flex; align-items: center;
+  padding: 0 40px;
+  gap: 32px;
+}
+.nav-logo { font-weight: 800; font-size: 18px; letter-spacing: -0.04em; color: var(--ink); text-decoration: none; margin-right: auto; }
+.nav-logo span { color: var(--brand); }
+.nav-link { font-size: 13px; font-weight: 500; color: var(--charcoal); text-decoration: none; }
+.nav-cta {
+  background: var(--ink); color: #fff;
+  border-radius: 100px; padding: 9px 20px;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: -0.01em; text-decoration: none;
+}
+
+/* ─── HERO ─── */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 60px;
+  align-items: center;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 80px 40px 72px;
+  min-height: calc(88vh - 60px);
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: 100px;
+  padding: 5px 14px;
+  font-size: 11px; font-weight: 700;
+  color: var(--charcoal);
+  letter-spacing: 0.04em; text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.hero-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--verified); }
+.hero-h1 {
+  font-size: clamp(40px, 5.5vw, 68px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.0;
+  margin-bottom: 20px;
+  color: var(--ink);
+}
+.hero-h1 em { font-style: italic; color: var(--brand); }
+.hero-sub {
+  font-size: 16px; color: var(--charcoal);
+  line-height: 1.65; max-width: 440px;
+  margin-bottom: 36px;
+  font-weight: 400;
+}
+
+/* Search */
+.search-wrap { position: relative; margin-bottom: 20px; max-width: 480px; }
+.search-input {
+  width: 100%;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: 100px;
+  padding: 16px 120px 16px 52px;
+  font-family: 'DM Sans', system-ui;
+  font-size: 14px; color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.search-input:focus {
+  border-color: rgba(255,92,0,0.3);
+  box-shadow: 0 0 0 3px rgba(255,92,0,0.08);
+}
+.search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+.search-btn {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  background: var(--ink); color: #fff;
+  border: none; border-radius: 100px;
+  padding: 10px 20px;
+  font-family: 'DM Sans', system-ui;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer;
+}
+
+/* Quick filters */
+.filters { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 36px; }
+.filter {
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: 100px;
+  padding: 7px 14px;
+  font-size: 12px; font-weight: 600; color: var(--charcoal);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+.filter:hover { border-color: rgba(0,0,0,0.2); color: var(--ink); }
+
+/* Trust */
+.trust { display: flex; gap: 20px; flex-wrap: wrap; }
+.trust-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--charcoal); font-weight: 500; }
+.trust-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--verified); }
+
+/* ─── EDITORIAL CARD ─── */
+.ecard {
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 3/4;
+  cursor: pointer;
+}
+.ecard-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  transition: transform 0.4s ease;
+}
+.ecard:hover .ecard-bg { transform: scale(1.03); }
+.ecard-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0.72) 100%);
+}
+.ecard-top { position: absolute; top: 14px; left: 14px; right: 14px; }
+.ecard-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.16);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 100px; padding: 5px 10px;
+  font-size: 10px; font-weight: 600; color: #fff;
+}
+.ecard-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--verified); }
+.ecard-bottom {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 18px 18px 20px;
+}
+.ecard-name { font-weight: 700; font-size: 18px; color: #fff; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 4px; }
+.ecard-meta { font-size: 12px; color: rgba(255,255,255,0.65); margin-bottom: 14px; }
+.ecard-row { display: flex; align-items: center; justify-content: space-between; }
+.ecard-price { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); letter-spacing: -0.02em; }
+.ecard-price span { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.5); }
+.ecard-cta {
+  background: #fff; color: #111; border: none; border-radius: 100px;
+  padding: 9px 18px; font-family: 'DM Sans', system-ui;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+}
+
+/* Dots */
+.dots { display: flex; gap: 5px; justify-content: center; margin-top: 14px; }
+.dot { height: 3px; border-radius: 100px; }
+.dot.on { width: 22px; background: var(--ink); }
+.dot.off { width: 6px; background: var(--hairline); }
+
+/* Photo gradients */
+.warm-a { background: linear-gradient(160deg, #2c1810 0%, #7a3010 30%, #c55a1e 60%, #e8824a 85%, #f5a875 100%); }
+.warm-b { background: linear-gradient(160deg, #0f0c08 0%, #3d2010 35%, #8a4a1e 65%, #cc7040 100%); }
+.warm-c { background: linear-gradient(160deg, #0a0e12 0%, #1a2a3a 35%, #2e4a6a 65%, #4a7090 100%); }
+
+/* ─── SECTION: FEATURED TRAINERS ─── */
+.section {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 72px 40px;
+  border-top: 1px solid var(--hairline);
+}
+.section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 8px; }
+.section-eyebrow { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.section-title { font-size: clamp(24px, 3vw, 36px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; }
+.section-link { font-size: 13px; font-weight: 700; color: var(--ink); text-decoration: none; }
+.section-sub { font-size: 14px; color: var(--charcoal); margin-bottom: 36px; line-height: 1.6; }
+
+/* Grid of editorial cards */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.cards-grid .ecard { aspect-ratio: 2/3; }
+
+/* ─── TRAINER BANNER ─── */
+.banner {
+  background: var(--ink);
+  border-radius: 20px;
+  padding: 56px 52px;
+  display: flex; align-items: center; justify-content: space-between; gap: 40px;
+  margin: 0 40px;
+  max-width: calc(var(--max) - 80px);
+  margin-left: auto; margin-right: auto;
+}
+.banner-eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+.banner-title { font-size: clamp(22px, 2.5vw, 32px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.15; color: #fff; margin-bottom: 12px; }
+.banner-sub { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.6; max-width: 380px; }
+.banner-actions { display: flex; gap: 10px; flex-shrink: 0; }
+.btn-brand { background: var(--brand); color: #fff; border: none; border-radius: 100px; padding: 14px 28px; font-family: 'DM Sans', system-ui; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.btn-outline { background: transparent; color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; padding: 14px 28px; font-family: 'DM Sans', system-ui; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--hairline);
+  max-width: var(--max); margin: 0 auto;
+  padding: 40px 40px;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+}
+.footer-logo { font-weight: 800; font-size: 16px; letter-spacing: -0.04em; color: var(--ink); text-decoration: none; }
+.footer-logo span { color: var(--brand); }
+.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-links a { color: var(--charcoal); text-decoration: none; font-size: 13px; }
+.footer-copy { font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Trained<span>By</span></a>
+  <a href="#" class="nav-link">Find a trainer</a>
+  <a href="#" class="nav-link">Stories</a>
+  <a href="#" class="nav-link" style="color:var(--brand);font-weight:700">For trainers</a>
+  <a href="#" class="nav-cta">Find your trainer</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <!-- LEFT -->
+  <div>
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      REPs Verified · Dubai
+    </div>
+    <h1 class="hero-h1">Find a trainer<br>who <em>actually</em><br>delivers.</h1>
+    <p class="hero-sub">Every trainer on TrainedBy is REPs-certified and background-checked. Book a session, track your results.</p>
+
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" placeholder="Strength, yoga, weight loss…" />
+      <button class="search-btn">Search</button>
+    </div>
+
+    <div class="filters">
+      <a href="#" class="filter">Weight Loss</a>
+      <a href="#" class="filter">Strength</a>
+      <a href="#" class="filter">HIIT</a>
+      <a href="#" class="filter">Nutrition</a>
+      <a href="#" class="filter">Yoga</a>
+      <a href="#" class="filter">Boxing</a>
+    </div>
+
+    <div class="trust">
+      <div class="trust-item"><div class="trust-dot"></div>REPs Certified only</div>
+      <div class="trust-item"><div class="trust-dot"></div>Background checked</div>
+      <div class="trust-item"><div class="trust-dot"></div>Free to browse</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: editorial trainer card -->
+  <div>
+    <div class="ecard">
+      <div class="ecard-bg warm-a"></div>
+      <div class="ecard-overlay"></div>
+      <div class="ecard-top">
+        <div class="ecard-badge">
+          <div class="ecard-badge-dot"></div>
+          REPs Verified
+        </div>
+      </div>
+      <div class="ecard-bottom">
+        <div class="ecard-name">Sarah Al-Mansoori</div>
+        <div class="ecard-meta">Strength & HIIT · Dubai Marina</div>
+        <div class="ecard-row">
+          <div class="ecard-price">AED 350 <span>/ session</span></div>
+          <button class="ecard-cta">View profile</button>
+        </div>
+      </div>
+    </div>
+    <div class="dots">
+      <div class="dot on"></div><div class="dot off"></div><div class="dot off"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED TRAINERS -->
+<div class="section">
+  <div class="section-eyebrow">Featured trainers</div>
+  <div class="section-header">
+    <h2 class="section-title">Dubai's top certified trainers</h2>
+    <a href="#" class="section-link">See all →</a>
+  </div>
+  <p class="section-sub">Every profile is REPs-verified. Real certifications, real results.</p>
+
+  <div class="cards-grid">
+    <div class="ecard">
+      <div class="ecard-bg warm-a"></div>
+      <div class="ecard-overlay"></div>
+      <div class="ecard-top"><div class="ecard-badge"><div class="ecard-badge-dot"></div>REPs</div></div>
+      <div class="ecard-bottom">
+        <div class="ecard-name" style="font-size:15px">Sarah A.</div>
+        <div class="ecard-meta">Strength · Marina</div>
+        <div class="ecard-price" style="font-size:12px">AED 350 <span>/ session</span></div>
+      </div>
+    </div>
+    <div class="ecard">
+      <div class="ecard-bg warm-c"></div>
+      <div class="ecard-overlay"></div>
+      <div class="ecard-top"><div class="ecard-badge"><div class="ecard-badge-dot"></div>REPs</div></div>
+      <div class="ecard-bottom">
+        <div class="ecard-name" style="font-size:15px">Marcus T.</div>
+        <div class="ecard-meta">Boxing · JBR</div>
+        <div class="ecard-price" style="font-size:12px">AED 420 <span>/ session</span></div>
+      </div>
+    </div>
+    <div class="ecard">
+      <div class="ecard-bg warm-b"></div>
+      <div class="ecard-overlay"></div>
+      <div class="ecard-top"><div class="ecard-badge"><div class="ecard-badge-dot"></div>REPs</div></div>
+      <div class="ecard-bottom">
+        <div class="ecard-name" style="font-size:15px">Aisha K.</div>
+        <div class="ecard-meta">Yoga · DIFC</div>
+        <div class="ecard-price" style="font-size:12px">AED 280 <span>/ session</span></div>
+      </div>
+    </div>
+    <div class="ecard">
+      <div class="ecard-bg warm-c"></div>
+      <div class="ecard-overlay" style="background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.2) 55%,rgba(0,0,0,0.75) 100%)"></div>
+      <div class="ecard-top"><div class="ecard-badge"><div class="ecard-badge-dot"></div>REPs</div></div>
+      <div class="ecard-bottom">
+        <div class="ecard-name" style="font-size:15px">Lena M.</div>
+        <div class="ecard-meta">Running · Downtown</div>
+        <div class="ecard-price" style="font-size:12px">AED 300 <span>/ session</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOR TRAINERS BANNER -->
+<div style="padding: 0 0 72px">
+  <div class="banner">
+    <div>
+      <div class="banner-eyebrow">For trainers</div>
+      <div class="banner-title">Your profile is your business.<br>Own it.</div>
+      <p class="banner-sub">Get your REPs-verified profile, booking link, and client dashboard — all in one place.</p>
+    </div>
+    <div class="banner-actions">
+      <button class="btn-brand">Claim your profile</button>
+      <button class="btn-outline">See how it works</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">Trained<span>By</span></a>
+  <div class="footer-links">
+    <a href="#">Find trainers</a>
+    <a href="#">Stories</a>
+    <a href="#">For trainers</a>
+    <a href="#">Join</a>
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+  </div>
+  <div class="footer-copy">© 2026 TrainedBy</div>
+</footer>
+
+</body>
+</html>

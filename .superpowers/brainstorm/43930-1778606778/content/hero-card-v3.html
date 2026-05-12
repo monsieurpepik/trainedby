@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #F5F4F3;
+    padding: 48px 24px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9B9490;
+    text-align: center;
+  }
+  .label.after { color: #FF5C00; }
+
+  .compare {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 280px;
+  }
+
+  /* ---- OLD (cheap) ---- */
+  .card-old {
+    width: 260px;
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+    overflow: hidden;
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+  .card-old .photo {
+    height: 150px;
+    background: linear-gradient(160deg,#FF5C00,#ffb380);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px;
+  }
+  .card-old .body { padding: 16px; }
+  .card-old .name { font-weight: 800; font-size: 15px; color: #1A1411; margin-bottom: 2px; }
+  .card-old .meta { font-size: 11px; color: #6B6460; margin-bottom: 12px; }
+  .card-old .tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
+  .card-old .tag {
+    background: #F5F4F3;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 100px;
+    padding: 3px 10px;
+    font-size: 10px; color: #6B6460; font-weight: 600;
+  }
+  .card-old .footer {
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(0,0,0,0.06); padding-top: 12px;
+  }
+  .card-old .price { font-weight: 800; font-size: 13px; color: #1A1411; }
+  .card-old .price span { font-size: 10px; font-weight: 400; color: #9B9490; }
+  .card-old .btn {
+    background: #FF5C00; color: #fff;
+    border-radius: 100px; padding: 8px 16px;
+    font-size: 11px; font-weight: 700;
+  }
+
+  /* ---- NEW (precision) ---- */
+  .card-new {
+    width: 260px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.09);
+    overflow: hidden;
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+  .card-new .photo {
+    height: 160px;
+    background: #EDEBE8;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .card-new .avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 18px;
+    color: #1A1411;
+    letter-spacing: -0.02em;
+  }
+  .card-new .verified {
+    position: absolute;
+    top: 10px; left: 10px;
+    display: flex; align-items: center; gap: 4px;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.09);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 10px; font-weight: 600; color: #1A1411;
+    letter-spacing: 0.01em;
+  }
+  .card-new .verified-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #00C853; flex-shrink: 0;
+  }
+  .card-new .body { padding: 16px 18px 18px; }
+  .card-new .name {
+    font-weight: 700; font-size: 15px;
+    color: #1A1411;
+    letter-spacing: -0.025em;
+    margin-bottom: 3px;
+  }
+  .card-new .meta {
+    font-size: 12px; color: #9B9490; font-weight: 400;
+    margin-bottom: 14px;
+    letter-spacing: -0.01em;
+  }
+  .card-new .tags {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .card-new .tag {
+    border: 1px solid rgba(0,0,0,0.09);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 11px; color: #6B6460; font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .card-new .footer {
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    padding-top: 14px;
+  }
+  .card-new .price {
+    font-weight: 600; font-size: 14px;
+    color: #1A1411;
+    letter-spacing: -0.02em;
+  }
+  .card-new .price span { font-size: 11px; font-weight: 400; color: #9B9490; }
+  .card-new .btn {
+    background: #1A1411; color: #fff;
+    border-radius: 5px;
+    padding: 8px 14px;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: -0.01em;
+    border: none; cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .card-new .btn:hover { opacity: 0.8; }
+
+  /* dots */
+  .dots { display: flex; gap: 4px; justify-content: center; margin-top: 10px; }
+  .dot { height: 3px; border-radius: 2px; background: rgba(0,0,0,0.15); }
+  .dot.active { width: 16px; background: #1A1411; }
+  .dot:not(.active) { width: 5px; }
+
+  /* annotation */
+  .note {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 8px;
+    padding: 16px 20px;
+    max-width: 600px;
+    font-size: 13px;
+    color: #6B6460;
+    line-height: 1.65;
+  }
+  .note strong { color: #1A1411; }
+</style>
+</head>
+<body>
+
+<div style="text-align:center">
+  <div style="font-size:18px;font-weight:700;color:#1A1411;letter-spacing:-0.03em;margin-bottom:6px">Trainer card — before / after</div>
+  <div style="font-size:13px;color:#9B9490">Applied getdesign.md principles: no shadows, sharp corners, tight type, border-only elevation</div>
+</div>
+
+<div class="compare">
+
+  <!-- OLD -->
+  <div class="col">
+    <div class="label">Before (cheap)</div>
+    <div class="card-old">
+      <div class="photo">👤</div>
+      <div class="body">
+        <div class="name">Sarah Al-Mansoori</div>
+        <div class="meta">Strength & HIIT · 6 years</div>
+        <div class="tags">
+          <span class="tag">Weight Loss</span>
+          <span class="tag">HIIT</span>
+          <span class="tag">Strength</span>
+        </div>
+        <div class="footer">
+          <div class="price">AED 350 <span>/ session</span></div>
+          <div class="btn">View →</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#9B9490;text-align:left;line-height:1.6;max-width:220px">
+      ✗ 20px border-radius<br>
+      ✗ Large blob shadow<br>
+      ✗ Orange gradient photo area<br>
+      ✗ Emoji placeholder<br>
+      ✗ Pill-shaped tags + button
+    </div>
+  </div>
+
+  <!-- NEW -->
+  <div class="col">
+    <div class="label after">After (precision)</div>
+    <div class="card-new">
+      <div class="photo">
+        <div class="verified">
+          <div class="verified-dot"></div>
+          REPs Verified
+        </div>
+        <div class="avatar">SA</div>
+      </div>
+      <div class="body">
+        <div class="name">Sarah Al-Mansoori</div>
+        <div class="meta">Strength & HIIT · Dubai Marina</div>
+        <div class="tags">
+          <span class="tag">Weight Loss</span>
+          <span class="tag">Strength</span>
+          <span class="tag">HIIT</span>
+        </div>
+        <div class="footer">
+          <div class="price">AED 350 <span>/ session</span></div>
+          <button class="btn">View profile</button>
+        </div>
+      </div>
+    </div>
+    <div class="dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div style="font-size:11px;color:#6B6460;text-align:left;line-height:1.6;max-width:220px">
+      ✓ 8px border-radius (sharp, precise)<br>
+      ✓ No shadow — border-only elevation<br>
+      ✓ Neutral photo bg (#EDEBE8)<br>
+      ✓ Initials on white circle<br>
+      ✓ Rectangular tags + button<br>
+      ✓ Tight letter-spacing on all text<br>
+      ✓ Dark CTA (orange saved for primary)
+    </div>
+  </div>
+
+</div>
+
+<div class="note">
+  <strong>What changed and why:</strong> Border-radius drops from 20px → 8px (removes "bubble" look). Shadow removed entirely — a clean border does the same job without the Bootstrap feel. Photo area is a neutral warm gray, not an orange gradient. Tags and buttons get 4-5px radius instead of pill — precision, not friendliness. Letter-spacing tightened across all text (-0.02em to -0.025em). These are the same principles getdesign.md uses: subtract decoration, add precision.
+</div>
+
+<div style="font-size:13px;color:#9B9490;text-align:center">Does the "After" card read as premium? Reply in terminal — or tell me what still bothers you.</div>
+
+</body>
+</html>

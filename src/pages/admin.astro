@@ -1,42 +1,28 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getMarket } from '../lib/market.ts';
-import { SUPABASE_ANON_KEY } from '../lib/config.ts';
-const market = getMarket(Astro.url.hostname);
-const brandName = market.brandName;
 ---
 <Base
-  title={`Admin CRM - ${brandName}`}
+  title="Admin CRM — TrainedBy"
   description="Internal trainer CRM dashboard."
 >
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html[data-market] {
-  --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
+:root {
+  --brand: #FF5C00; --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
   --reps: #00C853; --reps-dim: rgba(0,200,83,0.08); --reps-border: rgba(0,200,83,0.2);
-  --surface-2: #111; --surface-3: #1c1c1c; --surface-4: #242424;
+  --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c; --surface-4: #242424;
   --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.14);
   --text: #fff; --text-muted: rgba(255,255,255,0.5); --text-faint: rgba(255,255,255,0.25);
-  --danger: #ff4444; --warning: #ffaa00; --success: #00C853; --accent: #8888ff;
-  --danger-dim-sm: rgba(255,68,68,0.08); --danger-dim-md: rgba(255,68,68,0.1);
-  --danger-dim-lg: rgba(255,68,68,0.15); --danger-dim-xl: rgba(255,68,68,0.18);
-  --danger-border-sm: rgba(255,68,68,0.2); --danger-border-md: rgba(255,68,68,0.25);
-  --warning-dim-sm: rgba(255,170,0,0.08); --warning-dim-md: rgba(255,170,0,0.1);
-  --warning-border: rgba(255,170,0,0.2); --warning-border-sm: rgba(255,170,0,0.25);
-  --green-dim-lg: rgba(0,200,83,0.12); --green-dim-xl: rgba(0,200,83,0.2);
-  --accent-dim-sm: rgba(100,100,255,0.08); --accent-dim-md: rgba(100,100,255,0.15);
-  --accent-border: rgba(100,100,255,0.2);
-  --danger-border-lg: rgba(255,68,68,0.3);
-  --overlay-dark-lg: rgba(0,0,0,0.7); --bg-tint-xs: rgba(255,255,255,0.02);
+  --danger: #ff4444; --warning: #ffaa00; --success: #00C853;
 }
-.btn-success { background: var(--green-dim-lg); border: 1px solid var(--reps-border); color: var(--reps); }
-.btn-success:hover { background: var(--green-dim-xl); }
-.btn-danger { background: var(--danger-dim-md); border: 1px solid var(--danger-border-md); color: var(--danger); }
-.btn-danger:hover { background: var(--danger-dim-xl); }
+.btn-success { background: rgba(0,200,83,0.12); border: 1px solid var(--reps-border); color: var(--reps); }
+.btn-success:hover { background: rgba(0,200,83,0.2); }
+.btn-danger { background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.25); color: var(--danger); }
+.btn-danger:hover { background: rgba(255,68,68,0.18); }
 html { scroll-behavior: smooth; }
 body {
   background: var(--surface); color: var(--text);
-  font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.6;
+  font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6;
   -webkit-font-smoothing: antialiased; min-height: 100vh;
 }
 .admin-wrap { max-width: 1200px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -47,7 +33,7 @@ body {
   margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
 }
 .admin-title {
-  font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 800;
+  font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800;
 }
 .admin-title span { color: var(--brand); }
 .admin-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
@@ -57,8 +43,8 @@ body {
   cursor: pointer; border: none; transition: all 0.2s; text-decoration: none;
   display: inline-flex; align-items: center; gap: 6px;
 }
-.btn-primary { background: var(--brand); color: var(--text-on-brand); }
-.btn-primary:hover { background: var(--brand-hover); }
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover { background: #e05200; }
 .btn-ghost { background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted); }
 .btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
 
@@ -71,7 +57,7 @@ body {
 .kpi-card.brand { background: var(--brand-dim); border-color: var(--brand-border); }
 .kpi-card.green { background: var(--reps-dim); border-color: var(--reps-border); }
 .kpi-value {
-  font-family: 'DM Sans', sans-serif; font-size: 28px; font-weight: 800;
+  font-family: 'Manrope', sans-serif; font-size: 28px; font-weight: 800;
   letter-spacing: -0.5px;
 }
 .kpi-card.brand .kpi-value { color: var(--brand); }
@@ -116,7 +102,7 @@ td {
   font-size: 13px; vertical-align: middle;
 }
 tr:last-child td { border-bottom: none; }
-tr:hover td { background: var(--bg-tint-xs); }
+tr:hover td { background: rgba(255,255,255,0.02); }
 
 /* Trainer cell */
 .trainer-cell { display: flex; align-items: center; gap: 10px; }
@@ -124,7 +110,7 @@ tr:hover td { background: var(--bg-tint-xs); }
   width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
   background: var(--surface-3); border: 2px solid var(--border);
   object-fit: cover; display: flex; align-items: center; justify-content: center;
-  font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 13px; color: var(--text-muted);
+  font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 13px; color: var(--text-muted);
 }
 .trainer-name { font-weight: 700; font-size: 13px; }
 .trainer-email { font-size: 11px; color: var(--text-muted); }
@@ -138,12 +124,12 @@ tr:hover td { background: var(--bg-tint-xs); }
 .badge-pro { background: var(--brand-dim); border: 1px solid var(--brand-border); color: var(--brand); }
 .badge-free { background: var(--surface-3); border: 1px solid var(--border); color: var(--text-faint); }
 .badge-reps { background: var(--reps-dim); border: 1px solid var(--reps-border); color: var(--reps); }
-.badge-pending { background: var(--warning-dim-md); border: 1px solid var(--warning-border-sm); color: var(--warning); }
-.badge-test { background: var(--danger-dim-md); border: 1px solid var(--danger-border-sm); color: var(--danger); }
-.badge-lapsed { background: var(--danger-dim-sm); border: 1px solid var(--danger-border-sm); color: var(--danger); }
-.badge-high { background: var(--reps-dim); border: 1px solid var(--reps-border); color: var(--reps); }
-.badge-medium { background: var(--warning-dim-md); border: 1px solid var(--warning-border-sm); color: var(--warning); }
-.badge-low { background: var(--danger-dim-sm); border: 1px solid var(--danger-border-sm); color: var(--danger); }
+.badge-pending { background: rgba(255,170,0,0.1); border: 1px solid rgba(255,170,0,0.25); color: var(--warning); }
+.badge-test { background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.2); color: var(--danger); }
+.badge-lapsed { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); color: var(--danger); }
+.badge-high { background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.2); color: var(--reps); }
+.badge-medium { background: rgba(255,170,0,0.1); border: 1px solid rgba(255,170,0,0.25); color: var(--warning); }
+.badge-low { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); color: var(--danger); }
 
 /* Tabs */
 .tabs {
@@ -159,7 +145,7 @@ tr:hover td { background: var(--bg-tint-xs); }
 .tab:hover { color: var(--text); }
 .tab.active { background: var(--surface-3); color: var(--text); border: 1px solid var(--border); }
 .tab-badge {
-  background: var(--warning); color: var(--bg); border-radius: 10px;
+  background: var(--warning); color: #000; border-radius: 10px;
   padding: 1px 6px; font-size: 10px; font-weight: 800;
 }
 
@@ -185,7 +171,7 @@ tr:hover td { background: var(--bg-tint-xs); }
   border-radius: 16px; padding: 24px; max-width: 400px; margin: 40px auto;
   text-align: center;
 }
-.secret-prompt h3 { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+.secret-prompt h3 { font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 800; margin-bottom: 8px; }
 .secret-prompt p { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
 .secret-input {
   width: 100%; background: var(--surface-3); border: 1px solid var(--border);
@@ -193,7 +179,7 @@ tr:hover td { background: var(--bg-tint-xs); }
   outline: none; margin-bottom: 12px;
 }
 .secret-input:focus { border-color: var(--brand-border); }
-.kpi-card.warn { background: var(--warning-dim-sm); border-color: var(--warning-border); }
+.kpi-card.warn { background: rgba(255,170,0,0.08); border-color: rgba(255,170,0,0.2); }
 .kpi-card.warn .kpi-value { color: var(--warning); }
 
 /* Profile completion bar */
@@ -214,10 +200,10 @@ tr:hover td { background: var(--bg-tint-xs); }
 }
 .action-btn.view { background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted); }
 .action-btn.view:hover { color: var(--text); border-color: var(--border-hover); }
-.action-btn.email { background: var(--accent-dim-sm); border: 1px solid var(--accent-border); color: var(--accent); }
-.action-btn.email:hover { background: var(--accent-dim-md); }
-.action-btn.delete { background: var(--danger-dim-sm); border: 1px solid var(--danger-border-sm); color: var(--danger); }
-.action-btn.delete:hover { background: var(--danger-dim-lg); }
+.action-btn.email { background: rgba(100,100,255,0.08); border: 1px solid rgba(100,100,255,0.2); color: #8888ff; }
+.action-btn.email:hover { background: rgba(100,100,255,0.15); }
+.action-btn.delete { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); color: var(--danger); }
+.action-btn.delete:hover { background: rgba(255,68,68,0.15); }
 
 /* Empty state */
 .empty-state {
@@ -237,11 +223,11 @@ tr:hover td { background: var(--bg-tint-xs); }
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
 .toast.success { border-color: var(--reps-border); color: var(--reps); }
-.toast.error { border-color: var(--danger-border-lg); color: var(--danger); }
+.toast.error { border-color: rgba(255,68,68,0.3); color: var(--danger); }
 
 /* Modal */
 .modal-overlay {
-  position: fixed; inset: 0; background: var(--overlay-dark-lg);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
   display: none; align-items: center; justify-content: center;
   z-index: 9000; padding: 20px;
 }
@@ -251,7 +237,7 @@ tr:hover td { background: var(--bg-tint-xs); }
   border-radius: 20px; padding: 28px; max-width: 480px; width: 100%;
   max-height: 80vh; overflow-y: auto;
 }
-.modal-title { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+.modal-title { font-family: 'Manrope', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 20px; }
 .modal-field { margin-bottom: 16px; }
 .modal-label { font-size: 11px; font-weight: 700; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
 .modal-value { font-size: 13px; color: var(--text); }
@@ -284,12 +270,12 @@ tr:hover td { background: var(--bg-tint-xs); }
   <!-- All Trainers panel -->
   <div id="panel-trainers">
   <div class="kpi-row" id="kpi-row">
-    <div class="kpi-card"><div class="kpi-value" id="kpi-total"> - </div><div class="kpi-label">Total Trainers</div></div>
-    <div class="kpi-card brand"><div class="kpi-value" id="kpi-pro"> - </div><div class="kpi-label">Pro Subscribers</div></div>
-    <div class="kpi-card green"><div class="kpi-value" id="kpi-reps"> - </div><div class="kpi-label">REPs Verified</div></div>
-    <div class="kpi-card warn"><div class="kpi-value" id="kpi-pending"> - </div><div class="kpi-label">Pending Review</div></div>
-    <div class="kpi-card"><div class="kpi-value" id="kpi-complete"> - </div><div class="kpi-label">Profile ≥80%</div></div>
-    <div class="kpi-card"><div class="kpi-value" id="kpi-week"> - </div><div class="kpi-label">New This Week</div></div>
+    <div class="kpi-card"><div class="kpi-value" id="kpi-total">—</div><div class="kpi-label">Total Trainers</div></div>
+    <div class="kpi-card brand"><div class="kpi-value" id="kpi-pro">—</div><div class="kpi-label">Pro Subscribers</div></div>
+    <div class="kpi-card green"><div class="kpi-value" id="kpi-reps">—</div><div class="kpi-label">REPs Verified</div></div>
+    <div class="kpi-card warn"><div class="kpi-value" id="kpi-pending">—</div><div class="kpi-label">Pending Review</div></div>
+    <div class="kpi-card"><div class="kpi-value" id="kpi-complete">—</div><div class="kpi-label">Profile ≥80%</div></div>
+    <div class="kpi-card"><div class="kpi-value" id="kpi-week">—</div><div class="kpi-label">New This Week</div></div>
   </div>
 
   <div class="filters">
@@ -345,7 +331,7 @@ tr:hover td { background: var(--bg-tint-xs); }
   <!-- Verification Queue panel -->
   <div id="panel-queue" style="display:none">
     <div class="kpi-row">
-      <div class="kpi-card warn"><div class="kpi-value" id="q-kpi-pending"> - </div><div class="kpi-label">Pending Review</div></div>
+      <div class="kpi-card warn"><div class="kpi-value" id="q-kpi-pending">—</div><div class="kpi-label">Pending Review</div></div>
       <div class="kpi-card green"><div class="kpi-value" id="q-kpi-approved">0</div><div class="kpi-label">Approved Today</div></div>
       <div class="kpi-card"><div class="kpi-value" id="q-kpi-rejected">0</div><div class="kpi-label">Rejected Today</div></div>
     </div>
@@ -386,20 +372,9 @@ tr:hover td { background: var(--bg-tint-xs); }
 
 <div class="toast" id="toast"></div>
 
-<!-- Bulk email confirm modal -->
-<div class="modal-overlay" id="welcome-confirm-modal">
-  <div class="modal" style="position:relative;max-width:400px">
-    <div class="modal-title">Send welcome emails?</div>
-    <p id="welcome-confirm-msg" style="font-size:13px;color:var(--text-muted);margin:0 0 20px"></p>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="document.getElementById('welcome-confirm-modal').classList.remove('open')">Cancel</button>
-      <button class="btn btn-primary" id="welcome-confirm-btn">Send emails</button>
-    </div>
-  </div>
-</div>
-
-<script define:vars={{ ANON_KEY: SUPABASE_ANON_KEY }}>
+<script>
 const EDGE_BASE = 'https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1';
+const ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 let allTrainers = [];
 let filteredTrainers = [];
@@ -557,7 +532,7 @@ function renderTable() {
             : `<div class="trainer-avatar">${initials}</div>`}
           <div>
             <div class="trainer-name">${sanitize(t.name || 'Unknown')} ${isTest ? '<span class="badge badge-test">TEST</span>' : ''}</div>
-            <div class="trainer-email">${sanitize(t.email || ' - ')}</div>
+            <div class="trainer-email">${sanitize(t.email || '—')}</div>
           </div>
         </div>
       </td>
@@ -575,7 +550,7 @@ function renderTable() {
           <span class="completion-pct" style="color:${color}">${pct}%</span>
         </div>
       </td>
-      <td style="color:var(--text-muted)">${sanitize(t.city || ' - ')}</td>
+      <td style="color:var(--text-muted)">${sanitize(t.city || '—')}</td>
       <td style="color:var(--text-faint);font-size:11px;font-weight:700">${market}</td>
       <td style="color:var(--text-muted);white-space:nowrap">${joined}</td>
       <td>
@@ -603,11 +578,11 @@ function openDetail(id) {
   if (!t.instagram) missing.push('Instagram');
 
   document.getElementById('modal-name').textContent = t.name || 'Unknown Trainer';
-  document.getElementById('modal-profile-link').href = window.location.origin + '/' + (t.slug || '');
+  document.getElementById('modal-profile-link').href = 'https://trainedby.ae/' + (t.slug || '');
   document.getElementById('modal-email-btn').onclick = () => sendEmail(t.id, t.email, t.name);
 
   document.getElementById('modal-body').innerHTML = `
-    <div class="modal-field"><div class="modal-label">Email</div><div class="modal-value">${sanitize(t.email || ' - ')}</div></div>
+    <div class="modal-field"><div class="modal-label">Email</div><div class="modal-value">${sanitize(t.email || '—')}</div></div>
     <div class="modal-field"><div class="modal-label">Phone</div><div class="modal-value ${t.phone ? '' : 'muted'}">${sanitize(t.phone || 'Not provided')}</div></div>
     <div class="modal-field"><div class="modal-label">Plan</div><div class="modal-value">${t.plan === 'pro' ? '★ Pro' : 'Free'}</div></div>
     <div class="modal-field"><div class="modal-label">REPs Status</div><div class="modal-value">${t.reps_verified ? '✓ Verified (Level ' + (t.reps_level || '?') + ')' : 'Not verified'}</div></div>
@@ -656,17 +631,12 @@ async function sendEmail(id, email, name) {
 async function sendWelcomeAll() {
   const real = allTrainers.filter(t => !isTestTrainer(t) && t.email && t.email.includes('@'));
   if (real.length === 0) { showToast('No real trainers to email', 'error'); return; }
-  document.getElementById('welcome-confirm-msg').textContent = `Send welcome emails to ${real.length} trainer(s)?`;
-  const modal = document.getElementById('welcome-confirm-modal');
-  modal.classList.add('open');
-  document.getElementById('welcome-confirm-btn').onclick = async () => {
-    modal.classList.remove('open');
-    showToast('Sending ' + real.length + ' emails...', '');
-    for (const t of real) {
-      await sendEmail(t.id, t.email, t.name);
-      await new Promise(r => setTimeout(r, 500));
-    }
-  };
+  if (!confirm(`Send welcome emails to ${real.length} trainer(s)?`)) return;
+  showToast('Sending ' + real.length + ' emails...', '');
+  for (const t of real) {
+    await sendEmail(t.id, t.email, t.name);
+    await new Promise(r => setTimeout(r, 500));
+  }
 }
 
 function exportCSV() {
@@ -739,7 +709,7 @@ function renderQueue(reviews) {
   listEl.innerHTML = reviews.map(r => {
     const trainer = r.trainers || {};
     const trainerName = sanitize(trainer.name || 'Unknown Trainer');
-    const trainerEmail = sanitize(trainer.email || ' - ');
+    const trainerEmail = sanitize(trainer.email || '—');
     const market = (trainer.market || 'ae').toUpperCase();
     const submitted = new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
     const confidenceBadge = r.claude_confidence ? `<span class="badge badge-${r.claude_confidence}">${r.claude_confidence}</span>` : '';

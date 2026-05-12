@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrainedBy — Accent Colour Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: #DEDAD5;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    display: flex;
+    gap: 40px;
+    padding: 52px 48px;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    flex-wrap: wrap;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .phone-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #7A6E65;
+    text-align: center;
+    max-width: 375px;
+  }
+
+  /* ─── PHONE SHELL ─── */
+  .phone {
+    width: 375px;
+    height: 812px;
+    border-radius: 50px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 10px #1A1411,
+      0 0 0 12px #2C2420,
+      0 32px 80px rgba(0,0,0,0.32),
+      0 8px 24px rgba(0,0,0,0.16);
+  }
+
+  /* notch */
+  .notch {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 126px;
+    height: 36px;
+    background: #1A1411;
+    border-radius: 20px;
+    z-index: 50;
+  }
+
+  /* grain */
+  .grain {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    opacity: 0.030;
+    pointer-events: none;
+    z-index: 100;
+    border-radius: 50px;
+  }
+
+  /* ─── SHARED STRUCTURE ─── */
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 415px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  /* Photo sim — deliberately neutral, not orange.
+     Simulates a real trainer photo: dark shadows, mid tones, neutral */
+  .photo-sim {
+    position: absolute;
+    inset: 0;
+    /* Cool-neutral athletic photo: dark gym, warm skin, cool bg */
+    background:
+      radial-gradient(ellipse 60% 90% at 55% 100%, rgba(210,170,140,0.55) 0%, transparent 60%),
+      linear-gradient(175deg,
+        #1C1E22 0%,
+        #252830 20%,
+        #2E3038 45%,
+        #1A1C20 100%
+      );
+  }
+
+  /* Small warm circle = face/skin tone hint */
+  .photo-sim::before {
+    content: '';
+    position: absolute;
+    width: 120px;
+    height: 140px;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse, rgba(200,160,120,0.35) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  /* Status bar */
+  .status {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 54px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 28px 10px;
+    z-index: 10;
+  }
+
+  .s-time {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(248,244,238,0.90);
+  }
+
+  .s-icons { display: flex; gap: 6px; align-items: center; }
+  .s-icons svg { fill: rgba(248,244,238,0.88); }
+
+  /* Hero bottom fade */
+  .hero-fade {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 200px;
+    pointer-events: none;
+  }
+
+  .hero-name-block {
+    position: absolute;
+    bottom: 24px;
+    left: 28px;
+    right: 28px;
+  }
+
+  .hero-name {
+    font-size: 34px;
+    font-weight: 200;
+    letter-spacing: 0.025em;
+    line-height: 1.08;
+  }
+
+  .hero-tagline {
+    margin-top: 5px;
+    font-size: 12.5px;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    opacity: 0.72;
+  }
+
+  /* CONTENT */
+  .content {
+    flex: 1;
+    padding: 16px 24px 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .pills {
+    display: flex;
+    gap: 7px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 3px 8px;
+  }
+
+  .stats {
+    display: flex;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+    padding: 12px 0;
+  }
+
+  .stat { flex: 1; text-align: center; }
+  .stat + .stat { border-left: 1px solid rgba(0,0,0,0.06); }
+
+  .sn {
+    font-size: 19px;
+    font-weight: 300;
+    display: block;
+    letter-spacing: -0.01em;
+  }
+
+  .sl {
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #B0A8A2;
+    display: block;
+    margin-top: 1px;
+  }
+
+  .btn-p {
+    width: 100%;
+    height: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .btn-s {
+    width: 100%;
+    height: 46px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    background: transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .sec-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #B0A8A2;
+    margin-bottom: 8px;
+  }
+
+  .pkg {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.055);
+  }
+
+  .pkg-n { font-size: 13px; font-weight: 400; }
+  .pkg-p { font-size: 13px; font-weight: 300; }
+
+  /* ════════════════════════════════════════
+     PHONE A — Charcoal CTA (Hopp-style)
+     Photo does the work. UI stays out of the way.
+     Accent: none. Button: near-black.
+  ════════════════════════════════════════ */
+  .a .photo-sim {
+    background:
+      radial-gradient(ellipse 60% 80% at 52% 100%, rgba(200,165,130,0.45) 0%, transparent 55%),
+      linear-gradient(170deg, #1A1C20 0%, #242630 30%, #2A2D35 60%, #1C1E22 100%);
+  }
+
+  .a .hero-fade {
+    background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.85) 75%, #fff 100%);
+  }
+
+  .a .hero-name { color: #fff; }
+  .a .hero-tagline { color: rgba(255,255,255,0.75); }
+
+  .a .screen { background: #fff; }
+
+  .a .pill {
+    color: #6B6460;
+    background: rgba(0,0,0,0.055);
+  }
+
+  .a .sn { color: #1A1411; }
+
+  .a .btn-p { background: #1A1411; box-shadow: 0 4px 20px rgba(0,0,0,0.22); }
+  .a .btn-s { color: #7A7068; border: 1px solid rgba(0,0,0,0.10); }
+
+  .a .pkg-n { color: #1A1411; }
+  .a .pkg-p { color: #6B6460; }
+
+  /* ════════════════════════════════════════
+     PHONE B — Terracotta minimal
+     Same structure but terracotta ONLY on the one button.
+     Everything else neutral. Pills are grey.
+  ════════════════════════════════════════ */
+  .b .photo-sim {
+    background:
+      radial-gradient(ellipse 60% 80% at 52% 100%, rgba(200,165,130,0.45) 0%, transparent 55%),
+      linear-gradient(170deg, #1A1C20 0%, #242630 30%, #2A2D35 60%, #1C1E22 100%);
+  }
+
+  .b .hero-fade {
+    background: linear-gradient(to bottom, transparent 0%, rgba(248,244,239,0.85) 75%, #F8F4EF 100%);
+  }
+
+  .b .hero-name { color: #fff; }
+  .b .hero-tagline { color: rgba(255,255,255,0.72); }
+
+  .b .screen { background: #F8F4EF; }
+
+  .b .pill {
+    color: #7A6E68;
+    background: rgba(90,65,50,0.07);
+  }
+
+  .b .sn { color: #1A1411; }
+
+  .b .btn-p {
+    background: #C4633A;
+    box-shadow: 0 4px 20px rgba(196,99,58,0.24);
+  }
+
+  .b .btn-s {
+    color: #7A6055;
+    border: 1px solid rgba(90,65,50,0.13);
+  }
+
+  .b .pkg-n { color: #1A1411; }
+  .b .pkg-p { color: #9A8880; }
+
+  /* ════════════════════════════════════════
+     PHONE C — Stone/slate (no warm at all)
+     Ultra-neutral. Premium muted. Forest/slate accent.
+     Trending 2024 wellness/fitness aesthetic.
+  ════════════════════════════════════════ */
+  .c .photo-sim {
+    background:
+      radial-gradient(ellipse 60% 80% at 52% 100%, rgba(180,190,185,0.4) 0%, transparent 55%),
+      linear-gradient(170deg, #161A1C 0%, #1E2428 30%, #252C30 60%, #181C20 100%);
+  }
+
+  .c .hero-fade {
+    background: linear-gradient(to bottom, transparent 0%, rgba(245,245,242,0.85) 75%, #F5F5F2 100%);
+  }
+
+  .c .hero-name { color: #fff; }
+  .c .hero-tagline { color: rgba(255,255,255,0.70); }
+
+  .c .screen { background: #F5F5F2; }
+
+  .c .pill {
+    color: #5A6460;
+    background: rgba(60,80,75,0.07);
+  }
+
+  .c .sn { color: #181C1A; }
+
+  /* Accent: deep slate-green — premium, contemporary */
+  .c .btn-p {
+    background: #2D3D38;
+    box-shadow: 0 4px 20px rgba(30,50,44,0.22);
+  }
+
+  .c .btn-s {
+    color: #6A7470;
+    border: 1px solid rgba(60,80,75,0.14);
+  }
+
+  .c .pkg-n { color: #181C1A; }
+  .c .pkg-p { color: #5A6460; }
+
+  /* ─── ANNOTATION ─── */
+  .annotation {
+    max-width: 340px;
+    padding: 24px 28px;
+    background: #1A1411;
+    border-radius: 16px;
+    color: rgba(248,244,238,0.80);
+    font-size: 12.5px;
+    line-height: 1.65;
+    align-self: flex-start;
+    margin-top: 24px;
+  }
+
+  .annotation h3 {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #C4633A;
+    margin-bottom: 12px;
+  }
+
+  .annotation p { margin-bottom: 9px; color: rgba(248,244,238,0.68); }
+  .annotation p strong { color: rgba(248,244,238,0.92); font-weight: 500; }
+
+  .verdict {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+
+  .v-charcoal { background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.85); }
+  .v-terra { background: rgba(196,99,58,0.18); color: #C4633A; }
+  .v-slate { background: rgba(80,120,108,0.20); color: #7AADA0; }
+
+</style>
+</head>
+<body>
+
+<!-- STATUS BAR ICONS MACRO (reused) -->
+<!-- Signal bars, wifi, battery -->
+
+<!-- ═══════════════ PHONE A ═══════════════ -->
+<div class="col">
+  <div class="phone-label">A — Charcoal button<br>No colour accent</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="grain"></div>
+    <div class="screen a">
+      <div class="hero">
+        <div class="photo-sim"></div>
+        <div class="status">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="17" height="12" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1" opacity="0.4"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity="0.6"/><rect x="9" y="0" width="3" height="12" rx="1" opacity="0.85"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+            <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.4C10.8 2.4 13.3 3.6 15 5.6L16 4.4C14 2 11.2.8 8 .8 4.8.8 2 2 0 4.4l1 1.2C2.7 3.6 5.2 2.4 8 2.4z" opacity="0.4"/><path d="M8 5.2c1.9 0 3.7.8 4.9 2.1l1-1.2C12.4 4.4 10.3 3.6 8 3.6c-2.3 0-4.4.8-5.9 2.5l1 1.2C4.3 6 6.1 5.2 8 5.2z" opacity="0.7"/><circle cx="8" cy="10" r="2"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0" y="1" width="21" height="10" rx="3" stroke="rgba(248,244,238,0.9)" stroke-width="1.2" fill="none"/><rect x="2" y="3" width="14" height="6" rx="1.5" fill="rgba(248,244,238,0.9)"/><path d="M22 4v4c1.1-.5 1.1-3.5 0-4z" fill="rgba(248,244,238,0.6)"/></svg>
+          </div>
+        </div>
+        <div class="hero-fade"></div>
+        <div class="hero-name-block">
+          <div class="hero-name">Marcus<br>Adeyemi</div>
+          <div class="hero-tagline">Strength & Athletic Performance · Dubai</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="pills">
+          <span class="pill">Strength</span>
+          <span class="pill">HIIT</span>
+          <span class="pill">Mobility</span>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <span class="sn">8yr</span>
+            <span class="sl">Experience</span>
+          </div>
+          <div class="stat">
+            <span class="sn">94%</span>
+            <span class="sl">Goal Rate</span>
+          </div>
+          <div class="stat">
+            <span class="sn">340</span>
+            <span class="sl">Clients</span>
+          </div>
+        </div>
+        <button class="btn-p">Book a Session</button>
+        <button class="btn-s">View all packages</button>
+        <div class="sec-label">Sessions</div>
+        <div class="pkg"><span class="pkg-n">Single session</span><span class="pkg-p">AED 350</span></div>
+        <div class="pkg"><span class="pkg-n">8-session block</span><span class="pkg-p">AED 2,400</span></div>
+        <div class="pkg"><span class="pkg-n">Monthly unlimited</span><span class="pkg-p">AED 3,800</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation">
+    <h3>A — Charcoal</h3>
+    <span class="verdict v-charcoal">My pick</span>
+    <p><strong>Zero colour system.</strong> Let the trainer's photo own all the atmosphere. The button is near-black — it works with any photo, any skin tone, any gym.</p>
+    <p>This is what Hopp does. This is what Linktree premium does. Clean tools don't impose their palette on the content.</p>
+  </div>
+</div>
+
+<!-- ═══════════════ PHONE B ═══════════════ -->
+<div class="col">
+  <div class="phone-label">B — Terracotta CTA only<br>Warm off-white base</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="grain"></div>
+    <div class="screen b">
+      <div class="hero">
+        <div class="photo-sim"></div>
+        <div class="status">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="17" height="12" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1" opacity="0.4"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity="0.6"/><rect x="9" y="0" width="3" height="12" rx="1" opacity="0.85"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+            <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.4C10.8 2.4 13.3 3.6 15 5.6L16 4.4C14 2 11.2.8 8 .8 4.8.8 2 2 0 4.4l1 1.2C2.7 3.6 5.2 2.4 8 2.4z" opacity="0.4"/><path d="M8 5.2c1.9 0 3.7.8 4.9 2.1l1-1.2C12.4 4.4 10.3 3.6 8 3.6c-2.3 0-4.4.8-5.9 2.5l1 1.2C4.3 6 6.1 5.2 8 5.2z" opacity="0.7"/><circle cx="8" cy="10" r="2"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0" y="1" width="21" height="10" rx="3" stroke="rgba(248,244,238,0.9)" stroke-width="1.2" fill="none"/><rect x="2" y="3" width="14" height="6" rx="1.5" fill="rgba(248,244,238,0.9)"/><path d="M22 4v4c1.1-.5 1.1-3.5 0-4z" fill="rgba(248,244,238,0.6)"/></svg>
+          </div>
+        </div>
+        <div class="hero-fade"></div>
+        <div class="hero-name-block">
+          <div class="hero-name">Marcus<br>Adeyemi</div>
+          <div class="hero-tagline">Strength & Athletic Performance · Dubai</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="pills">
+          <span class="pill">Strength</span>
+          <span class="pill">HIIT</span>
+          <span class="pill">Mobility</span>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <span class="sn">8yr</span>
+            <span class="sl">Experience</span>
+          </div>
+          <div class="stat">
+            <span class="sn">94%</span>
+            <span class="sl">Goal Rate</span>
+          </div>
+          <div class="stat">
+            <span class="sn">340</span>
+            <span class="sl">Clients</span>
+          </div>
+        </div>
+        <button class="btn-p">Book a Session</button>
+        <button class="btn-s">View all packages</button>
+        <div class="sec-label">Sessions</div>
+        <div class="pkg"><span class="pkg-n">Single session</span><span class="pkg-p">AED 350</span></div>
+        <div class="pkg"><span class="pkg-n">8-session block</span><span class="pkg-p">AED 2,400</span></div>
+        <div class="pkg"><span class="pkg-n">Monthly unlimited</span><span class="pkg-p">AED 3,800</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation">
+    <h3>B — Terracotta CTA only</h3>
+    <span class="verdict v-terra">Compromise</span>
+    <p><strong>Terracotta lives in one place:</strong> the booking button. Everything else neutral warm-white. Better than our earlier attempts where terracotta was on every element.</p>
+    <p>Still has a "brand warm" feeling. Works if we want TrainedBy to own that identity across all trainers.</p>
+  </div>
+</div>
+
+<!-- ═══════════════ PHONE C ═══════════════ -->
+<div class="col">
+  <div class="phone-label">C — Deep slate-green CTA<br>Cool neutral base</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="grain"></div>
+    <div class="screen c">
+      <div class="hero">
+        <div class="photo-sim"></div>
+        <div class="status">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="17" height="12" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1" opacity="0.4"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity="0.6"/><rect x="9" y="0" width="3" height="12" rx="1" opacity="0.85"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+            <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.4C10.8 2.4 13.3 3.6 15 5.6L16 4.4C14 2 11.2.8 8 .8 4.8.8 2 2 0 4.4l1 1.2C2.7 3.6 5.2 2.4 8 2.4z" opacity="0.4"/><path d="M8 5.2c1.9 0 3.7.8 4.9 2.1l1-1.2C12.4 4.4 10.3 3.6 8 3.6c-2.3 0-4.4.8-5.9 2.5l1 1.2C4.3 6 6.1 5.2 8 5.2z" opacity="0.7"/><circle cx="8" cy="10" r="2"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0" y="1" width="21" height="10" rx="3" stroke="rgba(248,244,238,0.9)" stroke-width="1.2" fill="none"/><rect x="2" y="3" width="14" height="6" rx="1.5" fill="rgba(248,244,238,0.9)"/><path d="M22 4v4c1.1-.5 1.1-3.5 0-4z" fill="rgba(248,244,238,0.6)"/></svg>
+          </div>
+        </div>
+        <div class="hero-fade"></div>
+        <div class="hero-name-block">
+          <div class="hero-name">Marcus<br>Adeyemi</div>
+          <div class="hero-tagline">Strength & Athletic Performance · Dubai</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="pills">
+          <span class="pill">Strength</span>
+          <span class="pill">HIIT</span>
+          <span class="pill">Mobility</span>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <span class="sn">8yr</span>
+            <span class="sl">Experience</span>
+          </div>
+          <div class="stat">
+            <span class="sn">94%</span>
+            <span class="sl">Goal Rate</span>
+          </div>
+          <div class="stat">
+            <span class="sn">340</span>
+            <span class="sl">Clients</span>
+          </div>
+        </div>
+        <button class="btn-p">Book a Session</button>
+        <button class="btn-s">View all packages</button>
+        <div class="sec-label">Sessions</div>
+        <div class="pkg"><span class="pkg-n">Single session</span><span class="pkg-p">AED 350</span></div>
+        <div class="pkg"><span class="pkg-n">8-session block</span><span class="pkg-p">AED 2,400</span></div>
+        <div class="pkg"><span class="pkg-n">Monthly unlimited</span><span class="pkg-p">AED 3,800</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation">
+    <h3>C — Slate-green</h3>
+    <span class="verdict v-slate">Wild card</span>
+    <p><strong>Deep forest-slate</strong> (#2D3D38) is the dominant 2024 wellness/fitness accent. Lululemon, Alo Yoga, premium gyms all trend this direction.</p>
+    <p>Feels expensive and calm. Zero "gym app" cliché. Could differentiate in a crowded Dubai market.</p>
+  </div>
+</div>
+
+</body>
+</html>

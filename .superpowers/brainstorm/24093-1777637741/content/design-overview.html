@@ -1,0 +1,82 @@
+<h2>Booking System — Architecture Overview</h2>
+<p class="subtitle">Three actors, one clean payment flow</p>
+
+<div class="section">
+  <h3>The flow</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px;">
+    <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:20px;">
+      <div style="font-size:11px;color:#FF5C00;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Trainer (Pro plan)</div>
+      <ul style="margin:0;padding:0 0 0 16px;font-size:13px;color:rgba(255,255,255,0.7);line-height:2;">
+        <li>Connects Stripe account (one-time)</li>
+        <li>Creates session types + prices</li>
+        <li>Sets weekly availability</li>
+        <li>Blocks dates when needed</li>
+        <li>Sees bookings in dashboard</li>
+      </ul>
+    </div>
+    <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:20px;">
+      <div style="font-size:11px;color:#FF5C00;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Consumer</div>
+      <ul style="margin:0;padding:0 0 0 16px;font-size:13px;color:rgba(255,255,255,0.7);line-height:2;">
+        <li>Finds trainer on TrainedBy</li>
+        <li>Clicks "Book a Session"</li>
+        <li>Picks session type + time slot</li>
+        <li>Leaves name, email, phone, goal</li>
+        <li>Pays via Stripe</li>
+        <li>Gets confirmation email</li>
+      </ul>
+    </div>
+    <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:20px;">
+      <div style="font-size:11px;color:#FF5C00;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Platform (TrainedBy US)</div>
+      <ul style="margin:0;padding:0 0 0 16px;font-size:13px;color:rgba(255,255,255,0.7);line-height:2;">
+        <li>Stripe Atlas entity processes payments</li>
+        <li>Zero commission — trainer keeps 100%</li>
+        <li>Stripe routes money to trainer directly</li>
+        <li>Sends confirmation + reminder emails</li>
+        <li>Handles refunds if cancelled 24h+</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>What gets built</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+    <div style="background:#111;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">New pages</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:2.2;font-family:monospace;">/book/[slug]<br>/dashboard (bookings tab added)<br>/edit (sessions + availability tabs)</div>
+    </div>
+    <div style="background:#111;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">New edge functions</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:2.2;font-family:monospace;">get-trainer-slots<br>book-session<br>booking-webhook<br>cancel-booking<br>connect-stripe<br>connect-stripe-return</div>
+    </div>
+    <div style="background:#111;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">New DB tables</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:2.2;font-family:monospace;">session_types<br>trainer_availability<br>availability_overrides<br>bookings<br>package_credits</div>
+    </div>
+    <div style="background:#111;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Existing tables modified</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:2.2;font-family:monospace;">trainers — add<br>stripe_connect_account_id<br>stripe_connect_onboarded</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Session types supported at launch</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+    <div style="background:#111;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px;">
+      <div style="color:#FF5C00;font-weight:700;margin-bottom:6px;">Single session</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);">Pay once, book one slot. e.g. "60-min PT session — $80"</div>
+    </div>
+    <div style="background:#111;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px;">
+      <div style="color:#FF5C00;font-weight:700;margin-bottom:6px;">Package</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);">Pay upfront for N sessions at a discount. Credits stored, scheduled one at a time. e.g. "10-session pack — $700"</div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding:12px 16px;background:rgba(255,92,0,0.08);border:1px solid rgba(255,92,0,0.2);border-radius:8px;font-size:12px;color:rgba(255,255,255,0.5);">
+    Memberships (recurring billing) — planned for v2, infrastructure compatible
+  </div>
+</div>
+
+<div style="margin-top:24px;padding:16px;background:rgba(255,255,255,0.03);border-radius:8px;font-size:13px;color:rgba(255,255,255,0.5);">
+  <strong style="color:rgba(255,255,255,0.7);">Cancellation policy (platform-wide):</strong> Full refund if cancelled 24h+ before session. No refund if cancelled within 24h. Enforced automatically via Stripe refund API.
+</div>

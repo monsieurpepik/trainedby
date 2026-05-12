@@ -1,100 +1,38 @@
 ---
 import Base from "../layouts/Base.astro";
-import { getMarket } from "../lib/market.ts";
-import { SUPABASE_ANON_KEY } from "../lib/config.ts";
-const market = getMarket(Astro.url.hostname);
-const brandName = market.brandName;
-
+const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 ---
 
 <Base
-  title={`Trainer Profile - ${brandName}`}
-  description={`Verified personal trainer profile on ${brandName}`}
+  title="Trainer Profile — TrainedBy"
+  description="Verified personal trainer profile on TrainedBy.ae"
 >
-  <Fragment slot="head">
-    <style>
-      html[data-market] {
-        --bg: #FFFFFF;
-        --surface: #FAFAF9;
-        --surface-2: #F5F4F3;
-        --surface-3: #E8E5E2;
-        --text: #1A1411;
-        --text-muted: #6B6460;
-        --border: rgba(0,0,0,0.07);
-        --brand: #FF5C00;
-        --brand-hover: #e05200;
-        --text-on-brand: #ffffff;
-        --color-whatsapp: #25D366;
-        --color-star: #fbbf24;
-        --color-accent: #818cf8;
-        --color-accent-light: #a5b4fc;
-        --nav-logo-by: var(--brand);
-
-        /* ── Brand orange alpha tokens ── */
-        --brand-faintest: rgba(255,92,0,0.03);
-        --brand-dim: rgba(255,92,0,0.04);
-        --brand-dim-2: rgba(255,92,0,0.08);
-        --brand-bg: rgba(255,92,0,0.1);
-        --brand-bg-mid: rgba(255,92,0,0.12);
-        --brand-border-faint: rgba(255,92,0,0.18);
-        --brand-border: rgba(255,92,0,0.2);
-        --brand-border-strong: rgba(255,92,0,0.3);
-        --brand-border-hover: rgba(255,92,0,0.4);
-
-        /* ── Green alpha tokens ── */
-        --green-bg: rgba(34,197,94,0.08);
-        --green-bg-light: rgba(34,197,94,0.1);
-        --green-border: rgba(34,197,94,0.2);
-        --green-border-strong: rgba(34,197,94,0.3);
-
-        /* ── Purple/accent alpha tokens ── */
-        --accent-bg: rgba(99,102,241,0.08);
-        --accent-bg-light: rgba(99,102,241,0.1);
-        --accent-border: rgba(99,102,241,0.2);
-        --accent-border-strong: rgba(99,102,241,0.3);
-
-        /* ── Yellow alpha tokens ── */
-        --yellow-bg: rgba(251,191,36,0.12);
-        --yellow-bg-light: rgba(251,191,36,0.15);
-        --yellow-border: rgba(251,191,36,0.2);
-        --yellow-border-strong: rgba(251,191,36,0.3);
-
-        /* ── White glass tokens ── */
-        --glass-10: rgba(255,255,255,0.1);
-        --glass-70: rgba(255,255,255,0.7);
-
-        /* ── Dark overlay/scrim tokens ── */
-        --scrim-20: rgba(0,0,0,0.2);
-        --scrim-35: rgba(0,0,0,0.35);
-        --scrim-50: rgba(0,0,0,0.5);
-        --scrim-55: rgba(0,0,0,0.55);
-        --scrim-70: rgba(0,0,0,0.7);
-        --scrim-75: rgba(0,0,0,0.75);
-        --scrim-82: rgba(0,0,0,0.82);
-        --scrim-95: rgba(0,0,0,0.95);
-        --scrim-97: rgba(0,0,0,0.97);
-        --scrim-99: rgba(0,0,0,0.99);
-      }
-    </style>
-  </Fragment>
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html[data-market]{
-    --orange:var(--brand);
+  :root{
+    --orange:#FF5C00;
     --orange-dim:rgba(255,92,0,0.15);
     --green:#22c55e;
     --green-dim:rgba(34,197,94,0.15);
+    --white:#ffffff;
+    --white-60:rgba(255,255,255,0.6);
+    --white-30:rgba(255,255,255,0.3);
+    --white-10:rgba(255,255,255,0.1);
+    --white-06:rgba(255,255,255,0.06);
+    --black:#000000;
+    --glass:rgba(10,10,10,0.55);
+    --glass-border:rgba(255,255,255,0.12);
     --radius:16px;
     --radius-sm:10px;
-    --font:'DM Sans',sans-serif;
+    --font:'Manrope',sans-serif;
   }
   html,body{height:100%;width:100%;overflow-x:hidden}
-  body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+  body{font-family:var(--font);background:#0a0a0a;color:var(--white);-webkit-font-smoothing:antialiased}
 
   /* ── FULL BLEED BACKGROUND ── */
   #bg{
     position:fixed;inset:0;z-index:0;
-    background:var(--bg);
+    background:#0a0a0a;
     background-image:url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1400&q=85');
     background-size:cover;background-position:center top;
   }
@@ -102,10 +40,10 @@ const brandName = market.brandName;
     content:'';position:absolute;inset:0;
     background:linear-gradient(
       to bottom,
-      var(--scrim-35) 0%,
-      var(--scrim-50) 40%,
-      var(--scrim-82) 70%,
-      var(--scrim-97) 100%
+      rgba(0,0,0,0.35) 0%,
+      rgba(0,0,0,0.5) 40%,
+      rgba(0,0,0,0.82) 70%,
+      rgba(0,0,0,0.97) 100%
     );
   }
 
@@ -117,18 +55,18 @@ const brandName = market.brandName;
     padding-top:max(env(safe-area-inset-top),16px);
     max-width:100%;
   }
-  .tb-logo{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted)}
+  .tb-logo{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-60)}
   .tb-cta{
-    background:var(--surface);
-    border:1px solid var(--border);
-    color:var(--text);font-size:12px;font-weight:600;
+    background:rgba(255,255,255,0.12);
+    border:1px solid var(--glass-border);
+    color:var(--white);font-size:12px;font-weight:600;
     padding:7px 14px;border-radius:20px;
     text-decoration:none;letter-spacing:0.04em;
     backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   }
   .tb-share{
     width:36px;height:36px;border-radius:50%;
-    background:var(--surface);border:1px solid var(--border);
+    background:rgba(255,255,255,0.12);border:1px solid var(--glass-border);
     display:flex;align-items:center;justify-content:center;
     cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   }
@@ -165,15 +103,15 @@ const brandName = market.brandName;
   .avatar-inner{
     position:absolute;inset:3px;
     border-radius:50%;
-    background:var(--surface-2);
+    background:#1a1a1a;
     overflow:hidden;
     display:flex;align-items:center;justify-content:center;
   }
   .avatar-inner img{width:100%;height:100%;object-fit:cover}
   .avatar-initials{font-size:32px;font-weight:800;color:var(--orange)}
   .avatar-inner.no-photo{
-    background:linear-gradient(135deg,var(--surface-2) 0%,var(--surface-3) 100%);
-    border:2px solid var(--brand-border-strong);
+    background:linear-gradient(135deg,#1a1a1a 0%,#2a1500 100%);
+    border:2px solid rgba(255,92,0,0.3);
   }
 
   /* Name row */
@@ -181,7 +119,7 @@ const brandName = market.brandName;
     display:flex;align-items:center;gap:8px;
     margin-bottom:6px;
   }
-  .trainer-name{font-size:26px;font-weight:800;letter-spacing:-0.02em;color:var(--text)}
+  .trainer-name{font-size:26px;font-weight:800;letter-spacing:-0.02em;color:var(--white)}
   .verified-badge{
     width:22px;height:22px;
     background:var(--orange);border-radius:50%;
@@ -191,33 +129,33 @@ const brandName = market.brandName;
   .verified-badge svg{width:12px;height:12px}
 
   /* Title */
-  .trainer-title{font-size:14px;color:var(--text-muted);font-weight:500;margin-bottom:12px;line-height:1.4}
+  .trainer-title{font-size:14px;color:var(--white-60);font-weight:500;margin-bottom:12px;line-height:1.4}
 
   /* REPs badge row */
   .badge-row{
     display:flex;align-items:center;gap:8px;
     margin-bottom:20px;flex-wrap:wrap;justify-content:center;
   }
-  .reps-num{font-size:12px;color:var(--text-muted);font-weight:500;letter-spacing:0.04em}
+  .reps-num{font-size:12px;color:var(--white-60);font-weight:500;letter-spacing:0.04em}
   .reps-badge{
     display:flex;align-items:center;gap:5px;
     background:var(--green-dim);
-    border:1px solid var(--green-border-strong);
+    border:1px solid rgba(34,197,94,0.3);
     border-radius:20px;padding:4px 10px;
     font-size:12px;font-weight:600;color:var(--green);
   }
   .reps-badge svg{width:11px;height:11px}
   .pending-badge{
-    background:var(--yellow-bg-light);
-    border:1px solid var(--yellow-border-strong);
-    color:var(--color-star);
+    background:rgba(251,191,36,0.15);
+    border:1px solid rgba(251,191,36,0.3);
+    color:#fbbf24;
   }
 
   /* Stats glass pill */
   .stats-pill{
     display:flex;align-items:center;
-    background:var(--surface);
-    border:1px solid var(--border);
+    background:var(--glass);
+    border:1px solid var(--glass-border);
     border-radius:14px;
     padding:14px 0;
     margin-bottom:16px;
@@ -230,75 +168,75 @@ const brandName = market.brandName;
   }
   .stat-item+.stat-item::before{
     content:'';position:absolute;left:0;top:20%;height:60%;
-    width:1px;background:var(--border);
+    width:1px;background:var(--glass-border);
   }
-  .stat-val{font-size:20px;font-weight:800;color:var(--text);line-height:1}
+  .stat-val{font-size:20px;font-weight:800;color:var(--white);line-height:1}
   .stat-val.accept{color:var(--green);font-size:18px}
-  .stat-lbl{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-top:3px}
+  .stat-lbl{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--white-60);margin-top:3px}
 
   /* Training modes */
   .modes-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
   .mode-tag{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.04em;border:1px solid}
-  .mode-tag.in-person{background:var(--brand-bg);border-color:var(--brand-border-strong);color:var(--orange)}
-  .mode-tag.online{background:var(--accent-bg-light);border-color:var(--accent-border-strong);color:var(--color-accent)}
-  .mode-tag.hybrid{background:var(--green-bg-light);border-color:var(--green-border-strong);color:var(--green)}
+  .mode-tag.in-person{background:rgba(255,92,0,0.1);border-color:rgba(255,92,0,0.3);color:var(--orange)}
+  .mode-tag.online{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:#818cf8}
+  .mode-tag.hybrid{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--green)}
 
   /* Rating row */
   .rating-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px}
   .star-filled{color:var(--orange);font-size:14px}
-  .star-empty{color:var(--text-muted);font-size:14px}
+  .star-empty{color:rgba(255,255,255,0.2);font-size:14px}
   .rating-score{font-size:14px;font-weight:800}
-  .rating-count{font-size:12px;color:var(--text-muted)}
+  .rating-count{font-size:12px;color:var(--white-60)}
 
   /* Video badge on avatar */
-  .avatar-video-btn{position:absolute;bottom:2px;right:2px;width:28px;height:28px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);cursor:pointer;z-index:2}
+  .avatar-video-btn{position:absolute;bottom:2px;right:2px;width:28px;height:28px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;border:2px solid #0a0a0a;cursor:pointer;z-index:2}
 
   /* Reviews */
-  .reviews-summary{display:flex;align-items:center;gap:14px;padding:14px;background:var(--surface);border-radius:10px;border:1px solid var(--border);margin-bottom:12px}
+  .reviews-summary{display:flex;align-items:center;gap:14px;padding:14px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid var(--glass-border);margin-bottom:12px}
   .reviews-big{font-size:44px;font-weight:800;line-height:1}
   .reviews-meta{flex:1}
   .reviews-stars{display:flex;gap:2px;margin-bottom:4px}
-  .reviews-count{font-size:12px;color:var(--text-muted)}
-  .review-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px}
+  .reviews-count{font-size:12px;color:var(--white-60)}
+  .review-card{background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:10px;padding:14px;margin-bottom:8px}
   .review-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .review-av{width:34px;height:34px;border-radius:50%;background:var(--orange-dim);border:1px solid var(--brand-border-strong);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--orange);flex-shrink:0}
+  .review-av{width:34px;height:34px;border-radius:50%;background:var(--orange-dim);border:1px solid rgba(255,92,0,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--orange);flex-shrink:0}
   .review-name{font-size:13px;font-weight:700}
   .review-verified{font-size:10px;color:var(--green);font-weight:600;margin-top:2px}
   .review-stars-sm{display:flex;gap:2px;margin-left:auto}
-  .review-text{font-size:13px;line-height:1.7;color:var(--text-muted)}
-  .review-achievement{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:20px;font-size:11px;font-weight:600;color:var(--green)}
+  .review-text{font-size:13px;line-height:1.7;color:var(--white-60)}
+  .review-achievement{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:11px;font-weight:600;color:var(--green)}
 
   /* Reviews empty state */
   .reviews-empty{
     text-align:center;padding:24px 16px;
-    border:1px dashed var(--border);border-radius:12px;
+    border:1px dashed var(--glass-border);border-radius:12px;
   }
   .reviews-empty-icon{font-size:32px;margin-bottom:8px}
-  .reviews-empty-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
-  .reviews-empty-sub{font-size:12px;color:var(--text-muted);line-height:1.6}
+  .reviews-empty-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:4px}
+  .reviews-empty-sub{font-size:12px;color:var(--white-60);line-height:1.6}
 
   /* Transformations */
   .transforms-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .transform-card{border-radius:10px;overflow:hidden;background:var(--surface);border:1px solid var(--border)}
+  .transform-card{border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border)}
   .transform-imgs{display:grid;grid-template-columns:1fr 1fr;gap:1px}
-  .transform-img{aspect-ratio:1;object-fit:cover;width:100%;background:var(--surface-2)}
+  .transform-img{aspect-ratio:1;object-fit:cover;width:100%;background:rgba(255,255,255,0.06)}
   .transform-labels{display:flex;justify-content:space-between;padding:6px 8px 2px}
-  .t-before{font-size:9px;font-weight:700;color:var(--text-muted);letter-spacing:0.06em}
+  .t-before{font-size:9px;font-weight:700;color:var(--white-60);letter-spacing:0.06em}
   .t-after{font-size:9px;font-weight:700;color:var(--green);letter-spacing:0.06em}
   .transform-meta{padding:0 8px 8px;font-size:11px;color:var(--orange);font-weight:700}
 
   /* Video modal */
-  #videoModal{position:fixed;inset:0;background:var(--scrim-95);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+  #videoModal{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
   #videoModal.open{display:flex}
   #videoModal video{max-width:100%;max-height:80vh;border-radius:var(--radius)}
-  .video-close{position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:50%;background:var(--glass-10);border:none;color:var(--text-on-brand);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .video-close{position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
   /* Gym tag */
   .gym-tag{
     display:inline-flex;align-items:center;gap:5px;
-    background:var(--surface);border:1px solid var(--border);
+    background:var(--white-06);border:1px solid var(--glass-border);
     border-radius:20px;padding:5px 12px;
-    font-size:12px;color:var(--text-muted);font-weight:500;
+    font-size:12px;color:var(--white-60);font-weight:500;
     margin-bottom:24px;
   }
 
@@ -310,7 +248,7 @@ const brandName = market.brandName;
   .btn-wa-wrap{display:flex;flex-direction:column;gap:10px}
   .btn-wa{
     display:flex;align-items:center;justify-content:center;gap:10px;
-    background:var(--color-whatsapp);color:var(--text-on-brand);
+    background:#25D366;color:#fff;
     font-size:16px;font-weight:700;
     padding:17px 24px;border-radius:14px;
     text-decoration:none;border:none;cursor:pointer;
@@ -321,7 +259,7 @@ const brandName = market.brandName;
   .btn-wa svg{width:22px;height:22px}
   .btn-book{
     display:flex;align-items:center;justify-content:center;gap:10px;
-    background:var(--orange);color:var(--text-on-brand);
+    background:var(--orange);color:#fff;
     font-size:16px;font-weight:700;
     padding:17px 24px;border-radius:14px;
     text-decoration:none;border:none;cursor:pointer;
@@ -337,22 +275,22 @@ const brandName = market.brandName;
   }
   .btn-action{
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-    background:var(--surface);
-    border:1px solid var(--border);
+    background:rgba(255,255,255,0.08);
+    border:1px solid var(--glass-border);
     border-radius:14px;padding:16px 12px;
-    color:var(--text);font-size:13px;font-weight:600;
+    color:var(--white);font-size:13px;font-weight:600;
     cursor:pointer;text-decoration:none;
     backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
     transition:background 0.15s;
   }
-  .btn-action:active{background:var(--surface-2)}
-  .btn-action svg{width:20px;height:20px;color:var(--text-muted)}
+  .btn-action:active{background:rgba(255,255,255,0.14)}
+  .btn-action svg{width:20px;height:20px;color:var(--white-60)}
 
   /* Save contact */
   .btn-save{
     display:flex;align-items:center;justify-content:center;gap:8px;
     background:transparent;border:none;
-    color:var(--text-muted);font-size:13px;font-weight:500;
+    color:var(--white-60);font-size:13px;font-weight:500;
     padding:14px;cursor:pointer;text-decoration:none;
     font-family:var(--font);
   }
@@ -367,8 +305,8 @@ const brandName = market.brandName;
 
   /* Section card */
   .sec-card{
-    background:var(--surface);
-    border:1px solid var(--border);
+    background:var(--glass);
+    border:1px solid var(--glass-border);
     border-radius:var(--radius);
     overflow:hidden;
     backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
@@ -379,65 +317,65 @@ const brandName = market.brandName;
     cursor:pointer;
     user-select:none;
   }
-  .sec-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted)}
-  .sec-arrow{transition:transform 0.25s;color:var(--text-muted)}
+  .sec-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--white-60)}
+  .sec-arrow{transition:transform 0.25s;color:var(--white-60)}
   .sec-arrow.open{transform:rotate(180deg)}
   .sec-body{display:none;padding:0 18px 16px}
   .sec-body.open{display:block}
 
   /* Bio */
-  .bio-text{font-size:14px;line-height:1.7;color:var(--text-muted)}
+  .bio-text{font-size:14px;line-height:1.7;color:var(--white-60)}
 
   /* Tags */
   .tag-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
   .tag{
     font-size:12px;font-weight:600;padding:5px 11px;border-radius:20px;
     background:var(--orange-dim);color:var(--orange);
-    border:1px solid var(--brand-border);
+    border:1px solid rgba(255,92,0,0.2);
   }
   .cert-tag{
-    background:var(--surface-2);color:var(--text-muted);
-    border:1px solid var(--border);
+    background:var(--white-06);color:var(--white-60);
+    border:1px solid var(--glass-border);
   }
 
-  /* Packages - Grand Slam Offer cards */
+  /* Packages — Grand Slam Offer cards */
   .pkg-list{display:flex;flex-direction:column;gap:10px}
   .pkg-card{
-    background:var(--surface-2);border:1px solid var(--border);
+    background:var(--white-06);border:1px solid var(--glass-border);
     border-radius:var(--radius);padding:16px 18px;
     cursor:pointer;transition:background 0.15s,border-color 0.15s;
     text-decoration:none;display:block;
   }
-  .pkg-card:hover{background:var(--surface-3);border-color:var(--brand-border-strong)}
-  .pkg-card:active{background:var(--surface-3)}
+  .pkg-card:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,92,0,0.3)}
+  .pkg-card:active{background:var(--white-10)}
   .pkg-card.featured{
-    background:linear-gradient(135deg,var(--brand-bg-mid) 0%,var(--brand-dim) 100%);
-    border-color:var(--brand-border-hover);
+    background:linear-gradient(135deg,rgba(255,92,0,0.12) 0%,rgba(255,92,0,0.04) 100%);
+    border-color:rgba(255,92,0,0.4);
   }
   .pkg-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
   .pkg-left{display:flex;align-items:center;gap:12px}
   .pkg-icon{
     width:40px;height:40px;border-radius:10px;
-    background:var(--orange-dim);border:1px solid var(--brand-border);
+    background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
     display:flex;align-items:center;justify-content:center;
     font-size:18px;flex-shrink:0;
   }
-  .pkg-name{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.01em}
-  .pkg-sessions{font-size:12px;color:var(--text-muted);margin-top:2px}
+  .pkg-name{font-size:15px;font-weight:800;color:var(--white);letter-spacing:-0.01em}
+  .pkg-sessions{font-size:12px;color:var(--white-60);margin-top:2px}
   .pkg-badge{
     font-size:10px;font-weight:700;letter-spacing:0.05em;
-    background:var(--orange);color:var(--text-on-brand);
+    background:var(--orange);color:#fff;
     padding:2px 8px;border-radius:20px;margin-left:6px;
     vertical-align:middle;
   }
   .pkg-right{text-align:right;flex-shrink:0}
   .pkg-price{font-size:20px;font-weight:800;color:var(--orange);line-height:1}
-  .pkg-unit{font-size:11px;color:var(--text-muted);margin-top:2px}
+  .pkg-unit{font-size:11px;color:var(--white-60);margin-top:2px}
   /* Grand Slam outcome row */
   .pkg-outcome{
-    font-size:13px;font-weight:700;color:var(--text);
+    font-size:13px;font-weight:700;color:var(--white);
     padding:8px 0 6px;
-    border-top:1px solid var(--border);
+    border-top:1px solid var(--glass-border);
     margin-top:8px;
     line-height:1.5;
   }
@@ -445,7 +383,7 @@ const brandName = market.brandName;
   /* Guarantee badge */
   .pkg-guarantee{
     display:inline-flex;align-items:center;gap:5px;
-    background:var(--green-bg);border:1px solid var(--green-border);
+    background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);
     border-radius:20px;padding:4px 10px;
     font-size:11px;font-weight:600;color:var(--green);
     margin-top:6px;
@@ -456,54 +394,54 @@ const brandName = market.brandName;
   }
   .pkg-bonus-tag{
     font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;
-    background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--color-accent-light);
+    background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;
   }
   /* CTA row inside card */
   .pkg-cta-row{
     display:flex;align-items:center;justify-content:space-between;
     margin-top:12px;padding-top:10px;
-    border-top:1px solid var(--border);
+    border-top:1px solid var(--glass-border);
   }
-  .pkg-cta-text{font-size:12px;color:var(--text-muted)}
+  .pkg-cta-text{font-size:12px;color:var(--white-60)}
   .pkg-cta-btn{
-    background:var(--orange);color:var(--text-on-brand);
+    background:var(--orange);color:#fff;
     font-size:12px;font-weight:700;padding:7px 14px;
     border-radius:8px;border:none;cursor:pointer;
     font-family:var(--font);
   }
 
   /* Assessment */
-  .assess-intro{font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6}
+  .assess-intro{font-size:13px;color:var(--white-60);margin-bottom:14px;line-height:1.6}
   .assess-form{display:flex;flex-direction:column;gap:10px}
   .assess-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .assess-field{display:flex;flex-direction:column;gap:4px}
-  .assess-field label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)}
+  .assess-field label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--white-60)}
   .assess-field input,.assess-field select{
-    background:var(--surface-2);border:1px solid var(--border);
+    background:var(--white-06);border:1px solid var(--glass-border);
     border-radius:9px;padding:10px 12px;
-    color:var(--text);font-size:14px;font-family:var(--font);
+    color:var(--white);font-size:14px;font-family:var(--font);
     outline:none;
   }
   .assess-field input:focus,.assess-field select:focus{border-color:var(--orange)}
-  .assess-field select option{background:var(--surface-2)}
+  .assess-field select option{background:#1a1a1a}
   .btn-assess{
-    background:var(--orange);color:var(--text-on-brand);
+    background:var(--orange);color:#fff;
     font-size:14px;font-weight:700;padding:13px;
     border-radius:10px;border:none;cursor:pointer;
     font-family:var(--font);margin-top:4px;
   }
   .assess-result{
-    background:var(--orange-dim);border:1px solid var(--brand-border);
+    background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
     border-radius:10px;padding:14px;margin-top:8px;
-    font-size:13px;line-height:1.7;color:var(--text);
+    font-size:13px;line-height:1.7;color:var(--white);
     display:none;
   }
 
   /* ── TRAINING PHILOSOPHY ── */
   .philosophy-block{
     position:relative;
-    background:linear-gradient(135deg,var(--brand-dim-2) 0%,var(--brand-faintest) 100%);
-    border:1px solid var(--brand-border-faint);
+    background:linear-gradient(135deg,rgba(255,92,0,0.08) 0%,rgba(255,92,0,0.03) 100%);
+    border:1px solid rgba(255,92,0,0.18);
     border-radius:14px;padding:18px 18px 18px 22px;
     margin-bottom:4px;
   }
@@ -514,7 +452,7 @@ const brandName = market.brandName;
     background:var(--orange);
   }
   .philosophy-quote{
-    font-size:14px;line-height:1.75;color:var(--text);font-style:italic;
+    font-size:14px;line-height:1.75;color:var(--white);font-style:italic;
     font-weight:500;
   }
   .philosophy-author{
@@ -530,14 +468,14 @@ const brandName = market.brandName;
   }
   .trust-pill{
     display:flex;align-items:center;gap:6px;
-    background:var(--green-dim);border:1px solid var(--green-border);
+    background:var(--green-dim);border:1px solid rgba(34,197,94,0.2);
     border-radius:20px;padding:5px 12px;
     font-size:12px;font-weight:600;color:var(--green);
   }
   .trust-pill svg{width:13px;height:13px;flex-shrink:0}
   .trust-pill.amber{
-    background:var(--yellow-bg);border-color:var(--yellow-border);
-    color:var(--color-star);
+    background:rgba(251,191,36,0.12);border-color:rgba(251,191,36,0.2);
+    color:#fbbf24;
   }
 
   /* ── EDITORIAL TRAINER'S STACK ── */
@@ -545,47 +483,47 @@ const brandName = market.brandName;
   .affiliate-list{display:flex;flex-direction:column;gap:8px}
   .affiliate-item{
     display:flex;align-items:center;gap:12px;
-    background:var(--surface-2);border:1px solid var(--border);
+    background:var(--white-06);border:1px solid var(--glass-border);
     border-radius:12px;padding:12px 14px;
     text-decoration:none;transition:background 0.15s;
   }
-  .affiliate-item:hover{background:var(--surface-3)}
+  .affiliate-item:hover{background:rgba(255,255,255,0.09)}
   .affiliate-logo{
     width:40px;height:40px;border-radius:10px;
-    background:var(--surface-3);border:1px solid var(--border);
+    background:var(--white-10);border:1px solid var(--glass-border);
     display:flex;align-items:center;justify-content:center;
     font-size:18px;flex-shrink:0;overflow:hidden;
   }
   .affiliate-logo img{width:100%;height:100%;object-fit:cover;border-radius:10px}
-  .affiliate-name{font-size:13px;font-weight:700;color:var(--text)}
-  .affiliate-cat{font-size:11px;color:var(--text-muted);margin-top:1px}
-  .affiliate-arrow{margin-left:auto;color:var(--text-muted)}
+  .affiliate-name{font-size:13px;font-weight:700;color:var(--white)}
+  .affiliate-cat{font-size:11px;color:var(--white-60);margin-top:1px}
+  .affiliate-arrow{margin-left:auto;color:var(--white-30)}
   .affiliate-editorial-intro{
-    font-size:12px;color:var(--text-muted);line-height:1.6;
+    font-size:12px;color:var(--white-60);line-height:1.6;
     margin-bottom:14px;
     padding:10px 12px;
-    background:var(--surface-2);border-radius:10px;
+    background:var(--white-06);border-radius:10px;
     border-left:3px solid var(--orange);
   }
-  .affiliate-editorial-intro strong{color:var(--text)}
+  .affiliate-editorial-intro strong{color:var(--white)}
   .affiliate-discount{
     font-size:10px;font-weight:700;letter-spacing:0.04em;
-    background:var(--orange-dim);border:1px solid var(--brand-border);
+    background:var(--orange-dim);border:1px solid rgba(255,92,0,0.2);
     color:var(--orange);padding:2px 7px;border-radius:20px;flex-shrink:0;
   }
 
-  /* ── GALLERY - primary visual surface ── */
+  /* ── GALLERY — primary visual surface ── */
   .gallery-hero{
     width:100%;aspect-ratio:16/9;
     border-radius:14px;overflow:hidden;
     margin-bottom:8px;position:relative;
-    background:var(--surface-2);
+    background:var(--white-06);
   }
   .gallery-hero img{width:100%;height:100%;object-fit:cover}
   .gallery-hero-label{
     position:absolute;bottom:10px;left:12px;
     font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
-    color:var(--glass-70);background:var(--scrim-50);
+    color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.5);
     padding:3px 8px;border-radius:20px;
     backdrop-filter:blur(6px);
   }
@@ -594,7 +532,7 @@ const brandName = market.brandName;
   }
   .gallery-img{
     aspect-ratio:1;border-radius:8px;
-    background:var(--surface-2);overflow:hidden;
+    background:var(--white-06);overflow:hidden;
     cursor:pointer;transition:opacity 0.15s;
   }
   .gallery-img:hover{opacity:0.85}
@@ -603,7 +541,7 @@ const brandName = market.brandName;
   /* Powered by */
   .powered{
     text-align:center;padding:16px;
-    font-size:11px;color:var(--text-muted);
+    font-size:11px;color:var(--white-60);
     letter-spacing:0.04em;
   }
   .powered a{color:var(--orange);text-decoration:none;font-weight:600}
@@ -611,14 +549,14 @@ const brandName = market.brandName;
   /* Loading skeleton */
   #loading{
     position:fixed;inset:0;z-index:200;
-    background:var(--bg);
+    background:#0a0a0a;
     display:flex;align-items:center;justify-content:center;
     flex-direction:column;gap:16px;
   }
-  .sk-logo{font-size:18px;font-weight:800;letter-spacing:0.1em;color:var(--text-muted)}
+  .sk-logo{font-size:18px;font-weight:800;letter-spacing:0.1em;color:var(--white-60)}
   .sk-spinner{
     width:32px;height:32px;border-radius:50%;
-    border:2px solid var(--border);
+    border:2px solid var(--white-10);
     border-top-color:var(--orange);
     animation:spin 0.8s linear infinite;
   }
@@ -627,19 +565,19 @@ const brandName = market.brandName;
   #err{
     display:none;
     position:fixed;inset:0;z-index:200;
-    background:var(--bg);
+    background:#0a0a0a;
     align-items:center;justify-content:center;
     flex-direction:column;gap:12px;padding:40px;text-align:center;
   }
   .err-icon{font-size:48px;margin-bottom:8px}
   .err-title{font-size:20px;font-weight:800}
-  .err-sub{font-size:14px;color:var(--text-muted);line-height:1.6}
+  .err-sub{font-size:14px;color:var(--white-60);line-height:1.6}
 
   /* Pending */
   #pending{
     display:none;
     position:fixed;inset:0;z-index:200;
-    background:var(--bg);
+    background:#0a0a0a;
     align-items:center;justify-content:center;
     flex-direction:column;gap:12px;padding:40px;text-align:center;
   }
@@ -647,30 +585,30 @@ const brandName = market.brandName;
   /* Lead modal */
   #leadModal{
     display:none;position:fixed;inset:0;z-index:300;
-    background:var(--scrim-70);
+    background:rgba(0,0,0,0.7);
     align-items:flex-end;justify-content:center;
     backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
   }
   #leadModal.open{display:flex}
   .modal-sheet{
-    background:var(--surface);border:1px solid var(--border);
+    background:#111;border:1px solid var(--glass-border);
     border-radius:24px 24px 0 0;
     padding:28px 24px max(env(safe-area-inset-bottom),24px);
     width:100%;max-width:480px;
   }
-  .modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
+  .modal-handle{width:36px;height:4px;background:var(--white-30);border-radius:2px;margin:0 auto 20px}
   .modal-title{font-size:18px;font-weight:800;margin-bottom:4px}
-  .modal-sub{font-size:13px;color:var(--text-muted);margin-bottom:20px}
+  .modal-sub{font-size:13px;color:var(--white-60);margin-bottom:20px}
   .modal-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
-  .modal-field label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)}
+  .modal-field label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--white-60)}
   .modal-field input{
-    background:var(--surface-2);border:1px solid var(--border);
+    background:var(--white-06);border:1px solid var(--glass-border);
     border-radius:10px;padding:12px 14px;
-    color:var(--text);font-size:15px;font-family:var(--font);outline:none;
+    color:var(--white);font-size:15px;font-family:var(--font);outline:none;
   }
   .modal-field input:focus{border-color:var(--orange)}
   .btn-modal-submit{
-    width:100%;background:var(--orange);color:var(--text-on-brand);
+    width:100%;background:var(--orange);color:#fff;
     font-size:15px;font-weight:700;padding:15px;
     border-radius:12px;border:none;cursor:pointer;
     font-family:var(--font);margin-top:4px;
@@ -678,74 +616,84 @@ const brandName = market.brandName;
   .btn-modal-close{
     position:absolute;top:16px;right:16px;
     width:32px;height:32px;border-radius:50%;
-    background:var(--surface-2);border:none;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;color:var(--text);
+    background:var(--white-10);border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--white);
   }
 
   /* ═══════════════════════════════════════════════
-     DESKTOP LAYOUT - 768px and above
-     Full-bleed hero banner + 3-column content grid
+     DESKTOP LAYOUT — 768px and above
+     Two-column: hero/CTAs left, sections right
   ═══════════════════════════════════════════════ */
   @media (min-width: 768px) {
-
     /* Topbar gets a max-width container */
     #topbar {
-      padding-left: max(calc(50vw - 600px), 32px);
-      padding-right: max(calc(50vw - 600px), 32px);
+      padding-left: max(calc(50vw - 560px), 32px);
+      padding-right: max(calc(50vw - 560px), 32px);
     }
 
-    /* Background: vertical gradient for cinematic hero (not left-right) */
+    /* Background: shift image to left half */
     #bg {
-      background-position: center top;
+      background-position: 30% top;
     }
     #bg::after {
       background: linear-gradient(
+        to right,
+        rgba(0,0,0,0.55) 0%,
+        rgba(0,0,0,0.75) 45%,
+        rgba(0,0,0,0.97) 65%,
+        rgba(0,0,0,0.99) 100%
+      ),
+      linear-gradient(
         to bottom,
-        rgba(0,0,0,0.15) 0%,
-        rgba(0,0,0,0.4) 50%,
-        rgba(0,0,0,0.85) 100%
+        rgba(0,0,0,0.2) 0%,
+        rgba(0,0,0,0.5) 60%,
+        rgba(0,0,0,0.95) 100%
       );
     }
 
-    /* Page: block (not flex row) */
+    /* Page becomes a two-column grid */
     #page {
-      display: block !important;
-    }
-
-    /* ── HERO BANNER ── */
-    #profile-hero {
-      position: relative;
-      height: 300px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      padding: 0 48px 36px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    /* Hero identity: left-anchored */
-    #hero {
-      padding: 0;
-      text-align: left;
+      flex-direction: row;
       align-items: flex-start;
-      gap: 8px;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 80px 32px 48px;
+      gap: 0;
+      min-height: 100vh;
+    }
+
+    /* Left column: hero + CTAs (sticky) */
+    #left-col {
+      width: 360px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 80px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Right column: sections */
+    #right-col {
       flex: 1;
       min-width: 0;
+      padding-left: 40px;
+    }
+
+    #hero {
+      padding: 0 0 24px 0;
+      text-align: left;
+      align-items: flex-start;
     }
 
     .avatar-wrap {
-      width: 88px;
-      height: 88px;
+      width: 120px;
+      height: 120px;
     }
 
-    .trainer-name {
-      font-size: 32px;
-      color: #fff;
-    }
+    .trainer-name { font-size: 30px; }
 
-    .trainer-title {
-      color: rgba(255,255,255,0.7);
+    .stats-pill {
+      max-width: 100%;
     }
 
     .badge-row {
@@ -760,82 +708,23 @@ const brandName = market.brandName;
       justify-content: flex-start;
     }
 
-    .stats-pill {
-      max-width: 100%;
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.15);
-    }
-
-    .stat-val, .stat-lbl {
-      color: #fff;
-    }
-
-    .gym-tag {
-      color: rgba(255,255,255,0.65);
-    }
-
-    /* CTAs: right-anchored vertical stack in hero */
     #ctas {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      min-width: 200px;
-      flex-shrink: 0;
-      padding: 0;
-      margin-left: 32px;
+      padding: 0 0 24px 0;
     }
 
-    /* Hide secondary CTAs inside the hero on desktop */
-    #ctas .action-grid {
-      display: none;
-    }
-    #ctas .btn-save {
-      display: none;
-    }
-
-    /* Book button: full width within cta stack */
-    #ctas .btn-book {
-      width: 100%;
-    }
-
-    /* WA button: full width within cta stack */
-    #ctas .btn-wa-wrap {
-      width: 100%;
-    }
-    #ctas .btn-wa {
-      width: 100%;
-      justify-content: center;
-    }
-
-    /* ── CONTENT GRID ── */
-    #profile-grid {
-      background: var(--bg);
-      padding: 40px 48px 64px;
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 20px;
-    }
-
-    /* Sections participates in grid as transparent wrapper */
     #sections {
-      display: contents;
       padding: 0;
-      margin: 0;
+      margin-bottom: 48px;
     }
 
-    /* Card grid spans */
-    #pkgsCard       { grid-column: span 2; order: 1; }
-    #bioCard        { grid-column: span 2; order: 2; }
-    #philosophyCard { grid-column: span 1; order: 3; }
-    #transformsCard { grid-column: 1 / -1; order: 4; }
-    #reviewsCard    { grid-column: 1 / -1; order: 5; }
-    #affiliateCard  { grid-column: span 1; order: 6; }
-    #galleryCard    { grid-column: 1 / -1; order: 7; }
+    #socials {
+      padding: 0 0 20px 0 !important;
+    }
 
-    /* Assessment card (no ID — targets the only .sec-card without an ID) */
-    #sections > .sec-card:not([id]) { grid-column: span 1; order: 3; }
+    .powered {
+      text-align: left;
+      padding: 16px 0;
+    }
 
     /* Sections open by default on desktop */
     .sec-body {
@@ -852,27 +741,6 @@ const brandName = market.brandName;
       grid-template-columns: repeat(4, 1fr);
     }
 
-    /* Nearby section and socials: span full width in grid */
-    #nearbySection {
-      grid-column: 1 / -1;
-      padding: 0 0 20px;
-    }
-
-    #socials {
-      grid-column: 1 / -1;
-      padding: 0 0 20px;
-    }
-
-    #socials-desktop {
-      grid-column: 1 / -1;
-    }
-
-    .powered {
-      grid-column: 1 / -1;
-      text-align: left;
-      padding: 16px 0;
-    }
-
     /* Lead modal centered on desktop */
     #leadModal {
       align-items: center;
@@ -882,14 +750,15 @@ const brandName = market.brandName;
     }
   }
 
+  /* Large desktop */
   @media (min-width: 1024px) {
-    #profile-hero {
-      padding: 0 64px 40px;
+    #left-col {
+      width: 400px;
     }
-    #profile-grid {
-      padding: 48px 64px 80px;
+    #right-col {
+      padding-left: 56px;
     }
-    .trainer-name { font-size: 36px; }
+    .trainer-name { font-size: 34px; }
   }
   </style>
 
@@ -904,14 +773,14 @@ const brandName = market.brandName;
   <div class="err-icon">🔍</div>
   <div class="err-title">Trainer not found</div>
   <div class="err-sub">This profile doesn't exist or the link may be incorrect.</div>
-  <a href="/" style="margin-top:12px;color:var(--orange);font-weight:600;font-size:14px">Browse Trainers →</a>
+  <a href="/landing.html" style="margin-top:12px;color:var(--orange);font-weight:600;font-size:14px">Browse TrainedBy →</a>
 </div>
 
 <!-- Pending -->
 <div id="pending">
   <div style="width:72px;height:72px;border-radius:50%;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:8px">⏳</div>
   <div style="font-size:20px;font-weight:800">Verification in Progress</div>
-  <div style="font-size:14px;color:var(--text-muted);line-height:1.6;max-width:280px">This trainer's REPs UAE credentials are being verified. Check back shortly.</div>
+  <div style="font-size:14px;color:var(--white-60);line-height:1.6;max-width:280px">This trainer's REPs UAE credentials are being verified. Check back shortly.</div>
 </div>
 
 <!-- Background -->
@@ -919,21 +788,20 @@ const brandName = market.brandName;
 
 <!-- Top bar -->
 <div id="topbar">
-  <a href="/" class="tb-logo" id="site-logo">TrainedBy</a>
-  <script>document.addEventListener("DOMContentLoaded",function(){var b=window.__BRAND__?.name;if(b){var l=document.getElementById("site-logo");if(l)l.textContent=b;var p=document.getElementById("powered-by-link");if(p)p.textContent=b;}})</script>
+  <a href="/landing.html" class="tb-logo">TrainedBy</a>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="tb-share" onclick="shareProfile()" title="Share">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
     </div>
-    <a href="/join" class="tb-cta">Get Your Page</a>
+    <a href="/join.html" class="tb-cta">Get Your Page</a>
   </div>
 </div>
 
-<!-- Main page - two-column on desktop via JS-injected wrappers -->
+<!-- Main page — two-column on desktop via JS-injected wrappers -->
 <div id="page" style="display:none">
 
-  <!-- Hero banner (desktop: full-bleed 300px; mobile: stacked flex column) -->
-  <div id="profile-hero">
+  <!-- Left column wrapper (desktop) / inline (mobile) -->
+  <div id="left-col">
 
     <!-- Hero -->
     <div id="hero">
@@ -958,14 +826,14 @@ const brandName = market.brandName;
 
       <!-- Name row -->
       <div class="name-row">
-        <span id="trainerName" class="trainer-name"> - </span>
+        <span id="trainerName" class="trainer-name">—</span>
         <span id="verifiedIcon" class="verified-badge" style="display:none">
           <svg viewBox="0 0 24 24" fill="white"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </span>
       </div>
 
       <!-- Title -->
-      <div id="trainerTitle" class="trainer-title"> - </div>
+      <div id="trainerTitle" class="trainer-title">—</div>
 
       <!-- Badge row -->
       <div class="badge-row">
@@ -982,15 +850,15 @@ const brandName = market.brandName;
       <!-- Stats -->
       <div class="stats-pill" id="statsPill">
         <div class="stat-item">
-          <div class="stat-val" id="sYrs"> - </div>
+          <div class="stat-val" id="sYrs">—</div>
           <div class="stat-lbl">Yrs Exp</div>
         </div>
         <div class="stat-item">
-          <div class="stat-val" id="sClients"> - </div>
+          <div class="stat-val" id="sClients">—</div>
           <div class="stat-lbl">Clients</div>
         </div>
         <div class="stat-item">
-          <div class="stat-val" id="sSessions"> - </div>
+          <div class="stat-val" id="sSessions">—</div>
           <div class="stat-lbl">Sessions</div>
         </div>
         <div class="stat-item">
@@ -1037,10 +905,13 @@ const brandName = market.brandName;
       </button>
     </div>
 
-  </div><!-- /profile-hero -->
+    <!-- Socials (desktop: below CTAs in left col) -->
+    <div id="socials-desktop" style="display:none;gap:10px;padding:0 0 20px;flex-wrap:wrap"></div>
 
-  <!-- Content grid (white bg on desktop, single-col on mobile) -->
-  <div id="profile-grid">
+  </div><!-- /left-col -->
+
+  <!-- Right column (sections) -->
+  <div id="right-col">
 
     <!-- Sections -->
     <div id="sections">
@@ -1125,8 +996,8 @@ const brandName = market.brandName;
               <label>Activity Level</label>
               <select id="aActivity">
                 <option value="sedentary">Sedentary (desk job)</option>
-                <option value="light">Light (1-2x/week)</option>
-                <option value="moderate" selected>Moderate (3-4x/week)</option>
+                <option value="light">Light (1–2x/week)</option>
+                <option value="moderate" selected>Moderate (3–4x/week)</option>
                 <option value="active">Active (5+x/week)</option>
               </select>
             </div>
@@ -1155,38 +1026,6 @@ const brandName = market.brandName;
         </div>
         <div id="reviewsBody" class="sec-body open">
           <div id="reviewsContent"></div>
-          <!-- Write a Review form -->
-          <div id="writeReviewSection" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:none">
-            <button id="writeReviewToggle" onclick="document.getElementById('writeReviewForm').style.display=document.getElementById('writeReviewForm').style.display==='none'?'block':'none'" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:var(--text-muted);transition:all 0.18s">
-              <span style="font-size:15px">&#9998;</span> Write a Review
-            </button>
-            <div id="writeReviewForm" style="display:none;margin-top:12px">
-              <div style="margin-bottom:12px">
-                <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Your Name</label>
-                <input id="rvName" type="text" placeholder="e.g. James M." maxlength="60" style="width:100%;padding:10px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none" />
-              </div>
-              <div style="margin-bottom:12px">
-                <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Rating</label>
-                <div id="starPicker" style="display:flex;gap:6px">
-                  <span data-v="1" onclick="setRating(1)" style="font-size:28px;color:var(--text-muted);cursor:pointer">&#9733;</span>
-                  <span data-v="2" onclick="setRating(2)" style="font-size:28px;color:var(--text-muted);cursor:pointer">&#9733;</span>
-                  <span data-v="3" onclick="setRating(3)" style="font-size:28px;color:var(--text-muted);cursor:pointer">&#9733;</span>
-                  <span data-v="4" onclick="setRating(4)" style="font-size:28px;color:var(--text-muted);cursor:pointer">&#9733;</span>
-                  <span data-v="5" onclick="setRating(5)" style="font-size:28px;color:var(--text-muted);cursor:pointer">&#9733;</span>
-                </div>
-              </div>
-              <div style="margin-bottom:12px">
-                <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Your Review</label>
-                <textarea id="rvText" rows="4" placeholder="Share your experience with this trainer..." maxlength="600" style="width:100%;padding:10px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;resize:vertical"></textarea>
-              </div>
-              <div style="margin-bottom:16px">
-                <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Goal Achieved (optional)</label>
-                <input id="rvGoal" type="text" placeholder="e.g. Lost 8kg in 10 weeks" maxlength="80" style="width:100%;padding:10px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none" />
-              </div>
-              <button onclick="submitReview()" style="padding:11px 24px;background:var(--orange);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;width:100%;transition:opacity 0.18s" id="rvSubmitBtn">Submit Review</button>
-              <div id="rvMsg" style="margin-top:10px;font-size:13px;display:none"></div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -1198,7 +1037,7 @@ const brandName = market.brandName;
         </div>
         <div id="affiliateBody" class="sec-body open">
           <div class="affiliate-editorial-intro">
-            <strong>What I actually use.</strong> These are the products, supplements, and gear I personally train with and recommend to my clients - with exclusive discount codes.
+            <strong>What I actually use.</strong> These are the products, supplements, and gear I personally train with and recommend to my clients — with exclusive discount codes.
           </div>
           <div id="affiliateList" class="affiliate-list"></div>
         </div>
@@ -1217,21 +1056,18 @@ const brandName = market.brandName;
 
     </div>
 
-    <!-- Socials desktop (moved from profile-hero) -->
-    <div id="socials-desktop" style="display:none;gap:10px;padding:0 0 20px;flex-wrap:wrap"></div>
-
     <!-- Socials (mobile: below sections) -->
     <div id="socials" style="display:flex;gap:10px;padding:0 20px 20px;flex-wrap:wrap"></div>
 
-    <!-- Nearby Trainers - Strava-style discovery -->
+    <!-- Nearby Trainers — Strava-style discovery -->
     <div id="nearbySection" style="display:none;padding:0 20px 20px;">
-      <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;">Also in this gym</div>
+      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;">Also in this gym</div>
       <div id="nearbyList" style="display:flex;flex-direction:column;gap:10px;"></div>
-      <a href="/find" style="display:block;text-align:center;margin-top:14px;font-size:12px;color:var(--orange);text-decoration:none;font-weight:600;">Browse all trainers →</a>
+      <a href="/find.html" style="display:block;text-align:center;margin-top:14px;font-size:12px;color:var(--orange);text-decoration:none;font-weight:600;">Browse all trainers →</a>
     </div>
 
-    <div class="powered">Powered by <a href="/" id="powered-by-link">TrainedBy</a> · <a href="/find" style="color:var(--orange)">Find a Trainer</a></div>
-  </div><!-- /profile-grid -->
+    <div class="powered">Powered by <a href="/landing.html">TrainedBy.ae</a> · <a href="/find.html" style="color:var(--orange)">Find a Trainer</a></div>
+  </div><!-- /right-col -->
 
 </div><!-- /page -->
 
@@ -1242,8 +1078,6 @@ const brandName = market.brandName;
 </div>
 
 <!-- Lead Modal -->
-<div id="profile-toast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;white-space:nowrap"></div>
-
 <div id="leadModal" onclick="if(event.target===this)closeLead()">
   <div class="modal-sheet" style="position:relative">
     <div class="modal-handle"></div>
@@ -1265,23 +1099,10 @@ const brandName = market.brandName;
   </div>
 </div>
 
-<script define:vars={{ SUPABASE_KEY: SUPABASE_ANON_KEY }}>
-window.__SUPABASE_KEY__ = SUPABASE_KEY;
-</script>
-<script is:inline>
+<script is:inline define:vars={{ SUPABASE_KEY }}>
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-const SUPABASE_KEY = window.__SUPABASE_KEY__;
 
 let TRAINER = null;
-
-function showProfileToast(msg) {
-  const t = document.getElementById('profile-toast');
-  if (!t) return;
-  t.textContent = msg;
-  t.style.display = 'block';
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.style.display = 'none'; }, 3000);
-}
 const IS_DESKTOP = window.matchMedia('(min-width: 768px)').matches;
 
 function getSlug() {
@@ -1312,7 +1133,7 @@ async function loadTrainer() {
 
 function render(t) {
   // Page title
-  document.title = `${t.name} - ${t.title || 'Personal Trainer'} | ${window.__BRAND__?.name || 'TrainedBy'}`;
+  document.title = `${t.name} — ${t.title || 'Personal Trainer'} | TrainedBy`;
 
   // OG meta
   const ogTitle = document.querySelector('meta[property="og:title"]') || Object.assign(document.createElement('meta'), {property:'og:title'});
@@ -1323,7 +1144,8 @@ function render(t) {
   const profileUrl = window.location.origin + '/' + (t.slug || '');
   const schemaLd = {
     '@context': 'https://schema.org',
-    '@type': ['Person', 'LocalBusiness'],
+    '@type': 'LocalBusiness',
+    additionalType: 'https://schema.org/Person',
     name: t.name,
     jobTitle: t.title || 'Personal Trainer',
     description: t.bio || '',
@@ -1350,6 +1172,11 @@ function render(t) {
     } : undefined,
     priceRange: t.session_packages?.length > 0 ? '££' : undefined,
     sameAs: [t.instagram ? `https://instagram.com/${t.instagram.replace('@','')}` : null].filter(Boolean),
+    worksFor: {
+      '@type': 'Organization',
+      name: 'TrainedBy',
+      url: window.location.origin,
+    },
   };
   // Remove undefined fields
   const cleanSchema = JSON.parse(JSON.stringify(schemaLd));
@@ -1362,7 +1189,7 @@ function render(t) {
   }
   ldScript.textContent = JSON.stringify(cleanSchema);
 
-  // Background - use trainer cover or avatar or default gym
+  // Background — use trainer cover or avatar or default gym
   const bgPhoto = t.cover_url || t.photo_url || t.avatar_url;
   if (bgPhoto) {
     document.getElementById('bg').style.backgroundImage = `url('${bgPhoto}')`;
@@ -1381,7 +1208,7 @@ function render(t) {
     document.getElementById('avatarInitials').textContent = initials;
   }
 
-  // Rating row - only show if we have real verified reviews (loaded later)
+  // Rating row — only show if we have real verified reviews (loaded later)
   // We defer this to loadReviews()
 
   // Video intro badge
@@ -1404,7 +1231,7 @@ function render(t) {
   // Name
   document.getElementById('trainerName').textContent = t.name || t.full_name || '';
 
-  // Verified - check both reps_verified and verification_status
+  // Verified — check both reps_verified and verification_status
   if (t.reps_verified || t.verification_status === 'verified') {
     document.getElementById('verifiedIcon').style.display = 'flex';
     document.getElementById('repsBadge').style.display = 'flex';
@@ -1440,11 +1267,11 @@ function render(t) {
     document.getElementById('gymTag').style.display = 'inline-flex';
   }
 
-  // WhatsApp - always show
+  // WhatsApp — always show
   const waBtn = document.getElementById('waBtn');
   if (t.whatsapp) {
     const wn = t.whatsapp.replace(/\D/g, '');
-    waBtn.href = `https://wa.me/${wn}?text=Hi%20${encodeURIComponent(t.name)}%2C%20I%20found%20your%20profile%20on%20' + encodeURIComponent(window.__BRAND__?.name || 'TrainedBy') + '`;
+    waBtn.href = `https://wa.me/${wn}?text=Hi%20${encodeURIComponent(t.name)}%2C%20I%20found%20your%20profile%20on%20TrainedBy.ae`;
     waBtn.style.display = 'flex';
   } else {
     waBtn.href = '#';
@@ -1461,11 +1288,11 @@ function render(t) {
     document.getElementById('philosophyContent').innerHTML = `
       <div class="philosophy-block">
         <div class="philosophy-quote">${philosophy}</div>
-        <div class="philosophy-author"> -  ${t.name || 'Trainer'}</div>
+        <div class="philosophy-author">— ${t.name || 'Trainer'}</div>
       </div>`;
   }
 
-  // Trust Module - group all trust signals into one visual block
+  // Trust Module — group all trust signals into one visual block
   const trustContainer = document.createElement('div');
   trustContainer.className = 'trust-module';
   trustContainer.id = 'trustModule';
@@ -1576,7 +1403,7 @@ function render(t) {
     });
   }
 
-  // Gallery - hero image first, then grid
+  // Gallery — hero image first, then grid
   const gallery = t.gallery_urls || t.gallery || [];
   if (gallery.length) {
     document.getElementById('galleryCard').style.display = 'block';
@@ -1599,7 +1426,7 @@ function render(t) {
     });
   }
 
-  // Socials - on desktop show in left col, on mobile show below sections
+  // Socials — on desktop show in left col, on mobile show below sections
   const socialLinks = [];
   if (t.instagram) {
     socialLinks.push(`<a class="tag cert-tag" href="https://instagram.com/${t.instagram.replace('@','')}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>${t.instagram}</a>`);
@@ -1631,7 +1458,6 @@ function render(t) {
 
   // Load reviews, transformations, and nearby trainers
   if (t.id) {
-    window.__TRAINER_ID__ = t.id; // stored for review submission
     loadReviews(t.id);
     loadTransformations(t.id);
     loadNearbyTrainers(t);
@@ -1648,16 +1474,16 @@ async function loadReviews(trainerId) {
     });
     const reviews = await r.json();
 
-    // Always show the reviews card - either with real reviews or an honest empty state
+    // Always show the reviews card — either with real reviews or an honest empty state
     document.getElementById('reviewsCard').style.display = 'block';
 
     if (!Array.isArray(reviews) || reviews.length === 0) {
-      // Honest empty state - no fake reviews
+      // Honest empty state — no fake reviews
       document.getElementById('reviewsContent').innerHTML = `
         <div class="reviews-empty">
           <div class="reviews-empty-icon">⭐</div>
           <div class="reviews-empty-title">No reviews yet</div>
-          <div class="reviews-empty-sub">This trainer is new to our platform. Be the first to train with them and leave a review after your session.</div>
+          <div class="reviews-empty-sub">This trainer is new to TrainedBy. Be the first to train with them and leave a review after your session.</div>
         </div>`;
       return;
     }
@@ -1696,81 +1522,7 @@ async function loadReviews(trainerId) {
         <div class="reviews-empty-title">No reviews yet</div>
         <div class="reviews-empty-sub">Be the first to train with this trainer and leave a review after your session.</div>
       </div>`;
-  } finally {
-    // Always show the write-a-review section once the card is visible
-    const ws = document.getElementById('writeReviewSection');
-    if (ws) ws.style.display = 'block';
   }
-}
-
-// ── Review submission ────────────────────────────────────────────────────────
-let _selectedRating = 0;
-function setRating(v) {
-  _selectedRating = v;
-  const stars = document.querySelectorAll('#starPicker span');
-  stars.forEach((s, i) => {
-    s.style.color = i < v ? '#FF5C00' : 'rgba(255,255,255,0.2)';
-  });
-}
-
-async function submitReview() {
-  const name = (document.getElementById('rvName').value || '').trim();
-  const text = (document.getElementById('rvText').value || '').trim();
-  const goal = (document.getElementById('rvGoal').value || '').trim();
-  const msg = document.getElementById('rvMsg');
-  const btn = document.getElementById('rvSubmitBtn');
-
-  if (!name) { showRvMsg('Please enter your name.', '#ff5555'); return; }
-  if (!_selectedRating) { showRvMsg('Please select a star rating.', '#ff5555'); return; }
-  if (text.length < 10) { showRvMsg('Please write at least 10 characters.', '#ff5555'); return; }
-
-  btn.disabled = true;
-  btn.textContent = 'Submitting...';
-
-  try {
-    const trainerId = window.__TRAINER_ID__;
-    const payload = {
-      trainer_id: trainerId,
-      client_name: name,
-      client_avatar_initials: name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(),
-      rating: _selectedRating,
-      review_text: text,
-      goal_achieved: goal || null,
-      verified: false, // pending moderation
-      featured: false,
-    };
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/reviews`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal',
-      },
-      body: JSON.stringify(payload),
-    });
-    if (r.ok || r.status === 201) {
-      showRvMsg('Thank you! Your review has been submitted and will appear once verified.', '#22c55e');
-      document.getElementById('writeReviewForm').style.display = 'none';
-      document.getElementById('writeReviewToggle').style.display = 'none';
-    } else {
-      const err = await r.text();
-      showRvMsg('Something went wrong. Please try again.', '#ff5555');
-      console.error('Review submission error:', err);
-    }
-  } catch(e) {
-    showRvMsg('Network error. Please check your connection and try again.', '#ff5555');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Submit Review';
-  }
-}
-
-function showRvMsg(text, color) {
-  const el = document.getElementById('rvMsg');
-  el.textContent = text;
-  el.style.color = color;
-  el.style.display = 'block';
 }
 
 async function loadTransformations(trainerId) {
@@ -1808,14 +1560,14 @@ async function loadNearbyTrainers(trainer) {
       const initials = (t.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
       const avatarHtml = t.avatar_url || t.photo_url
         ? `<img src="${t.avatar_url||t.photo_url}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,92,0,0.3);" alt="${t.name}">`
-        : `<div style="width:40px;height:40px;border-radius:50%;background:var(--surface-3);border:2px solid rgba(255,92,0,0.3);display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:800;font-size:13px;color:var(--orange);">${initials}</div>`;
+        : `<div style="width:40px;height:40px;border-radius:50%;background:var(--surface-3);border:2px solid rgba(255,92,0,0.3);display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--orange);">${initials}</div>`;
       const specs = (t.specialties||[]).slice(0,2).join(' · ');
       const item = document.createElement('a');
       item.href = `/${t.slug}`;
       item.style.cssText = 'display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px;text-decoration:none;color:inherit;transition:border-color 0.2s;';
       item.onmouseenter = () => item.style.borderColor = 'rgba(255,92,0,0.25)';
       item.onmouseleave = () => item.style.borderColor = 'rgba(255,255,255,0.07)';
-      item.innerHTML = `${avatarHtml}<div style="flex:1;min-width:0;"><div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name||''}</div><div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${specs||t.title||'Personal Trainer'}</div></div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
+      item.innerHTML = `${avatarHtml}<div style="flex:1;min-width:0;"><div style="font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name||''}</div><div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${specs||t.title||'Personal Trainer'}</div></div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
       list.appendChild(item);
     });
   } catch(e) {}
@@ -1868,7 +1620,7 @@ async function submitLead() {
   const name = document.getElementById('leadName').value.trim();
   const phone = document.getElementById('leadPhone').value.trim();
   const msg = document.getElementById('leadMsg').value.trim();
-  if (!name || !phone) { const sub = document.getElementById('modalSub'); sub.textContent = '⚠️ Please enter your name and WhatsApp number.'; sub.style.color = 'var(--orange)'; return; }
+  if (!name || !phone) { alert('Please enter your name and WhatsApp number.'); return; }
   const btn = document.querySelector('.btn-modal-submit');
   btn.textContent = 'Sending…'; btn.disabled = true;
   try {
@@ -1882,7 +1634,7 @@ async function submitLead() {
     setTimeout(closeLead, 2000);
   } catch(e) {
     btn.textContent = 'Send Request →'; btn.disabled = false;
-    const sub = document.getElementById('modalSub'); sub.textContent = '⚠️ Something went wrong. Please try WhatsApp instead.'; sub.style.color = 'var(--orange)';
+    alert('Something went wrong. Please try WhatsApp instead.');
   }
 }
 
@@ -1893,15 +1645,15 @@ function runAssessment() {
   const weight = parseFloat(document.getElementById('aWeight').value);
   const goal = document.getElementById('aGoal').value;
   const activity = document.getElementById('aActivity').value;
-  if (!age || !height || !weight) { showProfileToast('Please fill in all fields.'); return; }
+  if (!age || !height || !weight) { alert('Please fill in all fields.'); return; }
 
   const bmi = weight / ((height/100) ** 2);
   const bmiCat = bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Healthy Weight' : bmi < 30 ? 'Overweight' : 'Obese';
   const actMult = {sedentary:1.2, light:1.375, moderate:1.55, active:1.725}[activity] || 1.55;
   const bmr = gender === 'male' ? 10*weight + 6.25*height - 5*age + 5 : 10*weight + 6.25*height - 5*age - 161;
   const tdee = Math.round(bmr * actMult);
-  const goalMap = {fat_loss:'Fat Loss - aim for a 300-500 kcal daily deficit', muscle_gain:'Muscle Gain - aim for a 200-300 kcal daily surplus', endurance:'Endurance - focus on zone 2 cardio + mobility', general:'General Fitness - balanced strength + cardio split'};
-  const sessMap = {fat_loss:'4-5x/week (3 strength + 2 cardio)', muscle_gain:'4x/week progressive overload', endurance:'5x/week (3 cardio + 2 strength)', general:'3-4x/week full-body'};
+  const goalMap = {fat_loss:'Fat Loss — aim for a 300–500 kcal daily deficit', muscle_gain:'Muscle Gain — aim for a 200–300 kcal daily surplus', endurance:'Endurance — focus on zone 2 cardio + mobility', general:'General Fitness — balanced strength + cardio split'};
+  const sessMap = {fat_loss:'4–5x/week (3 strength + 2 cardio)', muscle_gain:'4x/week progressive overload', endurance:'5x/week (3 cardio + 2 strength)', general:'3–4x/week full-body'};
 
   const result = document.getElementById('assessResult');
   result.style.display = 'block';
@@ -1929,13 +1681,13 @@ function shareProfile() {
   if (navigator.share) {
     navigator.share({ title: document.title, url: location.href });
   } else {
-    navigator.clipboard.writeText(location.href).then(() => showProfileToast('Link copied!'));
+    navigator.clipboard.writeText(location.href).then(() => alert('Link copied!'));
   }
 }
 
 function saveContact() {
   if (!TRAINER) return;
-  const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${TRAINER.name}\nTITLE:${TRAINER.title || 'Personal Trainer'}\nTEL:${TRAINER.whatsapp || ''}\nURL:${location.href}\nNOTE:Verified Personal Trainer on ${window.__BRAND__?.name || 'TrainedBy'}\nEND:VCARD`;
+  const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${TRAINER.name}\nTITLE:${TRAINER.title || 'Personal Trainer'}\nTEL:${TRAINER.whatsapp || ''}\nURL:${location.href}\nNOTE:Verified Personal Trainer on TrainedBy.ae\nEND:VCARD`;
   const blob = new Blob([vcard], {type:'text/vcard'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);

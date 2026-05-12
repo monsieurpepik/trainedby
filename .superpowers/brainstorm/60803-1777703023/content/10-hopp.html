@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrainedBy — Hopp Direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: #D9D3CB;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    display: flex;
+    gap: 56px;
+    padding: 52px 64px;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .phone-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #7A6E65;
+  }
+
+  /* ─── PHONE SHELL ─── */
+  .phone {
+    width: 375px;
+    height: 812px;
+    background: #fff;
+    border-radius: 50px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 10px #1A1411,
+      0 0 0 12px #2C2420,
+      0 32px 80px rgba(0,0,0,0.35),
+      0 8px 24px rgba(0,0,0,0.18);
+  }
+
+  /* ─── GRAIN OVERLAY ─── */
+  .phone::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+    opacity: 0.032;
+    pointer-events: none;
+    z-index: 100;
+    border-radius: 50px;
+  }
+
+  /* ─── NOTCH ─── */
+  .notch {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 126px;
+    height: 36px;
+    background: #1A1411;
+    border-radius: 20px;
+    z-index: 50;
+  }
+
+  /* ────────────────────────────
+     VARIANT A — Full-bleed photo hero
+     Photo IS the atmosphere
+  ──────────────────────────────*/
+
+  .screen-a {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: #F8F4EF;
+  }
+
+  /* HERO: full-bleed photo section */
+  .hero-a {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  /* Placeholder photo — deep warm gradient simulating fitness photo */
+  .photo-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(160deg,
+        #2D1F1A 0%,
+        #4A2E22 25%,
+        #7B3D25 55%,
+        #C4633A 80%,
+        #E8844E 100%
+      );
+  }
+
+  /* Atmospheric vignette at bottom — bleeds into content */
+  .hero-fade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 180px;
+    background: linear-gradient(to bottom,
+      transparent 0%,
+      rgba(248,244,239,0.15) 40%,
+      rgba(248,244,239,0.72) 70%,
+      rgba(248,244,239,1.0) 100%
+    );
+  }
+
+  /* Name overlaid at bottom of hero */
+  .hero-name-block {
+    position: absolute;
+    bottom: 28px;
+    left: 28px;
+    right: 28px;
+  }
+
+  .hero-name {
+    font-size: 34px;
+    font-weight: 200;
+    letter-spacing: 0.02em;
+    color: #1A1411;
+    line-height: 1.1;
+  }
+
+  .hero-tagline {
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 300;
+    color: #6A5548;
+    letter-spacing: 0.01em;
+  }
+
+  /* Status bar area */
+  .status-a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 54px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 28px 10px;
+    z-index: 10;
+  }
+
+  .status-time {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(248,244,238,0.90);
+  }
+
+  .status-icons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .status-icons svg {
+    fill: rgba(248,244,238,0.90);
+  }
+
+  /* CONTENT area below hero */
+  .content-a {
+    flex: 1;
+    background: #F8F4EF;
+    padding: 0 24px 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Specialty pills */
+  .pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .pill {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #C4633A;
+    background: rgba(196,99,58,0.08);
+    border-radius: 4px;
+    padding: 4px 8px;
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    border-top: 1px solid rgba(90,65,50,0.08);
+    border-bottom: 1px solid rgba(90,65,50,0.08);
+    padding: 14px 0;
+  }
+
+  .stat {
+    flex: 1;
+    text-align: center;
+  }
+
+  .stat + .stat {
+    border-left: 1px solid rgba(90,65,50,0.08);
+  }
+
+  .stat-num {
+    font-size: 20px;
+    font-weight: 300;
+    color: #1A1411;
+    letter-spacing: -0.01em;
+    display: block;
+  }
+
+  .stat-num em {
+    font-style: normal;
+    color: #C4633A;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #A89589;
+    display: block;
+    margin-top: 1px;
+  }
+
+  /* Primary CTA */
+  .btn-primary {
+    width: 100%;
+    height: 52px;
+    background: #C4633A;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(196,99,58,0.25);
+    margin-bottom: 10px;
+  }
+
+  .btn-secondary {
+    width: 100%;
+    height: 48px;
+    background: transparent;
+    color: #7A6055;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    border: 1px solid rgba(90,65,50,0.14);
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+
+  /* Sessions/packages preview */
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #A89589;
+    margin-bottom: 10px;
+  }
+
+  .package-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(90,65,50,0.07);
+  }
+
+  .pkg-name {
+    font-size: 13px;
+    font-weight: 400;
+    color: #1A1411;
+  }
+
+  .pkg-price {
+    font-size: 13px;
+    font-weight: 300;
+    color: #C4633A;
+  }
+
+  /* ────────────────────────────
+     VARIANT B — Hopp-exact interpretation
+     White header → full photo → white content
+     (name ABOVE photo like Hopp)
+  ──────────────────────────────*/
+
+  .screen-b {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+  }
+
+  /* White header card — name first */
+  .header-b {
+    background: #fff;
+    padding: 60px 24px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
+  }
+
+  .status-b {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 54px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 28px 10px;
+  }
+
+  .status-time-b {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1A1411;
+  }
+
+  .status-icons-b svg {
+    fill: #1A1411;
+  }
+
+  .name-b {
+    font-size: 30px;
+    font-weight: 200;
+    letter-spacing: 0.025em;
+    color: #1A1411;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+
+  .tagline-b {
+    font-size: 12px;
+    font-weight: 300;
+    color: #A89589;
+    letter-spacing: 0.01em;
+    margin-bottom: 12px;
+  }
+
+  /* Social-style specialty tags (like Hopp social icons row) */
+  .spec-tags-b {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .spec-tag-b {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #C4633A;
+    padding: 3px 8px;
+    border: 1px solid rgba(196,99,58,0.25);
+    border-radius: 3px;
+  }
+
+  /* Full-bleed photo section — no border radius */
+  .photo-b {
+    width: 100%;
+    height: 280px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .photo-bg-b {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(140deg,
+        #3A2518 0%,
+        #6B3520 35%,
+        #C4633A 75%,
+        #E8966A 100%
+      );
+  }
+
+  /* Subtle bottom fade into white content */
+  .photo-fade-b {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.95));
+  }
+
+  /* White content below photo */
+  .content-b {
+    flex: 1;
+    background: #fff;
+    padding: 16px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .btn-primary-b {
+    width: 100%;
+    height: 50px;
+    background: #C4633A;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 18px rgba(196,99,58,0.22);
+    margin-bottom: 8px;
+  }
+
+  .btn-secondary-b {
+    width: 100%;
+    height: 46px;
+    background: transparent;
+    color: #8A7068;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    border: 1px solid rgba(90,65,50,0.13);
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .stats-row-b {
+    display: flex;
+    gap: 0;
+    border: 1px solid rgba(90,65,50,0.09);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+
+  .stat-b {
+    flex: 1;
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .stat-b + .stat-b {
+    border-left: 1px solid rgba(90,65,50,0.09);
+  }
+
+  .stat-num-b {
+    font-size: 18px;
+    font-weight: 300;
+    color: #1A1411;
+    display: block;
+    letter-spacing: -0.01em;
+  }
+
+  .stat-num-b em {
+    font-style: normal;
+    color: #C4633A;
+  }
+
+  .stat-label-b {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #B0A099;
+    display: block;
+    margin-top: 1px;
+  }
+
+  .pkg-row-b {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(90,65,50,0.07);
+  }
+
+  .pkg-name-b {
+    font-size: 13px;
+    font-weight: 400;
+    color: #1A1411;
+  }
+
+  .pkg-price-b {
+    font-size: 13px;
+    font-weight: 300;
+    color: #C4633A;
+  }
+
+  /* ─── ANNOTATION ─── */
+  .annotation {
+    max-width: 440px;
+    padding: 28px 32px;
+    background: #1A1411;
+    border-radius: 16px;
+    color: rgba(248,244,238,0.85);
+    font-size: 13px;
+    line-height: 1.65;
+    align-self: flex-start;
+    margin-top: 24px;
+  }
+
+  .annotation h3 {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #C4633A;
+    margin-bottom: 14px;
+  }
+
+  .annotation p {
+    margin-bottom: 10px;
+    color: rgba(248,244,238,0.72);
+  }
+
+  .annotation p strong {
+    color: rgba(248,244,238,0.95);
+    font-weight: 500;
+  }
+
+  .annotation ul {
+    padding-left: 14px;
+    margin-bottom: 10px;
+    color: rgba(248,244,238,0.65);
+  }
+
+  .annotation ul li {
+    margin-bottom: 4px;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ─── PHONE A: Full-bleed hero, name over photo ─── -->
+<div class="col">
+  <div class="phone-label">A — Atmospheric Hero</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen-a">
+
+      <!-- HERO: full-bleed photo fills top 420px -->
+      <div class="hero-a">
+        <!-- Photo sim: warm athletic gradient -->
+        <div class="photo-bg"></div>
+
+        <!-- Status bar lives inside hero -->
+        <div class="status-a">
+          <span class="status-time">9:41</span>
+          <div class="status-icons">
+            <svg width="17" height="12" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1" opacity="0.4"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity="0.6"/><rect x="9" y="0" width="3" height="12" rx="1" opacity="0.85"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+            <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.4C10.8 2.4 13.3 3.6 15 5.6L16 4.4C14 2 11.2.8 8 .8 4.8.8 2 2 0 4.4l1 1.2C2.7 3.6 5.2 2.4 8 2.4z" opacity="0.4"/><path d="M8 5.2c1.9 0 3.7.8 4.9 2.1l1-1.2C12.4 4.4 10.3 3.6 8 3.6c-2.3 0-4.4.8-5.9 2.5l1 1.2C4.3 6 6.1 5.2 8 5.2z" opacity="0.7"/><circle cx="8" cy="10" r="2"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0" y="1" width="21" height="10" rx="3" stroke="rgba(248,244,238,0.9)" stroke-width="1.2" fill="none"/><rect x="2" y="3" width="14" height="6" rx="1.5" fill="rgba(248,244,238,0.9)"/><path d="M22 4v4c1.1-.5 1.1-3.5 0-4z" fill="rgba(248,244,238,0.6)"/></svg>
+          </div>
+        </div>
+
+        <!-- Fade at bottom — bleeds name into content -->
+        <div class="hero-fade"></div>
+
+        <!-- Name block sits at base of hero, name reads on the fade -->
+        <div class="hero-name-block">
+          <div class="hero-name">Marcus<br>Adeyemi</div>
+          <div class="hero-tagline">Strength & Athletic Performance · Dubai</div>
+        </div>
+      </div>
+
+      <!-- CONTENT below hero -->
+      <div class="content-a">
+
+        <div class="pills" style="margin-top:4px;">
+          <span class="pill">Strength</span>
+          <span class="pill">HIIT</span>
+          <span class="pill">Mobility</span>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat">
+            <span class="stat-num">8<em>yr</em></span>
+            <span class="stat-label">Experience</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">94<em>%</em></span>
+            <span class="stat-label">Goal Rate</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">340</span>
+            <span class="stat-label">Clients</span>
+          </div>
+        </div>
+
+        <button class="btn-primary">Book a Session</button>
+        <button class="btn-secondary">View all packages</button>
+
+        <div class="section-label">Sessions</div>
+
+        <div class="package-row">
+          <span class="pkg-name">Single session</span>
+          <span class="pkg-price">AED 350</span>
+        </div>
+        <div class="package-row">
+          <span class="pkg-name">8-session block</span>
+          <span class="pkg-price">AED 2,400</span>
+        </div>
+        <div class="package-row">
+          <span class="pkg-name">Monthly unlimited</span>
+          <span class="pkg-price">AED 3,800</span>
+        </div>
+
+      </div>
+    </div>
+    <div class="phone::after"></div>
+  </div>
+</div>
+
+<!-- ─── PHONE B: Hopp exact — name above, photo middle, CTAs below ─── -->
+<div class="col">
+  <div class="phone-label">B — Hopp Exact</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen-b">
+
+      <!-- White header with name -->
+      <div class="header-b">
+        <div class="status-b">
+          <span class="status-time-b">9:41</span>
+          <div class="status-icons-b" style="display:flex;gap:6px;align-items:center;">
+            <svg width="17" height="12" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1" fill="#1A1411" opacity="0.35"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#1A1411" opacity="0.55"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#1A1411" opacity="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1A1411"/></svg>
+            <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.4C10.8 2.4 13.3 3.6 15 5.6L16 4.4C14 2 11.2.8 8 .8 4.8.8 2 2 0 4.4l1 1.2C2.7 3.6 5.2 2.4 8 2.4z" fill="#1A1411" opacity="0.35"/><path d="M8 5.2c1.9 0 3.7.8 4.9 2.1l1-1.2C12.4 4.4 10.3 3.6 8 3.6c-2.3 0-4.4.8-5.9 2.5l1 1.2C4.3 6 6.1 5.2 8 5.2z" fill="#1A1411" opacity="0.7"/><circle cx="8" cy="10" r="2" fill="#1A1411"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#1A1411" stroke-width="1.2" fill="none"/><rect x="2" y="3" width="14" height="6" rx="1.5" fill="#1A1411"/><path d="M22 4v4c1.1-.5 1.1-3.5 0-4z" fill="#1A1411" opacity="0.5"/></svg>
+          </div>
+        </div>
+        <div class="name-b">Marcus Adeyemi</div>
+        <div class="tagline-b">Strength & Athletic Performance · Dubai</div>
+        <div class="spec-tags-b">
+          <span class="spec-tag-b">Strength</span>
+          <span class="spec-tag-b">HIIT</span>
+          <span class="spec-tag-b">Mobility</span>
+        </div>
+      </div>
+
+      <!-- Full-bleed photo: no border radius, edge to edge -->
+      <div class="photo-b">
+        <div class="photo-bg-b"></div>
+        <div class="photo-fade-b"></div>
+      </div>
+
+      <!-- White content below photo -->
+      <div class="content-b">
+
+        <button class="btn-primary-b">Book a Session</button>
+        <button class="btn-secondary-b">View packages & pricing</button>
+
+        <div class="stats-row-b">
+          <div class="stat-b">
+            <span class="stat-num-b">8<em>yr</em></span>
+            <span class="stat-label-b">Exp</span>
+          </div>
+          <div class="stat-b">
+            <span class="stat-num-b">94<em>%</em></span>
+            <span class="stat-label-b">Goals</span>
+          </div>
+          <div class="stat-b">
+            <span class="stat-num-b">340</span>
+            <span class="stat-label-b">Clients</span>
+          </div>
+        </div>
+
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.11em;text-transform:uppercase;color:#B0A099;margin-bottom:8px;">Sessions</div>
+
+        <div class="pkg-row-b">
+          <span class="pkg-name-b">Single session</span>
+          <span class="pkg-price-b">AED 350</span>
+        </div>
+        <div class="pkg-row-b">
+          <span class="pkg-name-b">8-session block</span>
+          <span class="pkg-price-b">AED 2,400</span>
+        </div>
+        <div class="pkg-row-b">
+          <span class="pkg-name-b">Monthly unlimited</span>
+          <span class="pkg-price-b">AED 3,800</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ANNOTATION ─── -->
+<div class="annotation">
+  <h3>What Hopp gets right</h3>
+
+  <p><strong>Photo = hero, not avatar.</strong> No circle crop, no ring, no frame. The trainer's physical presence fills the screen. This is the product. Everything else supports it.</p>
+
+  <p><strong>Gradient IS the brand atmosphere.</strong> Hopp uses the profile subject's energy colour. We use warm terracotta — already in our palette, already distinctive. No stock background needed.</p>
+
+  <p><strong>Two structural interpretations:</strong></p>
+  <ul>
+    <li><strong>A — Atmospheric Hero:</strong> Photo fills the top 420px, name overlaid at the bottom as the gradient fades to content. Feels more native iOS, more dramatic. Better for scrolling depth.</li>
+    <li><strong>B — Hopp Exact:</strong> Name first (above fold), then full-width photo, then white content. Cleaner information hierarchy — you know who before you see them. Closer to what Hopp ships.</li>
+  </ul>
+
+  <p><strong>The arcs and circles are gone.</strong> When the photo IS the atmosphere, you don't need decorative elements. The gradient does the work.</p>
+
+  <p><strong>Why this is better than the circle:</strong> Real trainers have great photos. A circle crop at 80px shows nothing. A 400px full-bleed shows everything that matters — posture, confidence, energy, environment. This is what clients are actually buying.</p>
+</div>
+
+</body>
+</html>

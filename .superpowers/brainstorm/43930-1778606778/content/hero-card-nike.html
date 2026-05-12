@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #111111;
+  --canvas: #ffffff;
+  --soft-cloud: #F5F4F3;
+  --hairline: #E0DDD9;
+  --mute: #9B9490;
+  --charcoal: #6B6460;
+  --brand: #FF5C00;
+  --success: #00A844;
+}
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #FAFAF9;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  gap: 48px;
+  min-height: 100vh;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--charcoal);
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+.title strong { color: var(--ink); }
+
+/* BEFORE */
+.before-card {
+  width: 260px;
+  background: var(--canvas);
+  border-radius: 20px;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  overflow: hidden;
+}
+.before-photo {
+  height: 150px;
+  background: linear-gradient(135deg, #FF5C00, #ffb380);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px;
+}
+.before-body { padding: 16px; }
+.before-name { font-weight: 800; font-size: 15px; margin-bottom: 2px; }
+.before-meta { font-size: 11px; color: var(--charcoal); margin-bottom: 12px; }
+.before-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
+.before-tag {
+  background: var(--soft-cloud); border: 1px solid var(--hairline);
+  border-radius: 100px; padding: 3px 10px;
+  font-size: 10px; color: var(--charcoal); font-weight: 600;
+}
+.before-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 12px; }
+.before-price { font-weight: 800; font-size: 13px; }
+.before-btn { background: #FF5C00; color: #fff; border-radius: 100px; padding: 8px 16px; font-size: 11px; font-weight: 700; }
+
+/* AFTER — Nike-principled */
+.after-card {
+  width: 260px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  /* NO border-radius on card body — Nike uses 0 for cards */
+  /* NO box-shadow — flat, hairline only */
+}
+
+.after-photo {
+  /* Soft-cloud bg. Real photo = edge-to-edge, no decoration needed */
+  background: var(--soft-cloud);
+  aspect-ratio: 3 / 2;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Initials circle — clean white, no color */
+.after-avatar {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 20px;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+}
+
+/* Verified — top left, white pill */
+.after-badge {
+  position: absolute;
+  top: 10px; left: 10px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  padding: 4px 8px;
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600; color: var(--ink);
+  letter-spacing: 0.01em;
+}
+.after-badge-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--success);
+}
+
+.after-body {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--hairline);
+}
+
+.after-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+  letter-spacing: -0.025em;
+  margin-bottom: 2px;
+  line-height: 1.3;
+}
+.after-meta {
+  font-size: 12px;
+  color: var(--mute);
+  font-weight: 400;
+  margin-bottom: 14px;
+  letter-spacing: -0.01em;
+}
+.after-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--hairline);
+  padding-top: 12px;
+  margin-top: 0;
+}
+.after-price {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+.after-price span { font-size: 11px; font-weight: 400; color: var(--mute); }
+
+/* Nike-style: pill button, black bg */
+.after-btn {
+  background: var(--ink);
+  color: var(--canvas);
+  border: none;
+  border-radius: 9999px;
+  padding: 9px 16px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+}
+
+/* Dot indicator — small, quiet */
+.dots {
+  display: flex; gap: 4px; justify-content: center;
+  margin-top: 12px;
+}
+.dot { height: 3px; border-radius: 0; }
+.dot.a { width: 20px; background: var(--ink); }
+.dot.b { width: 5px; background: var(--hairline); }
+
+/* Side-by-side layout */
+.compare {
+  display: flex;
+  gap: 56px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.col-label {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--mute);
+}
+.col-label.new { color: var(--brand); }
+
+.diff {
+  font-size: 11px; color: var(--charcoal); line-height: 1.65;
+  max-width: 220px; text-align: left;
+}
+
+.note {
+  max-width: 560px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  padding: 18px 22px;
+  font-size: 13px; color: var(--charcoal); line-height: 1.7;
+}
+.note strong { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="title">Trainer card — applying Nike design principles<br><strong>Photo is the design. UI steps back.</strong></div>
+
+<div class="compare">
+  <div class="col">
+    <div class="col-label">Before</div>
+    <div class="before-card">
+      <div class="before-photo">👤</div>
+      <div class="before-body">
+        <div class="before-name">Sarah Al-Mansoori</div>
+        <div class="before-meta">Strength & HIIT · 6 yrs</div>
+        <div class="before-tags">
+          <span class="before-tag">Weight Loss</span>
+          <span class="before-tag">HIIT</span>
+        </div>
+        <div class="before-footer">
+          <div class="before-price">AED 350</div>
+          <div class="before-btn">View →</div>
+        </div>
+      </div>
+    </div>
+    <div class="diff" style="color:#aaa">
+      ✗ Decorative gradient<br>
+      ✗ 20px rounded corners<br>
+      ✗ Large shadow<br>
+      ✗ Emoji placeholder<br>
+      ✗ Pill tags + pill button
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="col-label new">After · Nike-principled</div>
+    <div class="after-card">
+      <div class="after-photo">
+        <div class="after-badge">
+          <div class="after-badge-dot"></div>
+          REPs Verified
+        </div>
+        <div class="after-avatar">SA</div>
+      </div>
+      <div class="after-body">
+        <div class="after-name">Sarah Al-Mansoori</div>
+        <div class="after-meta">Strength & HIIT · Dubai Marina</div>
+        <div class="after-footer">
+          <div class="after-price">AED 350 <span>/ session</span></div>
+          <button class="after-btn">View profile</button>
+        </div>
+      </div>
+    </div>
+    <div class="dots">
+      <div class="dot a"></div>
+      <div class="dot b"></div>
+      <div class="dot b"></div>
+    </div>
+    <div class="diff">
+      ✓ 0px radius — flat, no bubble<br>
+      ✓ No shadow — hairline only<br>
+      ✓ Soft-cloud photo bg (#F5F4F3)<br>
+      ✓ Clean white avatar circle<br>
+      ✓ Tags removed — less noise<br>
+      ✓ Nike pill button — black<br>
+      ✓ Tight letter-spacing throughout<br>
+      ✓ When photo loads: fills edge-to-edge
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>Nike principle applied:</strong> The trainer photo is the only color source. The card UI is neutral scaffolding — it should be invisible until the photo loads. No gradients, no colored backgrounds, no shadow decoration. The "soft-cloud" neutral (#F5F4F3) is intentional — it's not a placeholder, it's how Nike treats image areas before photography takes over. The dot indicator is now a flat Nike-style bar, not a pill.
+</div>
+
+<div style="font-size:13px;color:var(--mute);text-align:center">Does this feel closer to the quality you're after? Or still off?</div>
+
+</body>
+</html>

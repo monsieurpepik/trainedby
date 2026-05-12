@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrainedBy — What to Steal</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #080808;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    color: #fff;
+    padding: 28px 20px 80px;
+  }
+
+  .page-hdr { text-align:center; margin-bottom: 40px; }
+  .page-hdr h1 {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #444; margin-bottom: 8px;
+  }
+  .page-hdr p { font-size: 15px; color: #888; line-height: 1.5; max-width: 560px; margin: 0 auto; }
+  .page-hdr strong { color: #D4622A; }
+
+  /* STEAL GRID */
+  .steal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 1100px;
+    margin: 0 auto 60px;
+  }
+
+  .steal {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #1a1a1a;
+    background: #0d0d0d;
+    display: flex; flex-direction: column;
+  }
+
+  .steal-source {
+    padding: 10px 14px;
+    background: #111;
+    border-bottom: 1px solid #1a1a1a;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .steal-from {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .steal-arrow { color: #333; font-size: 10px; }
+  .steal-what { font-size: 9px; color: #555; }
+
+  /* Source color accents */
+  .s-masterclass .steal-from { color: #f59e0b; }
+  .s-equinox .steal-from { color: #22c55e; }
+  .s-soho .steal-from { color: #a78bfa; }
+  .s-hotel .steal-from { color: #38bdf8; }
+  .s-cameo .steal-from { color: #f472b6; }
+  .s-banking .steal-from { color: #94a3b8; }
+  .s-resy .steal-from { color: #fb923c; }
+  .s-contra .steal-from { color: #34d399; }
+  .s-none .steal-from { color: #D4622A; }
+
+  .steal-preview {
+    padding: 16px;
+    flex: 1;
+    min-height: 160px;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative;
+  }
+
+  .steal-desc {
+    padding: 12px 14px;
+    border-top: 1px solid #1a1a1a;
+    background: #0a0a0a;
+  }
+  .steal-title { font-size: 12px; font-weight: 700; margin-bottom: 4px; color: #ddd; }
+  .steal-body { font-size: 10px; color: #555; line-height: 1.55; }
+
+  /* ===========================
+     STEAL 1: MasterClass Nameplate
+  =========================== */
+  .nameplate-demo {
+    text-align: center;
+  }
+  .np-brand { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #444; margin-bottom: 6px; }
+  .np-name {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 26px; font-weight: 700; letter-spacing: -0.01em;
+    color: #fff;
+    position: relative;
+    display: inline-block;
+  }
+  /* Unique accent line under name */
+  .np-name::after {
+    content: '';
+    position: absolute; bottom: -4px; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #D4622A, rgba(212,98,42,0.3), transparent);
+  }
+  .np-title { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 10px; letter-spacing: 0.06em; }
+
+  /* ===========================
+     STEAL 2: Equinox — No Price in Hero
+  =========================== */
+  .equinox-demo {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .eq-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #22c55e; opacity: 0.7; margin-bottom: 4px; }
+  .eq-approach {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .eq-approach-name { font-size: 11px; font-weight: 700; color: #ddd; margin-bottom: 2px; }
+  .eq-approach-desc { font-size: 9px; color: #555; line-height: 1.4; }
+  .eq-cta {
+    margin-top: 4px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 9px 12px;
+    font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.4);
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+  .eq-price-note { font-size: 9px; color: #333; text-align: center; margin-top: 4px; font-style: italic; }
+
+  /* ===========================
+     STEAL 3: Soho House — Shared Signals
+  =========================== */
+  .soho-demo {}
+  .soho-match-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(167,139,250,0.6); margin-bottom: 8px; }
+  .soho-interests { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .soho-tag {
+    font-size: 9px; padding: 3px 9px; border-radius: 20px;
+    border: 1px solid rgba(167,139,250,0.25);
+    background: rgba(167,139,250,0.07);
+    color: rgba(167,139,250,0.7);
+  }
+  .soho-why {
+    background: rgba(167,139,250,0.05); border: 1px solid rgba(167,139,250,0.12);
+    border-radius: 8px; padding: 10px 12px;
+    font-size: 10px; color: #555; line-height: 1.5;
+    font-style: italic;
+  }
+  .soho-why strong { color: rgba(167,139,250,0.7); font-style: normal; }
+
+  /* ===========================
+     STEAL 4: Luxury Hotel — Availability Slot
+  =========================== */
+  .hotel-demo {}
+  .hotel-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(56,189,248,0.6); margin-bottom: 8px; }
+  .hotel-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 8px; }
+  .hotel-slot {
+    border-radius: 6px; padding: 7px 4px; text-align: center;
+    font-size: 10px;
+  }
+  .hotel-slot.open {
+    background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); color: #38bdf8;
+  }
+  .hotel-slot.few {
+    background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.2); color: #fb923c;
+  }
+  .hotel-slot.full {
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); color: #333;
+    text-decoration: line-through;
+  }
+  .hotel-slot-day { font-size: 8px; display: block; margin-bottom: 1px; opacity: 0.6; }
+  .hotel-slot-time { font-size: 10px; font-weight: 600; }
+  .hotel-urgency { font-size: 9px; color: rgba(251,146,60,0.7); text-align: center; font-style: italic; }
+
+  /* ===========================
+     STEAL 5: Cameo — Video Intro in Circle
+  =========================== */
+  .cameo-demo { display: flex; flex-direction: column; align-items: center; }
+  .cameo-ring {
+    width: 90px; height: 90px; border-radius: 50%;
+    position: relative; margin-bottom: 10px;
+  }
+  .cameo-border {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: conic-gradient(#f472b6 0deg, #f472b6 180deg, rgba(244,114,182,0.15) 180deg, rgba(244,114,182,0.15) 360deg);
+    padding: 2px;
+    display: flex; align-items: center; justify-content: center;
+    animation: spin 4s linear infinite;
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .cameo-photo {
+    width: calc(100% - 4px); height: calc(100% - 4px);
+    border-radius: 50%;
+    background: #1a1a1a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 800; color: rgba(244,114,182,0.5);
+    font-family: Georgia, serif;
+    position: relative; z-index: 1;
+  }
+  .cameo-play {
+    position: absolute; inset: 0; z-index: 2;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.3);
+    font-size: 20px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    cursor: pointer;
+  }
+  .cameo-ring:hover .cameo-play { opacity: 1; }
+  .cameo-hint { font-size: 9px; color: rgba(244,114,182,0.4); letter-spacing: 0.06em; text-transform: uppercase; }
+  .cameo-desc-mini { font-size: 10px; color: #444; text-align: center; margin-top: 6px; line-height: 1.4; }
+
+  /* ===========================
+     STEAL 6: Private Banking — Enquire vs Buy
+  =========================== */
+  .banking-demo {}
+  .bank-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(148,163,184,0.5); margin-bottom: 8px; }
+  .bank-pkg {
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px; padding: 11px 12px;
+    margin-bottom: 6px;
+  }
+  .bank-pkg-name { font-size: 11px; font-weight: 700; color: #ccc; margin-bottom: 2px; }
+  .bank-pkg-desc { font-size: 9px; color: #444; line-height: 1.4; }
+  .bank-pkg-price { font-size: 10px; color: #666; margin-top: 6px; font-style: italic; }
+  .bank-cta {
+    background: transparent; border: 1px solid rgba(148,163,184,0.2);
+    border-radius: 8px; padding: 10px;
+    font-size: 10px; font-weight: 600; color: rgba(148,163,184,0.5);
+    text-align: center; letter-spacing: 0.04em; margin-top: 4px;
+  }
+
+  /* ===========================
+     STEAL 7: Resy / Scarcity signal
+  =========================== */
+  .resy-demo {}
+  .resy-bar {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(251,146,60,0.06); border: 1px solid rgba(251,146,60,0.18);
+    border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
+  }
+  .resy-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #fb923c;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px rgba(251,146,60,0.6);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .resy-text { font-size: 10px; color: rgba(251,146,60,0.8); line-height: 1.4; }
+  .resy-text strong { display: block; font-size: 11px; margin-bottom: 1px; }
+  .resy-slots {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .resy-slot {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px; padding: 6px 10px;
+    font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.4);
+  }
+  .resy-slot.active {
+    background: rgba(212,98,42,0.1); border-color: rgba(212,98,42,0.3); color: #D4622A;
+  }
+
+  /* ===========================
+     STEAL 8: Contra — Case Study / Transformation
+  =========================== */
+  .contra-demo {}
+  .contra-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(52,211,153,0.5); margin-bottom: 8px; }
+  .contra-case {
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px; overflow: hidden;
+  }
+  .contra-imgs { display: grid; grid-template-columns: 1fr 1fr; height: 60px; }
+  .contra-img {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .contra-img.before { background: rgba(255,255,255,0.03); color: #333; border-right: 1px solid #1a1a1a; }
+  .contra-img.after { background: rgba(52,211,153,0.06); color: rgba(52,211,153,0.4); }
+  .contra-meta { padding: 8px 12px; }
+  .contra-client { font-size: 10px; color: #555; }
+  .contra-result { font-size: 11px; font-weight: 700; color: rgba(52,211,153,0.7); margin-top: 2px; }
+  .contra-period { font-size: 9px; color: #333; }
+
+  /* ===========================
+     STEAL 9: Nobody Does This — Trainer POV video intro
+  =========================== */
+  .nobody-demo { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .nb-video {
+    width: 100%; border-radius: 10px; overflow: hidden;
+    background: #111; border: 1px solid #1e1e1e; position: relative;
+    aspect-ratio: 16/9;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .nb-video-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #1a0a00 0%, #0a0a0a 100%);
+  }
+  .nb-video-glow {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(212,98,42,0.12) 0%, transparent 70%);
+  }
+  .nb-play {
+    position: relative; z-index: 2;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(212,98,42,0.9);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 0 20px rgba(212,98,42,0.4);
+  }
+  .nb-caption { font-size: 9px; color: #333; text-align: center; font-style: italic; }
+
+  /* BOTTOM — Composite Profile Upgrade */
+  .composite-section {
+    max-width: 1100px; margin: 0 auto;
+  }
+  .composite-hdr {
+    text-align: center; margin-bottom: 24px;
+  }
+  .composite-hdr h2 { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #444; margin-bottom: 8px; }
+  .composite-hdr p { font-size: 13px; color: #666; }
+
+  .composite-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* Final profile */
+  .final-profile {
+    background: #0a0a0a;
+    border-radius: 20px;
+    border: 1.5px solid rgba(212,98,42,0.3);
+    overflow: hidden;
+    box-shadow: 0 0 50px rgba(212,98,42,0.07);
+  }
+
+  .fp-bar {
+    background: #0a0a0a; padding: 9px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .fp-wordmark { font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+  .fp-wordmark span { color: #D4622A; }
+  .fp-verified { font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(212,98,42,0.6); border: 1px solid rgba(212,98,42,0.2); padding: 2px 7px; border-radius: 20px; }
+
+  .fp-hero {
+    position: relative; height: 170px;
+    background: #0a0a0a; overflow: hidden;
+  }
+  .fp-hero-glow {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 90% at 50% 0%, rgba(212,98,42,0.2) 0%, transparent 70%);
+  }
+  .fp-hero-grain {
+    position: absolute; inset: 0; opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .fp-arc {
+    position: absolute; inset: 0; z-index: 2;
+  }
+  .fp-arc svg { width: 100%; height: 100%; }
+
+  /* Video circle */
+  .fp-photo-ring {
+    position: absolute; bottom: -46px; left: 50%; transform: translateX(-50%);
+    z-index: 10;
+    width: 96px; height: 96px; border-radius: 50%;
+    background: conic-gradient(#D4622A 0deg, #ff9c5a 100deg, rgba(212,98,42,0.2) 200deg, rgba(212,98,42,0.06) 300deg, #D4622A 360deg);
+    padding: 2.5px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .fp-photo-inner {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: #161616;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; border: 2px solid #0a0a0a;
+    position: relative;
+  }
+  .fp-initials {
+    font-family: Georgia, serif;
+    font-size: 28px; font-weight: 700;
+    color: rgba(212,98,42,0.6);
+  }
+  .fp-video-hint {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s;
+    font-size: 18px;
+  }
+  .fp-photo-ring:hover .fp-video-hint { opacity: 1; }
+
+  .fp-body { padding: 55px 18px 20px; display: flex; flex-direction: column; align-items: center; }
+  .fp-name {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 22px; font-weight: 700; letter-spacing: -0.01em;
+    margin-bottom: 2px; text-align: center;
+    position: relative; display: inline-block;
+  }
+  .fp-name::after {
+    content: '';
+    position: absolute; bottom: -3px; left: 0; right: 0; height: 1.5px;
+    background: linear-gradient(90deg, #D4622A, rgba(212,98,42,0.2), transparent);
+  }
+  .fp-creds { font-size: 9px; color: rgba(255,255,255,0.3); letter-spacing: 0.06em; margin: 8px 0 4px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .fp-cred-dot { color: #333; }
+  .fp-location { font-size: 9px; color: rgba(255,255,255,0.25); margin-bottom: 10px; }
+  .fp-tagline {
+    font-family: Georgia, serif; font-style: italic;
+    font-size: 11px; color: rgba(255,255,255,0.38);
+    text-align: center; line-height: 1.5; margin-bottom: 14px; max-width: 220px;
+  }
+
+  /* Match signal */
+  .fp-match {
+    width: 100%;
+    background: rgba(167,139,250,0.05); border: 1px solid rgba(167,139,250,0.12);
+    border-radius: 8px; padding: 8px 10px; margin-bottom: 12px;
+    font-size: 9px; color: rgba(167,139,250,0.6); line-height: 1.4;
+  }
+  .fp-match strong { color: rgba(167,139,250,0.85); font-size: 10px; display: block; margin-bottom: 2px; }
+
+  /* Scarcity */
+  .fp-scarcity {
+    width: 100%;
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(251,146,60,0.05); border: 1px solid rgba(251,146,60,0.15);
+    border-radius: 8px; padding: 8px 10px; margin-bottom: 12px;
+  }
+  .fp-scar-dot {
+    width: 5px; height: 5px; border-radius: 50%; background: #fb923c; flex-shrink: 0;
+    box-shadow: 0 0 4px rgba(251,146,60,0.5);
+  }
+  .fp-scar-text { font-size: 9px; color: rgba(251,146,60,0.7); }
+
+  .fp-btn {
+    display: block; width: 100%; padding: 11px;
+    border-radius: 9px; text-align: center;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.03em;
+    margin-bottom: 6px;
+  }
+  .fp-btn.primary { background: #D4622A; color: #fff; box-shadow: 0 4px 16px rgba(212,98,42,0.25); }
+  .fp-btn.ghost { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); }
+  .fp-btn.wa { background: transparent; border: 1px solid rgba(37,211,102,0.18); color: rgba(37,211,102,0.7); }
+
+  .fp-footer { padding: 10px; text-align: center; border-top: 1px solid rgba(255,255,255,0.04); font-size: 8px; color: rgba(255,255,255,0.1); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* Annotation list */
+  .annotation-list {
+    display: flex; flex-direction: column; gap: 1px;
+    background: #0d0d0d; border-radius: 14px; border: 1px solid #1a1a1a;
+    overflow: hidden;
+  }
+  .ann-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 13px 16px;
+    border-bottom: 1px solid #141414;
+  }
+  .ann-item:last-child { border-bottom: none; }
+  .ann-source {
+    font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; margin-top: 1px;
+    min-width: 70px;
+  }
+  .ann-text { font-size: 11px; color: #888; line-height: 1.5; }
+  .ann-text strong { color: #ccc; display: block; font-size: 12px; margin-bottom: 1px; }
+
+  /* VOTE */
+  .vote-section { max-width: 700px; margin: 40px auto 0; text-align: center; }
+  .vote-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .vote-btn {
+    padding: 13px; border-radius: 12px;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; border: 2px solid; background: transparent; color: #fff;
+    transition: all 0.15s;
+  }
+  .vote-btn.yes { border-color: #D4622A; }
+  .vote-btn.yes:hover { background: #D4622A; }
+  .vote-btn.pick { border-color: #334155; }
+  .vote-btn.pick:hover { background: #334155; }
+  .vote-note { font-size: 11px; color: #444; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="page-hdr">
+  <h1>What to Steal — 9 Ideas</h1>
+  <p>Best patterns from <strong>MasterClass, Equinox, Soho House, Resy, Cameo, Contra,</strong> private banking,<br>luxury hotels — and one thing <strong>nobody does yet.</strong></p>
+</div>
+
+<!-- STEAL GRID -->
+<div class="steal-grid">
+
+  <!-- 1. MasterClass Nameplate -->
+  <div class="steal s-masterclass">
+    <div class="steal-source">
+      <span class="steal-from">MasterClass</span>
+      <span class="steal-arrow">→</span>
+      <span class="steal-what">Nameplate under name</span>
+    </div>
+    <div class="steal-preview">
+      <div class="nameplate-demo">
+        <div class="np-brand">TrainedBy</div>
+        <div class="np-name">Marcus Johnson</div>
+        <div class="np-title">Elite Strength Coach · Dubai</div>
+      </div>
+    </div>
+    <div class="steal-desc">
+      <div class="steal-title">Gradient underline on serif name</div>
+      <div class="steal-body">MasterClass gives each instructor a unique name treatment — different typeface, different accent. We apply a left-anchored orange gradient underline to every trainer name. Costs nothing. Looks like a signature.</div>
+    </div>
+  </div>
+
+  <!-- 2. Equinox — No Price, No "Free" -->
+  <div class="steal s-equinox">
+    <div class="steal-source">
+      <span class="steal-from">Equinox</span>
+      <span class="steal-arrow">→</span>
+      <span class="steal-what">Remove price from hero</span>
+    </div>
+    <div class="steal-preview">
+      <div class="equinox-demo">
+        <div class="eq-label">Training Philosophy</div>
+        <div class="eq-approach">
+          <div class="eq-approach-name">The Foundation Method™</div>
+          <div class="eq-approach-desc">Progressive overload protocol built around your movement patterns, recovery capacity, and lifestyle constraints.</div>
+        </div>
+        <div class="eq-cta">Enquire About Availability</div>
+        <div class="eq-price-note">Pricing discussed during consultation</div>
+      </div>
+    </div>
+    <div class="steal-desc">
+      <div class="steal-title">No pricing in hero. Ever.</div>
+      <div class="steal-body">Equinox never shows prices at the top. Premium services reveal price after desire is established. Replace "Book Free Consultation" with "Request a Consultation" — remove "free." Price is discussed in consultation. This alone repositions the trainer 2 tiers up.</div>
+    </div>
+  </div>
+
+  <!-- 3. Soho House — Why You Match -->
+  <div class="steal s-soho">
+    <div class="steal-source">
+      <span class="steal-from">Soho House</span>
+      <span class="steal-arrow">→</span>
+      <span class="steal-what">Match signal / shared context</span>
+    </div>
+    <div class="steal-preview">
+      <div class="soho-demo">
+        <div class="soho-match-label">Why this trainer fits your goals</div>
+        <div class="soho-interests">
+          <span class="soho-tag">Body Recomposition</span>
+          <span class="soho-tag">Early mornings</span>
+          <span class="soho-tag">No gym before</span>
+        </div>
+        <div class="soho-why">Marcus has helped <strong>14 clients</strong> with your exact profile — beginners targeting recomposition in Dubai. Average result: <strong>−9kg, +4kg lean mass</strong> in 16 weeks.</div>
+      </div>
+    </div>
+    <div class="steal-desc">
+      <div class="steal-title">Personalised "why you fit" card</div>
+      <div class="steal-body">Soho House surfaces shared interests between members to trigger connection. We do the same: when a visitor has filled a goals form (or based on referral data), the trainer's page shows a personalised card — "here's why Marcus is right for you." Invisible intelligence, visible relevance.</div>
+    </div>
+  </div>
+
+  <!-- 4. Hotel — Availability as Scarcity -->
+  <div class="steal s-hotel">
+    <div class="steal-source">
+      <span class="steal-from">Luxury Hotel</span>
+      <span class="steal-arrow">→</span>
+      <span class="steal-what">Live availability calendar</span>
+    </div>
+    <div class="steal-preview">
+      <div class="hotel-demo">
+        <div class="hotel-label">Next Available Slots</div>
+        <div class="hotel-slots">
+          <div class="hotel-slot full"><span class="hotel-slot-day">Mon</span><span class="hotel-slot-time">Full</span></div>
+          <div class="hotel-slot open"><span class="hotel-slot-day">Tue</span><span class="hotel-slot-time">7am</span></div>
+          <div class="hotel-slot few"><span class="hotel-slot-day">Wed</span><span class="hotel-slot-time">6am</span></div>
+          <div class="hotel-slot open"><span class="hotel-slot-day">Thu</span><span class="hotel-slot-time">7am</span></div>
+          <div class="hotel-slot full"><span class="hotel-slot-day">Fri</span><span class="hotel-slot-time">Full</span></div>
+          <div class="hotel-slot open"><span class="hotel-slot-day">Sat</span><span class="hotel-slot-time">8am</span></div>
+        </div>
+        <div class="hotel-urgency">2 slots remaining this week</div>
+      </div>
+    </div>
+    <div class="steal-desc">
+      <div class="steal-title">Slot scarcity visible on profile</div>
+      <div class="steal-body">Hotel booking sites show "only 2 rooms left." We show "2 slots remaining this week" directly on the profile — pulled from the trainer's calendar. Creates real urgency without being fake. If they're full, it signals demand. If open, it signals accessibility.</div>
+    </div>
+  </div>
+
+  <!-- 5. Cameo — Video in Circle -->
+  <div class="steal s-cameo">
+    <div class="steal-source">
+      <span class="steal-from">Cameo</span>
+      <span class="steal-arrow">→</span>
+      <span class="steal-what">Video intro auto-plays in circle</span>
+    </div>
+    <div class="steal-preview">
+      <div class="cameo-demo">
+        <div class="cameo-ring">
+          <div class="cameo-border">
+            <div class="cameo-photo">
+              MJ
+              <div class="cameo-play">▶</div>
+            </div>
+          </div>
+        </div>
+        <div class="cameo-hint">Tap to play intro</div>
+        <div class="cameo-desc-mini">Trainer records a 20–30 sec intro.<br>Plays in the circle on tap.</div>
+      </div>
+    </div>
+    <div class="steal-desc">
+      <div class="steal-title">30-sec video intro lives inside the photo circle</div>
+      <div class="steal-body">Cameo profiles auto-play intro videos — it's their highest conversion feature. We let trainers record a short video (20–30 sec) that plays in the circle on tap. The ring animates when a video is available. Photo when no video. Massive trust and personality signal.</div>
+    </div>
+  </div>
+
+  <!-- 6. Private Banking — Enquire, Don't Buy -->
+  <div class="steal s-banking">
+    <div class="steal-source">
+      <span class="steal-from">Private Banking</span>
+      <span class="steal-arrow">→</span>
+      <span class="steal-what">Enquire, don't display price</span>
+    </div>
+    <div class="steal-preview">
+      <div class="banking-demo">
+        <div class="bank-label">Programmes</div>
+        <div class="bank-pkg">
+          <div class="bank-pkg-name">Foundation · 8 Weeks</div>
+          <div class="bank-pkg-desc">Strength baseline, movement assessment, custom nutrition protocol.</div>
+          <div class="bank-pkg-price">From AED 1,800 · Details in consultation</div>
+        </div>
+        <div class="bank-pkg">
+          <div class="bank-pkg-name">Elite · 3 Months</div>
+          <div class="bank-pkg-desc">Full programme design, weekly check-ins, body composition tracking.</div>
+          <div class="bank-pkg-price">Pricing on enquiry</div>
+        </div>
+        <div class="bank-cta">Request Programme Details</div>
+      </div>
+    </div>
+    <div class="steal-desc">
+      <div class="steal-title">Show packages. Don't always show price.</div>
+      <div class="steal-body">Private banks show services, not price tags. Premium trainers do the same. Show programme names and descriptions. "From AED X" anchors value. "Pricing on enquiry" for top tier. This filters clients by seriousness and positions the trainer as selective.</div>
+    </div>
+  </div>
+
+  <!-- 7. Resy — Slot Scarcity Signal -->
+  <div class="steal s-resy">
+    <div class="steal-source">
+      <span class="steal-from">Resy / OpenTable</span>
+      <span class="steal-arrow">→</span>
+      <span class="steal-what">Scarcity pulse</span>
+    </div>
+    <div class="steal-preview">
+      <div class="resy-demo">
+        <div class="resy-bar">
+          <div class="resy-dot"></div>
+          <div class="resy-text">
+            <strong>In demand this week</strong>
+            4 people viewed this profile in the last 24h
+          </div>
+        </div>
+        <div class="resy-slots">
+          <div class="resy-slot">Mon 7am</div>
+          <div class="resy-slot active">Tue 6am</div>
+          <div class="resy-slot active">Thu 7am</div>
+          <div class="resy-slot">Sat 8am</div>
+        </div>
+      </div>
+    </div>
+    <div class="steal-desc">
+      <div class="steal-title">Pulsing demand signal</div>
+      <div class="steal-body">Resy shows "X people are also looking at this." We show a pulsing orange dot: "4 people viewed this profile in the last 24h." Real data, not fake scarcity. Psychologically, it signals that quality trainers are sought-after — book before someone else does.</div>
+    </div>
+  </div>
+
+  <!-- 8. Contra — Transformation Case Study -->
+  <div class="steal s-contra">
+    <div class="steal-source">
+      <span class="steal-from">Contra</span>
+      <span class="steal-arrow">→</span>
+      <span class="steal-what">Case study card (not testimonial)</span>
+    </div>
+    <div class="steal-preview">
+      <div class="contra-demo">
+        <div class="contra-label">Client Results</div>
+        <div class="contra-case">
+          <div class="contra-imgs">
+            <div class="contra-img before">Before</div>
+            <div class="contra-img after">16 Weeks</div>
+          </div>
+          <div class="contra-meta">
+            <div class="contra-client">Ahmed K., 34 — Dubai Marina</div>
+            <div class="contra-result">−11kg · +5kg lean mass · 18% → 12% body fat</div>
+            <div class="contra-period">Foundation Programme · 16 weeks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="steal-desc">
+      <div class="steal-title">Result cards, not star ratings</div>
+      <div class="steal-body">Contra shows portfolio case studies — problem, approach, outcome. For trainers: not "⭐⭐⭐⭐⭐ great trainer" but a structured result card: client profile, programme used, measurable outcome. Real evidence. Works as social proof and as a portfolio of what the trainer can do.</div>
+    </div>
+  </div>
+
+  <!-- 9. Nobody Does This -->
+  <div class="steal s-none">
+    <div class="steal-source">
+      <span class="steal-from">Nobody Does This Yet</span>
+      <span class="steal-arrow">→</span>
+      <span class="steal-what">Trainer methodology as named IP</span>
+    </div>
+    <div class="steal-preview" style="padding: 14px;">
+      <div style="text-align:center; margin-bottom:10px;">
+        <div style="font-size:9px;color:#444;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Marcus Johnson's Method</div>
+        <div style="font-family:Georgia,serif;font-style:italic;font-size:18px;font-weight:700;color:#D4622A;letter-spacing:-0.01em;">"The Foundation Method™"</div>
+        <div style="font-size:9px;color:#444;margin-top:4px;line-height:1.4;max-width:200px;margin-left:auto;margin-right:auto;">Movement assessment → strength baseline → progressive overload → lifestyle integration</div>
+      </div>
+      <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+        <span style="font-size:9px;padding:3px 8px;border-radius:4px;background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.2);color:rgba(212,98,42,0.6);">Week 1–2: Assess</span>
+        <span style="font-size:9px;padding:3px 8px;border-radius:4px;background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.2);color:rgba(212,98,42,0.6);">Week 3–6: Build</span>
+        <span style="font-size:9px;padding:3px 8px;border-radius:4px;background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.2);color:rgba(212,98,42,0.6);">Week 7+: Peak</span>
+      </div>
+    </div>
+    <div class="steal-desc">
+      <div class="steal-title">Trainers get to name their methodology</div>
+      <div class="steal-body">Equinox has "EQX OS." Nike has "Training Club." Barry's has a method. We let every TrainedBy trainer name their system — "The Foundation Method™" or "The 90-Day Reset™." Instantly differentiates them from Linktree/Hopp pages. Nobody can copy a named method.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- COMPOSITE PROFILE -->
+<div class="composite-section">
+  <div class="composite-hdr">
+    <h2>All 9 Applied — The Composite Profile</h2>
+    <p>What the profile looks like when all stolen patterns are in play</p>
+  </div>
+
+  <div class="composite-grid">
+    <div class="final-profile">
+      <div class="fp-bar">
+        <div class="fp-wordmark">Trained<span>By</span></div>
+        <div class="fp-verified">Verified Trainer</div>
+      </div>
+      <div class="fp-hero">
+        <div class="fp-hero-glow"></div>
+        <div class="fp-hero-grain"></div>
+        <div class="fp-arc">
+          <svg viewBox="0 0 300 170" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cg" x1="-20" y1="170" x2="310" y2="-5" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="rgba(212,98,42,0)"/>
+                <stop offset="40%" stop-color="rgba(212,98,42,0.2)"/>
+                <stop offset="75%" stop-color="rgba(212,98,42,0.5)"/>
+                <stop offset="100%" stop-color="#D4622A"/>
+              </linearGradient>
+            </defs>
+            <path d="M -20 170 Q 80 110 155 58 Q 225 12 310 -5"
+                  stroke="url(#cg)" stroke-width="44" fill="none" stroke-linecap="butt"/>
+            <path d="M -20 170 Q 80 110 155 58 Q 225 12 310 -5"
+                  stroke="rgba(8,8,8,0.5)" stroke-width="26" fill="none" stroke-linecap="butt"/>
+            <path d="M -20 170 Q 80 110 155 58 Q 225 12 310 -5"
+                  stroke="rgba(212,98,42,0.65)" stroke-width="1" fill="none" stroke-linecap="round"/>
+            <circle cx="278" cy="8" r="8" fill="rgba(212,98,42,0.92)"/>
+            <circle cx="262" cy="18" r="6.5" fill="rgba(212,98,42,0.84)"/>
+            <circle cx="288" cy="1" r="5.5" fill="rgba(232,120,52,0.88)"/>
+            <circle cx="248" cy="10" r="3.5" fill="rgba(212,98,42,0.5)"/>
+          </svg>
+        </div>
+        <div class="fp-photo-ring">
+          <div class="fp-photo-inner">
+            <div class="fp-initials">MJ</div>
+            <div class="fp-video-hint">▶</div>
+          </div>
+        </div>
+      </div>
+      <div class="fp-body">
+        <div class="fp-name">Marcus Johnson</div>
+        <div class="fp-creds">
+          <span>NASM-CPT</span><span class="fp-cred-dot">·</span>
+          <span>Strength & Conditioning</span><span class="fp-cred-dot">·</span>
+          <span>8 yrs</span>
+        </div>
+        <div class="fp-location">◈ Dubai Marina, UAE</div>
+        <div class="fp-tagline">"I build athletes. Results measured, not promised."</div>
+
+        <!-- Soho House: match signal -->
+        <div class="fp-match">
+          <strong>Why Marcus fits your goals</strong>
+          14 clients like you (beginners, body recomp) — avg. −9kg in 16 weeks
+        </div>
+
+        <!-- Resy: scarcity pulse -->
+        <div class="fp-scarcity">
+          <div class="fp-scar-dot"></div>
+          <div class="fp-scar-text">2 slots remaining this week · 4 people viewed today</div>
+        </div>
+
+        <!-- Equinox: no "free", no price -->
+        <a class="fp-btn primary">Request a Consultation</a>
+        <a class="fp-btn ghost">View Programmes</a>
+        <a class="fp-btn wa">Connect on WhatsApp</a>
+      </div>
+      <div class="fp-footer">TrainedBy.ae · @marcus-johnson</div>
+    </div>
+
+    <!-- Annotations -->
+    <div class="annotation-list">
+      <div class="ann-item">
+        <span class="ann-source" style="color:#f59e0b">MasterClass</span>
+        <div class="ann-text"><strong>Serif name + gradient underline</strong>Georgia typeface with left-anchored orange gradient line. Each trainer's name becomes a signature.</div>
+      </div>
+      <div class="ann-item">
+        <span class="ann-source" style="color:#f472b6">Cameo</span>
+        <div class="ann-text"><strong>Video intro in photo circle</strong>Conic gradient ring animates when video available. Tap to play 30-sec trainer intro. Photo fallback when no video.</div>
+      </div>
+      <div class="ann-item">
+        <span class="ann-source" style="color:#22c55e">Equinox</span>
+        <div class="ann-text"><strong>"Request a Consultation" — zero price in hero</strong>Price discussed in consultation. Removes "free" entirely. Repositions trainer 2 tiers up instantly.</div>
+      </div>
+      <div class="ann-item">
+        <span class="ann-source" style="color:#a78bfa">Soho House</span>
+        <div class="ann-text"><strong>Personalised match card</strong>"Why Marcus fits your goals" — surfaces relevant past client results based on visitor's goals. Invisible intelligence.</div>
+      </div>
+      <div class="ann-item">
+        <span class="ann-source" style="color:#fb923c">Resy</span>
+        <div class="ann-text"><strong>Pulsing demand signal</strong>Real-time: slots remaining + profile views today. Urgency without fake scarcity. Stolen from restaurant booking.</div>
+      </div>
+      <div class="ann-item">
+        <span class="ann-source" style="color:#94a3b8">Private Banking</span>
+        <div class="ann-text"><strong>Packages without price shock</strong>"From AED X" anchor, "pricing on enquiry" for premium tier. Filters clients, signals selectivity.</div>
+      </div>
+      <div class="ann-item">
+        <span class="ann-source" style="color:#34d399">Contra</span>
+        <div class="ann-text"><strong>Result cards as portfolio</strong>Structured client case study: who, what programme, measurable outcome. Not star ratings — evidence.</div>
+      </div>
+      <div class="ann-item">
+        <span class="ann-source" style="color:#D4622A">Nobody Yet</span>
+        <div class="ann-text"><strong>Named methodology as IP</strong>Every trainer names their system. "The Foundation Method™" — can't be replicated on Linktree or Hopp. True differentiation.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="vote-section">
+  <div class="vote-row">
+    <button class="vote-btn yes" onclick="vote('all')">All of these — let's spec it</button>
+    <button class="vote-btn pick" onclick="vote('pick')">I want to pick which ones</button>
+  </div>
+  <p class="vote-note">Say which of the 9 you want to drop, or say "all in" and I'll write the design spec.</p>
+</div>
+
+<script>
+function vote(v) {
+  fetch('/event', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({type:'choice', value:v, question:'steal-direction', ts:Date.now()})
+  });
+  document.querySelectorAll('.vote-btn').forEach(b => b.style.opacity='0.4');
+  document.querySelector('.vote-btn.'+(v==='all'?'yes':'pick')).style.opacity='1';
+}
+</script>
+</body>
+</html>

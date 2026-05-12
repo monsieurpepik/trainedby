@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrainedBy — Light Direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: #E8E3DC;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    display: flex;
+    gap: 48px;
+    padding: 48px 60px;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .phone-label {
+    font-size: 9px; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(60,45,38,0.40);
+  }
+
+  /* ─────────────────────────────────────────────
+     PHONE SHELL — light
+  ───────────────────────────────────────────── */
+  .phone {
+    width: 375px;
+    min-height: 812px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(180,155,130,0.25),
+      0 0 0 8px #D8D0C6,
+      0 40px 100px rgba(80,55,40,0.22),
+      0 20px 40px rgba(80,55,40,0.12);
+    flex-shrink: 0;
+  }
+  .notch {
+    position: absolute; top: 14px; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 34px;
+    background: #1A1410; border-radius: 20px; z-index: 100;
+  }
+
+  /* ─────────────────────────────────────────────
+     PHONE A  —  warm off-white
+  ───────────────────────────────────────────── */
+  .phone-a {
+    background: #F8F4EF;
+  }
+
+  /* ─────────────────────────────────────────────
+     PHONE B  —  parchment/stone
+  ───────────────────────────────────────────── */
+  .phone-b {
+    background: #EDE7DE;
+  }
+
+  /* ─────────────────────────────────────────────
+     TEXT COLOURS — same for both variants
+  ───────────────────────────────────────────── */
+  .dark   { color: #1A1411; }  /* headings, name */
+  .mid    { color: #6A5548; }  /* body, quote */
+  .muted  { color: #A89589; }  /* labels, meta */
+  .faint  { color: #C8BDB5; }  /* separators, captions */
+
+  /* ─────────────────────────────────────────────
+     STATUS BAR
+  ───────────────────────────────────────────── */
+  .status {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 28px 0;
+    position: relative; z-index: 20; height: 44px;
+    color: #1A1411;
+  }
+  .status-time { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+  .status-icons { display: flex; gap: 5px; align-items: center; }
+  .status-icons svg { width: 16px; height: 16px; fill: #1A1411; }
+
+  /* ─────────────────────────────────────────────
+     NAV
+  ───────────────────────────────────────────── */
+  .nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 20px 0;
+    position: relative; z-index: 20;
+  }
+  .nav-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(90,65,50,0.07);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; cursor: pointer; color: #6A5548;
+  }
+  .nav-wordmark {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.18em;
+    text-transform: uppercase; color: rgba(90,65,50,0.20);
+  }
+
+  /* ─────────────────────────────────────────────
+     HERO  (full-bleed atmosphere)
+  ───────────────────────────────────────────── */
+  .hero { position: relative; padding-bottom: 32px; }
+
+  /* A: off-white — very faint warm top glow */
+  .hero-atm-a {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 100% 55% at 50% -10%, rgba(190,120,80,0.06) 0%, transparent 65%),
+      radial-gradient(ellipse 60% 40% at 80% 5%, rgba(170,100,60,0.04) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+  /* B: parchment — atmosphere already in the bg colour, keep it minimal */
+  .hero-atm-b {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 90% 50% at 50% -15%, rgba(175,110,70,0.07) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* Subtle grain — premium paper feel */
+  .hero-grain {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 0.045; pointer-events: none; z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ─────────────────────────────────────────────
+     ARC ZONE
+  ───────────────────────────────────────────── */
+  .arc {
+    position: relative; width: 100%; height: 90px;
+    overflow: visible; z-index: 4;
+  }
+  .arc svg {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%; overflow: visible;
+  }
+
+  /* ─────────────────────────────────────────────
+     PHOTO RING
+  ───────────────────────────────────────────── */
+  .photo-wrap {
+    position: relative; display: flex; justify-content: center;
+    margin-top: -14px; z-index: 10;
+  }
+  .photo-ring {
+    width: 108px; height: 108px; border-radius: 50%;
+    padding: 2.5px;
+    background: conic-gradient(
+      #C4633A 0deg,
+      #E8946A 80deg,
+      rgba(196,99,58,0.15) 175deg,
+      rgba(196,99,58,0.04) 265deg,
+      #C4633A 360deg
+    );
+    animation: ring-spin 12s linear infinite;
+    cursor: pointer; position: relative;
+  }
+  @keyframes ring-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  .photo-inner {
+    width: 100%; height: 100%; border-radius: 50%; overflow: hidden;
+    animation: ring-spin 12s linear infinite reverse;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .phone-a .photo-inner { background: linear-gradient(160deg, #EDE5DC 0%, #E4D9CE 100%); }
+  .phone-b .photo-inner { background: linear-gradient(160deg, #DDD5C8 0%, #D5CBBC 100%); }
+
+  .photo-initials {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 28px; font-weight: 200;
+    color: rgba(196,99,58,0.50);
+    letter-spacing: 0.04em;
+  }
+  .photo-play {
+    position: absolute; bottom: 4px; right: 4px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #C4633A;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; padding-left: 1px; z-index: 20;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(196,99,58,0.35);
+  }
+
+  /* ─────────────────────────────────────────────
+     IDENTITY
+  ───────────────────────────────────────────── */
+  .identity {
+    text-align: center; padding: 20px 24px 0;
+    position: relative; z-index: 10;
+  }
+  .trainer-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 34px; font-weight: 200;
+    letter-spacing: 0.025em;
+    color: #1A1411;
+    line-height: 1.1; margin-bottom: 10px;
+  }
+  .trainer-sub {
+    font-size: 11px; font-weight: 400;
+    color: #A89589;
+    letter-spacing: 0.08em;
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; flex-wrap: wrap;
+  }
+  .trainer-sep { color: #D4C8BE; }
+  .trainer-verified {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: #C4633A;
+  }
+  .trainer-location {
+    font-size: 11px; font-weight: 300;
+    color: #C8BDB5; margin-top: 5px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─────────────────────────────────────────────
+     QUOTE
+  ───────────────────────────────────────────── */
+  .quote {
+    font-size: 13px; font-weight: 300;
+    line-height: 1.80;
+    color: #9A8880;
+    text-align: center;
+    padding: 18px 38px 0;
+    position: relative; z-index: 10;
+  }
+
+  /* ─────────────────────────────────────────────
+     STATS
+  ───────────────────────────────────────────── */
+  .stats {
+    display: flex; justify-content: center;
+    padding: 26px 20px 0; position: relative; z-index: 10;
+  }
+  .stat { flex: 1; text-align: center; position: relative; }
+  .stat + .stat::before {
+    content: ''; position: absolute; left: 0; top: 50%;
+    transform: translateY(-50%); height: 20px; width: 1px;
+    background: rgba(90,65,50,0.10);
+  }
+  .stat-val {
+    font-size: 20px; font-weight: 300;
+    color: #2A1E18; letter-spacing: -0.5px; line-height: 1;
+  }
+  .stat-lbl {
+    font-size: 9px; font-weight: 500;
+    color: #B8A89E;
+    text-transform: uppercase; letter-spacing: 0.16em; margin-top: 4px;
+  }
+
+  /* ─────────────────────────────────────────────
+     AVAILABILITY
+  ───────────────────────────────────────────── */
+  .avail {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 20px 24px 0;
+    font-size: 12px; font-weight: 300;
+    color: #A89589; position: relative; z-index: 10;
+  }
+  .avail-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(60,170,90,0.80);
+    box-shadow: 0 0 6px rgba(60,170,90,0.30);
+    flex-shrink: 0;
+  }
+  .avail strong { color: #5A4840; font-weight: 500; }
+
+  /* ─────────────────────────────────────────────
+     BUTTONS
+  ───────────────────────────────────────────── */
+  .ctas { padding: 24px 20px 0; display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 10; }
+  .btn {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 15px 20px;
+    border-radius: 12px; font-size: 14px;
+    cursor: pointer; border: none;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.01em;
+  }
+  /* Primary: terracotta */
+  .btn-primary {
+    background: #C4633A;
+    color: #fff; font-weight: 500;
+    box-shadow: 0 4px 20px rgba(196,99,58,0.22);
+  }
+  /* Secondary: ghost */
+  .btn-secondary {
+    background: transparent;
+    color: #7A6055;
+    border: 1px solid rgba(90,65,50,0.14);
+    font-weight: 300;
+  }
+  /* WhatsApp */
+  .btn-wa {
+    background: rgba(60,170,90,0.05);
+    color: rgba(40,150,75,0.80);
+    border: 1px solid rgba(60,170,90,0.14);
+    font-size: 13px; font-weight: 300;
+  }
+
+  /* ─────────────────────────────────────────────
+     DIVIDER
+  ───────────────────────────────────────────── */
+  .rule { margin: 28px 24px 0; height: 1px; background: rgba(90,65,50,0.07); position: relative; z-index: 10; }
+
+  /* ─────────────────────────────────────────────
+     MATCH CARD
+  ───────────────────────────────────────────── */
+  .match {
+    margin: 24px 20px 0; padding: 18px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(90,65,50,0.10);
+    position: relative; z-index: 10;
+  }
+  .phone-a .match { background: rgba(196,99,58,0.04); }
+  .phone-b .match { background: rgba(196,99,58,0.05); }
+  .match-label {
+    font-size: 9px; font-weight: 500; letter-spacing: 0.14em;
+    text-transform: uppercase; color: #C4633A; opacity: 0.70;
+    margin-bottom: 8px;
+  }
+  .match-body { font-size: 13px; font-weight: 300; color: #8A7568; line-height: 1.65; }
+  .match-body strong { color: #4A3528; font-weight: 500; }
+
+  /* ─────────────────────────────────────────────
+     METHODOLOGY
+  ───────────────────────────────────────────── */
+  .method { padding: 24px 24px 0; position: relative; z-index: 10; }
+  .method-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px; font-weight: 200;
+    color: #2A1E18; margin-bottom: 6px; letter-spacing: 0.02em;
+  }
+  .method-tm {
+    font-size: 8px; font-weight: 500;
+    color: #A89589; letter-spacing: 0.06em;
+    vertical-align: super; margin-left: 2px;
+  }
+  .method-desc { font-size: 12px; font-weight: 300; color: #9A8578; line-height: 1.65; margin-bottom: 12px; }
+  .method-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .method-pill {
+    font-size: 10px; font-weight: 400;
+    color: #8A7568; padding: 5px 11px;
+    border-radius: 6px;
+    border: 1px solid rgba(90,65,50,0.12);
+    letter-spacing: 0.04em;
+  }
+
+  /* ─────────────────────────────────────────────
+     RESULTS
+  ───────────────────────────────────────────── */
+  .results { padding: 24px 0 0; overflow: hidden; position: relative; z-index: 10; }
+  .results-scroll {
+    display: flex; overflow-x: auto;
+    padding: 0 20px 4px; scrollbar-width: none;
+  }
+  .results-scroll::-webkit-scrollbar { display: none; }
+  .result {
+    flex-shrink: 0; width: 140px; padding: 16px;
+    border-radius: 14px; margin-right: 9px;
+    border: 1px solid rgba(90,65,50,0.09);
+  }
+  .phone-a .result { background: rgba(255,255,255,0.65); }
+  .phone-b .result { background: rgba(240,234,226,0.60); }
+  .result:last-child { margin-right: 0; }
+  .result-metric {
+    font-size: 24px; font-weight: 300;
+    color: #C4633A;
+    letter-spacing: -1.5px; line-height: 1; margin-bottom: 4px;
+  }
+  .result-desc { font-size: 11px; font-weight: 300; color: #9A8578; line-height: 1.4; margin-bottom: 10px; }
+  .result-client { font-size: 9px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #C4B8B0; }
+
+  /* ─────────────────────────────────────────────
+     PACKAGES
+  ───────────────────────────────────────────── */
+  .packages { padding: 24px 24px 0; position: relative; z-index: 10; }
+  .pkg {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 14px 0; border-bottom: 1px solid rgba(90,65,50,0.07);
+    cursor: pointer;
+  }
+  .pkg:last-child { border-bottom: none; }
+  .pkg-name { font-size: 14px; font-weight: 300; color: #7A6055; }
+  .pkg-detail { font-size: 11px; font-weight: 300; color: #B8A898; margin-top: 2px; }
+  .pkg-price { font-size: 13px; font-weight: 400; color: #9A8880; text-align: right; flex-shrink: 0; margin-left: 12px; }
+  .pkg-price.enquiry { color: #C4633A; font-size: 11px; letter-spacing: 0.05em; }
+  .pkg.featured .pkg-name { font-weight: 500; color: #2A1E18; }
+  .pkg.featured .pkg-price { color: #5A4840; font-weight: 500; }
+
+  .spacer { height: 48px; }
+
+  /* ─────────────────────────────────────────────
+     NOTES PANEL
+  ───────────────────────────────────────────── */
+  .notes { width: 260px; padding-top: 60px; flex-shrink: 0; }
+  .notes-title {
+    font-size: 9px; font-weight: 500; letter-spacing: 0.16em;
+    text-transform: uppercase; color: #8A7A70; margin-bottom: 24px;
+  }
+  .note { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #D8D0C8; }
+  .note:last-child { border-bottom: none; }
+  .note-tag {
+    display: inline-block; font-size: 8px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: #C4633A; opacity: 0.8; margin-bottom: 5px;
+  }
+  .note-text { font-size: 12px; color: #8A7A70; line-height: 1.55; }
+  .note-text strong { color: #5A4840; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     PHONE A — Warm off-white  #F8F4EF
+═══════════════════════════════════════════════════════ -->
+<div class="col">
+  <div class="phone-label">Warm off-white  #F8F4EF</div>
+  <div class="phone phone-a">
+    <div class="notch"></div>
+
+    <div class="hero">
+      <div class="hero-atm-a"></div>
+      <div class="hero-grain"></div>
+
+      <div class="status">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 17 12"><rect x="0" y="6" width="3" height="6" rx="1"/><rect x="4.5" y="4" width="3" height="8" rx="1"/><rect x="9" y="2" width="3" height="10" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg>
+          <svg viewBox="0 0 16 12"><path d="M8 10.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/><path d="M4.5 7.5a5 5 0 017 0" stroke="#1A1411" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M1.5 4.5a9 9 0 0113 0" stroke="#1A1411" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 25 12"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#1A1411" stroke-width="1.3" fill="none"/><rect x="1.5" y="2.5" width="17" height="7" rx="2" fill="#1A1411"/><path d="M22.5 4.5v3" stroke="#1A1411" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <div class="nav">
+        <div class="nav-btn">←</div>
+        <div class="nav-wordmark">TrainedBy</div>
+        <div class="nav-btn">↗</div>
+      </div>
+
+      <!-- Contour arcs — terracotta tint, barely visible -->
+      <div class="arc">
+        <svg viewBox="0 0 375 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+          <circle cx="-55" cy="-25" r="240" fill="none" stroke="rgba(196,99,58,0.09)" stroke-width="0.65"/>
+          <circle cx="-55" cy="-25" r="305" fill="none" stroke="rgba(196,99,58,0.06)" stroke-width="0.65"/>
+          <circle cx="-55" cy="-25" r="375" fill="none" stroke="rgba(196,99,58,0.04)" stroke-width="0.65"/>
+        </svg>
+      </div>
+
+      <div class="photo-wrap">
+        <div class="photo-ring">
+          <div class="photo-inner">
+            <div class="photo-initials">JC</div>
+          </div>
+        </div>
+        <div class="photo-play">▶</div>
+      </div>
+    </div>
+
+    <div class="identity">
+      <div class="trainer-name">James Crawford</div>
+      <div class="trainer-sub">
+        <span>NASM</span><span class="trainer-sep">·</span>
+        <span>ISSA</span><span class="trainer-sep">·</span>
+        <span class="trainer-verified">✦ Verified</span>
+      </div>
+      <div class="trainer-location">Dubai Marina, UAE</div>
+    </div>
+
+    <div class="quote">
+      Every client who walked through my door came with a goal.<br>Every one who stayed built a standard.
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-val">12 yrs</div><div class="stat-lbl">Experience</div></div>
+      <div class="stat"><div class="stat-val">340+</div><div class="stat-lbl">Clients</div></div>
+      <div class="stat"><div class="stat-val">4.9</div><div class="stat-lbl">Rating</div></div>
+    </div>
+
+    <div class="avail">
+      <div class="avail-dot"></div>
+      <span><strong>2 slots remaining</strong> this week · Tue 7am next</span>
+    </div>
+
+    <div class="ctas">
+      <button class="btn btn-primary">Request a Consultation</button>
+      <button class="btn btn-secondary">View Programmes &amp; Pricing</button>
+      <button class="btn btn-wa">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Connect on WhatsApp
+      </button>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="match">
+      <div class="match-label">Why this trainer fits your goals</div>
+      <div class="match-body">
+        You want to <strong>lose 8kg and build lean muscle</strong>. James specialises in body recomposition for active professionals — 47 documented transformations in 18 months.
+      </div>
+    </div>
+
+    <div class="method">
+      <div class="method-name">The Foundation Method<span class="method-tm">TM</span></div>
+      <div class="method-desc">A structured 3-phase approach: movement audit, progressive overload, and habit architecture for long-term performance.</div>
+      <div class="method-pills">
+        <span class="method-pill">Movement Audit</span>
+        <span class="method-pill">Load Progression</span>
+        <span class="method-pill">Habit Architecture</span>
+      </div>
+    </div>
+
+    <div class="results">
+      <div class="results-scroll">
+        <div class="result"><div class="result-metric">−14kg</div><div class="result-desc">Body recomposition, 16 weeks</div><div class="result-client">Sarah M. · Lean Athlete</div></div>
+        <div class="result"><div class="result-metric">+32%</div><div class="result-desc">Deadlift 1-rep max increase</div><div class="result-client">David K. · Strength Base</div></div>
+        <div class="result"><div class="result-metric">8 wks</div><div class="result-desc">Marathon prep, first-time finish</div><div class="result-client">Aisha R. · Endurance</div></div>
+      </div>
+    </div>
+
+    <div class="packages">
+      <div class="pkg"><div><div class="pkg-name">Fundamentals</div><div class="pkg-detail">8 sessions · assessment included</div></div><div class="pkg-price">From AED 2,400</div></div>
+      <div class="pkg featured"><div><div class="pkg-name">Transformation</div><div class="pkg-detail">16 weeks · nutrition included</div></div><div class="pkg-price">From AED 5,800</div></div>
+      <div class="pkg"><div><div class="pkg-name">Elite Performance</div><div class="pkg-detail">Athletes &amp; executives</div></div><div class="pkg-price enquiry">On enquiry</div></div>
+    </div>
+    <div class="spacer"></div>
+  </div>
+</div><!-- /col A -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PHONE B — Parchment/Stone  #EDE7DE
+═══════════════════════════════════════════════════════ -->
+<div class="col">
+  <div class="phone-label">Parchment / stone  #EDE7DE</div>
+  <div class="phone phone-b">
+    <div class="notch"></div>
+
+    <div class="hero">
+      <div class="hero-atm-b"></div>
+      <div class="hero-grain"></div>
+
+      <div class="status">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 17 12"><rect x="0" y="6" width="3" height="6" rx="1"/><rect x="4.5" y="4" width="3" height="8" rx="1"/><rect x="9" y="2" width="3" height="10" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg>
+          <svg viewBox="0 0 16 12"><path d="M8 10.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/><path d="M4.5 7.5a5 5 0 017 0" stroke="#1A1411" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M1.5 4.5a9 9 0 0113 0" stroke="#1A1411" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 25 12"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#1A1411" stroke-width="1.3" fill="none"/><rect x="1.5" y="2.5" width="17" height="7" rx="2" fill="#1A1411"/><path d="M22.5 4.5v3" stroke="#1A1411" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <div class="nav">
+        <div class="nav-btn">←</div>
+        <div class="nav-wordmark">TrainedBy</div>
+        <div class="nav-btn">↗</div>
+      </div>
+
+      <!-- No arc on parchment — the texture carries it -->
+      <div class="arc" style="height:90px;"></div>
+
+      <div class="photo-wrap">
+        <div class="photo-ring">
+          <div class="photo-inner">
+            <div class="photo-initials">JC</div>
+          </div>
+        </div>
+        <div class="photo-play">▶</div>
+      </div>
+    </div>
+
+    <div class="identity">
+      <div class="trainer-name">James Crawford</div>
+      <div class="trainer-sub">
+        <span>NASM</span><span class="trainer-sep">·</span>
+        <span>ISSA</span><span class="trainer-sep">·</span>
+        <span class="trainer-verified">✦ Verified</span>
+      </div>
+      <div class="trainer-location">Dubai Marina, UAE</div>
+    </div>
+
+    <div class="quote">
+      Every client who walked through my door came with a goal.<br>Every one who stayed built a standard.
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-val">12 yrs</div><div class="stat-lbl">Experience</div></div>
+      <div class="stat"><div class="stat-val">340+</div><div class="stat-lbl">Clients</div></div>
+      <div class="stat"><div class="stat-val">4.9</div><div class="stat-lbl">Rating</div></div>
+    </div>
+
+    <div class="avail">
+      <div class="avail-dot"></div>
+      <span><strong>2 slots remaining</strong> this week · Tue 7am next</span>
+    </div>
+
+    <div class="ctas">
+      <button class="btn btn-primary">Request a Consultation</button>
+      <button class="btn btn-secondary">View Programmes &amp; Pricing</button>
+      <button class="btn btn-wa">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Connect on WhatsApp
+      </button>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="match">
+      <div class="match-label">Why this trainer fits your goals</div>
+      <div class="match-body">
+        You want to <strong>lose 8kg and build lean muscle</strong>. James specialises in body recomposition for active professionals — 47 documented transformations in 18 months.
+      </div>
+    </div>
+
+    <div class="method">
+      <div class="method-name">The Foundation Method<span class="method-tm">TM</span></div>
+      <div class="method-desc">A structured 3-phase approach: movement audit, progressive overload, and habit architecture for long-term performance.</div>
+      <div class="method-pills">
+        <span class="method-pill">Movement Audit</span>
+        <span class="method-pill">Load Progression</span>
+        <span class="method-pill">Habit Architecture</span>
+      </div>
+    </div>
+
+    <div class="results">
+      <div class="results-scroll">
+        <div class="result"><div class="result-metric">−14kg</div><div class="result-desc">Body recomposition, 16 weeks</div><div class="result-client">Sarah M. · Lean Athlete</div></div>
+        <div class="result"><div class="result-metric">+32%</div><div class="result-desc">Deadlift 1-rep max increase</div><div class="result-client">David K. · Strength Base</div></div>
+        <div class="result"><div class="result-metric">8 wks</div><div class="result-desc">Marathon prep, first-time finish</div><div class="result-client">Aisha R. · Endurance</div></div>
+      </div>
+    </div>
+
+    <div class="packages">
+      <div class="pkg"><div><div class="pkg-name">Fundamentals</div><div class="pkg-detail">8 sessions · assessment included</div></div><div class="pkg-price">From AED 2,400</div></div>
+      <div class="pkg featured"><div><div class="pkg-name">Transformation</div><div class="pkg-detail">16 weeks · nutrition included</div></div><div class="pkg-price">From AED 5,800</div></div>
+      <div class="pkg"><div><div class="pkg-name">Elite Performance</div><div class="pkg-detail">Athletes &amp; executives</div></div><div class="pkg-price enquiry">On enquiry</div></div>
+    </div>
+    <div class="spacer"></div>
+  </div>
+</div><!-- /col B -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     NOTES
+═══════════════════════════════════════════════════════ -->
+<div class="notes">
+  <div class="notes-title">Light direction — rationale</div>
+
+  <div class="note">
+    <div class="note-tag">Why light</div>
+    <div class="note-text"><strong>Dark-on-dark = 2019 fitness app.</strong> Every premium gym app went dark. White requires more design discipline — which is why it reads fresher. Equinox's physical spaces are white walls. Apple Fitness+, Headspace, Arc'teryx — all light.</div>
+  </div>
+
+  <div class="note">
+    <div class="note-tag">Off-white vs pure white</div>
+    <div class="note-text"><strong>Pure #FFFFFF feels digital and sterile.</strong> A warm off-white (#F8F4EF) or parchment (#EDE7DE) feels considered — like quality paper. The warmth in the background harmonises with terracotta without competing.</div>
+  </div>
+
+  <div class="note">
+    <div class="note-tag">Terracotta button</div>
+    <div class="note-text">On a dark background, terracotta had to fight for space. <strong>On off-white, it lands with authority.</strong> The primary CTA is the only saturated element on the page — everything else recedes. That hierarchy is automatic.</div>
+  </div>
+
+  <div class="note">
+    <div class="note-tag">Background mark</div>
+    <div class="note-text"><strong>Left phone: contour arcs</strong> in terracotta at 4–9% — barely there, like a pressed pattern in heavy paper.<br><br><strong>Right phone: nothing</strong> — parchment tone carries it alone. The grain texture adds depth without a decorative mark.</div>
+  </div>
+
+  <div class="note">
+    <div class="note-tag">Photos</div>
+    <div class="note-text">Once real photos go in, <strong>light backgrounds will make them pop far more naturally</strong> than dark. Dark requires very specific high-contrast photography. Light works with everything.</div>
+  </div>
+</div>
+
+</body>
+</html>

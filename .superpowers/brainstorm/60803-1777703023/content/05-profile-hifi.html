@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrainedBy — Profile Hi-Fi</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  /* ─── CANVAS ───────────────────────────────── */
+  body {
+    background: #0a0a0a;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    gap: 60px;
+    padding: 40px 40px 80px;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  /* ─── PHONE SHELL ───────────────────────────── */
+  .phone {
+    width: 375px;
+    min-height: 812px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px #222,
+      0 0 0 8px #111,
+      0 0 60px rgba(0,0,0,0.8),
+      0 30px 80px rgba(0,0,0,0.6);
+    flex-shrink: 0;
+    background: #0d0d0d;
+  }
+
+  /* Notch */
+  .phone-notch {
+    position: absolute;
+    top: 14px; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 34px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+  }
+
+  /* ─── STATUS BAR ────────────────────────────── */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    position: relative;
+    z-index: 10;
+    height: 44px;
+  }
+  .status-time { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+  .status-icons { display: flex; gap: 6px; align-items: center; }
+  .status-icons svg { width: 16px; height: 16px; fill: #fff; }
+
+  /* ─── NAV BAR ───────────────────────────────── */
+  .nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px 12px;
+    position: relative;
+    z-index: 10;
+  }
+  .nav-back {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .nav-logo {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #555;
+  }
+  .nav-share {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  /* ─── SVG ARC (TrainedBy brand mark) ────────── */
+  .arc-container {
+    width: 100%;
+    margin-top: 0;
+    position: relative;
+    z-index: 5;
+    height: 160px;
+    overflow: hidden;
+  }
+  .arc-container svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: absolute;
+    inset: 0;
+  }
+
+  /* ─── HERO SECTION ──────────────────────────── */
+  .hero {
+    position: relative;
+    padding: 0 20px 0;
+    margin-top: -60px;
+    z-index: 10;
+  }
+
+  /* Ambient glow behind the photo */
+  .hero-glow {
+    position: absolute;
+    top: -40px; left: 50%;
+    transform: translateX(-50%);
+    width: 280px; height: 280px;
+    background: radial-gradient(ellipse at center, rgba(212,98,42,0.18) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── VERIFIED BAR ──────────────────────────── */
+  .verified-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #D4622A;
+    margin-bottom: 18px;
+    position: relative; z-index: 10;
+  }
+  .verified-dot {
+    width: 4px; height: 4px;
+    background: #D4622A;
+    border-radius: 50%;
+  }
+
+  /* ─── PHOTO RING ────────────────────────────── */
+  .photo-ring-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+    position: relative; z-index: 10;
+  }
+
+  .photo-ring {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    padding: 3px;
+    background: conic-gradient(
+      #D4622A 0deg,
+      #ff9c5a 90deg,
+      rgba(212,98,42,0.18) 180deg,
+      rgba(212,98,42,0.06) 260deg,
+      #D4622A 360deg
+    );
+    position: relative;
+    cursor: pointer;
+  }
+  .photo-ring-inner {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #1a1a1a;
+    position: relative;
+  }
+  .photo-ring-inner img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Placeholder avatar */
+  .avatar-placeholder {
+    width: 100%; height: 100%;
+    background: linear-gradient(160deg, #2a1a0e 0%, #1a0e06 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: 700;
+    color: rgba(212,98,42,0.6);
+    font-family: Georgia, serif;
+    letter-spacing: -1px;
+  }
+
+  /* Video ring animation — Cameo-style */
+  .photo-ring.has-video {
+    animation: spin-ring 8s linear infinite;
+  }
+  @keyframes spin-ring {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .photo-ring.has-video .photo-ring-inner {
+    animation: spin-ring 8s linear infinite reverse;
+  }
+
+  /* Play icon overlay */
+  .video-play {
+    position: absolute;
+    bottom: 2px; right: 2px;
+    width: 22px; height: 22px;
+    background: #D4622A;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 20;
+    font-size: 8px;
+    padding-left: 2px;
+  }
+
+  /* ─── TRAINER NAME ──────────────────────────── */
+  .trainer-name {
+    text-align: center;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: -0.8px;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 6px;
+    position: relative; z-index: 10;
+  }
+  .trainer-name .name-underline {
+    display: inline-block;
+    position: relative;
+  }
+  .trainer-name .name-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; left: 0; right: 0;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, #D4622A 30%, #ff9c5a 70%, transparent);
+  }
+
+  /* ─── SPECIALTY LINE ────────────────────────── */
+  .trainer-specialty {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+    position: relative; z-index: 10;
+  }
+  .trainer-specialty strong { color: #999; font-weight: 500; }
+
+  /* ─── LOCATION ──────────────────────────────── */
+  .trainer-location {
+    text-align: center;
+    font-size: 11px;
+    color: #444;
+    margin-bottom: 20px;
+    position: relative; z-index: 10;
+  }
+  .trainer-location span { color: #D4622A; font-size: 10px; }
+
+  /* ─── PERSONAL QUOTE ────────────────────────── */
+  .trainer-quote {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #777;
+    text-align: center;
+    padding: 0 12px;
+    margin-bottom: 20px;
+    position: relative; z-index: 10;
+    quotes: "\201C" "\201D";
+  }
+  .trainer-quote::before { content: open-quote; color: #D4622A; font-size: 20px; line-height: 0; vertical-align: -6px; }
+  .trainer-quote::after  { content: close-quote; color: #D4622A; font-size: 20px; line-height: 0; vertical-align: -6px; }
+
+  /* ─── STATS ROW ─────────────────────────────── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr 1px 1fr;
+    margin: 0 0 22px;
+    padding: 14px 12px;
+    border: 1px solid #1e1e1e;
+    border-radius: 12px;
+    background: #0f0f0f;
+    position: relative; z-index: 10;
+  }
+  .stats-divider { background: #1e1e1e; height: 100%; }
+  .stat {
+    text-align: center;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .stat-value {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .stat-label {
+    font-size: 9px;
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── AVAILABILITY (Luxury Hotel-style) ─────── */
+  .availability-banner {
+    background: rgba(212,98,42,0.08);
+    border: 1px solid rgba(212,98,42,0.18);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative; z-index: 10;
+    cursor: pointer;
+  }
+  .avail-left {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .avail-indicator {
+    width: 8px; height: 8px;
+    background: #4caf50;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px rgba(76,175,80,0.4);
+  }
+  .avail-text {
+    font-size: 11px;
+    color: #aaa;
+    line-height: 1.3;
+  }
+  .avail-text strong { color: #fff; display: block; font-size: 12px; }
+  .avail-cta {
+    font-size: 10px;
+    font-weight: 600;
+    color: #D4622A;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  /* ─── CTA BUTTONS ───────────────────────────── */
+  .cta-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+    position: relative; z-index: 10;
+  }
+  .btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 20px;
+    background: #D4622A;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.92; }
+
+  .btn-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 20px;
+    background: transparent;
+    color: #fff;
+    border: 1px solid #222;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .btn-secondary:hover { border-color: #333; }
+
+  .btn-whatsapp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 20px;
+    background: rgba(37,211,102,0.08);
+    color: #25d366;
+    border: 1px solid rgba(37,211,102,0.18);
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* WhatsApp icon */
+  .wa-icon { font-size: 16px; }
+
+  /* ─── METHODOLOGY SECTION ───────────────────── */
+  .section-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #333;
+    margin-bottom: 10px;
+    position: relative; z-index: 10;
+  }
+
+  .methodology-card {
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 18px;
+    background: #0d0d0d;
+    position: relative; z-index: 10;
+  }
+  .method-name {
+    font-family: Georgia, serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: #fff;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .method-tm {
+    font-size: 9px;
+    color: #D4622A;
+    font-family: -apple-system, sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    position: relative;
+    top: -6px;
+  }
+  .method-desc {
+    font-size: 12px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .method-pillars {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .method-pill {
+    padding: 3px 10px;
+    border: 1px solid #1e1e1e;
+    border-radius: 20px;
+    font-size: 10px;
+    color: #555;
+  }
+
+  /* ─── RESULT CARDS (Contra-style) ───────────── */
+  .results-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    margin-bottom: 20px;
+    position: relative; z-index: 10;
+  }
+  .results-scroll::-webkit-scrollbar { display: none; }
+  .result-card {
+    flex-shrink: 0;
+    width: 150px;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    padding: 14px;
+    background: #0d0d0d;
+  }
+  .result-metric {
+    font-size: 22px;
+    font-weight: 700;
+    color: #D4622A;
+    letter-spacing: -1px;
+    margin-bottom: 2px;
+  }
+  .result-desc {
+    font-size: 10px;
+    color: #555;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .result-client {
+    font-size: 9px;
+    color: #333;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .result-programme {
+    font-size: 9px;
+    color: #2a2a2a;
+    margin-top: 1px;
+  }
+
+  /* ─── PACKAGES (Private Banking-style) ──────── */
+  .packages-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 28px;
+    position: relative; z-index: 10;
+  }
+  .package-row {
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    background: #0d0d0d;
+  }
+  .package-row:hover { border-color: #2a2a2a; }
+  .package-row.featured {
+    border-color: rgba(212,98,42,0.3);
+    background: rgba(212,98,42,0.04);
+  }
+  .pkg-left {}
+  .pkg-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #ddd;
+    margin-bottom: 2px;
+  }
+  .pkg-desc {
+    font-size: 10px;
+    color: #444;
+  }
+  .pkg-right { text-align: right; }
+  .pkg-price {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .pkg-price.enquiry {
+    font-size: 11px;
+    color: #D4622A;
+    letter-spacing: 0.04em;
+  }
+  .pkg-period {
+    font-size: 10px;
+    color: #444;
+  }
+  .pkg-badge {
+    display: inline-block;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #D4622A;
+    border: 1px solid rgba(212,98,42,0.3);
+    border-radius: 4px;
+    padding: 2px 5px;
+    margin-bottom: 3px;
+  }
+
+  /* ─── MATCH CARD (Soho House-style) ─────────── */
+  .match-card {
+    background: linear-gradient(135deg, rgba(212,98,42,0.08), rgba(0,0,0,0));
+    border: 1px solid rgba(212,98,42,0.15);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    position: relative; z-index: 10;
+  }
+  .match-header {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #D4622A;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .match-header::before {
+    content: '';
+    display: block;
+    width: 16px; height: 1px;
+    background: #D4622A;
+  }
+  .match-text {
+    font-size: 13px;
+    color: #888;
+    line-height: 1.6;
+  }
+  .match-text strong { color: #ccc; }
+
+  /* ─── GRAIN OVERLAY ─────────────────────────── */
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.025;
+  }
+
+  /* ─── SIDE ANNOTATIONS ──────────────────────── */
+  .annotations {
+    flex: 1;
+    max-width: 320px;
+    padding-top: 60px;
+  }
+  .ann-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  .ann-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #111;
+    cursor: default;
+  }
+  .ann-item:last-child { border-bottom: none; }
+  .ann-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #D4622A;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .ann-body {}
+  .ann-from {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #D4622A;
+    margin-bottom: 3px;
+  }
+  .ann-what {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.5;
+  }
+  .ann-what strong { color: #ccc; }
+</style>
+</head>
+<body>
+
+<!-- Grain overlay -->
+<svg class="grain-overlay" xmlns="http://www.w3.org/2000/svg">
+  <filter id="grain">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+  <rect width="100%" height="100%" filter="url(#grain)"/>
+</svg>
+
+<!-- ═══ PHONE ═══════════════════════════════════════ -->
+<div class="phone">
+  <div class="phone-notch"></div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <!-- Signal -->
+      <svg viewBox="0 0 17 12"><rect x="0" y="6" width="3" height="6" rx="1"/><rect x="4.5" y="4" width="3" height="8" rx="1"/><rect x="9" y="2" width="3" height="10" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg>
+      <!-- WiFi -->
+      <svg viewBox="0 0 16 12"><path d="M8 10.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/><path d="M4.5 7.5a5 5 0 017 0" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M1.5 4.5a9 9 0 0113 0" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      <!-- Battery -->
+      <svg viewBox="0 0 25 12"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#fff" stroke-width="1.3" fill="none"/><rect x="1.5" y="2.5" width="17" height="7" rx="2" fill="#fff"/><path d="M22.5 4.5v3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <div class="nav-bar">
+    <div class="nav-back">←</div>
+    <div class="nav-logo">TrainedBy</div>
+    <div class="nav-share">↗</div>
+  </div>
+
+  <!-- Arc brand mark — banksy sweep -->
+  <div class="arc-container">
+    <!-- Grain texture layer -->
+    <div style="position:absolute;inset:0;opacity:0.04;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');z-index:1;"></div>
+    <!-- Ambient glow -->
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 90% at 60% 0%,rgba(212,98,42,0.22) 0%,transparent 70%);z-index:1;"></div>
+    <svg viewBox="0 0 375 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
+      <defs>
+        <linearGradient id="ag1" x1="-20" y1="160" x2="390" y2="-10" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="rgba(212,98,42,0)"/>
+          <stop offset="35%" stop-color="rgba(212,98,42,0.18)"/>
+          <stop offset="70%" stop-color="rgba(212,98,42,0.55)"/>
+          <stop offset="100%" stop-color="#D4622A"/>
+        </linearGradient>
+      </defs>
+      <!-- Wide gradient body of the arc -->
+      <path d="M -20 160 Q 100 100 200 52 Q 290 12 390 -8"
+            stroke="url(#ag1)" stroke-width="52" fill="none" stroke-linecap="butt"/>
+      <!-- Dark shadow overlay for depth -->
+      <path d="M -20 160 Q 100 100 200 52 Q 290 12 390 -8"
+            stroke="rgba(13,13,13,0.55)" stroke-width="30" fill="none" stroke-linecap="butt"/>
+      <!-- Bright edge line -->
+      <path d="M -20 160 Q 100 100 200 52 Q 290 12 390 -8"
+            stroke="rgba(212,98,42,0.75)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <!-- Paint-splatter dots at the tip — the "banksy" signature -->
+      <circle cx="348" cy="8"  r="10"  fill="rgba(212,98,42,0.94)"/>
+      <circle cx="330" cy="20" r="8"   fill="rgba(212,98,42,0.86)"/>
+      <circle cx="362" cy="0"  r="7"   fill="rgba(232,120,52,0.9)"/>
+      <circle cx="338" cy="-2" r="5.5" fill="rgba(212,98,42,0.72)"/>
+      <circle cx="316" cy="14" r="4.5" fill="rgba(212,98,42,0.56)"/>
+      <circle cx="326" cy="2"  r="3.5" fill="rgba(212,98,42,0.42)"/>
+      <circle cx="370" cy="12" r="2.5" fill="rgba(212,98,42,0.35)"/>
+      <circle cx="308" cy="26" r="2"   fill="rgba(212,98,42,0.28)"/>
+    </svg>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-glow"></div>
+
+    <!-- Photo ring -->
+    <div class="photo-ring-wrap">
+      <div class="photo-ring has-video">
+        <div class="photo-ring-inner">
+          <div class="avatar-placeholder">JC</div>
+        </div>
+      </div>
+      <div class="video-play">▶</div>
+    </div>
+
+    <!-- Name -->
+    <div class="trainer-name">
+      <span class="name-underline">James Crawford</span>
+    </div>
+    <div class="trainer-specialty"><strong>Strength &amp; Athletic Performance</strong> · NASM · ISSA · <span style="color:#D4622A;font-size:10px;font-weight:600;letter-spacing:0.05em;">✦ Verified</span></div>
+    <div class="trainer-location"><span>◆</span> Dubai Marina, UAE</div>
+
+    <!-- Quote -->
+    <div class="trainer-quote">
+      Every client who walked through my door came with a goal. Every one who stayed built a standard.
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-value">12 yrs</div>
+        <div class="stat-label">Experience</div>
+      </div>
+      <div class="stats-divider"></div>
+      <div class="stat">
+        <div class="stat-value">340+</div>
+        <div class="stat-label">Clients</div>
+      </div>
+      <div class="stats-divider"></div>
+      <div class="stat">
+        <div class="stat-value">4.9</div>
+        <div class="stat-label">Rating</div>
+      </div>
+    </div>
+
+    <!-- Availability -->
+    <div class="availability-banner">
+      <div class="avail-left">
+        <div class="avail-indicator"></div>
+        <div class="avail-text">
+          <strong>2 slots remaining this week</strong>
+          Next available: Tuesday 7am
+        </div>
+      </div>
+      <div class="avail-cta">Book →</div>
+    </div>
+
+    <!-- CTAs -->
+    <div class="cta-stack">
+      <button class="btn-primary">Request a Consultation</button>
+      <button class="btn-secondary">View Programmes &amp; Pricing</button>
+      <button class="btn-whatsapp">
+        <span class="wa-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </span>
+        Connect on WhatsApp
+      </button>
+    </div>
+
+    <!-- Match card -->
+    <div class="match-card">
+      <div class="match-header">Why this trainer fits your goals</div>
+      <div class="match-text">
+        You want to <strong>lose 8kg and build lean muscle</strong>. James specialises in body recomposition for active professionals, with 47 documented transformations in the last 18 months.
+      </div>
+    </div>
+
+    <!-- Methodology -->
+    <div class="section-label">Methodology</div>
+    <div class="methodology-card">
+      <div class="method-name">
+        The Foundation Method
+        <span class="method-tm">TM</span>
+      </div>
+      <div class="method-desc">A structured 3-phase approach to athletic performance: build the base, introduce load progression, then optimise for long-term maintenance.</div>
+      <div class="method-pillars">
+        <span class="method-pill">Movement Audit</span>
+        <span class="method-pill">Load Progression</span>
+        <span class="method-pill">Habit Architecture</span>
+      </div>
+    </div>
+
+    <!-- Client results -->
+    <div class="section-label">Client Results</div>
+    <div class="results-scroll">
+      <div class="result-card">
+        <div class="result-metric">−14kg</div>
+        <div class="result-desc">Body recomposition over 16 weeks</div>
+        <div class="result-client">Sarah M.</div>
+        <div class="result-programme">Lean Athlete · 2024</div>
+      </div>
+      <div class="result-card">
+        <div class="result-metric">+32%</div>
+        <div class="result-desc">Increase in deadlift 1-rep max</div>
+        <div class="result-client">David K.</div>
+        <div class="result-programme">Strength Base · 2024</div>
+      </div>
+      <div class="result-card">
+        <div class="result-metric">8 wks</div>
+        <div class="result-desc">Marathon prep, first-time finisher</div>
+        <div class="result-client">Aisha R.</div>
+        <div class="result-programme">Endurance · 2025</div>
+      </div>
+      <div class="result-card">
+        <div class="result-metric">−9%</div>
+        <div class="result-desc">Body fat reduction, no muscle loss</div>
+        <div class="result-client">Tom H.</div>
+        <div class="result-programme">Recomposition · 2025</div>
+      </div>
+    </div>
+
+    <!-- Packages -->
+    <div class="section-label">Programmes</div>
+    <div class="packages-stack">
+      <div class="package-row">
+        <div class="pkg-left">
+          <div class="pkg-name">Fundamentals</div>
+          <div class="pkg-desc">8 sessions · assessment included</div>
+        </div>
+        <div class="pkg-right">
+          <div class="pkg-price">From AED 2,400</div>
+          <div class="pkg-period">per month</div>
+        </div>
+      </div>
+      <div class="package-row featured">
+        <div class="pkg-left">
+          <div class="pkg-badge">Most Popular</div>
+          <div class="pkg-name">Transformation</div>
+          <div class="pkg-desc">16 weeks · nutrition included</div>
+        </div>
+        <div class="pkg-right">
+          <div class="pkg-price">From AED 5,800</div>
+          <div class="pkg-period">per month</div>
+        </div>
+      </div>
+      <div class="package-row">
+        <div class="pkg-left">
+          <div class="pkg-name">Elite Performance</div>
+          <div class="pkg-desc">Elite athletes & executives</div>
+        </div>
+        <div class="pkg-right">
+          <div class="pkg-price enquiry">Pricing on enquiry</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /hero -->
+</div><!-- /phone -->
+
+<!-- ═══ ANNOTATIONS ══════════════════════════════════ -->
+<div class="annotations">
+  <div class="ann-title">What was stolen &amp; from where</div>
+
+  <div class="ann-item">
+    <div class="ann-num">1</div>
+    <div class="ann-body">
+      <div class="ann-from">MasterClass</div>
+      <div class="ann-what"><strong>Serif name + gradient underline.</strong> Signals authority like an instructor, not a service worker.</div>
+    </div>
+  </div>
+
+  <div class="ann-item">
+    <div class="ann-num">2</div>
+    <div class="ann-body">
+      <div class="ann-from">Cameo</div>
+      <div class="ann-what"><strong>Spinning conic ring + video play button.</strong> Makes the photo feel alive. 30-sec intro plays in the circle.</div>
+    </div>
+  </div>
+
+  <div class="ann-item">
+    <div class="ann-num">3</div>
+    <div class="ann-body">
+      <div class="ann-from">Luxury Hotels (Four Seasons)</div>
+      <div class="ann-what"><strong>Live availability banner.</strong> "2 slots remaining this week" + green availability dot. Concierge energy, not SaaS.</div>
+    </div>
+  </div>
+
+  <div class="ann-item">
+    <div class="ann-num">4</div>
+    <div class="ann-body">
+      <div class="ann-from">Equinox</div>
+      <div class="ann-what"><strong>No price in hero. "Request a Consultation" not "Book Now".</strong> Premium brands make you reach, not click.</div>
+    </div>
+  </div>
+
+  <div class="ann-item">
+    <div class="ann-num">5</div>
+    <div class="ann-body">
+      <div class="ann-from">Soho House</div>
+      <div class="ann-what"><strong>"Why this trainer fits your goals"</strong> personalised match card. Feels like a concierge recommendation.</div>
+    </div>
+  </div>
+
+  <div class="ann-item">
+    <div class="ann-num">6</div>
+    <div class="ann-body">
+      <div class="ann-from">Nobody yet — TrainedBy™</div>
+      <div class="ann-what"><strong>Named methodology as IP.</strong> "The Foundation Method™" — turns training into intellectual property, not a commodity.</div>
+    </div>
+  </div>
+
+  <div class="ann-item">
+    <div class="ann-num">7</div>
+    <div class="ann-body">
+      <div class="ann-from">Contra</div>
+      <div class="ann-what"><strong>Result cards as portfolio.</strong> Real client names, measurable outcomes, programme + year. Evidence over testimonials.</div>
+    </div>
+  </div>
+
+  <div class="ann-item">
+    <div class="ann-num">8</div>
+    <div class="ann-body">
+      <div class="ann-from">Private Banking (Julius Baer)</div>
+      <div class="ann-what"><strong>"From AED X" anchor pricing + "Pricing on enquiry" tier.</strong> Top tier stays invisible. Creates aspiration for the premium package.</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

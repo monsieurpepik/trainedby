@@ -1,177 +1,242 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getMarket } from '../lib/market.ts';
-import { SUPABASE_ANON_KEY } from '../lib/config.ts';
-const market = getMarket(Astro.url.hostname);
-const brandName = market.brandName;
-const SUPABASE_KEY = SUPABASE_ANON_KEY;
+const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 ---
 
 <Base
-  title={`Find a Verified Trainer | ${brandName}`}
-  description={`Browse verified personal trainers on ${brandName}. Filter by speciality, location and training mode.`}
+  title="Find a Verified Personal Trainer in UAE | TrainedBy.ae"
+  description="Browse REPs UAE verified personal trainers in Dubai, Abu Dhabi and across the UAE. Filter by speciality, location and training mode."
 >
   <Fragment slot="head">
     <meta name="color-scheme" content="light">
-    <meta name="theme-color" content="#FFFFFF">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
-    <!-- Light theme override — html[data-market] specificity (0,1,0) beats Base.astro :root (0,0,1) regardless of load order -->
-    <style is:inline>
-      html[data-market] {
-        --bg: #FFFFFF;
-        --surface: #FAFAF9;
-        --surface-2: #F5F4F3;
-        --surface-3: #E8E5E2;
-        --text: #1A1411;
-        --text-muted: #6B6460;
-        --border: rgba(0,0,0,0.07);
-        --border-hover: rgba(0,0,0,0.14);
-        --brand: #FF5C00;
-        --brand-dim: rgba(255,92,0,0.08);
-        --brand-border: rgba(255,92,0,0.2);
-        --font-body: 'DM Sans', system-ui, sans-serif;
-        --font-display: 'DM Sans', system-ui, sans-serif;
-        --border-focus: rgba(0,0,0,0.2);
-        --text-on-brand: #ffffff;
-        --text-watermark: rgba(26,20,17,0.08);
-        --reps-badge-bg: rgba(0,200,83,0.12);
-        --reps-badge-border: rgba(0,200,83,0.25);
-        --reps-verified-text: #00A844;
-        --whatsapp: #25D366;
-        --whatsapp-hover: #1db954;
-        --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
-      }
-      html[data-market] { background: #FFFFFF; color: #1A1411; }
-      body { background: #FFFFFF !important; color: #1A1411 !important; font-family: 'DM Sans', system-ui, sans-serif; }
-    </style>
   </Fragment>
 
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+:root {
+  --surface:   #FFFFFF;
+  --surface2:  #F5F4F3;
+  --surface3:  #E8E5E2;
+  --text:      #1A1411;
+  --text-muted: #6B6460;
+  --text-faint: rgba(26,20,17,0.4);
+  --border:    rgba(0,0,0,0.07);
+  --brand:     #FF5C00;
+  --green:     #00C853;
+}
+
+body {
+  background: #F5F4F3;
+  color: #1A1411;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
 
 /* TOP BAR */
-.top-bar{
-  position:sticky;top:0;z-index:100;
-  background:var(--bg);
-  border-bottom:1px solid var(--border);
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
 }
-.top-bar-inner{
-  max-width:960px;margin:0 auto;
-  display:flex;align-items:center;gap:12px;
-  padding:10px 16px;
+.top-bar-logo {
+  font-weight: 800;
+  font-size: 15px;
+  color: #1A1411;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+  flex-shrink: 0;
 }
-.nav-logo{font-size:15px;font-weight:800;letter-spacing:-0.02em;text-decoration:none;color:var(--text);flex-shrink:0}
-.search-wrap{
-  flex:1;position:relative;
+.top-bar-search {
+  flex: 1;
+  max-width: 480px;
+  margin: 0 auto;
+  background: #F5F4F3;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  height: 36px;
+  border: 1px solid transparent;
 }
-.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none}
-#search-input{
-  width:100%;padding:10px 12px 10px 38px;
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:10px;color:var(--text);font-family:var(--font-body);font-size:14px;
-  outline:none;transition:border-color 0.2s;
+.top-bar-search:focus-within { border-color: rgba(0,0,0,0.12); }
+.top-bar-search input {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: #1A1411;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  flex: 1;
+  outline: none;
 }
-#search-input:focus{border-color:var(--border-focus)}
-#search-input::placeholder{color:var(--text-muted)}
-.result-count{font-size:12px;color:var(--text-muted);font-weight:500;white-space:nowrap;flex-shrink:0}
-.nav-cta{
-  background:var(--text);color:var(--text-on-brand);font-size:13px;font-weight:700;
-  padding:8px 16px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;
+.top-bar-search input::placeholder { color: #999; }
+.top-bar-count {
+  font-size: 12px;
+  color: #6B6460;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.top-bar-cta {
+  background: #1A1411;
+  color: #fff;
+  padding: 7px 16px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  flex-shrink: 0;
 }
 
 /* FILTERS */
-.filters{
-  display:flex;gap:8px;overflow-x:auto;padding:10px 16px;
-  scrollbar-width:none;-webkit-overflow-scrolling:touch;
-  max-width:960px;margin:0 auto;
-  border-bottom:1px solid var(--border);
+.filter-strip {
+  padding: 12px 20px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  align-items: center;
 }
-.filters::-webkit-scrollbar{display:none}
-.filter-pill{
-  flex-shrink:0;padding:6px 14px;border-radius:100px;
-  border:1px solid var(--border);background:var(--surface);
-  color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;
-  transition:all 0.15s;white-space:nowrap;font-family:var(--font-body);
+.filter-strip::-webkit-scrollbar { display: none; }
+
+.filter-pill {
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: #F5F4F3;
+  color: #6B6460;
+  transition: background 0.15s, color 0.15s;
 }
-.filter-pill:hover{border-color:var(--border-hover);color:var(--text);background:var(--surface-2)}
-.filter-pill.active{
-  background:var(--text);border-color:var(--text);
-  color:var(--text-on-brand);font-weight:700;
+/* Active filter: dark fill, NOT orange */
+.filter-pill.active {
+  background: #1A1411;
+  color: #fff;
+  border-color: #1A1411;
+}
+/* Verified pill: orange (trainer credential badge) */
+.filter-pill.verified {
+  background: rgba(255,92,0,0.08);
+  color: #FF5C00;
+  border-color: rgba(255,92,0,0.2);
+}
+.filter-pill.verified.active {
+  background: #FF5C00;
+  color: #fff;
+  border-color: #FF5C00;
 }
 
 /* MAIN LAYOUT */
-.main{max-width:960px;margin:0 auto;padding:20px 16px 60px}
+.main{max-width:1200px;margin:0 auto;padding:0 16px 60px}
 
 /* RESULTS HEADER */
 .results-header{
   display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:16px;
+  margin-bottom:16px;padding-top:16px;
 }
-.results-count{font-size:13px;color:var(--text-muted);font-weight:500}
+.results-count{font-size:13px;color:#6B6460;font-weight:500}
 .sort-select{
-  background:var(--surface);border:1px solid var(--border);
-  color:var(--text);font-family:var(--font-body);font-size:12px;font-weight:600;
+  background:#fff;border:1px solid rgba(0,0,0,0.1);
+  color:#1A1411;font-family:'DM Sans',system-ui,sans-serif;font-size:12px;font-weight:600;
   padding:6px 10px;border-radius:8px;outline:none;cursor:pointer;
 }
 
 /* TRAINER GRID */
-#trainerGrid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:16px;
-}
-@media(min-width:768px){
-  #trainerGrid{grid-template-columns:repeat(4,1fr);}
+/* Mobile: 2-column grid */
+.trainer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 16px 16px 80px;
 }
 
-/* TRAINER CARD — light design */
-.trainer-card{
-  background:var(--surface);
-  border-radius:16px;
-  overflow:hidden;
-  cursor:pointer;
-  transition:transform 0.15s,box-shadow 0.15s,border-color 0.15s;
-  display:block;
-  border:1px solid var(--border);
+/* Desktop: 4-column grid */
+@media (min-width: 768px) {
+  .trainer-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 20px 24px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 }
-.trainer-card:hover{
-  transform:translateY(-2px);
-  box-shadow:var(--shadow-card);
-  border-color:var(--border-hover);
+
+/* TRAINER CARD */
+.trainer-card {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.15s;
 }
-.trainer-card:focus-visible{
-  outline:2px solid var(--brand);
-  outline-offset:2px;
+.trainer-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+.tc-avatar-wrap {
+  position: relative;
+  background: #F5F4F3;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.tc-photo-wrap{position:relative;aspect-ratio:3/4;background:var(--surface-2);overflow:hidden}
-.tc-photo{
-  width:100%;height:100%;
-  object-fit:cover;object-position:top center;
+.tc-avatar {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1A1411;
+  letter-spacing: -0.03em;
 }
-.tc-initials{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:48px;font-weight:800;color:var(--text-watermark);
-  font-family:'DM Sans',sans-serif;user-select:none;
+.tc-verified {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,200,83,0.1);
+  border: 1px solid rgba(0,200,83,0.25);
+  color: #00C853;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
 }
-.tc-verified{
-  position:absolute;top:10px;right:10px;
-  background:var(--reps-badge-bg);border:1px solid var(--reps-badge-border);
-  border-radius:100px;padding:3px 9px;
-  font-size:10px;font-weight:700;color:var(--reps-verified-text);
+.tc-body { padding: 12px; }
+.tc-name { font-weight: 700; font-size: 13px; color: #1A1411; margin-bottom: 2px; }
+.tc-meta { font-size: 11px; color: #6B6460; margin-bottom: 8px; }
+.tc-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+.tc-tag {
+  background: #F5F4F3;
+  color: #6B6460;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 100px;
 }
-.tc-body{padding:14px}
-.tc-name{font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px;letter-spacing:-0.01em}
-.tc-meta{font-size:12px;color:var(--text-muted);margin-bottom:10px}
-.tc-price{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px}
-.tc-wa-btn{
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  background:var(--whatsapp);color:var(--text-on-brand);border-radius:10px;
-  padding:10px 14px;font-size:13px;font-weight:700;
-  text-decoration:none;transition:background 0.15s;
+.tc-price { font-weight: 700; font-size: 13px; color: #1A1411; margin-bottom: 10px; }
+.tc-price span { font-size: 10px; font-weight: 400; color: #6B6460; }
+.tc-wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #1A1411;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 100px;
+  text-decoration: none;
+  cursor: pointer;
 }
-.tc-wa-btn:hover{background:var(--whatsapp-hover)}
-.tc-wa-btn svg{flex-shrink:0}
 
 /* EMPTY STATE */
 .empty-state{
@@ -179,15 +244,15 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
   grid-column:1/-1;
 }
 .empty-icon{font-size:48px;margin-bottom:16px}
-.empty-title{font-size:18px;font-weight:700;margin-bottom:8px}
-.empty-sub{font-size:14px;color:var(--text-muted)}
+.empty-title{font-size:18px;font-weight:700;margin-bottom:8px;color:#1A1411}
+.empty-sub{font-size:14px;color:#6B6460}
 
 /* SKELETON */
 .skeleton-card{
-  background:var(--surface);border:1px solid var(--border);
+  background:#fff;border:1px solid rgba(0,0,0,0.07);
   border-radius:16px;overflow:hidden;
 }
-.skel{background:linear-gradient(90deg,var(--surface-2) 25%,var(--surface-3) 50%,var(--surface-2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+.skel{background:linear-gradient(90deg,#E8E5E2 25%,rgba(0,0,0,0.04) 50%,#E8E5E2 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .skel-cover{height:100px;border-radius:0}
 .skel-body{padding:14px}
@@ -197,52 +262,38 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
 /* LOAD MORE */
 .load-more-wrap{text-align:center;margin-top:28px}
 .btn-load-more{
-  background:var(--surface);border:1px solid var(--border);
-  color:var(--text);font-family:var(--font-body);font-size:14px;font-weight:600;
-  padding:12px 28px;border-radius:20px;cursor:pointer;
+  background:#fff;border:1px solid rgba(0,0,0,0.1);
+  color:#1A1411;font-family:'DM Sans',system-ui,sans-serif;font-size:14px;font-weight:600;
+  padding:12px 28px;border-radius:100px;cursor:pointer;
   transition:border-color 0.2s;
 }
-.btn-load-more:hover{border-color:var(--border-focus);color:var(--text)}
-
-/* ── Mobile responsive ────────────────────────────────────────────── */
-@media(max-width:640px){
-  #trainerGrid{grid-template-columns:1fr}
-  .main{padding:12px 12px max(60px,calc(60px + env(safe-area-inset-bottom)))}
-  .results-header{flex-direction:column;align-items:flex-start;gap:8px}
-  .sort-select{width:100%}
-}
-@media(min-width:641px) and (max-width:900px){
-  #trainerGrid{grid-template-columns:repeat(2,1fr)}
-}
-
-/* ── Safe area ───────────────────────────────────────────────────── */
-.main{padding-bottom:max(60px,calc(60px + env(safe-area-inset-bottom)))}
+.btn-load-more:hover{border-color:#1A1411}
   </style>
 
+<!-- Sticky top bar — replaces arc-hero -->
 <div class="top-bar">
-  <div class="top-bar-inner">
-    <a href="/" class="nav-logo">{brandName}</a>
-    <div class="search-wrap">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="search-input" placeholder="Search by name, specialty or gym…" oninput="filterTrainers()">
-    </div>
-    <span class="result-count" id="result-count"></span>
-    <a href="/join" class="nav-cta">Get Your Page →</a>
+  <a href="/" class="top-bar-logo">TrainedBy</a>
+  <div class="top-bar-search">
+    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search-input" placeholder="Search trainers…" aria-label="Search trainers" />
   </div>
-  <div class="filters" id="filters">
-    <button class="filter-pill active" data-filter="all" onclick="setFilter('all',this)">All Trainers</button>
-    <button class="filter-pill" data-filter="in-person" onclick="setFilter('in-person',this)">In-Person</button>
-    <button class="filter-pill" data-filter="online" onclick="setFilter('online',this)">Online</button>
-    <button class="filter-pill" data-filter="hybrid" onclick="setFilter('hybrid',this)">Hybrid</button>
-    <button class="filter-pill" data-filter="strength" onclick="setFilter('strength',this)">Strength</button>
-    <button class="filter-pill" data-filter="fat-loss" onclick="setFilter('fat-loss',this)">Fat Loss</button>
-    <button class="filter-pill" data-filter="hiit" onclick="setFilter('hiit',this)">HIIT</button>
-    <button class="filter-pill" data-filter="pilates" onclick="setFilter('pilates',this)">Pilates</button>
-    <button class="filter-pill" data-filter="boxing" onclick="setFilter('boxing',this)">Boxing</button>
-    <button class="filter-pill" data-filter="yoga" onclick="setFilter('yoga',this)">Yoga</button>
-    <button class="filter-pill" data-filter="nutrition" onclick="setFilter('nutrition',this)">Nutrition</button>
-    <button class="filter-pill" data-filter="female-only" onclick="setFilter('female-only',this)">Female Trainers</button>
-  </div>
+  <span class="top-bar-count" id="result-count">Loading…</span>
+  <a href="/join" class="top-bar-cta">Sign up</a>
+</div>
+
+<div class="filter-strip" id="filters">
+  <button class="filter-pill active" data-filter="all" onclick="setFilter('all',this)" data-i18n="find.filter_all">All Trainers</button>
+  <button class="filter-pill" data-filter="in-person" onclick="setFilter('in-person',this)">In-Person</button>
+  <button class="filter-pill" data-filter="online" onclick="setFilter('online',this)" data-i18n="find.filter_online">Online</button>
+  <button class="filter-pill" data-filter="hybrid" onclick="setFilter('hybrid',this)">Hybrid</button>
+  <button class="filter-pill" data-filter="strength" onclick="setFilter('strength',this)">Strength</button>
+  <button class="filter-pill" data-filter="fat-loss" onclick="setFilter('fat-loss',this)">Fat Loss</button>
+  <button class="filter-pill" data-filter="hiit" onclick="setFilter('hiit',this)">HIIT</button>
+  <button class="filter-pill" data-filter="pilates" onclick="setFilter('pilates',this)">Pilates</button>
+  <button class="filter-pill" data-filter="boxing" onclick="setFilter('boxing',this)">Boxing</button>
+  <button class="filter-pill" data-filter="yoga" onclick="setFilter('yoga',this)">Yoga</button>
+  <button class="filter-pill" data-filter="nutrition" onclick="setFilter('nutrition',this)">Nutrition</button>
+  <button class="filter-pill" data-filter="female-only" onclick="setFilter('female-only',this)">Female Trainers</button>
 </div>
 
 <div class="main">
@@ -257,9 +308,9 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
     </select>
   </div>
 
-  <div id="trainerGrid">
+  <div id="trainerGrid" class="trainer-grid">
     <!-- Skeletons while loading -->
-    <Fragment set:html={Array(6).fill(0).map(() => `
+    ${Array(6).fill(0).map(() => `
     <div class="skeleton-card">
       <div class="skel skel-cover"></div>
       <div class="skel-body">
@@ -267,7 +318,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
         <div class="skel skel-line w60"></div>
         <div class="skel skel-line w40" style="margin-top:12px"></div>
       </div>
-    </div>`).join('')} />
+    </div>`).join('')}
   </div>
 
   <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
@@ -275,7 +326,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'D
   </div>
 </div>
 
-<script is:inline define:vars={{ SUPABASE_KEY, BRAND_NAME: brandName }}>
+<script is:inline define:vars={{ SUPABASE_KEY }}>
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
 
 let allTrainers = [];
@@ -286,9 +337,8 @@ const PAGE_SIZE = 12;
 
 async function loadTrainers() {
   try {
-    const mkt = (window.__MARKET__ || 'ae');
     const r = await fetch(
-      `${SUPABASE_URL}/rest/v1/trainers?verification_status=eq.verified&market=eq.${mkt}&order=created_at.desc&limit=200`,
+      `${SUPABASE_URL}/rest/v1/trainers?verification_status=eq.verified&order=created_at.desc&limit=200`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
     );
     const trainers = await r.json();
@@ -311,14 +361,30 @@ async function loadTrainers() {
       return { ...t, min_price: minPrice, packages: tPkgs };
     });
 
+    // If no verified trainers, show demo data
+    if (!allTrainers.length) {
+      allTrainers = getDemoTrainers();
+    }
+
     filtered = [...allTrainers];
     renderGrid();
   } catch(e) {
-    filtered = [];
+    allTrainers = getDemoTrainers();
+    filtered = [...allTrainers];
     renderGrid();
   }
 }
 
+function getDemoTrainers() {
+  return [
+    { id:'demo1', full_name:'Sarah Al Mansoori', slug:'sarah', title:'Strength & Conditioning Coach', city:'Dubai', specialties:['Strength','Fat Loss','HIIT'], certifications:['REPs Level 3','NASM CPT'], years_experience:8, clients_trained:240, avg_rating:4.9, review_count:34, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:150, whatsapp:'+971501234567' },
+    { id:'demo2', full_name:'Ahmed Hassan', slug:'ahmed', title:'Functional Fitness & Boxing Coach', city:'Dubai', specialties:['Boxing','Functional','HIIT'], certifications:['REPs Level 3','Boxing Coach'], years_experience:6, clients_trained:180, avg_rating:4.8, review_count:22, reps_verified:true, accepting_clients:true, training_modes:['in-person'], min_price:200, whatsapp:'+971502345678' },
+    { id:'demo3', full_name:'Layla Rashidi', slug:'layla', title:'Pilates & Yoga Specialist', city:'Abu Dhabi', specialties:['Pilates','Yoga','Flexibility'], certifications:['STOTT Pilates','RYT 200'], years_experience:5, clients_trained:120, avg_rating:5.0, review_count:18, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:180, whatsapp:'+971503456789' },
+    { id:'demo4', full_name:'Marcus Williams', slug:'marcus', title:'Bodybuilding & Nutrition Coach', city:'Dubai', specialties:['Muscle Gain','Nutrition','Bodybuilding'], certifications:['NASM CPT','Precision Nutrition'], years_experience:10, clients_trained:320, avg_rating:4.7, review_count:45, reps_verified:true, accepting_clients:false, training_modes:['in-person','online'], min_price:250, whatsapp:'+971504567890' },
+    { id:'demo5', full_name:'Fatima Al Zaabi', slug:'fatima', title:'Women\'s Fitness Specialist', city:'Dubai', specialties:['Fat Loss','Toning','Pre/Postnatal'], certifications:['REPs Level 3','Pre/Postnatal'], years_experience:4, clients_trained:95, avg_rating:4.9, review_count:28, reps_verified:true, accepting_clients:true, training_modes:['in-person'], min_price:150, whatsapp:'+971505678901', gender:'female' },
+    { id:'demo6', full_name:'Ryan O\'Brien', slug:'ryan', title:'Running & Endurance Coach', city:'Dubai', specialties:['Running','Endurance','Triathlon'], certifications:['UESCA Running Coach','REPs Level 3'], years_experience:7, clients_trained:200, avg_rating:4.8, review_count:31, reps_verified:true, accepting_clients:true, training_modes:['in-person','online'], min_price:120, whatsapp:'+971506789012' },
+  ];
+}
 
 function setFilter(filter, btn) {
   activeFilter = filter;
@@ -374,12 +440,11 @@ function renderGrid() {
   const end = (page + 1) * PAGE_SIZE;
   const toShow = filtered.slice(start, end);
 
-  const countEl = document.getElementById('result-count');
-  if (countEl) countEl.textContent = filtered.length === 0 ? 'No trainers found' :
-    `${filtered.length} trainer${filtered.length !== 1 ? 's' : ''}`;
-  const resultsCountEl = document.getElementById('resultsCount');
-  if (resultsCountEl) resultsCountEl.textContent = filtered.length === 0 ? 'No trainers found' :
+  document.getElementById('resultsCount').textContent =
+    filtered.length === 0 ? 'No trainers found' :
     `${filtered.length} verified trainer${filtered.length !== 1 ? 's' : ''}`;
+
+  document.getElementById('result-count').textContent = `${filtered.length} trainers`;
 
   if (!filtered.length) {
     grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No trainers found</div><div class="empty-sub">Try adjusting your search or filters</div></div>`;
@@ -397,43 +462,67 @@ function loadMore() {
 }
 
 function esc(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
-function trainerCardHTML(t) {
-  const name = t.full_name || t.name || 'Trainer';
-  const initials = name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-  const slug = esc(t.slug || t.id || '');
-  const specialty = esc((t.specialties || [])[0] || 'Personal Trainer');
-  const city = esc(t.city || '');
-  const currency = window.__CURRENCY__ || '';
-  const price = t.min_price ? `From ${currency} ${t.min_price.toLocaleString()}`.trim() : '';
-  const waNum = esc(t.whatsapp || '');
-  const waMsg = encodeURIComponent(`Hi, I found your profile on ${BRAND_NAME} and I'd like to book a session!`);
-  const waHref = waNum ? `https://wa.me/${waNum.replace(/\D/g,'')}?text=${waMsg}` : '';
 
-  const photoHtml = t.avatar_url
-    ? `<img class="tc-photo" src="${esc(t.avatar_url)}" alt="${esc(name)}" loading="lazy">`
-    : `<div class="tc-initials">${esc(initials)}</div>`;
-  const verifiedBadge = t.reps_verified ? `<div class="tc-verified">✓ Verified</div>` : '';
+function trainerCardHTML(trainer) {
+  const initials = (trainer.name || trainer.full_name || '??')
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+  const rating = trainer.avg_rating
+    ? `★ ${parseFloat(trainer.avg_rating).toFixed(1)}`
+    : '★ —';
+
+  const price = trainer.min_price || trainer.session_price
+    ? `${esc(trainer.currency || 'AED')} ${trainer.min_price || trainer.session_price}`
+    : '';
+
+  const cityDisplay = esc(trainer.city || trainer.location || '');
+
+  const specialties = (trainer.specialties || [])
+    .slice(0, 2)
+    .map(s => `<span class="tc-tag">${esc(s)}</span>`)
+    .join('');
+
+  const verified = trainer.reps_verified
+    ? `<span class="tc-verified">✓ Verified</span>`
+    : '';
+
+  const waHref = trainer.whatsapp
+    ? `https://wa.me/${trainer.whatsapp.replace(/\D/g, '')}`
+    : `/${esc(trainer.slug || trainer.id)}`;
+
+  const profileHref = `/${esc(trainer.slug || trainer.id)}`;
 
   return `
-<div class="trainer-card" onclick="window.location='/${slug}'">
-  <div class="tc-photo-wrap">
-    ${photoHtml}
-    ${verifiedBadge}
-  </div>
-  <div class="tc-body">
-    <div class="tc-name">${esc(name)}</div>
-    <div class="tc-meta">${specialty}${city ? ' · ' + city : ''}</div>
-    ${price ? `<div class="tc-price">${price} / session</div>` : ''}
-    ${waHref ? `<a class="tc-wa-btn" href="${waHref}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
-      WhatsApp
-    </a>` : `<a class="tc-wa-btn" href="/${slug}" onclick="event.stopPropagation()">View Profile</a>`}
-  </div>
-</div>`;
+    <div class="trainer-card" role="article" onclick="window.location='${profileHref}'" style="cursor:pointer;">
+      <div class="tc-avatar-wrap">
+        <div class="tc-avatar">${initials}</div>
+        ${verified}
+      </div>
+      <div class="tc-body">
+        <div class="tc-name">${esc(trainer.full_name || trainer.name || 'Trainer')}</div>
+        <div class="tc-meta">${cityDisplay}${cityDisplay ? ' · ' : ''}${rating}</div>
+        <div class="tc-tags">${specialties}</div>
+        ${price ? `<div class="tc-price">${price} <span>/ session</span></div>` : ''}
+        <a href="${waHref}" class="tc-wa" onclick="event.stopPropagation();" target="_blank" rel="noopener">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Contact
+        </a>
+      </div>
+    </div>`;
 }
+
+// Wire top bar search input to filter logic
+document.getElementById('search-input').addEventListener('input', filterTrainers);
 
 loadTrainers();
 </script>

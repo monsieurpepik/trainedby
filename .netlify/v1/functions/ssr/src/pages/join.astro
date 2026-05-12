@@ -1,30 +1,18 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getMarket } from '../lib/market.ts';
-import { getLocale, t, getBrand } from '../lib/i18n.ts';
 const market = getMarket(Astro.url.hostname);
-const locale = getLocale(Astro.request);
-const brand = getBrand(locale);
-const DEMO_SLUGS: Record<string, string> = {
-  'en-ae': 'sarah-al-mansoori',
-  'en-uk': 'james-hartley',
-  'en-us': 'marcus-johnson',
-  'en-in': 'arjun-sharma',
-  'es':    'lucia-fernandez',
-  'fr':    'thomas-moreau',
-  'it':    'giulia-romano',
-};
-const demoSlug = DEMO_SLUGS[locale] ?? 'sarah-al-mansoori';
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 ---
 
 <Base
-  title={`${market.brandName} – Link-in-Bio & Booking Hub for Fitness Trainers`}
-  description={`Create your verified personal trainer profile on ${market.brandName}. ${market.certificationBody} verified. Free to set up in 2 minutes.`}
+  title="Get Your Verified Trainer Page — TrainedBy"
+  description={`Create your verified personal trainer profile on TrainedBy. ${market.certificationBody} verified. Free to set up in 2 minutes.`}
 >
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  
+  --brand: #FF5C00; --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
   --reps: #00C853; --reps-dim: rgba(0,200,83,0.08); --reps-border: rgba(0,200,83,0.2);
   --surface: #0a0a0a; --surface-2: #111; --surface-3: #1c1c1c;
   --border: rgba(255,255,255,0.08); --text: #fff;
@@ -316,24 +304,6 @@ body {
   color: var(--brand); margin: 8px 0 4px;
 }
 
-/* ── Mobile responsive ────────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .join-wrap { padding-left: 16px; padding-right: 16px; }
-  .field-row { grid-template-columns: 1fr; gap: 0; }
-  .otp-input { width: 44px; height: 52px; font-size: 20px; }
-  .otp-row { gap: 8px; }
-  .step-title { font-size: 22px; }
-  .success-title { font-size: 26px; }
-  .income-teaser-amount { font-size: 18px; }
-  .toggle-row { gap: 6px; }
-  .toggle-pill { padding: 7px 12px; font-size: 11px; }
-}
-
-/* ── Safe area for notched phones ─────────────────────────────────── */
-.join-wrap {
-  padding-bottom: max(40px, calc(40px + env(safe-area-inset-bottom)));
-}
-
 .hidden { display: none !important; }
   </style>
 
@@ -341,11 +311,11 @@ body {
 
   <!-- Header -->
   <div class="join-header">
-    <a href="/" class="join-logo">
+    <a href="/landing.html" class="join-logo">
       <svg width="28" height="28" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF5C00"/><text x="16" y="23" font-family="Manrope,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
       <span data-brand-name>TrainedBy</span>
     </a>
-    <a href="/edit" class="join-login-link"><span data-i18n="join.already">Already a member?</span> <span data-i18n="join.login">Sign in</span></a>
+    <a href="/edit.html" class="join-login-link"><span data-i18n="join.already">Already a member?</span> <span data-i18n="join.login">Sign in</span></a>
   </div>
 
   <!-- Progress -->
@@ -358,19 +328,17 @@ body {
     <div class="step-dot active" id="dot-1">1</div>
     <div class="step-line" id="line-1"></div>
     <div class="step-dot inactive" id="dot-2">2</div>
-    <div class="step-line" id="line-2"></div>
-    <div class="step-dot inactive" id="dot-3">3</div>
   </div>
 
   <!-- ===== STEP 1: Essentials ===== -->
   <div id="step-1">
-    <h1 class="step-title">{t(locale, 'join.title_ext').replace('\\n', '<br>')}</h1>
-    <p class="step-subtitle">{t(locale, 'join.sub_ext').replace('{cert}', market.certificationBody)}</p>
+    <h1 class="step-title" data-i18n="join.title">Your trainer page,<br>live in 60 seconds.</h1>
+    <p class="step-subtitle" data-i18n="join.sub">Free forever. No credit card. {market.certificationBody} verified.</p>
 
     <!-- Auto-Build from Instagram -->
     <div style="background:linear-gradient(135deg,rgba(255,92,0,0.07),rgba(255,92,0,0.02));border:1px solid rgba(255,92,0,0.2);border-radius:14px;padding:14px 16px;margin-bottom:20px;">
-      <div style="font-size:12px;font-weight:700;color:var(--brand);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:6px;">{t(locale, 'join.autobuild_label')}</div>
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">{t(locale, 'join.autobuild_sub')}</div>
+      <div style="font-size:12px;font-weight:700;color:var(--brand);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:6px;">✨ Auto-Build</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">Paste your Instagram handle and we'll pre-fill your profile in seconds.</div>
       <div style="display:flex;gap:8px;">
         <div style="display:flex;align-items:center;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;overflow:hidden;flex:1;">
           <span style="padding:10px 0 10px 12px;color:var(--text-faint);font-size:14px;">@</span>
@@ -378,7 +346,7 @@ body {
             style="background:transparent;border:none;outline:none;padding:10px 12px 10px 4px;color:var(--text);font-size:14px;width:100%;font-family:'Inter',sans-serif;">
         </div>
         <button onclick="autoBuildFromIG()" id="autobuild-btn"
-          style="background:var(--brand);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;">{t(locale, 'join.autobuild_btn')}</button>
+          style="background:var(--brand);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;">Fill →</button>
       </div>
       <div id="autobuild-status" style="font-size:11px;color:var(--text-faint);margin-top:6px;"></div>
     </div>
@@ -389,14 +357,14 @@ body {
     </div>
 
     <div class="field">
-      <label>{t(locale, 'join.url_label')} <span class="field-req">*</span></label>
+      <label>Your Profile URL <span class="field-req">*</span></label>
       <div class="slug-field" id="slug-field-wrap">
         <span class="slug-prefix" id="slug-prefix">loading.../</span>
         <input type="text" id="s1-slug" placeholder="sarah" autocomplete="off"
           oninput="checkSlug(this.value)">
         <span class="slug-status" id="slug-status"></span>
       </div>
-      <div class="field-hint">{t(locale, 'join.url_hint')}</div>
+      <div class="field-hint">Letters, numbers, hyphens only</div>
       <div class="field-error hidden" id="slug-error"></div>
     </div>
 
@@ -415,7 +383,7 @@ body {
         </div>
       </div>
     </div>
-    <div class="field-hint" style="margin-bottom:16px;">{t(locale, 'join.email_hint')}</div>
+    <div class="field-hint" style="margin-bottom:16px;">Email used for magic-link login · WhatsApp shown on your profile</div>
 
     <!-- REPs section -->
     <div class="reps-card">
@@ -424,27 +392,22 @@ body {
       </div>
       <div>
         <div class="reps-card-title">{market.certificationBody} Verified Badge</div>
-        <div class="reps-card-sub">{t(locale, 'join.cert_trust')}</div>
+        <div class="reps-card-sub">Clients trust verified trainers 3× more. Free. Takes 24h.</div>
       </div>
     </div>
 
     <div class="field">
       <label>{market.certVerifyLabel} <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
-      <input type="text" id="s1-reps" placeholder={market.certVerifyPlaceholder} autocomplete="off" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.05em;">
-      <div class="field-hint" id="cert-hint">
-        {locale === 'en-ae' ? (
-          <>Find yours at <a href="https://repsuae.com/searcht" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">repsuae.com/searcht</a> - leave blank to add later</>
-        ) : locale === 'en-uk' ? (
-          <>Find yours at <a href="https://www.reps-uk.org/find-a-trainer/" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">reps-uk.org</a> - leave blank to add later</>
-        ) : locale === 'en-us' ? (
-          <>Find yours at <a href="https://www.nasm.org/resources/validate-credentials" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">nasm.org/validate</a> - leave blank to add later</>
-        ) : (
-          <>Leave blank to add later</>
-        )}
-      </div>
+      <input type="text" id="s1-reps" placeholder="{market.certVerifyPlaceholder}" autocomplete="off" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.05em;">
+      <div class="field-hint">Find yours at <a href="https://repsuae.com/searcht" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">repsuae.com/searcht</a> — leave blank to add later</div>
     </div>
 
     <div class="field-error hidden" id="s1-error"></div>
+
+    <label id="consent-label" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:16px;font-size:13px;color:var(--text-muted);line-height:1.5;">
+      <input type="checkbox" id="consent-checkbox" style="width:16px;height:16px;margin-top:2px;accent-color:var(--brand);flex-shrink:0;" />
+      <span>I agree to the <a href="/privacy" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">Privacy Policy</a> and <a href="/terms" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">Terms of Service</a>.</span>
+    </label>
 
     <button class="btn-primary" id="s1-btn" onclick="step1Next()">
       Continue →
@@ -453,30 +416,26 @@ body {
     <div class="trust-row">
       <div class="trust-item">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="#00C853"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l7.59-7.59L18 9l-8 8z"/></svg>
-        {t(locale, 'join.trust_cert').replace('{cert}', market.certificationBody)}
+        {market.certificationBody} Verified
       </div>
       <div class="trust-item">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-        {t(locale, 'join.trust_free')}
+        Free Forever
       </div>
       <div class="trust-item">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        {t(locale, 'join.trust_speed')}
+        60 Sec Setup
       </div>
     </div>
-    <p style="text-align:center;margin-top:20px;font-size:12px;color:rgba(255,255,255,0.35)">
-      Wondering what your profile will look like?
-      <a href={`/${demoSlug}`} style="color:rgba(255,255,255,0.55);text-decoration:underline;text-underline-offset:3px" target="_blank" rel="noopener">See an example</a>
-    </p>
   </div>
 
   <!-- ===== STEP 2: Specialties + OTP ===== -->
   <div id="step-2" class="hidden">
-    <h1 class="step-title">{t(locale, 'join.step2_title')}</h1>
-    <p class="step-subtitle">{t(locale, 'join.step2_sub')}</p>
+    <h1 class="step-title">What do you specialise in?</h1>
+    <p class="step-subtitle">Clients filter by specialty. Pick all that apply — then verify your email to go live.</p>
 
     <div class="field">
-      <label>{t(locale, 'join.specialties_label')} <span class="field-req">*</span></label>
+      <label>Specialties <span class="field-req">*</span></label>
       <div class="toggle-row" id="spec-toggle-row">
         <div class="toggle-pill" onclick="toggleSpec(this,'Strength')">Strength</div>
         <div class="toggle-pill" onclick="toggleSpec(this,'Fat Loss')">Fat Loss</div>
@@ -496,24 +455,31 @@ body {
     </div>
 
     <div class="field">
-      <label>{t(locale, 'join.title_role')} <span class="field-req">*</span></label>
-      <input type="text" id="s2-title" placeholder="e.g. Strength &amp; Conditioning Coach" maxlength="60">
-      <div class="field-hint">{t(locale, 'join.title_hint')}</div>
+      <label>Your Title / Role <span class="field-req">*</span></label>
+      <input type="text" id="s2-title" placeholder="e.g. Strength & Conditioning Coach" maxlength="60">
+      <div class="field-hint">Shown below your name — be specific, it converts better</div>
     </div>
 
     <div class="field">
-      <label>{t(locale, 'join.mode_label')}</label>
+      <label>Training Mode</label>
       <div class="toggle-row">
-        <div class="toggle-pill active" id="mode-in-person" onclick="toggleMode(this,'in-person')">{t(locale, 'join.mode_in_person')}</div>
-        <div class="toggle-pill" id="mode-online" onclick="toggleMode(this,'online')">{t(locale, 'join.mode_online')}</div>
-        <div class="toggle-pill" id="mode-hybrid" onclick="toggleMode(this,'hybrid')">{t(locale, 'join.mode_hybrid')}</div>
+        <div class="toggle-pill active" id="mode-in-person" onclick="toggleMode(this,'in-person')">In-Person</div>
+        <div class="toggle-pill" id="mode-online" onclick="toggleMode(this,'online')">Online</div>
+        <div class="toggle-pill" id="mode-hybrid" onclick="toggleMode(this,'hybrid')">Hybrid</div>
       </div>
     </div>
 
-    <div class="divider"><span class="divider-text">{t(locale, 'join.verify_divider')}</span></div>
+    <!-- Passive income teaser -->
+    <div class="income-teaser">
+      <div class="income-teaser-title">You're about to unlock passive income</div>
+      <div class="income-teaser-amount">+AED 1,200–3,500/mo</div>
+      <div class="income-teaser-sub">After you go live, connect affiliate links for ZEROFAT meal plans, Gymshark gear, and supplements — your clients buy, you earn automatically.</div>
+    </div>
+
+    <div class="divider"><span class="divider-text">VERIFY YOUR EMAIL TO GO LIVE</span></div>
 
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">
-      {t(locale, 'join.otp_sent')} <strong id="email-display" style="color:var(--text);"></strong>
+      We sent a 6-digit code to <strong id="email-display" style="color:var(--text);"></strong>
     </p>
 
     <div class="otp-row">
@@ -527,88 +493,13 @@ body {
 
     <div class="field-error hidden" id="s2-error" style="text-align:center;margin-bottom:12px;"></div>
 
-    <!-- Consent checkbox - required before account creation (GDPR / CCPA / PDPL) -->
-    <label id="consent-label" style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;cursor:pointer;font-size:13px;color:var(--text-muted);line-height:1.5;">
-      <input type="checkbox" id="consent-checkbox" style="margin-top:2px;accent-color:var(--brand);width:16px;height:16px;flex-shrink:0;" />
-      <span>I agree to the <a href="/terms" target="_blank" style="color:var(--brand);text-decoration:underline;">Terms of Service</a> and <a href="/privacy" target="_blank" style="color:var(--brand);text-decoration:underline;">Privacy Policy</a>. I confirm my certification details are genuine and accurate.</span>
-    </label>
-
     <button class="btn-primary" id="verify-btn" onclick="verifyAndCreate()">
-      {t(locale, 'join.verify_btn')}
+      Verify &amp; Go Live 🚀
     </button>
-    <button class="btn-secondary" onclick="resendCode()" id="resend-btn">{t(locale, 'join.resend')}</button>
-    <button class="btn-ghost" onclick="showStep(1)">{t(locale, 'join.back')}</button>
+    <button class="btn-secondary" onclick="resendCode()" id="resend-btn">Resend Code</button>
+    <button class="btn-ghost" onclick="showStep(1)">← Back</button>
 
-    <p style="text-align:center;font-size:11px;color:var(--text-faint);margin-top:8px;">{t(locale, 'join.spam_hint')}</p>
-  </div>
-
-  <!-- ===== STEP 3: Profile & Packages ===== -->
-  <div id="step-3" class="hidden">
-    <h1 class="step-title">Complete your profile</h1>
-    <p class="step-subtitle">Add a photo, bio, and your training packages so clients know what to expect.</p>
-
-    <!-- Profile Photo -->
-    <div class="field">
-      <label>Profile Photo <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
-      <div id="avatar-upload-area" onclick="document.getElementById('avatar-file-input').click()"
-        style="width:96px;height:96px;border-radius:50%;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;color:var(--text-muted);gap:4px;font-size:11px;transition:border-color 0.15s;">
-        <img id="avatar-preview-img" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Avatar preview" />
-        <span id="avatar-upload-placeholder">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </span>
-        <span id="avatar-upload-label" style="font-size:10px;color:var(--text-faint);">Upload</span>
-      </div>
-      <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="handleAvatarFileChange(event)" />
-    </div>
-
-    <!-- Bio -->
-    <div class="field">
-      <label style="display:flex;justify-content:space-between;align-items:center;">
-        Bio <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;" id="bio-char-count">0 / 500</span>
-      </label>
-      <textarea id="s3-bio" rows="4" maxlength="500"
-        placeholder="Tell clients about your training style and what results they can expect..."
-        oninput="updateBioCharCount()"
-        style="width:100%;padding:14px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:15px;outline:none;resize:vertical;transition:border-color 0.2s;box-sizing:border-box;"></textarea>
-      <button id="ai-bio-btn" onclick="generateAIBio()"
-        style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:transparent;border:1px solid var(--brand);color:var(--brand);border-radius:8px;font-size:12px;cursor:pointer;margin-top:8px;transition:background 0.15s;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        Write bio with AI
-      </button>
-      <p id="ai-bio-error" class="hidden" style="color:var(--danger,#ef4444);font-size:13px;margin-top:4px;"></p>
-    </div>
-
-    <!-- Instagram -->
-    <div class="field">
-      <label>Instagram <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
-      <div style="display:flex;align-items:center;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s;" onfocusin="this.style.borderColor='var(--brand)'" onfocusout="this.style.borderColor='var(--border)'">
-        <span style="padding:14px 0 14px 16px;color:var(--text-faint);font-size:15px;">@</span>
-        <input type="text" id="s3-instagram" placeholder="yourhandle" autocomplete="off"
-          style="border:none;background:transparent;padding:14px 16px 14px 4px;font-size:15px;flex:1;min-width:0;color:var(--text);outline:none;font-family:'Inter',sans-serif;" />
-      </div>
-    </div>
-
-    <!-- Packages -->
-    <div class="field">
-      <label>Training Packages <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
-      <div id="packages-list"></div>
-      <button onclick="addPackageRow()"
-        style="width:100%;padding:10px;background:transparent;border:1px dashed var(--border);color:var(--text-muted);border-radius:10px;font-size:13px;cursor:pointer;margin-top:4px;">
-        + Add package
-      </button>
-    </div>
-
-    <!-- Availability -->
-    <div class="field">
-      <label>Availability <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
-      <input type="text" id="s3-availability" placeholder="e.g. Weekday mornings, flexible schedule"
-        style="width:100%;padding:14px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:15px;outline:none;transition:border-color 0.2s;box-sizing:border-box;" />
-    </div>
-
-    <div class="field-error hidden" id="s3-error"></div>
-
-    <button class="btn-primary" id="s3-btn" onclick="completeStep3()">Finish — Go Live 🚀</button>
-    <button class="btn-ghost" onclick="showStep(2)">← Back</button>
+    <p style="text-align:center;font-size:11px;color:var(--text-faint);margin-top:8px;">Check your spam folder if you don't see it within 1 minute.</p>
   </div>
 
   <!-- ===== SUCCESS ===== -->
@@ -617,30 +508,34 @@ body {
       <div class="success-icon">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="var(--brand)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
       </div>
-      <h1 class="success-title">{t(locale, 'join.success_title')}</h1>
-      <p class="success-sub">{t(locale, 'join.success_sub')}</p>
+      <h1 class="success-title">You're live! 🔥</h1>
+      <p class="success-sub">Your profile is up. Share your link now — clients can already view your page.</p>
 
       <div class="url-card">
         <span class="url-card-text" id="success-url">...</span>
-        <button class="url-copy-btn" onclick="copyProfileUrl()" id="copy-btn">{t(locale, 'join.copy_btn')}</button>
+        <button class="url-copy-btn" onclick="copyProfileUrl()">Copy</button>
       </div>
 
-      <a id="view-profile-btn" href="#" class="btn-primary" style="display:flex;text-align:center;text-decoration:none;margin-bottom:12px;">{t(locale, 'join.view_profile')}</a>
-      <a href="/dashboard" class="btn-secondary" style="display:flex;text-align:center;text-decoration:none;justify-content:center;">{t(locale, 'join.go_dashboard')}</a>
+      <a id="view-profile-btn" href="#" class="btn-primary" style="display:flex;text-align:center;text-decoration:none;margin-bottom:12px;">View My Profile →</a>
+      <a href="/dashboard.html" class="btn-secondary" style="display:flex;text-align:center;text-decoration:none;justify-content:center;">Complete Profile &amp; Unlock Earnings →</a>
 
       <div class="next-steps">
-        <div class="next-steps-title">{t(locale, 'join.next_steps_title')}</div>
+        <div class="next-steps-title">What happens next</div>
         <div class="next-step-item">
           <div class="next-step-num">1</div>
-          <div>{t(locale, 'join.next1')}</div>
+          <div>Share your link in your Instagram bio and WhatsApp status</div>
         </div>
         <div class="next-step-item">
           <div class="next-step-num">2</div>
-          <div>{t(locale, 'join.next2')}</div>
+          <div>Add your photo, bio &amp; session packages in the dashboard (2 min)</div>
         </div>
         <div class="next-step-item">
           <div class="next-step-num">3</div>
-          <div>{t(locale, 'join.next3')}</div>
+          <div>Connect your affiliate links — earn passively from every client recommendation</div>
+        </div>
+        <div class="next-step-item">
+          <div class="next-step-num">4</div>
+          <div>REPs badge appears automatically once our team verifies your number (24h)</div>
         </div>
       </div>
     </div>
@@ -649,13 +544,9 @@ body {
 </div><!-- /join-wrap -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
-<script define:vars={{ __MARKET_KEY__: market.market }}>
-window.__MARKET__ = __MARKET_KEY__;
-</script>
-<script is:inline>
+<script is:inline define:vars={{ SUPABASE_ANON_KEY }}>
 // ===== CONFIG =====
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lemh0ZGJmeXZrc2hwdXBscXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzE4NDIsImV4cCI6MjA5MDUwNzg0Mn0.zJG9xodJS70Wl2IJWiLxk2bSL7eukg5uUbLfF7jvQAo';
 const EDGE_BASE = SUPABASE_URL + '/functions/v1';
 
 // ── Funnel tracking ───────────────────────────────────────────────────────────────
@@ -663,7 +554,6 @@ const SESSION_ID = crypto.randomUUID();
 const UTM_SOURCE = new URLSearchParams(location.search).get('utm_source') || '';
 const UTM_MEDIUM = new URLSearchParams(location.search).get('utm_medium') || '';
 const REFERRER = document.referrer || '';
-const REF_SLUG = (new URLSearchParams(location.search).get('ref') || '').slice(0, 80);
 
 function trackEvent(event_name, metadata) {
   fetch(EDGE_BASE + '/growth-agent', {
@@ -700,61 +590,13 @@ const state = {
   trainer_id: null
 };
 
-// ===== DRAFT (localStorage auto-save) =====
-const DRAFT_KEY = 'tb_join_draft';
-function saveDraft() {
-  try {
-    localStorage.setItem(DRAFT_KEY, JSON.stringify({
-      name: state.name, slug: state.slug, email: state.email,
-      phone: state.phone, reps_number: state.reps_number,
-      specialties: state.specialties, title: state.title,
-      training_modes: state.training_modes, trainer_id: state.trainer_id,
-      bio: document.getElementById('s3-bio')?.value || '',
-      instagram: document.getElementById('s3-instagram')?.value || '',
-      availability: document.getElementById('s3-availability')?.value || '',
-    }));
-  } catch(_) {}
-}
-async function loadDraft() {
-  try {
-    const raw = localStorage.getItem(DRAFT_KEY);
-    if (!raw) return;
-    const d = JSON.parse(raw);
-    if (d.name) { state.name = d.name; const el = document.getElementById('s1-name'); if (el) el.value = d.name; }
-    if (d.slug) { state.slug = d.slug; const el = document.getElementById('s1-slug'); if (el) el.value = d.slug; }
-    if (d.email) { state.email = d.email; const el = document.getElementById('s1-email'); if (el) el.value = d.email; }
-    if (d.phone) { state.phone = d.phone; const el = document.getElementById('s1-phone'); if (el) el.value = d.phone; }
-    if (d.reps_number) { state.reps_number = d.reps_number; const el = document.getElementById('s1-reps'); if (el) el.value = d.reps_number; }
-    if (d.bio) { const el = document.getElementById('s3-bio'); if (el) { el.value = d.bio; updateBioCharCount(); } }
-    if (d.instagram) { const el = document.getElementById('s3-instagram'); if (el) el.value = d.instagram; }
-    if (d.availability) { const el = document.getElementById('s3-availability'); if (el) el.value = d.availability; }
-    if (Array.isArray(d.specialties)) state.specialties = d.specialties;
-    if (d.title) state.title = d.title;
-    if (Array.isArray(d.training_modes)) state.training_modes = d.training_modes;
-    // If account was already created, resume at step 3
-    if (d.trainer_id) {
-      const { data: sessionData } = await sb.auth.getSession();
-      if (sessionData?.session) {
-        state.trainer_id = d.trainer_id;
-        showStep(3);
-      } else {
-        // Stale draft from a different session — clear it
-        clearDraft();
-      }
-    }
-  } catch(_) {}
-}
-function clearDraft() {
-  try { localStorage.removeItem(DRAFT_KEY); } catch(_) {}
-}
-
 // ===== PROGRESS =====
 function setProgress(pct) {
   document.getElementById('progress-fill').style.width = pct + '%';
 }
 
 function showStep(n) {
-  ['1','2','3','success'].forEach(s => {
+  ['1','2','success'].forEach(s => {
     const el = document.getElementById('step-' + s);
     if (el) el.classList.add('hidden');
   });
@@ -773,17 +615,6 @@ function showStep(n) {
     document.getElementById('line-1').className = 'step-line done';
     document.getElementById('step-indicator').style.display = 'flex';
     setProgress(60);
-  } else if (n === 3) {
-    document.getElementById('dot-1').className = 'step-dot done';
-    document.getElementById('dot-1').innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
-    document.getElementById('dot-2').className = 'step-dot done';
-    document.getElementById('dot-2').innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
-    document.getElementById('dot-3').className = 'step-dot active';
-    document.getElementById('dot-3').innerHTML = '3';
-    document.getElementById('line-1').className = 'step-line done';
-    document.getElementById('line-2').className = 'step-line done';
-    document.getElementById('step-indicator').style.display = 'flex';
-    setProgress(80);
   } else if (n === 'success') {
     document.getElementById('step-indicator').style.display = 'none';
     setProgress(100);
@@ -822,7 +653,7 @@ async function autoBuildFromIG() {
     }
     // Store Instagram handle in state for later
     state.instagram = '@' + handle;
-    status.textContent = '\u2713 Pre-filled from @' + handle + ' - review and adjust below';
+    status.textContent = '\u2713 Pre-filled from @' + handle + ' — review and adjust below';
     status.style.color = '#00C853';
   } catch(e) {
     status.textContent = 'Could not fetch profile. Fill in manually below.';
@@ -862,14 +693,9 @@ function checkSlug(val) {
   }, 400);
 }
 
-// ===== Client-side sanitization (belt-and-suspenders; server also sanitizes) =====
-function sanitizeInput(str) {
-  return str.replace(/<[^>]*>/g, '').replace(/[<>"'`]/g, '').trim().slice(0, 500);
-}
-
 // ===== STEP 1 =====
 async function step1Next() {
-  const name = sanitizeInput(document.getElementById('s1-name').value.trim());
+  const name = document.getElementById('s1-name').value.trim();
   const slug = document.getElementById('s1-slug').value.trim();
   const email = document.getElementById('s1-email').value.trim();
   const phone = document.getElementById('s1-phone').value.trim();
@@ -880,6 +706,7 @@ async function step1Next() {
   if (!slug || slug.length < 2) { showErr(errEl, 'Please choose a profile URL (min 2 characters).'); return; }
   if (!email || !email.includes('@')) { showErr(errEl, 'Please enter a valid email address.'); return; }
   if (!phone) { showErr(errEl, 'Please enter your WhatsApp number.'); return; }
+  if (!document.getElementById('consent-checkbox').checked) { showErr(errEl, 'Please agree to the Privacy Policy and Terms of Service to continue.'); return; }
 
   errEl.classList.add('hidden');
   const btn = document.getElementById('s1-btn');
@@ -956,14 +783,6 @@ async function verifyAndCreate() {
   if (state.specialties.length === 0) { showErr(errEl, 'Please select at least one specialty.'); return; }
   if (!title) { showErr(errEl, 'Please enter your title/role.'); return; }
 
-  // Consent validation - required for GDPR / CCPA / PDPL compliance
-  const consentBox = document.getElementById('consent-checkbox');
-  if (consentBox && !consentBox.checked) {
-    showErr(errEl, 'Please agree to the Terms of Service and Privacy Policy to continue.');
-    document.getElementById('consent-label')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
-
   const code = Array.from({length:6}, (_,i) => document.getElementById('otp-'+i).value).join('');
   if (code.length < 6) { showErr(errEl, 'Please enter the 6-digit code from your email.'); return; }
 
@@ -985,6 +804,9 @@ async function verifyAndCreate() {
 
     const userId = authData?.user?.id;
 
+    // Get referral from URL
+    const refSlug = new URLSearchParams(location.search).get('ref') || null;
+
     // Create trainer record
     const trainerPayload = {
       name: state.name,
@@ -993,13 +815,12 @@ async function verifyAndCreate() {
       whatsapp: (document.getElementById('phone-prefix-display')?.textContent ?? '{market.phonePrefix}') + state.phone,
       reps_number: state.reps_number || null,
       verification_status: state.reps_number ? 'pending' : 'unverified',
-      market: window.__MARKET__ || 'ae',
       specialties: state.specialties,
       title: state.title,
       training_modes: state.training_modes,
       plan: 'free',
       accepting_clients: true,
-      referred_by_slug: REF_SLUG || null,
+      referred_by: refSlug
     };
     if (userId) trainerPayload.user_id = userId;
 
@@ -1010,7 +831,7 @@ async function verifyAndCreate() {
       .single();
 
     if (trainerErr) {
-      // Trainer might already exist - try to fetch
+      // Trainer might already exist — try to fetch
       const { data: existing } = await sb.from('trainers').select('*').eq('email', state.email).maybeSingle();
       if (!existing) throw trainerErr;
       state.trainer_id = existing.id;
@@ -1018,9 +839,11 @@ async function verifyAndCreate() {
       state.trainer_id = trainer?.id;
     }
 
-    // Success — proceed to step 3 for profile completion
-    saveDraft();
-    showStep(3);
+    // Success
+    const profileUrl = window.location.hostname + '/' + state.slug;
+    document.getElementById('success-url').textContent = profileUrl;
+    document.getElementById('view-profile-btn').href = `/${state.slug}`;
+    showStep('success');
 
   } catch(e) {
     showErr(errEl, e.message || 'Verification failed. Please check your code and try again.');
@@ -1074,183 +897,5 @@ document.getElementById('s1-name').addEventListener('input', function() {
 document.getElementById('s1-slug').addEventListener('input', function() {
   this.dataset.userEdited = '1';
 });
-['s1-email', 's1-slug', 's1-phone', 's1-reps'].forEach(function(id) {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('input', saveDraft);
-});
-
-// ===== STEP 3 FUNCTIONS =====
-let _avatarBlob = null;
-
-function handleAvatarFileChange(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  _avatarBlob = file;
-  const url = URL.createObjectURL(file);
-  const img = document.getElementById('avatar-preview-img');
-  const placeholder = document.getElementById('avatar-upload-placeholder');
-  const label = document.getElementById('avatar-upload-label');
-  if (img) { img.src = url; img.style.display = 'block'; }
-  if (placeholder) placeholder.style.display = 'none';
-  if (label) label.style.display = 'none';
-}
-
-function updateBioCharCount() {
-  const val = document.getElementById('s3-bio')?.value || '';
-  const el = document.getElementById('bio-char-count');
-  if (el) el.textContent = val.length + ' / 500';
-  saveDraft();
-}
-
-async function generateAIBio() {
-  const btn = document.getElementById('ai-bio-btn');
-  if (!btn || btn.disabled) return;
-  btn.disabled = true;
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Generating...';
-  const bioErrEl = document.getElementById('ai-bio-error');
-  if (bioErrEl) bioErrEl.classList.add('hidden');
-  try {
-    const { data: sessionData } = await sb.auth.getSession();
-    const jwt = sessionData?.session?.access_token;
-    const res = await fetch(EDGE_BASE + '/ai-bio-writer', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(jwt ? { 'Authorization': 'Bearer ' + jwt } : {})
-      },
-      body: JSON.stringify({
-        name: state.name,
-        specialties: state.specialties,
-        title: state.title,
-        market: window.__MARKET__ || 'ae'
-      })
-    });
-    if (res.ok) {
-      const { bio } = await res.json();
-      if (bio) {
-        const bioEl = document.getElementById('s3-bio');
-        if (bioEl) { bioEl.value = bio; updateBioCharCount(); }
-      } else {
-        if (bioErrEl) { bioErrEl.textContent = 'Could not generate bio — please write your own.'; bioErrEl.classList.remove('hidden'); }
-      }
-    } else {
-      if (bioErrEl) { bioErrEl.textContent = 'Could not generate bio — please write your own.'; bioErrEl.classList.remove('hidden'); }
-    }
-  } catch(_) {
-    if (bioErrEl) { bioErrEl.textContent = 'Could not generate bio — please write your own.'; bioErrEl.classList.remove('hidden'); }
-  }
-  btn.disabled = false;
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Write bio with AI';
-}
-
-let _packageCount = 0;
-let _step3Submitting = false;
-function addPackageRow() {
-  const list = document.getElementById('packages-list');
-  if (!list) return;
-  const idx = _packageCount++;
-  const div = document.createElement('div');
-  div.id = 'pkg-row-' + idx;
-  div.style.cssText = 'background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;';
-  div.innerHTML = '<div style="margin-bottom:8px;"><input type="text" class="pkg-name" placeholder="e.g. 10-Pack, Monthly Plan" style="width:100%;padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;font-family:Inter,sans-serif;box-sizing:border-box;" /></div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
-    + '<input type="number" class="pkg-price" min="0" step="1" placeholder="Price (e.g. 250)" style="padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;font-family:Inter,sans-serif;width:100%;box-sizing:border-box;" />'
-    + '<select class="pkg-currency" style="padding:10px 12px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;font-family:Inter,sans-serif;">'
-    + '<option value="AED">AED</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="EUR">EUR</option>'
-    + '</select></div>';
-  list.appendChild(div);
-}
-
-function collectPackages() {
-  return Array.from(document.querySelectorAll('#packages-list .pkg-name'))
-    .map(function(nameEl, i) {
-      const row = nameEl.closest('div[id^="pkg-row"]') || nameEl.parentElement.parentElement;
-      return {
-        name: nameEl.value.trim(),
-        price: parseFloat(row.querySelector('.pkg-price')?.value) || 0,
-        currency: row.querySelector('.pkg-currency')?.value || 'AED'
-      };
-    })
-    .filter(function(p) { return p.name; });
-}
-
-async function completeStep3() {
-  const errEl = document.getElementById('s3-error');
-  if (errEl) errEl.classList.add('hidden');
-
-  if (_step3Submitting) return;
-  _step3Submitting = true;
-
-  if (!state.trainer_id) {
-    _step3Submitting = false;
-    if (errEl) { errEl.textContent = 'Session error — please refresh'; errEl.classList.remove('hidden'); }
-    return;
-  }
-
-  const btn = document.getElementById('s3-btn');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Saving...'; }
-
-  try {
-    const updates = {};
-    const bioVal = document.getElementById('s3-bio')?.value.trim();
-    if (bioVal) updates.bio = bioVal;
-    const igVal = document.getElementById('s3-instagram')?.value.trim().replace(/^@/, '');
-    if (igVal) updates.instagram_handle = igVal;
-    const avail = document.getElementById('s3-availability')?.value.trim();
-    if (avail) updates.availability = avail;
-
-    // Upload avatar if provided
-    if (_avatarBlob) {
-      const ALLOWED_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
-      const MAX_AVATAR_BYTES = 5 * 1024 * 1024; // 5 MB
-      if (!ALLOWED_TYPES[_avatarBlob.type]) {
-        throw new Error('Avatar must be a JPEG, PNG, or WebP image.');
-      }
-      if (_avatarBlob.size > MAX_AVATAR_BYTES) {
-        throw new Error('Avatar file must be under 5 MB.');
-      }
-      const ext = ALLOWED_TYPES[_avatarBlob.type];
-      const path = 'trainers/' + state.trainer_id + '/avatar.' + ext;
-      const { error: uploadErr } = await sb.storage.from('avatars').upload(path, _avatarBlob, { upsert: true, contentType: _avatarBlob.type });
-      if (uploadErr) {
-        if (errEl) { errEl.textContent = 'Photo upload failed: ' + uploadErr.message; errEl.classList.remove('hidden'); }
-      } else {
-        const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
-        updates.avatar_url = urlData.publicUrl;
-      }
-    }
-
-    if (Object.keys(updates).length) {
-      await sb.from('trainers').update(updates).eq('id', state.trainer_id);
-    }
-
-    // Save packages
-    const packages = collectPackages();
-    if (packages.length) {
-      await sb.from('session_packages').delete().eq('trainer_id', state.trainer_id);
-      await sb.from('session_packages').insert(packages.map(function(p) {
-        return Object.assign({}, p, { trainer_id: state.trainer_id });
-      }));
-    }
-
-    clearDraft();
-    // Show success screen
-    const profileUrl = window.location.hostname + '/' + state.slug;
-    const successUrl = document.getElementById('success-url');
-    const viewBtn = document.getElementById('view-profile-btn');
-    if (successUrl) successUrl.textContent = profileUrl;
-    if (viewBtn) viewBtn.href = '/' + state.slug;
-    trackEvent('join_signup_complete', { trainer_id: state.trainer_id });
-    showStep('success');
-
-  } catch(e) {
-    _step3Submitting = false;
-    if (errEl) { errEl.textContent = e.message || 'Something went wrong. Please try again.'; errEl.classList.remove('hidden'); }
-    if (btn) { btn.disabled = false; btn.innerHTML = 'Finish — Go Live 🚀'; }
-  }
-}
-
-// Load any saved draft on page init
-loadDraft();
 </script>
 </Base>

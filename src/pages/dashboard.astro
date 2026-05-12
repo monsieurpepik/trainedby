@@ -1,223 +1,98 @@
 ---
 import Base from '../layouts/Base.astro';
 import ProfileCompleteness from '../components/ProfileCompleteness.astro';
-import { getMarket } from '../lib/market.ts';
-import { getLocale, t, getBrand } from '../lib/i18n.ts';
-import { createClient } from '@supabase/supabase-js';
-
-const market = getMarket(Astro.url.hostname);
-const locale = getLocale(Astro.request);
-const brand = getBrand(locale);
 const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 const ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
-
-// ── SSR: compute profile completeness ──────────────────────────────────────
-let ssrScore = 0;
-let ssrFields: { key: string; label: string; pts: number; done: boolean; action: string }[] = [];
-let ssrPlan = 'free';
-let ssrSlug = '';
-let bookingSetupSteps: { label: string; done: boolean; action: string }[] = [];
-let bookingReady = false;
-let bookings: { id: string; consumer_name: string; consumer_email: string; scheduled_at: string; duration_min: number; amount_cents: number; status: string; session_type: { name: string } | null }[] = [];
-
-const cookieHeader = Astro.request.headers.get('cookie') || '';
-const tbSession = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith('tb_session='))?.slice('tb_session='.length);
-
-if (tbSession) {
-  try {
-    const svc = createClient(
-      import.meta.env.SUPABASE_URL,
-      import.meta.env.SUPABASE_SERVICE_ROLE_KEY
-    );
-
-    // Validate session token
-    const { data: link } = await svc
-      .from('magic_links')
-      .select('trainer_id')
-      .eq('token', tbSession)
-      .eq('used', false)
-      .gt('expires_at', new Date().toISOString())
-      .single();
-
-    // Extend session for 7 days on each valid dashboard load
-    if (link?.trainer_id) {
-      const newExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-      await svc.from('magic_links')
-        .update({ expires_at: newExpiry })
-        .eq('token', tbSession)
-        .eq('used', false);
-    }
-
-    if (link?.trainer_id) {
-      const [{ data: trainer }, { count: pkgCount }, { count: sessionTypeCount }, { count: availabilityCount }, { data: bookingsData }] = await Promise.all([
-        svc.from('trainers').select('avatar_url, bio, instagram_handle, reps_verified, verification_status, plan, slug, stripe_connect_onboarded').eq('id', link.trainer_id).single(),
-        svc.from('session_packages').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id),
-        svc.from('session_types').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id).eq('is_active', true),
-        svc.from('trainer_availability').select('id', { count: 'exact', head: true }).eq('trainer_id', link.trainer_id),
-        svc.from('bookings').select('id, consumer_name, consumer_email, scheduled_at, duration_min, amount_cents, status, session_type:session_types(name)').eq('trainer_id', link.trainer_id).in('status', ['confirmed', 'cancelled', 'refunded', 'completed']).order('scheduled_at', { ascending: false }).limit(50),
-      ]);
-
-      if (trainer) {
-        ssrPlan = trainer.plan || 'free';
-        ssrSlug = trainer.slug || '';
-        bookings = (bookingsData ?? []) as typeof bookings;
-        const certVerified = trainer.reps_verified === true || trainer.verification_status === 'verified';
-        const FIELDS = [
-          { key: 'avatar_url', label: 'Profile photo', pts: 20, done: !!trainer.avatar_url, action: '/edit' },
-          { key: 'bio', label: 'Bio (50+ characters)', pts: 20, done: !!(trainer.bio && trainer.bio.length > 50), action: '/edit' },
-          { key: 'instagram_handle', label: 'Instagram handle', pts: 15, done: !!trainer.instagram_handle, action: '/edit' },
-          { key: 'packages', label: 'At least 1 package', pts: 20, done: (pkgCount ?? 0) >= 1, action: '/edit' },
-          { key: 'cert_verified', label: 'Certification verified', pts: 10, done: certVerified, action: '/edit' },
-        ];
-        const totalPts = FIELDS.reduce((s, f) => s + f.pts, 0);
-        const raw = FIELDS.filter(f => f.done).reduce((sum, f) => sum + f.pts, 0);
-        ssrScore = Math.round((raw / totalPts) * 100);
-        ssrFields = FIELDS;
-        // Booking setup gating
-        bookingSetupSteps = [
-          { label: 'Connect your bank (Stripe)', done: !!trainer.stripe_connect_onboarded, action: '/dashboard?stripe=start' },
-          { label: 'Add at least one session type', done: (sessionTypeCount ?? 0) >= 1, action: '/edit?tab=sessions' },
-          { label: 'Set your availability', done: (availabilityCount ?? 0) >= 1, action: '/edit?tab=availability' },
-        ];
-        bookingReady = bookingSetupSteps.every(s => s.done);
-      }
-    }
-  } catch (e) {
-    console.error('[SSR ProfileCompleteness]', e);
-  }
-}
 ---
 
 <Base
-  title={`Dashboard - ${market.brandName}`}
-  description={`Your ${market.brandName} trainer dashboard. Manage leads, analytics, and your profile.`}
+  title="Dashboard — TrainedBy"
+  description="Your TrainedBy trainer dashboard. Manage leads, analytics, digital products, and affiliate income."
 >
   <Fragment slot="head">
     <meta name="color-scheme" content="light">
     <meta name="theme-color" content="#FFFFFF">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
-    <!-- Light theme override — must be LAST in <head> to win the CSS cascade over Base.astro dark globals -->
-    <style>
-      html[data-market] {
-        --bg: #FFFFFF;
-        --surface: #FAFAF9;
-        --surface-2: #F5F4F3;
-        --surface-3: #E8E5E2;
-        --surface-4: #E0DDD9;
-        --text: #1A1411;
-        --text-muted: #6B6460;
-        --text-faint: rgba(26,20,17,0.4);
-        --border: rgba(0,0,0,0.07);
-        --border-hover: rgba(0,0,0,0.14);
-        --brand: #FF5C00;
-        --brand-dim: rgba(255,92,0,0.10);
-        --brand-border: rgba(255,92,0,0.25);
-        --green: #00C853;
-        --color-whatsapp: #25D366;
-        --accent: #8888ff;
-        --gold-light: #f5d06b;
-        --gold-dark: #c9a227;
-        --ai-bg: #080810;
-        --ai-indigo: #6366f1;
-        --ai-indigo-light: #818cf8;
-        --ai-indigo-dark: #4f46e5;
-        --font-body: 'DM Sans', system-ui, sans-serif;
-        --font-display: 'DM Sans', system-ui, sans-serif;
-        --card-dark-tint-sm: rgba(255,255,255,0.12);
-        --card-dark-tint-xs: rgba(255,255,255,0.15);
-        --white-tint-nav: rgba(255,255,255,0.95);
-        --text-tint-sm: rgba(26,20,17,0.2);
-        --whatsapp-dim-sm: rgba(37,211,102,0.08);
-        --whatsapp-dim-md: rgba(37,211,102,0.15);
-        --whatsapp-border-sm: rgba(37,211,102,0.15);
-        --accent-dim-sm: rgba(100,100,255,0.08);
-        --accent-border-sm: rgba(100,100,255,0.2);
-        --green-dim-xs: rgba(0,200,83,0.06);
-        --green-border-xs: rgba(0,200,83,0.15);
-        --shadow-overlay: rgba(0,0,0,0.5);
-        --chart-bar-hover: rgba(26,20,17,0.15);
-        --ai-indigo-tint-xs: rgba(99,102,241,0.04);
-        --ai-indigo-tint-sm: rgba(99,102,241,0.06);
-        --ai-indigo-tint-md: rgba(99,102,241,0.08);
-        --ai-indigo-tint-lg: rgba(99,102,241,0.15);
-        --ai-indigo-border-xxs: rgba(99,102,241,0.2);
-        --ai-indigo-border-xs: rgba(99,102,241,0.15);
-        --ai-indigo-border-sm: rgba(99,102,241,0.2);
-        --ai-indigo-border-md: rgba(99,102,241,0.3);
-        --ai-indigo-border-lg: rgba(99,102,241,0.35);
-        --ai-indigo-glow-xs: rgba(99,102,241,0.2);
-        --ai-indigo-glow-sm: rgba(99,102,241,0.4);
-        --ai-indigo-glow-md: rgba(99,102,241,0.5);
-        --ai-indigo-transparent: rgba(99,102,241,0);
-        --ai-indigo-focus: rgba(99,102,241,0.5);
-        --ai-indigo-focus-ring: rgba(99,102,241,0.08);
-        --white-tint-label: rgba(255,255,255,0.4);
-        --white-tint-text-faint: rgba(255,255,255,0.5);
-        --white-tint-text: rgba(255,255,255,0.9);
-        --white-tint-muted: rgba(255,255,255,0.35);
-        --white-tint-panel: rgba(255,255,255,0.05);
-        --brand-faded: rgba(255,92,0,0.8);
-        --brand-dim-xs: rgba(255,92,0,0.04);
-        --pro-gold-tint-md: rgba(197,162,39,0.10);
-        --pro-gold-tint-xs: rgba(197,162,39,0.04);
-        --pro-gold-shadow-sm: rgba(197,162,39,0.3);
-        --pro-gold-shadow-lg: rgba(197,162,39,0.5);
-        --pro-border: rgba(197,162,39,0.35);
-        --pro-dim: rgba(197,162,39,0.08);
-        --pro-gradient: linear-gradient(90deg,transparent,rgba(245,208,107,0.5),transparent);
-        --text-on-gold: #0a0a0a;
-      }
-      body {
-        background: var(--bg);
-        color: var(--text);
-        font-family: 'DM Sans', system-ui, sans-serif;
-      }
-    </style>
   </Fragment>
+
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg) !important; color: var(--text) !important;
-  font-family: 'DM Sans', system-ui, sans-serif; font-size: 14px; line-height: 1.6;
-  -webkit-font-smoothing: antialiased; min-height: 100vh;
-}
-.dash-wrap {
-  max-width: 480px; margin: 0 auto;
-  padding: 0 20px max(80px, env(safe-area-inset-bottom));
+:root {
+  --bg:         #FFFFFF;
+  --surface:    #FAFAF9;
+  --surface-2:  #F5F4F3;
+  --surface-3:  #E8E5E2;
+  --surface-4:  #E0DDD9;
+  --text:       #1A1411;
+  --text-muted: #6B6460;
+  --text-faint: rgba(26,20,17,0.4);
+  --border:     rgba(0,0,0,0.07);
+  --brand:      #FF5C00;
+  --green:      #00C853;
+  --reps:       #00C853;
+  --reps-dim:   rgba(0,200,83,0.1);
+  --danger:     #E53935;
+  --danger-dim: rgba(229,57,53,0.1);
+  --brand-dim: rgba(255,92,0,0.10); --brand-border: rgba(255,92,0,0.25);
+  --reps-border: rgba(0,200,83,0.2);
+  --border-hover: rgba(0,0,0,0.14);
 }
 
-/* Desktop tab nav */
-.dash-tabs { display: none; }
+body {
+  background: var(--surface, #FAFAF9);
+  color: var(--text, #1A1411);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 14px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+html { scroll-behavior: smooth; }
+
+.dash-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
 @media (min-width: 768px) {
-  .dash-header { display: none; }
-  .dash-tabs { display: block; background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
-  .bottom-nav { display: none !important; }
-  .dash-wrap { max-width: 960px; padding-bottom: 32px; }
-  .dash-tabs-inner { max-width: 960px; margin: 0 auto; height: 52px; display: flex; align-items: center; padding: 0 32px; }
-  .tabs-logo { font-weight: 800; font-size: 15px; color: var(--text); letter-spacing: -0.03em; text-decoration: none; margin-right: 32px; flex-shrink: 0; }
-  .tabs-list { display: flex; flex: 1; height: 52px; }
-  .tab-item { padding: 0 16px; font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: color 0.15s; }
-  .tab-item:hover { color: var(--text); }
-  .tab-item.active { color: var(--text); font-weight: 700; border-bottom-color: var(--text); }
-  .tabs-right { margin-left: auto; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-  .tab-view-profile { font-size: 12px; color: var(--brand); font-weight: 700; text-decoration: none; }
-  .tabs-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--text); }
-  .stats-grid { grid-template-columns: repeat(4, 1fr); }
+  .dash-wrap {
+    max-width: 960px;
+    padding-bottom: 32px;
+  }
 }
 
 /* Header */
 .dash-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: 20px;
-  border-bottom: 1px solid var(--border); margin: 0 -20px; padding-left: 20px; padding-right: 20px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  padding: 0 20px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 .dash-logo {
-  display: flex; align-items: center; gap: 8px;
-  font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 16px;
-  text-decoration: none; color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 15px;
+  color: #1A1411;
+  text-decoration: none;
+  letter-spacing: -0.03em;
 }
+.nav-edit, .nav-view {
+  font-size: 13px;
+  color: #6B6460;
+  font-weight: 500;
+  text-decoration: none;
+}
+.nav-view { color: #FF5C00; font-weight: 700; }
 .header-nav { display: flex; gap: 8px; }
 .header-nav a {
   padding: 8px 14px; border-radius: 20px;
@@ -229,23 +104,114 @@ body {
 }
 .header-nav .nav-edit:hover { border-color: var(--border-hover); color: var(--text); }
 .header-nav .nav-view {
-  background: var(--brand); color: var(--text-on-brand);
+  background: var(--brand); color: #fff;
 }
-.header-nav .nav-view:hover { background: var(--brand-hover); }
+.header-nav .nav-view:hover { background: #e05200; }
+
+/* Desktop tab nav */
+.dash-tabs { display: none; }
+
+@media (min-width: 768px) {
+  .dash-header { display: none; }
+  .dash-tabs { display: block; }
+  .bottom-nav { display: none !important; }
+
+  .dash-tabs {
+    background: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .dash-tabs-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    gap: 0;
+  }
+  .tabs-logo {
+    font-weight: 800;
+    font-size: 15px;
+    color: #1A1411;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+    margin-right: 32px;
+    flex-shrink: 0;
+  }
+  .tabs-list {
+    display: flex;
+    gap: 0;
+    flex: 1;
+    height: 52px;
+  }
+  .tab-item {
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6B6460;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s;
+  }
+  .tab-item:hover { color: #1A1411; }
+  .tab-item.active {
+    color: #1A1411;
+    font-weight: 700;
+    border-bottom-color: #1A1411;
+  }
+  .tabs-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .tab-view-profile {
+    font-size: 12px;
+    color: #FF5C00;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .tabs-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #F5F4F3;
+    border: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: #1A1411;
+  }
+  /* Focus-visible states for keyboard nav */
+  .tabs-logo:hover { opacity: 0.75; }
+  .tabs-logo:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
+  .tab-view-profile:hover { opacity: 0.8; }
+  .tab-view-profile:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
+  .tab-item:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+}
 
 /* Trainer greeting */
 .trainer-greeting {
-  padding: 24px 0 20px;
+  padding: 24px 20px 20px;
   border-bottom: 1px solid var(--border);
 }
 .greeting-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .greeting-avatar {
   width: 44px; height: 44px; border-radius: 50%;
   object-fit: cover; background: var(--surface-3);
-  border: 2px solid var(--border);
+  border: 2px solid var(--brand);
 }
 .greeting-name {
-  font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800;
+  font-size: 18px; font-weight: 800;
 }
 .greeting-sub { font-size: 12px; color: var(--text-muted); }
 
@@ -256,61 +222,84 @@ body {
   border-radius: 12px; padding: 12px 14px;
 }
 .url-bar-text {
-  flex: 1; font-size: 13px; font-weight: 600; color: var(--text-muted);
+  flex: 1; font-size: 13px; font-weight: 600; color: var(--brand);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .url-copy-btn {
   padding: 6px 12px; border-radius: 8px;
-  background: var(--surface-3); border: 1px solid var(--border);
-  color: var(--text-muted); font-size: 11px; font-weight: 700;
+  background: var(--brand-dim); border: 1px solid var(--brand-border);
+  color: var(--brand); font-size: 11px; font-weight: 700;
   cursor: pointer; flex-shrink: 0;
 }
 
 /* Stats grid */
-.stats-section { padding: 24px 0; border-bottom: 1px solid var(--border); }
+.stats-section { padding: 24px 20px; border-bottom: 1px solid var(--border); }
 .stats-section-title {
   font-size: 11px; font-weight: 700; color: var(--text-faint);
   text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;
 }
 .stats-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
 }
+
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .stat-card {
-  background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: 14px; padding: 16px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 14px;
+  padding: 18px;
 }
 .stat-card.brand-card {
-  background: var(--text); border-color: var(--text); color: var(--text-on-brand);
+  background: #1A1411;
+  border-color: #1A1411;
 }
-.stat-card-icon {
-  width: 32px; height: 32px; border-radius: 8px;
-  background: var(--surface-3); border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 10px; color: var(--text-muted);
-}
-.stat-card.brand-card .stat-card-icon {
-  background: var(--card-dark-tint-sm); border-color: var(--card-dark-tint-xs); color: var(--text-on-brand);
-}
+.stat-card-icon { color: #6B6460; margin-bottom: 8px; }
+.stat-card.brand-card .stat-card-icon { color: rgba(255,255,255,0.5); }
 .stat-card-value {
-  font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 800;
-  letter-spacing: -0.5px; margin-bottom: 2px;
+  font-size: 26px;
+  font-weight: 800;
+  color: #1A1411;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 4px;
 }
-.stat-card-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
-.stat-card-change {
-  font-size: 11px; font-weight: 600; margin-top: 4px;
+.stat-card.brand-card .stat-card-value { color: #fff; }
+.stat-card-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B6460;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
 }
-.stat-card-change.up { color: var(--reps); }
-.stat-card-change.down { color: var(--danger); }
+.stat-card.brand-card .stat-card-label { color: rgba(255,255,255,0.5); }
+.stat-card-change { font-size: 11px; color: #00C853; font-weight: 600; }
+.stat-card-change.down { color: #E53935; }
 
 /* Chart placeholder */
-.chart-section { padding: 24px 0; border-bottom: 1px solid var(--border); }
+.chart-section, .leads-section, .checklist-section, .income-section {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
 .chart-header {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 14px;
 }
-.chart-title {
-  font-size: 11px; font-weight: 700; color: var(--text-faint);
-  text-transform: uppercase; letter-spacing: 0.08em;
+.chart-title, .leads-title, .checklist-title, .stats-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1A1411;
 }
 .chart-period-select {
   padding: 6px 10px; border-radius: 8px;
@@ -327,33 +316,29 @@ body {
   display: flex; align-items: flex-end; gap: 4px;
   padding: 12px 12px 0; height: 100%;
 }
+.chart-bar { background: #E8E5E2; border-radius: 4px 4px 0 0; }
+.chart-bar.today { background: #1A1411; }
 .chart-bar {
-  flex: 1; border-radius: 4px 4px 0 0;
-  background: var(--surface-3); border: 1px solid var(--border);
+  flex: 1;
+  border-radius: 4px 4px 0 0;
   transition: background 0.2s; cursor: pointer; min-height: 4px;
 }
-.chart-bar:hover { background: var(--chart-bar-hover); }
-.chart-bar.today { background: var(--text); border-color: var(--text); }
+.chart-bar:hover { background: rgba(26,20,17,0.25); }
 .chart-labels {
   display: flex; gap: 4px; padding: 4px 12px 0;
 }
 .chart-label {
-  flex: 1; text-align: center; font-size: 9px; color: var(--text-faint);
+  flex: 1; text-align: center; font-size: 9px; color: #6B6460;
   font-weight: 600;
 }
 
 /* Leads section */
-.leads-section { padding: 24px 0; border-bottom: 1px solid var(--border); }
 .leads-header {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 14px;
 }
-.leads-title {
-  font-size: 11px; font-weight: 700; color: var(--text-faint);
-  text-transform: uppercase; letter-spacing: 0.08em;
-}
 .leads-count {
-  background: var(--text); color: var(--text-on-brand);
+  background: var(--brand); color: #fff;
   font-size: 10px; font-weight: 700; padding: 2px 8px;
   border-radius: 10px;
 }
@@ -366,7 +351,7 @@ body {
 .lead-avatar {
   width: 36px; height: 36px; border-radius: 50%;
   background: var(--surface-3); display: flex; align-items: center;
-  justify-content: center; font-family: 'DM Sans', sans-serif;
+  justify-content: center;
   font-size: 14px; font-weight: 800; color: var(--text-muted);
   flex-shrink: 0;
 }
@@ -375,30 +360,28 @@ body {
 .lead-actions { display: flex; gap: 6px; margin-left: auto; }
 .lead-wa-btn {
   width: 32px; height: 32px; border-radius: 50%;
-  background: var(--whatsapp-dim-sm); border: 1px solid var(--whatsapp-border-sm);
+  background: rgba(37,211,102,0.08); border: 1px solid rgba(37,211,102,0.15);
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; text-decoration: none; color: var(--color-whatsapp);
+  cursor: pointer; text-decoration: none; color: #25D366;
   transition: background 0.2s;
 }
-.lead-wa-btn:hover { background: var(--whatsapp-dim-md); }
+.lead-wa-btn:hover { background: rgba(37,211,102,0.15); }
 .lead-type-tag {
   padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.04em;
 }
 .lead-type-tag.assessment {
-  background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted);
+  background: var(--brand-dim); border: 1px solid var(--brand-border); color: var(--brand);
 }
 .lead-type-tag.booking {
   background: var(--reps-dim); border: 1px solid var(--reps-border); color: var(--reps);
 }
 .lead-type-tag.package {
-  background: var(--accent-dim-sm); border: 1px solid var(--accent-border-sm); color: var(--accent);
+  background: rgba(100,100,255,0.08); border: 1px solid rgba(100,100,255,0.2); color: #8888ff;
 }
 
 /* Onboarding checklist */
-.checklist-section { padding: 24px 0; border-bottom: 1px solid var(--border); }
 .checklist-title {
-  font-size: 11px; font-weight: 700; color: var(--text-faint);
   text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;
 }
 .checklist-item {
@@ -418,29 +401,20 @@ body {
 .checklist-sub { font-size: 11px; color: var(--text-muted); }
 .checklist-action {
   margin-left: auto; padding: 6px 12px; border-radius: 8px;
-  background: var(--surface-3); border: 1px solid var(--border);
-  color: var(--text-muted); font-size: 11px; font-weight: 700;
+  background: var(--brand-dim); border: 1px solid var(--brand-border);
+  color: var(--brand); font-size: 11px; font-weight: 700;
   text-decoration: none; cursor: pointer; flex-shrink: 0;
 }
 
-/* Upgrade banner - Pro metallic gold treatment */
+/* Upgrade banner */
 .upgrade-banner {
-  background: linear-gradient(135deg, var(--pro-gold-tint-md) 0%, var(--pro-gold-tint-xs) 100%);
-  border: 1px solid var(--pro-border);
-  border-radius: 16px; padding: 20px; margin: 24px 0;
-  box-shadow: 0 0 32px var(--pro-dim);
-  position: relative; overflow: hidden;
-}
-.upgrade-banner::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: var(--pro-gradient);
+  background: linear-gradient(135deg, rgba(255,92,0,0.12) 0%, rgba(255,92,0,0.05) 100%);
+  border: 1px solid var(--brand-border); border-radius: 16px;
+  padding: 20px; margin: 24px 0;
 }
 .upgrade-title {
-  font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 16px; font-weight: 800;
+  font-size: 16px; font-weight: 800;
   margin-bottom: 6px;
-  background: var(--pro-gradient, linear-gradient(135deg,var(--gold-dark),var(--gold-light),var(--gold-dark)));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 .upgrade-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
 .upgrade-features {
@@ -453,16 +427,13 @@ body {
 .upgrade-feature svg { flex-shrink: 0; }
 .upgrade-btn {
   width: 100%; padding: 14px; border-radius: 12px;
-  background: var(--pro-gradient, linear-gradient(135deg,var(--gold-dark),var(--gold-light),var(--gold-dark)));
-  color: var(--text-on-gold); border: none;
-  font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 14px; font-weight: 800;
+  background: var(--brand); color: #fff; border: none;
+  font-size: 14px; font-weight: 700;
   cursor: pointer; transition: all 0.2s;
-  box-shadow: 0 4px 20px var(--pro-gold-shadow-sm);
 }
-.upgrade-btn:hover { box-shadow: 0 6px 28px var(--pro-gold-shadow-lg); transform: translateY(-1px); }
+.upgrade-btn:hover { background: #e05200; }
 
 /* Income stream cards */
-.income-section { padding: 24px 0; border-bottom: 1px solid var(--border); }
 .income-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .income-stream-card {
   background: var(--surface-2); border: 1px solid var(--border);
@@ -470,13 +441,13 @@ body {
   position: relative; overflow: hidden;
 }
 .income-stream-card.active {
-  background: var(--surface-2);
-  border-color: var(--border-hover);
+  background: linear-gradient(135deg, rgba(255,92,0,0.10) 0%, var(--surface-2) 100%);
+  border-color: var(--brand-border);
 }
 .income-stream-card.locked { opacity: 0.55; }
 .income-stream-icon { font-size: 20px; margin-bottom: 8px; }
 .income-stream-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
-.income-stream-value { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+.income-stream-value { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
 .income-stream-value.green { color: var(--reps); }
 .income-stream-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
 .income-stream-lock {
@@ -487,29 +458,29 @@ body {
 }
 
 /* Referral flywheel */
-.referral-section { padding: 24px 0; }
+.referral-section { padding: 24px 20px; }
 .referral-card {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(255,92,0,0.08) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--brand-border);
   border-radius: 16px; padding: 18px;
 }
-.referral-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; font-family: 'DM Sans', sans-serif; }
+.referral-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
 .referral-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
 /* Flywheel progress */
 .flywheel-progress { margin-bottom: 16px; }
 .flywheel-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 6px; }
-.flywheel-label span:last-child { color: var(--text-muted); }
+.flywheel-label span:last-child { color: var(--brand); }
 .flywheel-bar { height: 6px; background: var(--surface-3); border-radius: 3px; overflow: hidden; }
-.flywheel-fill { height: 100%; background: var(--text); border-radius: 3px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.flywheel-fill { height: 100%; background: var(--brand); border-radius: 3px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
 .flywheel-steps { display: flex; gap: 6px; margin-top: 10px; }
 .flywheel-step {
   flex: 1; height: 4px; border-radius: 2px;
   background: var(--surface-3);
 }
-.flywheel-step.done { background: var(--text); }
+.flywheel-step.done { background: var(--brand); }
 .flywheel-reward {
   display: flex; align-items: center; gap: 8px;
-  background: var(--green-dim-xs); border: 1px solid var(--green-border-xs);
+  background: rgba(0,200,83,0.06); border: 1px solid rgba(0,200,83,0.15);
   border-radius: 10px; padding: 10px 12px; margin-bottom: 14px;
   font-size: 12px; color: var(--reps); font-weight: 600;
 }
@@ -530,30 +501,29 @@ body {
   display: flex; align-items: center; justify-content: center; gap: 5px;
   transition: all 0.2s; text-decoration: none;
 }
-.referral-share-btn:hover { border-color: var(--border-hover); color: var(--text); }
+.referral-share-btn:hover { border-color: var(--brand-border); color: var(--brand); }
 
-/* ── AI Assistant Panel ───────────────────────────────────────────────────────────────────────────── */
+/* ── AI Assistant Panel ──────────────────────────────────────────────────── */
 .ai-panel {
   display: none; flex-direction: column;
   position: fixed; inset: 0; z-index: 50;
-  background: var(--ai-bg); /* Slightly blue-tinted dark for AI context */
+  background: var(--surface);
   padding-top: max(0px, env(safe-area-inset-top));
   padding-bottom: max(64px, calc(env(safe-area-inset-bottom) + 64px));
 }
 .ai-panel.open { display: flex; }
 .ai-panel-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px; border-bottom: 1px solid var(--ai-indigo-border-sm);
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  background: var(--ai-indigo-tint-xs);
 }
 .ai-panel-title {
-  font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 16px; font-weight: 800;
+  font-size: 16px; font-weight: 800;
   display: flex; align-items: center; gap: 8px;
 }
 .ai-panel-badge {
   font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
-  background: var(--ai-indigo-tint-lg); color: var(--ai-indigo-light); border: 1px solid var(--ai-indigo-border-md);
+  background: var(--brand-dim); color: var(--brand); border: 1px solid var(--brand-border);
 }
 .ai-panel-close {
   background: var(--surface-3); border: 1px solid var(--border);
@@ -573,16 +543,16 @@ body {
 }
 @keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .ai-msg.user {
-  background: var(--ai-indigo); color: var(--text-on-brand);
+  background: var(--brand); color: #fff;
   border-bottom-right-radius: 4px; align-self: flex-end;
 }
 .ai-msg.bot {
-  background: var(--ai-indigo-tint-md); color: var(--text);
-  border: 1px solid var(--ai-indigo-border-sm); border-bottom-left-radius: 4px; align-self: flex-start;
+  background: var(--surface-3); color: var(--text);
+  border: 1px solid var(--border); border-bottom-left-radius: 4px; align-self: flex-start;
   white-space: pre-wrap;
 }
 .ai-msg.typing {
-  background: var(--ai-indigo-tint-sm); border: 1px solid var(--ai-indigo-border-xs);
+  background: var(--surface-3); border: 1px solid var(--border);
   align-self: flex-start; color: var(--text-muted); font-style: italic;
 }
 .ai-quick-prompts {
@@ -594,11 +564,11 @@ body {
   color: var(--text-muted); cursor: pointer; transition: all 0.15s;
   white-space: nowrap;
 }
-.ai-chip:hover { border-color: var(--ai-indigo-glow-sm); color: var(--ai-indigo-light); background: var(--ai-indigo-tint-md); }
+.ai-chip:hover { border-color: var(--brand-border); color: var(--brand); background: var(--brand-dim); }
 .ai-input-row {
-  padding: 12px 20px; border-top: 1px solid var(--ai-indigo-border-xs);
+  padding: 12px 20px; border-top: 1px solid var(--border);
   display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0;
-  background: var(--ai-bg);
+  background: var(--surface);
 }
 .ai-input {
   flex: 1; background: var(--surface-3); border: 1px solid var(--border);
@@ -607,49 +577,28 @@ body {
   max-height: 100px; line-height: 1.5;
   transition: border-color 0.2s;
 }
-.ai-input:focus { border-color: var(--ai-indigo-focus); box-shadow: 0 0 0 3px var(--ai-indigo-focus-ring); }
+.ai-input:focus { border-color: var(--brand-border); }
 .ai-input::placeholder { color: var(--text-faint); }
 .ai-send {
   width: 42px; height: 42px; border-radius: 12px; border: none;
-  background: var(--ai-indigo); color: var(--text-on-brand); cursor: pointer;
+  background: var(--brand); color: #fff; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: all 0.2s;
-  box-shadow: 0 2px 12px var(--ai-indigo-glow-sm);
+  flex-shrink: 0; transition: background 0.2s;
 }
-.ai-send:hover { background: var(--ai-indigo-dark); box-shadow: 0 4px 20px var(--ai-indigo-glow-md); }
+.ai-send:hover { background: #e05200; }
 .ai-send:disabled { opacity: 0.4; cursor: not-allowed; }
 .ai-welcome {
   text-align: center; padding: 32px 20px 16px;
 }
 .ai-welcome-icon {
-  width: 56px; height: 56px; border-radius: 16px;
-  background: var(--ai-indigo-tint-lg);
-  border: 1px solid var(--ai-indigo-border-lg);
-  display: flex; align-items: center;
+  width: 56px; height: 56px; border-radius: 16px; background: var(--brand-dim);
+  border: 1px solid var(--brand-border); display: flex; align-items: center;
   justify-content: center; margin: 0 auto 16px;
-  animation: ai-breathe 3s ease-in-out infinite;
 }
 .ai-welcome-title {
-  font-family: var(--font-display, 'DM Sans', sans-serif); font-size: 18px; font-weight: 800; margin-bottom: 6px;
+  font-size: 18px; font-weight: 800; margin-bottom: 6px;
 }
 .ai-welcome-sub { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
-/* AI channel settings */
-.ai-channel-btn {
-  display: flex; align-items: center; gap: 6px;
-  padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
-  background: var(--surface-3); border: 1px solid var(--border); color: var(--text-muted);
-  cursor: pointer; transition: all 0.2s;
-}
-.ai-channel-btn:hover { border-color: var(--border-hover); color: var(--text); }
-.ai-channel-btn.active { background: var(--brand-dim); border-color: var(--brand-border); color: var(--brand); }
-.ai-channel-info { padding: 4px 0; }
-.btn-primary {
-  display: block; width: 100%; padding: 14px; border-radius: 12px;
-  background: var(--brand); color: var(--text-on-brand); font-size: 14px; font-weight: 700;
-  border: none; cursor: pointer; transition: background 0.2s; text-align: center;
-}
-.btn-primary:hover { background: var(--brand-hover); }
-
 /* Empty state */
 .empty-state {
   text-align: center; padding: 32px 0;
@@ -659,24 +608,43 @@ body {
 
 /* Bottom nav */
 .bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: var(--white-tint-nav); backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border);
-  display: flex; padding: 12px 0 max(12px, env(safe-area-inset-bottom));
-  z-index: 20;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  display: flex;
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 .bottom-nav-item {
-  flex: 1; display: flex; flex-direction: column; align-items: center;
-  gap: 3px; cursor: pointer; text-decoration: none;
-  color: var(--text-faint); transition: color 0.2s;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: #6B6460;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'DM Sans', system-ui, sans-serif;
 }
-.bottom-nav-item.active { color: var(--text); }
-.bottom-nav-item span { font-size: 10px; font-weight: 600; }
+.bottom-nav-item.active {
+  color: #1A1411;
+}
+.bottom-nav-item svg {
+  stroke: currentColor;
+}
 
 /* Spinner */
 .spinner {
   display: inline-block; width: 14px; height: 14px;
-  border: 2px solid var(--text-tint-sm); border-top-color: var(--text);
+  border: 2px solid rgba(0,0,0,0.1); border-top-color: #1A1411;
   border-radius: 50%; animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -689,7 +657,7 @@ body {
   color: var(--text); padding: 12px 20px; border-radius: 24px;
   font-size: 13px; font-weight: 600; z-index: 100;
   transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
-  white-space: nowrap; box-shadow: 0 8px 32px var(--shadow-overlay);
+  white-space: nowrap; box-shadow: 0 8px 32px rgba(0,0,0,0.15);
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
 .toast.success { background: var(--reps-dim); border-color: var(--reps-border); color: var(--reps); }
@@ -697,10 +665,6 @@ body {
 .hidden { display: none !important; }
 
 @keyframes pulse{0%,80%,100%{transform:scale(0.6);opacity:0.3}40%{transform:scale(1);opacity:1}}
-@keyframes ai-breathe {
-  0%, 100% { box-shadow: 0 0 0 0 var(--ai-indigo-transparent), 0 0 12px var(--ai-indigo-glow-xs); }
-  50% { box-shadow: 0 0 0 8px var(--ai-indigo-tint-md), 0 0 28px var(--ai-indigo-glow-sm); }
-}
   </style>
 
 <!-- Desktop tab nav — hidden on mobile, shown via CSS at ≥768px -->
@@ -724,7 +688,7 @@ body {
   <!-- Header -->
   <div class="dash-header">
     <a href="/" class="dash-logo">
-      <svg width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" style="fill: var(--text)"/><text x="16" y="23" font-family="DM Sans,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
+      <svg width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#1A1411"/><text x="16" y="23" font-family="DM Sans,Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="white">TB</text></svg>
       Dashboard
     </a>
     <div class="header-nav">
@@ -736,18 +700,17 @@ body {
   <!-- Loading -->
   <div id="dash-loading" style="text-align:center;padding:60px 0;">
     <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
-      <div style="width:8px;height:8px;border-radius:50%;background:var(--brand);animation:pulse 1.2s ease-in-out infinite;"></div>
-      <div style="width:8px;height:8px;border-radius:50%;background:var(--brand);animation:pulse 1.2s ease-in-out infinite;animation-delay:0.2s;"></div>
-      <div style="width:8px;height:8px;border-radius:50%;background:var(--brand);animation:pulse 1.2s ease-in-out infinite;animation-delay:0.4s;"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:#1A1411;animation:pulse 1.2s ease-in-out infinite;"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:#1A1411;animation:pulse 1.2s ease-in-out infinite;animation-delay:0.2s;"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:#1A1411;animation:pulse 1.2s ease-in-out infinite;animation-delay:0.4s;"></div>
     </div>
-    <style>@keyframes pulse{0%,80%,100%{transform:scale(0.6);opacity:0.3}40%{transform:scale(1);opacity:1}}</style>
   </div>
 
   <!-- Auth gate -->
   <div id="dash-auth" class="hidden" style="text-align:center;padding:60px 0;">
-    <h2 style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Sign in to view your dashboard</h2>
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px;">Sign in to view your dashboard</h2>
     <p style="font-size:14px;color:var(--text-muted);margin-bottom:24px;">Access your leads, analytics, and profile settings.</p>
-    <a href="/edit" style="display:inline-block;padding:14px 28px;border-radius:12px;background:var(--text);color:var(--text-on-brand);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;">Sign In →</a>
+    <a href="/edit" style="display:inline-block;padding:14px 28px;border-radius:12px;background:var(--brand);color:#fff;text-decoration:none;font-size:14px;font-weight:700;">Sign In →</a>
   </div>
 
   <!-- Dashboard content -->
@@ -759,7 +722,7 @@ body {
         <img id="dash-avatar" class="greeting-avatar" src="" alt="Avatar">
         <div>
           <div class="greeting-name" id="dash-name">Loading...</div>
-          <div class="greeting-sub" id="dash-sub">{market.brandName}</div>
+          <div class="greeting-sub" id="dash-sub">TrainedBy.ae</div>
         </div>
       </div>
       <div class="url-bar">
@@ -769,31 +732,7 @@ body {
     </div>
 
     <!-- Profile Completeness Widget -->
-    <ProfileCompleteness score={ssrScore} fields={ssrFields} plan={ssrPlan} slug={ssrSlug} />
-
-    <!-- Booking Setup Card (only shown when setup is incomplete) -->
-    {!bookingReady && (
-      <div style="background:var(--brand-dim);border:1px solid var(--brand-border);border-radius:14px;padding:16px 18px;margin-bottom:20px;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Finish setup to accept bookings</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Complete these steps to go live.</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          {bookingSetupSteps.map((step, i) => (
-            <a href={step.action} style={`display:flex;align-items:center;gap:10px;text-decoration:none;opacity:${i > 0 && !bookingSetupSteps[i-1].done ? '0.4' : '1'};pointer-events:${i > 0 && !bookingSetupSteps[i-1].done ? 'none' : 'auto'};`}>
-              <div style={`width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${step.done ? 'var(--green)' : 'var(--border)'};border:1.5px solid ${step.done ? 'var(--green)' : 'var(--border-hover)'};`}>
-                {step.done
-                  ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-on-brand)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                  : <span style="font-size:11px;font-weight:700;color:var(--text-muted);">{i + 1}</span>
-                }
-              </div>
-              <span style={`font-size:13px;font-weight:500;color:${step.done ? 'var(--text-faint)' : 'var(--text)'};text-decoration:${step.done ? 'line-through' : 'none'};`}>{step.label}</span>
-              {!step.done && (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="2" style="margin-left:auto;"><path d="M9 18l6-6-6-6"/></svg>
-              )}
-            </a>
-          ))}
-        </div>
-      </div>
-    )}
+    <ProfileCompleteness />
 
     <!-- Stats -->
     <div class="stats-section">
@@ -803,31 +742,31 @@ body {
           <div class="stat-card-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
           </div>
-          <div class="stat-card-value" id="stat-leads"> - </div>
-          <div class="stat-card-label">{t(locale, 'dash.stats_leads')}</div>
+          <div class="stat-card-value" id="stat-leads">—</div>
+          <div class="stat-card-label">New Leads</div>
           <div class="stat-card-change up" id="stat-leads-change"></div>
         </div>
         <div class="stat-card">
           <div class="stat-card-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </div>
-          <div class="stat-card-value" id="stat-views"> - </div>
-          <div class="stat-card-label">{t(locale, 'dash.stats_views')}</div>
+          <div class="stat-card-value" id="stat-views">—</div>
+          <div class="stat-card-label">Profile Views</div>
           <div class="stat-card-change up" id="stat-views-change"></div>
         </div>
         <div class="stat-card">
           <div class="stat-card-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
           </div>
-          <div class="stat-card-value" id="stat-wa-taps"> - </div>
-          <div class="stat-card-label">{t(locale, 'dash.stats_wa')}</div>
+          <div class="stat-card-value" id="stat-wa-taps">—</div>
+          <div class="stat-card-label">WhatsApp Taps</div>
           <div class="stat-card-change up" id="stat-wa-change"></div>
         </div>
         <div class="stat-card">
           <div class="stat-card-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </div>
-          <div class="stat-card-value" id="stat-assess"> - </div>
+          <div class="stat-card-value" id="stat-assess">—</div>
           <div class="stat-card-label">Assessments</div>
           <div class="stat-card-change up" id="stat-assess-change"></div>
         </div>
@@ -835,14 +774,14 @@ body {
     </div>
 
     <!-- WHOOP-style Actionable Insight Banner -->
-    <div id="insight-banner" style="display:none;margin:16px 0;background:linear-gradient(135deg,var(--brand-dim),var(--brand-dim-xs));border:1px solid var(--brand-border);border-radius:14px;padding:14px 16px;">
+    <div id="insight-banner" style="display:none;margin:16px 0;background:linear-gradient(135deg,rgba(255,92,0,0.10),rgba(255,92,0,0.04));border:1px solid rgba(255,92,0,0.25);border-radius:14px;padding:14px 16px;">
       <div style="display:flex;align-items:flex-start;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:8px;background:var(--brand-dim);border:1px solid var(--brand-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--brand)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,92,0,0.15);border:1px solid rgba(255,92,0,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         </div>
         <div>
-          <div style="font-size:11px;font-weight:700;color:var(--brand);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:3px;">Insight</div>
-          <div id="insight-text" style="font-size:13px;color:var(--text);line-height:1.5;"></div>
+          <div style="font-size:11px;font-weight:700;color:rgba(255,92,0,0.9);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:3px;">Insight</div>
+          <div id="insight-text" style="font-size:13px;color:#1A1411;line-height:1.5;"></div>
           <div id="insight-action" style="margin-top:8px;"></div>
         </div>
       </div>
@@ -851,7 +790,7 @@ body {
     <!-- Views chart -->
     <div class="chart-section">
       <div class="chart-header">
-        <span class="chart-title">{t(locale, 'dash.stats_views')}</span>
+        <span class="chart-title">Profile Views</span>
         <select class="chart-period-select" onchange="loadChart(this.value)">
           <option value="7">Last 7 days</option>
           <option value="14">Last 14 days</option>
@@ -867,15 +806,15 @@ body {
     <!-- Leads -->
     <div class="leads-section">
       <div class="leads-header">
-        <span class="leads-title">{t(locale, 'dash.stats_leads')}</span>
+        <span class="leads-title">Recent Leads</span>
         <span class="leads-count" id="leads-total-badge">0</span>
       </div>
       <div id="leads-list">
         <div class="empty-state">
           <div class="empty-state-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(26,20,17,0.1)" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
           </div>
-          <div class="empty-state-text">No leads yet - share your profile link to get started.</div>
+          <div class="empty-state-text">No leads yet — share your profile link to get started.</div>
         </div>
       </div>
     </div>
@@ -886,9 +825,9 @@ body {
       <div id="checklist-list"></div>
     </div>
 
-    <!-- Income Streams (launch version: sessions only) -->
+    <!-- Income Streams -->
     <div class="income-section" id="income-section">
-      <div class="stats-section-title" style="margin-bottom:14px">Your Income</div>
+      <div class="stats-section-title" style="margin-bottom:14px">Your Income Streams</div>
       <div class="income-grid" id="income-grid">
         <div class="income-stream-card active">
           <div class="income-stream-icon">🏋️</div>
@@ -896,141 +835,97 @@ body {
           <div class="income-stream-value" id="is-sessions">Active</div>
           <div class="income-stream-sub">Your core training income</div>
         </div>
+        <div class="income-stream-card locked" id="is-affiliate-card">
+          <div class="income-stream-lock">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(26,20,17,0.4)" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <div class="income-stream-icon">💰</div>
+          <div class="income-stream-label">Affiliate Vault</div>
+          <div class="income-stream-value">Locked</div>
+          <div class="income-stream-sub">Gymshark, ZEROFAT &amp; more</div>
+        </div>
+        <div class="income-stream-card locked" id="is-digital-card">
+          <div class="income-stream-lock">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(26,20,17,0.4)" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <div class="income-stream-icon">📦</div>
+          <div class="income-stream-label">Digital Products</div>
+          <div class="income-stream-value">Locked</div>
+          <div class="income-stream-sub">PDFs, plans &amp; courses</div>
+        </div>
+        <div class="income-stream-card locked" id="is-referral-card">
+          <div class="income-stream-lock">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(26,20,17,0.4)" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <div class="income-stream-icon">🔗</div>
+          <div class="income-stream-label">Referral Income</div>
+          <div class="income-stream-value">Locked</div>
+          <div class="income-stream-sub">Earn from trainer referrals</div>
+        </div>
       </div>
     </div>
 
-    <!-- Bookings Section -->
-    <div class="leads-section" id="bookings-section">
-      <div class="stats-section-title" style="margin-bottom:14px">Your Bookings</div>
-      {bookings.length === 0 ? (
-        <p style="font-size:13px;color:var(--text-muted);line-height:1.6">No bookings yet. Share your booking link with clients to get started.</p>
-      ) : (
-        <div>
-          {bookings.map(b => {
-            const d = new Date(b.scheduled_at);
-            const isPast = d < new Date();
-            const isUpcoming = !isPast && b.status === 'confirmed';
-            const statusColor = (b.status === 'confirmed' || b.status === 'completed') ? 'var(--reps)' : (b.status === 'cancelled' || b.status === 'refunded') ? 'var(--danger)' : 'var(--text-faint)';
-            const statusBg = (b.status === 'confirmed' || b.status === 'completed') ? 'var(--reps-dim)' : (b.status === 'cancelled' || b.status === 'refunded') ? 'var(--danger-dim)' : 'rgba(255,255,255,0.05)';
-            return (
-              <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-                <div>
-                  <div style="font-size:13px;font-weight:600">{b.consumer_name}</div>
-                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
-                    {b.session_type?.name ?? 'Session'} · {d.toLocaleDateString(locale,{weekday:'short',month:'short',day:'numeric'})} at {d.toLocaleTimeString(locale,{hour:'numeric',minute:'2-digit'})}
-                  </div>
-                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
-                    {market.currencySymbol}{(b.amount_cents/100).toFixed(2)} · {b.duration_min} min
-                  </div>
-                </div>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
-                  <span style={`font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:${statusBg};color:${statusColor}`}>
-                    {b.status.toUpperCase()}
-                  </span>
-                  {isUpcoming && (
-                    <span style="font-size:11px;color:var(--text-muted)">Contact client to cancel</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+    <!-- Upgrade Banner -->
+    <div class="upgrade-banner" id="upgrade-banner">
+      <div class="upgrade-title">🔓 Unlock 3 More Income Streams</div>
+      <div class="upgrade-sub">Pro trainers earn an average of <strong style="color:#1A1411">6,200 AED/month</strong> in passive income from affiliates and digital products — on top of their sessions.</div>
+      <div class="upgrade-features">
+        <div class="upgrade-feature">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5C00"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          <strong style="color:#FF5C00">Master Affiliate Vault</strong> — Gymshark, ZEROFAT, MyProtein
         </div>
-      )}
+        <div class="upgrade-feature">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5C00"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          <strong style="color:#FF5C00">Digital Product Hub</strong> — sell PDFs, plans &amp; courses
+        </div>
+        <div class="upgrade-feature">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5C00"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          <strong style="color:#FF5C00">Grand Slam Offer Builder</strong> — AI-powered outcome cards
+        </div>
+        <div class="upgrade-feature">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#00C853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          WhatsApp lead notifications + analytics
+        </div>
+      </div>
+      <button class="upgrade-btn" onclick="startUpgrade()">🔓 Unlock Passive Income — AED 99/mo</button>
+      <div style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:10px">🛡 ROI Guarantee: 1,000 AED in 30 days or full refund</div>
     </div>
 
-
-    <!-- Generate Training Plan - Pro Feature Card -->
-    <div class="checklist-section" id="generate-plan-section" style="display:none">
-      <div class="checklist-title" style="display:flex;align-items:center;gap:8px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--brand)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        Generate a Training Plan
-      </div>
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">
-        Build a personalised training plan for a client in 30 seconds. Send it as a PDF or share the link directly.
-      </div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div class="field" style="margin-bottom:0">
-          <label style="font-size:11px;font-weight:700;color:var(--white-tint-label);text-transform:uppercase;letter-spacing:0.05em;">Client goal</label>
-          <input type="text" id="plan-goal" placeholder="e.g. Lose 8kg in 12 weeks" style="background:var(--surface-3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;width:100%;outline:none;font-family:'DM Sans',sans-serif;">
+    <!-- Referral Flywheel -->
+    <div class="referral-section">
+      <div class="referral-card">
+        <div class="referral-title">🔄 The Referral Flywheel</div>
+        <div class="referral-sub">Refer 4 trainers to Pro and your subscription is <strong style="color:#1A1411">free forever</strong>. Each referral earns you 1 free month.</div>
+        <div class="flywheel-reward">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <span id="flywheel-reward-text">Refer 4 trainers = free Pro forever</span>
         </div>
-        <div class="field" style="margin-bottom:0">
-          <label style="font-size:11px;font-weight:700;color:var(--white-tint-label);text-transform:uppercase;letter-spacing:0.05em;">Sessions per week</label>
-          <div style="display:flex;gap:8px;">
-            <button class="toggle-pill active" id="plan-freq-2" onclick="setPlanFreq(2)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--brand);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;">2×</button>
-            <button class="toggle-pill" id="plan-freq-3" onclick="setPlanFreq(3)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">3×</button>
-            <button class="toggle-pill" id="plan-freq-4" onclick="setPlanFreq(4)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">4×</button>
-            <button class="toggle-pill" id="plan-freq-5" onclick="setPlanFreq(5)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">5×</button>
+        <div class="flywheel-progress">
+          <div class="flywheel-label">
+            <span id="flywheel-count-label">0 of 4 referrals</span>
+            <span id="flywheel-pct-label">0% to free Pro</span>
+          </div>
+          <div class="flywheel-bar"><div class="flywheel-fill" id="flywheel-fill" style="width:0%"></div></div>
+          <div class="flywheel-steps" id="flywheel-steps">
+            <div class="flywheel-step"></div>
+            <div class="flywheel-step"></div>
+            <div class="flywheel-step"></div>
+            <div class="flywheel-step"></div>
           </div>
         </div>
-        <div class="field" style="margin-bottom:0">
-          <label style="font-size:11px;font-weight:700;color:var(--white-tint-label);text-transform:uppercase;letter-spacing:0.05em;">Duration</label>
-          <div style="display:flex;gap:8px;">
-            <button class="toggle-pill active" id="plan-dur-4" onclick="setPlanDur(4)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--brand);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;">4 wk</button>
-            <button class="toggle-pill" id="plan-dur-8" onclick="setPlanDur(8)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">8 wk</button>
-            <button class="toggle-pill" id="plan-dur-12" onclick="setPlanDur(12)" style="flex:1;padding:8px;border-radius:8px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;">12 wk</button>
-          </div>
+        <div class="referral-url">
+          <span class="referral-url-text" id="referral-url-text">loading...</span>
+          <button class="url-copy-btn" onclick="copyReferral()">Copy</button>
         </div>
-        <button id="generate-plan-btn" onclick="generatePlan()" style="background:var(--brand);color:var(--text-on-brand);border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Generate Plan
-        </button>
-        <div id="plan-result" style="display:none;background:var(--surface-3);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:13px;color:var(--text-muted);line-height:1.6;"></div>
-      </div>
-    </div>
-
-    <!-- AI Assistant Channel Settings (Pro only) -->
-    <div class="checklist-section" id="ai-settings-section" style="display:none">
-      <div class="checklist-title">{t(locale, 'dash.channel_title')}</div>
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">{t(locale, 'dash.channel_sub')}</div>
-
-      <!-- Channel selector -->
-      <div style="display:flex;gap:10px;margin-bottom:20px;" id="ai-channel-selector">
-        <button class="ai-channel-btn active" data-channel="dashboard" onclick="selectChannel('dashboard')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          {t(locale, 'dash.channel_dashboard')}
-        </button>
-        <button class="ai-channel-btn" data-channel="whatsapp" onclick="selectChannel('whatsapp')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-          {t(locale, 'dash.channel_whatsapp')}
-        </button>
-        <button class="ai-channel-btn" data-channel="telegram" onclick="selectChannel('telegram')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          {t(locale, 'dash.channel_telegram')}
-        </button>
-      </div>
-
-      <!-- Dashboard info -->
-      <div id="ai-channel-dashboard" class="ai-channel-info">
-        <p style="font-size:13px;color:var(--text-muted);">Your AI assistant is available in the AI Coach tab below. Tap it to start a conversation.</p>
-      </div>
-
-      <!-- WhatsApp setup -->
-      <div id="ai-channel-whatsapp" class="ai-channel-info" style="display:none">
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Your AI assistant will reply to messages sent to the platform WhatsApp number from your registered WhatsApp number.</p>
-        <div style="background:var(--white-tint-panel);border-radius:10px;padding:12px;font-size:13px;">
-          <div style="color:var(--white-tint-text-faint);margin-bottom:4px;">Your registered number</div>
-          <div id="wa-registered-number" style="color:var(--white-tint-text);font-weight:600;">Loading...</div>
-        </div>
-        <p style="font-size:12px;color:var(--white-tint-muted);margin-top:10px;">To change your number, update it in Edit Profile.</p>
-      </div>
-
-      <!-- Telegram setup -->
-      <div id="ai-channel-telegram" class="ai-channel-info" style="display:none">
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Link your Telegram account to talk to your AI assistant there.</p>
-        <div id="tg-linked-state" style="display:none;background:var(--white-tint-panel);border-radius:10px;padding:12px;font-size:13px;">
-          <div style="color:var(--white-tint-text-faint);margin-bottom:4px;">Linked account</div>
-          <div id="tg-username" style="color:var(--white-tint-text);font-weight:600;"></div>
-          <button onclick="unlinkTelegram()" style="margin-top:10px;font-size:12px;color:var(--brand-faded);background:none;border:none;cursor:pointer;padding:0;">Unlink</button>
-        </div>
-        <div id="tg-unlinked-state">
-          <button class="btn-primary" onclick="generateTelegramLink()" style="width:100%;margin-top:0;">
-            Generate Telegram Link
+        <div class="referral-share-btns">
+          <a id="referral-wa-share" href="#" class="referral-share-btn" target="_blank">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Share on WhatsApp
+          </a>
+          <button class="referral-share-btn" onclick="copyReferral()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy Link
           </button>
-          <div id="tg-link-display" style="display:none;margin-top:12px;background:var(--white-tint-panel);border-radius:10px;padding:12px;">
-            <div style="font-size:12px;color:var(--white-tint-text-faint);margin-bottom:6px;">Open this link on your phone:</div>
-            <a id="tg-link-url" href="#" target="_blank" style="font-size:13px;color:var(--brand);word-break:break-all;"></a>
-            <div style="font-size:11px;color:var(--white-tint-muted);margin-top:8px;">Link expires in 10 minutes. Tap it to open Telegram and complete the connection.</div>
-          </div>
         </div>
       </div>
     </div>
@@ -1043,8 +938,8 @@ body {
 <div class="ai-panel" id="ai-panel">
   <div class="ai-panel-header">
     <div class="ai-panel-title">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="stroke: var(--brand)" stroke-width="2"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M12 6v6l4 2"/></svg>
-      {t(locale, 'dash.ai_title')}
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="2"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M12 6v6l4 2"/></svg>
+      Your AI Coach
       <span class="ai-panel-badge">Beta</span>
     </div>
     <button class="ai-panel-close" onclick="closeAI()">Done</button>
@@ -1052,10 +947,10 @@ body {
   <div class="ai-messages" id="ai-messages">
     <div class="ai-welcome" id="ai-welcome">
       <div class="ai-welcome-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="stroke: var(--brand)" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
       </div>
       <div class="ai-welcome-title">Hey, I'm your AI coach</div>
-      <div class="ai-welcome-sub">I know your profile, your market, and your goals. Ask me anything - from writing your bio to building a 12-week programme.</div>
+      <div class="ai-welcome-sub">I know your profile, your market, and your goals. Ask me anything — from writing your bio to building a 12-week programme.</div>
     </div>
   </div>
   <div class="ai-quick-prompts" id="ai-chips">
@@ -1067,7 +962,7 @@ body {
     <button class="ai-chip" onclick="sendChip(this)">Nutrition advice</button>
   </div>
   <div class="ai-input-row">
-    <textarea class="ai-input" id="ai-input" placeholder={t(locale, 'dash.ai_placeholder')} rows="1"></textarea>
+    <textarea class="ai-input" id="ai-input" placeholder="Ask your AI coach anything..." rows="1"></textarea>
     <button class="ai-send" id="ai-send" onclick="sendAI()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
@@ -1078,7 +973,7 @@ body {
 <nav class="bottom-nav">
   <a href="/dashboard" class="bottom-nav-item active">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-    <span>{t(locale, 'dash.channel_dashboard')}</span>
+    <span>Dashboard</span>
   </a>
   <a href="/edit" class="bottom-nav-item">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -1086,15 +981,15 @@ body {
   </a>
   <button class="bottom-nav-item" onclick="openAI()" style="background:none;border:none;cursor:pointer;">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-    <span>{t(locale, 'dash.ai_title')}</span>
+    <span>AI Coach</span>
   </button>
   <a id="nav-view-profile" href="#" class="bottom-nav-item">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-    <span>{t(locale, 'profile_verified_badge').replace('✓ ', '')}</span>
+    <span>Profile</span>
   </a>
   <a href="/pricing" class="bottom-nav-item">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-    <span>{t(locale, 'pricing.pro_name')}</span>
+    <span>Upgrade</span>
   </a>
 </nav>
 
@@ -1102,11 +997,10 @@ body {
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
-<script is:inline define:vars={{ SUPABASE_ANON_KEY, ANON_KEY, BRAND_NAME: market.brandName }}>
+<script is:inline define:vars={{ SUPABASE_ANON_KEY, ANON_KEY }}>
 const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
 const EDGE_BASE = SUPABASE_URL + '/functions/v1';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-window.renderPC = function() {}; // widget now server-rendered
 
 let trainer = null;
 
@@ -1179,7 +1073,7 @@ function populateDash(t) {
   // Referral flywheel
   const refUrl = 'https://' + _domain + '/join?ref=' + t.slug;
   document.getElementById('referral-url-text').textContent = _domain + '/join?ref=' + t.slug;
-  const waMsg = encodeURIComponent('Hey! I\'m using ' + (window.__BRAND__?.name || 'TrainedBy') + ' to manage my PT business. Get your free verified profile here: ' + refUrl);
+  const waMsg = encodeURIComponent('Hey! I\'m using TrainedBy to manage my PT business and earn passive income from affiliates. Get your free profile here: ' + refUrl);
   document.getElementById('referral-wa-share').href = 'https://wa.me/?text=' + waMsg;
   const refCount = t.referral_count || 0;
   const refTarget = 4;
@@ -1195,12 +1089,11 @@ function populateDash(t) {
     document.getElementById('flywheel-reward-text').textContent = '🎉 You\'ve earned free Pro forever!';
   }
 
-  // Income stream cards - unlock for Pro/Premium
+  // Income stream cards — unlock for Pro/Premium
   const isPro = t.plan === 'pro' || t.plan === 'premium';
   if (isPro) {
     document.getElementById('upgrade-banner').style.display = 'none';
-    // Removed: affiliate/digital/referral cards no longer exist
-    [].forEach(id => {
+    ['is-affiliate-card','is-digital-card','is-referral-card'].forEach(id => {
       const card = document.getElementById(id);
       card.classList.remove('locked');
       card.classList.add('active');
@@ -1213,100 +1106,7 @@ function populateDash(t) {
 
   // Profile completeness widget
   if (typeof window.renderPC === 'function') window.renderPC(t);
-
-  // Generate Plan - show for Pro trainers
-  if (isPro) {
-    const planSection = document.getElementById('generate-plan-section');
-    if (planSection) planSection.style.display = 'block';
-  }
-
-  // AI Assistant settings - show for Pro trainers
-  if (isPro) {
-    const aiSection = document.getElementById('ai-settings-section');
-    if (aiSection) {
-      aiSection.style.display = 'block';
-      // Set active channel
-      const ch = t.assistant_channel || 'dashboard';
-      selectChannel(ch, false); // false = don't save to DB
-      // Show WhatsApp number
-      const waEl = document.getElementById('wa-registered-number');
-      if (waEl) waEl.textContent = t.whatsapp || 'Not set - add in Edit Profile';
-      // Show Telegram linked state
-      if (t.telegram_chat_id) {
-        document.getElementById('tg-linked-state').style.display = 'block';
-        document.getElementById('tg-unlinked-state').style.display = 'none';
-        document.getElementById('tg-username').textContent = t.telegram_username ? '@' + t.telegram_username : 'Linked';
-      }
-    }
-  }
 }
-
-// ── Generate Plan ───────────────────────────────────────────────────────────
-let planFreq = 2;
-let planDur = 4;
-
-window.setPlanFreq = function(n) {
-  planFreq = n;
-  [2,3,4,5].forEach(v => {
-    const btn = document.getElementById('plan-freq-' + v);
-    if (btn) {
-      btn.style.borderColor = v === n ? 'var(--brand)' : 'var(--border)';
-      btn.style.color = v === n ? 'var(--text)' : 'var(--text-muted)';
-    }
-  });
-};
-
-window.setPlanDur = function(n) {
-  planDur = n;
-  [4,8,12].forEach(v => {
-    const btn = document.getElementById('plan-dur-' + v);
-    if (btn) {
-      btn.style.borderColor = v === n ? 'var(--brand)' : 'var(--border)';
-      btn.style.color = v === n ? 'var(--text)' : 'var(--text-muted)';
-    }
-  });
-};
-
-window.generatePlan = async function() {
-  const goal = document.getElementById('plan-goal').value.trim();
-  if (!goal) { showToast('Enter a client goal first'); return; }
-
-  const btn = document.getElementById('generate-plan-btn');
-  const result = document.getElementById('plan-result');
-  btn.disabled = true;
-  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Generating...';
-  result.style.display = 'none';
-
-  try {
-    const res = await fetch(EDGE_BASE + '/generate-plan', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + getAuthToken()
-      },
-      body: JSON.stringify({
-        goal,
-        sessions_per_week: planFreq,
-        duration_weeks: planDur,
-      })
-    });
-    const data = await res.json();
-    if (data.plan) {
-      result.style.display = 'block';
-      result.innerHTML = '<pre style="white-space:pre-wrap;font-family:inherit;">' + data.plan + '</pre>';
-      if (data.share_url) {
-        result.innerHTML += '<a href="' + data.share_url + '" target="_blank" style="display:inline-block;margin-top:12px;color:var(--brand);font-size:12px;font-weight:700;">Share plan link →</a>';
-      }
-    } else {
-      showToast('Could not generate plan - try again');
-    }
-  } catch {
-    showToast('Error generating plan');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate Plan';
-  }
-};
 
 async function loadStats() {
   try {
@@ -1337,13 +1137,13 @@ function generateInsight(data) {
   let action = '';
   if (views > 20 && leads === 0) {
     text = `Your profile got <strong>${views} views</strong> this week but 0 leads. Visitors are interested but not converting.`;
-    action = `<a href="/edit" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Add a session package with a clear outcome to convert views into bookings</a>`;
+    action = `<a href="/edit.html" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Add a Grand Slam Offer with a guarantee to convert views into bookings</a>`;
   } else if (leads > 0 && waTaps === 0) {
     text = `You got <strong>${leads} lead${leads>1?'s':''}</strong> but no WhatsApp taps. Clients filled the form but didn't message you directly.`;
-    action = `<a href="/edit" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Make sure your WhatsApp number is visible on your profile</a>`;
+    action = `<a href="/edit.html" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Make sure your WhatsApp number is visible on your profile</a>`;
   } else if (views > 0 && convRate > 0) {
-    text = `Your conversion rate is <strong>${convRate}%</strong> this week (${leads} lead${leads>1?'s':''} from ${views} views). ${convRate >= 5 ? 'That\'s above average - great work.' : 'Industry average is 5-8%. A results guarantee could double this.'}`;
-    action = convRate < 5 ? `<a href="/edit" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Add a money-back guarantee to your packages</a>` : '';
+    text = `Your conversion rate is <strong>${convRate}%</strong> this week (${leads} lead${leads>1?'s':''} from ${views} views). ${convRate >= 5 ? 'That\'s above average — great work.' : 'Industry average is 5–8%. A results guarantee could double this.'}`;
+    action = convRate < 5 ? `<a href="/edit.html" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Add a money-back guarantee to your packages</a>` : '';
   } else if (views === 0) {
     text = 'Your profile has no views yet this week. Share your profile link to start getting traffic.';
     action = `<button onclick="copyUrl()" style="font-size:12px;font-weight:700;color:var(--brand);background:none;border:none;cursor:pointer;padding:0;">→ Copy your profile link and share it now</button>`;
@@ -1369,7 +1169,7 @@ async function loadLeads() {
       const timeAgo = formatTimeAgo(lead.created_at);
       const typeTag = lead.type === 'assessment' ? 'assessment' : lead.type === 'package' ? 'package' : 'booking';
       const typeLabel = lead.type === 'assessment' ? 'Assessment' : lead.type === 'package' ? 'Package' : 'Booking';
-      const waMsg = encodeURIComponent(`Hi ${lead.name}, I'm ${trainer.name} from ${window.__BRAND__?.name || 'TrainedBy'}. I saw your enquiry and would love to help you reach your fitness goals!`);
+      const waMsg = encodeURIComponent(`Hi ${lead.name}, I'm ${trainer.name} from TrainedBy.ae. I saw your enquiry and would love to help you reach your fitness goals!`);
       const waUrl = `https://wa.me/${(lead.phone || '').replace(/\D/g,'')}?text=${waMsg}`;
       list.innerHTML += `
         <div class="lead-item">
@@ -1441,60 +1241,15 @@ function copyReferral() {
 
 async function startUpgrade() {
   try {
-    const res = await fetch(EDGE_BASE + '/payment-router', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
-      body: JSON.stringify({
-        trainer_id: trainer.id,
-        plan: 'pro',
-        billing: 'monthly',
-        success_url: location.origin + '/dashboard?upgraded=1',
-        cancel_url: location.origin + '/dashboard',
-      })
+    const res = await fetch(EDGE_BASE + '/create-checkout', {
+      method: 'POST', headers: { 'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({ trainer_id: trainer.id, plan: 'pro', success_url: location.origin + '/dashboard?upgraded=1', cancel_url: location.origin + '/dashboard' })
     });
     const data = await res.json();
-    if (!res.ok) { showToast(data.error || 'Could not start checkout.', 'error'); return; }
-    if (data.provider === 'stripe' && data.checkout_url) {
-      location.href = data.checkout_url;
-    } else if (data.provider === 'razorpay') {
-      await openRazorpay(data);
-    } else {
-      showToast('Could not start checkout. Please try again.', 'error');
-    }
-  } catch (err) {
-    if (err && err.message && err.message.includes('razorpay')) {
-      showToast('Payment provider unavailable. Please try again.', 'error');
-    } else {
-      showToast('Could not start checkout.', 'error');
-    }
-  }
-}
-
-function openRazorpay(data) {
-  return new Promise((resolve, reject) => {
-    function openModal() {
-      const rzp = new Razorpay({
-        key: data.key_id,
-        amount: data.amount,
-        currency: data.currency,
-        order_id: data.order_id,
-        name: BRAND_NAME,
-        description: data.description,
-        prefill: { name: data.trainer_name, email: data.trainer_email },
-        handler: () => { resolve(); location.href = location.origin + '/dashboard?upgraded=1'; },
-        modal: { ondismiss: resolve },
-      });
-      rzp.open();
-    }
-    if (window.Razorpay) { openModal(); return; }
-    const existing = document.querySelector('script[src*="checkout.razorpay.com"]');
-    if (existing) { existing.addEventListener('load', openModal); existing.addEventListener('error', () => reject(new Error('razorpay-sdk-load-failed'))); return; }
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = openModal;
-    script.onerror = () => reject(new Error('razorpay-sdk-load-failed'));
-    document.head.appendChild(script);
-  });
+    if (data.url) location.href = data.url;
+    else showToast('Could not start checkout. Please try again.', 'error');
+  } catch { showToast('Could not start checkout.', 'error'); }
 }
 
 function formatTimeAgo(dateStr) {
@@ -1513,59 +1268,16 @@ if (new URLSearchParams(location.search).get('upgraded') === '1') {
 
 init();
 
-// Handle Stripe Connect redirect params
-(function handleStripeParam() {
-  const params = new URLSearchParams(window.location.search);
-  const stripeParam = params.get('stripe');
-  if (!stripeParam) return;
-
-  const token = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('tb_session='))?.slice('tb_session='.length);
-  if (!token) return;
-
-  const FUNCTIONS_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1';
-
-  if (stripeParam === 'start') {
-    // Initiate Stripe Connect
-    fetch(`${FUNCTIONS_URL}/connect-stripe`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ trainer_id: trainer?.id }),
-    })
-    .then(r => r.json())
-    .then(d => { if (d.url) window.location.href = d.url; })
-    .catch(err => console.error('[connect-stripe]', err));
-  }
-
-  if (stripeParam === 'return') {
-    // Verify onboarding completion
-    fetch(`${FUNCTIONS_URL}/connect-stripe-return`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ trainer_id: trainer?.id }),
-    })
-    .then(r => r.json())
-    .then(d => {
-      if (d.onboarded) {
-        // Clean URL and reload to show updated setup state
-        window.history.replaceState({}, '', '/dashboard');
-        window.location.reload();
-      }
-    })
-    .catch(err => console.error('[connect-stripe-return]', err));
-  }
-})();
-
 // ── Support Chatbot Widget ──────────────────────────────────────────────────────────
 (function() {
   const SUPPORT_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1/support-agent';
-  // ANON_KEY injected via define:vars from frontmatter
 
   const style = document.createElement('style');
   style.textContent = [
     '.tb-chat-btn{position:fixed;bottom:24px;right:20px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#FF5C00;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,92,0,.4);transition:transform .2s,box-shadow .2s}',
     '.tb-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(255,92,0,.5)}',
     '.tb-chat-btn svg{width:24px;height:24px;fill:#fff}',
-    '.tb-chat-window{position:fixed;bottom:88px;right:20px;z-index:9998;width:min(360px,calc(100vw - 40px));background:#111;border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.6);display:none;flex-direction:column;font-family:'DM Sans',sans-serif}',
+    '.tb-chat-window{position:fixed;bottom:88px;right:20px;z-index:9998;width:min(360px,calc(100vw - 40px));background:#111;border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.6);display:none;flex-direction:column;font-family:Inter,sans-serif}',
     '.tb-chat-window.open{display:flex}',
     '.tb-chat-header{padding:14px 16px;background:#FF5C00;display:flex;align-items:center;justify-content:space-between}',
     '.tb-chat-header-title{font-weight:700;font-size:14px;color:#fff}',
@@ -1595,8 +1307,7 @@ init();
 
   const win = document.createElement('div');
   win.className = 'tb-chat-window';
-  const _bn = window.__BRAND__?.name || 'TrainedBy';
-  win.innerHTML = '<div class="tb-chat-header"><div><div class="tb-chat-header-title">' + _bn + ' Support</div><div class="tb-chat-header-sub">Ask me anything about your account</div></div><button class="tb-chat-close" id="tb-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div><div class="tb-chat-messages" id="tb-msgs"><div class="tb-msg bot">Hey! Ask me anything about ' + _bn + ' - pricing, verification, referrals, or how features work.</div></div><div class="tb-chat-input-row"><input class="tb-chat-input" id="tb-input" placeholder="Ask a question..." maxlength="300"/><button class="tb-chat-send" id="tb-send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div>';
+  win.innerHTML = '<div class="tb-chat-header"><div><div class="tb-chat-header-title">TrainedBy Support</div><div class="tb-chat-header-sub">Ask me anything about your account</div></div><button class="tb-chat-close" id="tb-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div><div class="tb-chat-messages" id="tb-msgs"><div class="tb-msg bot">Hey! Ask me anything about TrainedBy — pricing, REPs verification, referrals, or how features work.</div></div><div class="tb-chat-input-row"><input class="tb-chat-input" id="tb-input" placeholder="Ask a question..." maxlength="300"/><button class="tb-chat-send" id="tb-send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div>';
 
   document.body.appendChild(btn);
   document.body.appendChild(win);
@@ -1650,10 +1361,9 @@ init();
 
 // ── Trainer AI Coach ─────────────────────────────────────────────────────────
 (function() {
-  const AI_URL = EDGE_BASE + '/trainer-assistant';
+  const AI_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1/trainer-assistant';
   let aiHistory = [];
   let aiBusy = false;
-  let aiConversationId = 'default';
 
   window.openAI = function() {
     document.getElementById('ai-panel').classList.add('open');
@@ -1714,17 +1424,23 @@ init();
     aiHistory.push({ role: 'user', content: question });
 
     try {
+      const token = (function() {
+        const cookies = document.cookie.split(';').map(c => c.trim());
+        for (const c of cookies) { if (c.startsWith('tb_session=')) return c.slice('tb_session='.length); }
+        return localStorage.getItem('tb_edit_token');
+      })();
+
       const res = await fetch(AI_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+          'Authorization': 'Bearer ' + ANON_KEY
         },
         body: JSON.stringify({
-          trainer_id: trainer?.id,
           message: question,
-          conversation_id: aiConversationId,
-          source: 'dashboard'
+          history: aiHistory.slice(-10), // last 10 turns for context
+          token: token,
+          locale: window.__LOCALE__ || 'en'
         })
       });
 
@@ -1767,56 +1483,5 @@ init();
     }
   });
 })();
-
-// ── AI Assistant Channel Management ─────────────────────────────────────────────────────────
-window.selectChannel = async function(channel, save = true) {
-  // Update button states
-  document.querySelectorAll('.ai-channel-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.channel === channel);
-  });
-  // Show correct info panel
-  ['dashboard', 'whatsapp', 'telegram'].forEach(ch => {
-    const el = document.getElementById('ai-channel-' + ch);
-    if (el) el.style.display = ch === channel ? 'block' : 'none';
-  });
-  // Persist to DB
-  if (save && trainer?.id) {
-    try {
-      await sb.from('trainers').update({ assistant_channel: channel }).eq('id', trainer.id);
-      showToast('Channel updated to ' + channel);
-    } catch { /* silently fail */ }
-  }
-};
-
-window.generateTelegramLink = async function() {
-  if (!trainer?.id) return;
-  try {
-    const { data, error } = await sb.rpc('generate_telegram_link_token', { p_trainer_id: trainer.id });
-    if (error) throw error;
-    const token = data;
-    const botName = window.__BRAND__?.telegramBot || 'TrainedByAssistantBot';
-    const linkUrl = `https://t.me/${botName}?start=${token}`;
-    document.getElementById('tg-link-url').textContent = linkUrl;
-    document.getElementById('tg-link-url').href = linkUrl;
-    document.getElementById('tg-link-display').style.display = 'block';
-  } catch (e) {
-    showToast('Could not generate link. Please try again.', 'error');
-  }
-};
-
-window.unlinkTelegram = async function() {
-  if (!trainer?.id) return;
-  try {
-    await sb.from('trainers').update({
-      telegram_chat_id: null,
-      telegram_username: null,
-      assistant_channel: 'dashboard'
-    }).eq('id', trainer.id);
-    document.getElementById('tg-linked-state').style.display = 'none';
-    document.getElementById('tg-unlinked-state').style.display = 'block';
-    selectChannel('dashboard', false);
-    showToast('Telegram unlinked');
-  } catch { showToast('Could not unlink. Please try again.', 'error'); }
-};
 </script>
 </Base>
