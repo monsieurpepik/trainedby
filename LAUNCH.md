@@ -12,7 +12,7 @@ All 8 items must be ✅ before signups open.
 | Google Rich Results Test passes | ⬜ | — | — |
 | WhatsApp OG card shows trainer branding | ⬜ | — | — |
 | Stripe shows correct currency per market | ⬜ | — | — |
-| Sentry has ≥ 1 confirmed live event | ⬜ | — | — |
+| Sentry has ≥ 1 confirmed live event | ✅ | Claude Code | 2026-05-12 |
 | CI pipeline blocks failing PRs | ✅ | Claude Code | 2026-05-04 |
 
 > **Gates 4–7** require manual verification on the live deployment:
