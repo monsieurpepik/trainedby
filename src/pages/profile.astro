@@ -1144,7 +1144,8 @@ function render(t) {
   const profileUrl = window.location.origin + '/' + (t.slug || '');
   const schemaLd = {
     '@context': 'https://schema.org',
-    '@type': ['Person', 'LocalBusiness'],
+    '@type': 'LocalBusiness',
+    additionalType: 'https://schema.org/Person',
     name: t.name,
     jobTitle: t.title || 'Personal Trainer',
     description: t.bio || '',
