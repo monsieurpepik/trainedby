@@ -81,7 +81,8 @@ const pageDesc = trainerName
 const profileUrl = `${Astro.url.origin}/${slug}`;
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "Person",
+  "@type": "LocalBusiness",
+  "additionalType": "https://schema.org/Person",
   "name": trainerName,
   "url": profileUrl,
   ...(trainerPhoto ? { "image": trainerPhoto } : {}),
