@@ -1,5 +1,5 @@
 /**
- * create-razorpay-order — India market payment integration
+ * create-razorpay-order  -  India market payment integration
  * ─────────────────────────────────────────────────────────────────────────────
  * Creates a Razorpay order for TrainedBy Pro subscriptions on trainedby.in
  *
@@ -23,8 +23,8 @@ const corsHeaders = {
 };
 
 const PLANS = {
-  pro_499: { amount: 49900, label: 'TrainedBy Pro — ₹499/month' },   // amount in paise
-  pro_999: { amount: 99900, label: 'TrainedBy Pro — ₹999/month' },
+  pro_499: { amount: 49900, label: 'TrainedBy Pro  -  ₹499/month' },   // amount in paise
+  pro_999: { amount: 99900, label: 'TrainedBy Pro  -  ₹999/month' },
 };
 
 Deno.serve(async (req) => {

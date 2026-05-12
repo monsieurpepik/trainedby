@@ -1,0 +1,172 @@
+---
+import { getMarket } from '../lib/market.ts';
+import { ClientRouter } from 'astro:transitions';
+import CookieConsent from '../components/CookieConsent.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  canonical?: string;
+  noIndex?: boolean;
+}
+
+const {
+  title,
+  description,
+  ogImage,
+  canonical,
+  noIndex = false,
+} = Astro.props;
+
+const market = getMarket(Astro.url.hostname);
+
+const marketCanonicalBase = canonical ?? `https://${market.domain}${Astro.url.pathname}`;
+const marketOgLocale = market.locale.replace('-', '_');
+const resolvedDescription = description ?? market.metaDescription;
+const resolvedOgImage = ogImage ?? `https://${market.domain}/og-image.jpg`;
+---
+
+<!doctype html>
+<html lang={market.locale.split('-')[0]} dir="ltr" data-market={market.market}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>{title}</title>
+    <meta name="description" content={resolvedDescription} />
+    <link rel="canonical" href={marketCanonicalBase} />
+    {noIndex && <meta name="robots" content="noindex,nofollow" />}
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="color-scheme" content="light" />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={resolvedDescription} />
+    <meta property="og:image" content={resolvedOgImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content={marketCanonicalBase} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={market.brandName ?? 'TrainedBy'} />
+    <meta property="og:locale" content={marketOgLocale} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={resolvedDescription} />
+    <meta name="twitter:image" content={resolvedOgImage} />
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://mezhtdbfyvkshpuplqqw.supabase.co" />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://mezhtdbfyvkshpuplqqw.supabase.co" />
+
+    <link
+      rel="preload"
+      as="style"
+      crossorigin
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <ClientRouter fallback="none" />
+
+    <!-- Light theme tokens (BaseMinimal pages are always light) -->
+    <style is:global>
+      html[data-market] {
+        --bg: #FFFFFF;
+        --surface: #FAFAF9;
+        --surface-2: #F5F4F3;
+        --surface-3: #E8E5E2;
+        --surface-4: #D4D1CE;
+        --text: #1A1411;
+        --text-2: #6B6460;
+        --text-muted: #6B6460;
+        --text-faint: rgba(26,20,17,0.35);
+        --border: rgba(0,0,0,0.07);
+        --border-hover: rgba(0,0,0,0.14);
+        --brand: #FF5C00;
+        --brand-hover: #e05200;
+        --brand-dim: rgba(255,92,0,0.08);
+        --brand-border: rgba(255,92,0,0.2);
+        --brand-glow: rgba(255,92,0,0.3);
+        --radius: 12px;
+        --radius-lg: 20px;
+        --radius-xl: 28px;
+        --shadow: 0 4px 24px rgba(0,0,0,0.08);
+        --shadow-lg: 0 8px 48px rgba(0,0,0,0.12);
+        --border-strong: rgba(0,0,0,0.2);
+        --text-3: #9B9490;
+        --green: #22c55e;
+        --green-dim: rgba(34,197,94,0.08);
+        --green-border: rgba(34,197,94,0.2);
+        --amber: #FF9800;
+        --amber-dim: rgba(255,152,0,0.12);
+        --red: #ef4444;
+        --danger: #ff5555;
+        --text-on-brand: #ffffff;
+        --gold: #f59e0b;
+        --transition: 0.18s ease;
+        --font-display: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      /* ── CoachePar / France - Cobalt Blue ──────────────────────── */
+      html[data-market="fr"], html[data-market="fr"] :root {
+        --brand: #2563EB;
+        --brand-hover: #1d4ed8;
+        --brand-dim: rgba(37,99,235,0.12);
+        --brand-border: rgba(37,99,235,0.30);
+        --brand-glow: rgba(37,99,235,0.45);
+      }
+
+      /* ── AllenatoCon / Italy - Scuderia Red ───────────────────── */
+      html[data-market="it"], html[data-market="it"] :root {
+        --brand: #DC2626;
+        --brand-hover: #b91c1c;
+        --brand-dim: rgba(220,38,38,0.12);
+        --brand-border: rgba(220,38,38,0.30);
+        --brand-glow: rgba(220,38,38,0.45);
+      }
+
+      /* ── EntrenaCon / Spain & LatAm - Solar Yellow ──────────────── */
+      html[data-market="es"], html[data-market="mx"],
+      html[data-market="es"] :root, html[data-market="mx"] :root {
+        --brand: #D97706;
+        --brand-hover: #b45309;
+        --brand-dim: rgba(217,119,6,0.12);
+        --brand-border: rgba(217,119,6,0.30);
+        --brand-glow: rgba(217,119,6,0.45);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+        text-rendering: optimizeLegibility;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-body);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        line-height: 1.6;
+        min-height: 100dvh;
+        overflow-x: hidden;
+      }
+    </style>
+
+    <!-- Per-page head overrides -->
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+    <CookieConsent />
+  </body>
+</html>

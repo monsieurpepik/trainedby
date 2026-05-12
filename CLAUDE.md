@@ -11,7 +11,7 @@ TrainedBy is a global multi-market personal trainer discovery platform with a Sa
 **Repo structure:**
 - `src/pages/` — Astro pages (consumer + trainer dashboard)
 - `src/lib/` — Shared utilities (market.ts, i18n.ts, supabase.ts)
-- `supabase/functions/` — 34 Deno edge functions
+- `supabase/functions/` — 55 Deno edge functions
 - `supabase/migrations/` — All DB migrations
 - `scripts/` — Deployment and maintenance scripts
 

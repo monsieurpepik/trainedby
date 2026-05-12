@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrainedBy Profile — Design Direction</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    color: #fff;
+    padding: 32px 24px 60px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 15px;
+    color: #ccc;
+    margin-bottom: 40px;
+    line-height: 1.5;
+  }
+  .subtitle strong { color: #D4622A; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .card {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+  }
+  .card:hover { transform: translateY(-4px); }
+  .card.option-a { border-color: #7C3AED; }
+  .card.option-b { border-color: #D4622A; }
+  .card.option-c { border-color: #0EA5E9; }
+
+  .card-label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 10;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+  .option-a .card-label { background: #7C3AED; color: #fff; }
+  .option-b .card-label { background: #D4622A; color: #fff; }
+  .option-c .card-label { background: #0EA5E9; color: #fff; }
+
+  .recommended-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: #22c55e;
+    color: #fff;
+  }
+
+  /* ---- OPTION A: LINKTREE PURE ---- */
+  .mock-a {
+    background: #1a0a2e;
+    min-height: 560px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 28px;
+  }
+  .mock-a .bg-photo {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, #2d1b69 0%, #1a0a2e 60%, #0a0a0a 100%);
+    opacity: 0.9;
+  }
+  .mock-a .bg-photo::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%25" height="100%25" filter="url(%23n)" opacity="0.04"/></svg>') center/cover;
+  }
+  .mock-a > * { position: relative; z-index: 1; width: 100%; }
+  .a-avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7C3AED, #a855f7);
+    border: 3px solid rgba(255,255,255,0.3);
+    margin: 0 auto 12px;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 700; color: #fff;
+  }
+  .a-name { text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .a-bio { text-align: center; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 20px; line-height: 1.4; }
+  .a-link {
+    display: block;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 50px;
+    padding: 12px 16px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #fff;
+    text-decoration: none;
+    backdrop-filter: blur(8px);
+  }
+  .a-link:hover { background: rgba(255,255,255,0.2); }
+  .a-socials {
+    display: flex; justify-content: center; gap: 14px; margin-top: 16px;
+  }
+  .a-social {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .a-footer { text-align: center; margin-top: 20px; font-size: 10px; color: rgba(255,255,255,0.25); }
+
+  /* ---- OPTION B: HYBRID (RECOMMENDED) ---- */
+  .mock-b {
+    background: #0a0a0a;
+    min-height: 560px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .b-hero {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .b-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, #3d1a0a 0%, #1a0a0a 50%, #0a0a0a 100%);
+  }
+  .b-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="g" cx="70%25" cy="30%25"><stop offset="0%25" stop-color="%23D4622A" stop-opacity="0.4"/><stop offset="100%25" stop-color="transparent"/></radialGradient></defs><rect width="100%25" height="100%25" fill="url(%23g)"/></svg>') center/cover;
+  }
+  /* Arc hint */
+  .b-arc {
+    position: absolute; inset: 0;
+  }
+  .b-arc svg { width: 100%; height: 100%; }
+  .b-hero-bottom {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, #0a0a0a);
+  }
+  .b-avatar-wrap {
+    position: absolute; bottom: -36px; left: 50%; transform: translateX(-50%);
+    z-index: 5;
+  }
+  .b-avatar {
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #D4622A, #ff8c42);
+    border: 3px solid #0a0a0a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 700; color: #fff;
+  }
+  .b-body {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 48px 20px 24px;
+  }
+  .b-name { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
+  .b-title { font-size: 12px; color: #D4622A; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+  .b-bio { font-size: 12px; color: rgba(255,255,255,0.55); text-align: center; margin-bottom: 18px; line-height: 1.45; }
+  .b-link {
+    display: block; width: 100%;
+    background: rgba(212,98,42,0.12);
+    border: 1px solid rgba(212,98,42,0.3);
+    border-radius: 50px;
+    padding: 11px 16px;
+    text-align: center;
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  .b-link.primary { background: #D4622A; border-color: #D4622A; }
+  .b-divider {
+    width: 100%; height: 1px; background: rgba(255,255,255,0.06);
+    margin: 14px 0;
+  }
+  .b-ai-hint {
+    font-size: 10px; color: rgba(212,98,42,0.7);
+    text-align: center; letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .b-ai-card {
+    width: 100%;
+    background: rgba(212,98,42,0.06);
+    border: 1px solid rgba(212,98,42,0.18);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.5;
+  }
+  .b-socials {
+    display: flex; justify-content: center; gap: 12px; margin-top: 14px;
+  }
+  .b-social {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+
+  /* ---- OPTION C: PREMIUM SPORT ---- */
+  .mock-c {
+    background: #020b18;
+    min-height: 560px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .c-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(170deg, #001a30 0%, #020b18 40%, #001a0d 100%);
+  }
+  .c-bg::before {
+    content: '';
+    position: absolute; top: 0; right: 0;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(14,165,233,0.3) 0%, transparent 70%);
+  }
+  .c-hero {
+    position: relative;
+    height: 200px;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 16px 16px;
+  }
+  .c-photo-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(14,165,233,0.1) 0%, #020b18 100%);
+    border-bottom: 1px solid rgba(14,165,233,0.15);
+  }
+  .c-name-block { flex: 1; }
+  .c-sport { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: #0EA5E9; font-weight: 700; margin-bottom: 2px; }
+  .c-name { font-size: 24px; font-weight: 900; line-height: 1; letter-spacing: -0.02em; }
+  .c-avatar-side {
+    width: 60px; height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #0EA5E9, #0369a1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700; color: #fff;
+    border: 2px solid rgba(14,165,233,0.4);
+    margin-left: 12px;
+  }
+  .c-body { position: relative; z-index: 2; padding: 16px; flex: 1; }
+  .c-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 16px;
+  }
+  .c-stat {
+    background: rgba(14,165,233,0.06);
+    border: 1px solid rgba(14,165,233,0.15);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .c-stat-val { font-size: 18px; font-weight: 800; color: #0EA5E9; line-height: 1; }
+  .c-stat-lbl { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2px; }
+  .c-btn {
+    display: block; width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 13px; font-weight: 700;
+    margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .c-btn.primary { background: #0EA5E9; color: #000; }
+  .c-btn.secondary { background: rgba(14,165,233,0.1); border: 1px solid rgba(14,165,233,0.25); color: #0EA5E9; }
+  .c-tags {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+  }
+  .c-tag {
+    font-size: 10px; padding: 4px 10px; border-radius: 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Descriptions */
+  .desc {
+    padding: 16px;
+    background: #111;
+    border-top: 1px solid #222;
+  }
+  .desc-title {
+    font-size: 14px; font-weight: 700; margin-bottom: 6px;
+  }
+  .option-a .desc-title { color: #a78bfa; }
+  .option-b .desc-title { color: #D4622A; }
+  .option-c .desc-title { color: #38bdf8; }
+  .desc p { font-size: 11px; color: #888; line-height: 1.5; }
+  .desc ul { font-size: 11px; color: #888; line-height: 1.7; padding-left: 14px; }
+
+  /* Vote buttons */
+  .vote-row {
+    max-width: 1100px; margin: 40px auto 0;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .vote-btn {
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid;
+    background: transparent;
+    color: #fff;
+    transition: all 0.15s;
+  }
+  .vote-btn.a { border-color: #7C3AED; }
+  .vote-btn.a:hover { background: #7C3AED; }
+  .vote-btn.b { border-color: #D4622A; }
+  .vote-btn.b:hover { background: #D4622A; }
+  .vote-btn.c { border-color: #0EA5E9; }
+  .vote-btn.c:hover { background: #0EA5E9; color: #000; }
+
+  .question {
+    max-width: 1100px; margin: 16px auto 0;
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+  }
+</style>
+</head>
+<body>
+
+<h1>TrainedBy — Profile Page Direction</h1>
+<p class="subtitle">Which design direction for <strong>[slug].astro</strong>?<br>Top of page competes with Linktree — deeper you scroll, AI/SaaS vertical kicks in.</p>
+
+<div class="grid">
+
+  <!-- OPTION A: LINKTREE PURE -->
+  <div class="card option-a">
+    <div class="card-label">Option A</div>
+    <div class="mock-a">
+      <div class="bg-photo"></div>
+      <div class="a-avatar">MJ</div>
+      <div class="a-name">Marcus Johnson</div>
+      <div class="a-bio">NASM · Dubai · 8 yrs exp<br>Elite strength & conditioning coach</div>
+      <a class="a-link">📅 Book a Free Consultation</a>
+      <a class="a-link">💬 WhatsApp Me</a>
+      <a class="a-link">🏋️ View My Packages</a>
+      <a class="a-link">📸 Follow on Instagram</a>
+      <div class="a-socials">
+        <div class="a-social">IG</div>
+        <div class="a-social">YT</div>
+        <div class="a-social">TK</div>
+        <div class="a-social">FB</div>
+      </div>
+      <div class="a-footer">trainedby.ae/marcus-johnson</div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Pure Linktree Clone</div>
+      <ul>
+        <li>Gradient bg (no photo)</li>
+        <li>Circle avatar, centered layout</li>
+        <li>Pill buttons only</li>
+        <li>Social icons row at bottom</li>
+        <li>Minimal — no differentiation from Linktree</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- OPTION B: HYBRID (RECOMMENDED) -->
+  <div class="card option-b">
+    <div class="card-label">Option B</div>
+    <div class="recommended-badge">✦ Recommended</div>
+    <div class="mock-b">
+      <div class="b-hero">
+        <div class="b-bg"></div>
+        <!-- Arc decoration -->
+        <div class="b-arc">
+          <svg viewBox="0 0 300 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M -20 220 Q 80 140 160 75 Q 230 18 310 -5"
+                  stroke="rgba(212,98,42,0.55)" stroke-width="48" fill="none" stroke-linecap="butt"/>
+            <path d="M -20 220 Q 80 140 160 75 Q 230 18 310 -5"
+                  stroke="rgba(10,10,10,0.45)" stroke-width="28" fill="none" stroke-linecap="butt"/>
+            <path d="M -20 220 Q 80 140 160 75 Q 230 18 310 -5"
+                  stroke="rgba(212,98,42,0.7)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <circle cx="278" cy="14" r="9" fill="rgba(212,98,42,0.9)"/>
+            <circle cx="262" cy="24" r="7" fill="rgba(212,98,42,0.8)"/>
+            <circle cx="288" cy="6" r="6" fill="rgba(232,120,52,0.85)"/>
+          </svg>
+        </div>
+        <div class="b-hero-bottom"></div>
+        <div class="b-avatar-wrap">
+          <div class="b-avatar">MJ</div>
+        </div>
+      </div>
+      <div class="b-body">
+        <div class="b-name">Marcus Johnson</div>
+        <div class="b-title">Elite Strength Coach · Dubai</div>
+        <div class="b-bio">NASM certified · 8 years experience<br>Specialised in body recomp & athletic performance</div>
+        <a class="b-link primary">Book Free Consultation</a>
+        <a class="b-link">💬 WhatsApp</a>
+        <a class="b-link">View Packages</a>
+        <div class="b-socials">
+          <div class="b-social">IG</div>
+          <div class="b-social">YT</div>
+          <div class="b-social">𝕏</div>
+        </div>
+        <div class="b-divider"></div>
+        <div class="b-ai-hint">✦ AI Training Plan</div>
+        <div class="b-ai-card">Based on your goals, Marcus recommends a 12-week hybrid strength program. Tap to get your personalised plan →</div>
+      </div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Brand Arc + Linktree Links + AI Peek</div>
+      <ul>
+        <li>Arc hero (brand identity preserved)</li>
+        <li>Circle avatar anchored to hero bottom</li>
+        <li>Pill buttons — WhatsApp, Booking, Packages</li>
+        <li>AI teaser card visible above fold</li>
+        <li>Scroll deeper → full AI agents, services, stats</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- OPTION C: PREMIUM SPORT -->
+  <div class="card option-c">
+    <div class="card-label">Option C</div>
+    <div class="mock-c">
+      <div class="c-bg"></div>
+      <div class="c-hero">
+        <div class="c-photo-bg"></div>
+        <div class="c-name-block">
+          <div class="c-sport">Personal Trainer · Dubai</div>
+          <div class="c-name">Marcus<br>Johnson</div>
+        </div>
+        <div class="c-avatar-side">MJ</div>
+      </div>
+      <div class="c-body">
+        <div class="c-stats">
+          <div class="c-stat">
+            <div class="c-stat-val">8yr</div>
+            <div class="c-stat-lbl">Experience</div>
+          </div>
+          <div class="c-stat">
+            <div class="c-stat-val">142</div>
+            <div class="c-stat-lbl">Clients</div>
+          </div>
+          <div class="c-stat">
+            <div class="c-stat-val">4.9</div>
+            <div class="c-stat-lbl">Rating</div>
+          </div>
+        </div>
+        <a class="c-btn primary">Book Now</a>
+        <a class="c-btn secondary">View Packages</a>
+        <div class="c-tags">
+          <span class="c-tag">Strength</span>
+          <span class="c-tag">Body Recomp</span>
+          <span class="c-tag">NASM</span>
+          <span class="c-tag">Athletic</span>
+        </div>
+      </div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Nike/Athlete Premium</div>
+      <ul>
+        <li>Dark athletic aesthetic, cyan accent</li>
+        <li>Stats block (years, clients, rating)</li>
+        <li>Side avatar (not centered)</li>
+        <li>More like a sports profile / athlete card</li>
+        <li>Different from Linktree — unique positioning</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="vote-row">
+  <button class="vote-btn a" onclick="record('option-a')">A — Pure Linktree</button>
+  <button class="vote-btn b" onclick="record('option-b')">B — Hybrid (Recommended)</button>
+  <button class="vote-btn c" onclick="record('option-c')">C — Premium Athlete</button>
+</div>
+
+<p class="question">Which direction for the profile page? (Or a mix?)</p>
+
+<script>
+function record(val) {
+  fetch('/event', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({type:'choice', value: val, question:'profile-design-direction', ts: Date.now()})
+  });
+  document.querySelectorAll('.card').forEach(c => c.style.opacity = '0.4');
+  const chosen = val.replace('option-', '');
+  document.querySelector('.option-' + chosen).style.opacity = '1';
+  document.querySelector('.option-' + chosen).style.transform = 'scale(1.02)';
+  document.querySelectorAll('.vote-btn').forEach(b => b.style.opacity = '0.4');
+  document.querySelector('.vote-btn.' + chosen).style.opacity = '1';
+}
+</script>
+</body>
+</html>

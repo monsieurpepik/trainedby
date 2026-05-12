@@ -1,0 +1,581 @@
+---
+/**
+ * Dynamic trainer profile route
+ * Serves clean URLs: /sarah-al-mansoori → renders the full trainer profile page
+ * Astro SSR extracts slug + market config and passes them as props to the
+ * <TrainerProfile client:load /> React island, which handles data fetch + rendering.
+ */
+import Base from "../layouts/Base.astro";
+import { getMarket } from "../lib/market.ts";
+import TrainerProfile from "../components/TrainerProfile";
+import { SUPABASE_URL as _SUPABASE_URL, SUPABASE_ANON_KEY } from "../lib/config.ts";
+
+const { slug } = Astro.params;
+const market = getMarket(Astro.url.hostname);
+const brandName = market.brandName ?? 'TrainedBy';
+const paymentEnabled = market.paymentEnabled;
+const currencySymbol = market.currencySymbol;
+
+// Validate slug - only alphanumeric and hyphens
+if (!slug || !/^[a-z0-9-]+$/i.test(slug)) {
+  return Astro.redirect('/find', 302);
+}
+
+// Reserved routes - never treat these as trainer slugs
+const RESERVED = new Set([
+  'find', 'join', 'pricing', 'blog', 'dashboard', 'edit',
+  'admin', 'superadmin', 'for-trainers', 'privacy',
+  'terms', 'cookie-policy', 'landing', 'index', 'profile',
+  'sitemap.xml', 'robots.txt', 'favicon.ico', 'manifest.webmanifest',
+]);
+if (RESERVED.has(slug.toLowerCase())) {
+  return Astro.redirect('/find', 302);
+}
+
+// Verify trainer exists before rendering (SSR - runs on server)
+const SUPABASE_URL = _SUPABASE_URL;
+const ANON_KEY = SUPABASE_ANON_KEY;
+
+let trainerName = '';
+let trainerSpecialty = '';
+let trainerPhoto = '';
+let trainerExists = false;
+let avgRating: number | null = null;
+let reviewCount: number = 0;
+let certifications: string[] = [];
+
+try {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/trainers?slug=eq.${encodeURIComponent(slug)}&select=name,specialties,avatar_url,avg_rating,review_count,certifications&limit=1`,
+    { headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${ANON_KEY}` } }
+  );
+  if (res.ok) {
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      trainerExists = true;
+      trainerName = data[0].name || '';
+      trainerSpecialty = Array.isArray(data[0].specialties)
+        ? data[0].specialties[0]
+        : (data[0].specialties || 'Personal Trainer');
+      trainerPhoto = data[0].avatar_url || '';
+      avgRating = data[0].avg_rating ?? null;
+      reviewCount = data[0].review_count ?? 0;
+      certifications = Array.isArray(data[0].certifications) ? data[0].certifications : [];
+    }
+  }
+} catch (e) {
+  // On network error, still render - client JS will handle the error state
+  trainerExists = true;
+}
+
+if (!trainerExists) {
+  return new Response(null, { status: 404 });
+}
+
+const pageTitle = trainerName
+  ? `${trainerName} - Verified Trainer on ${brandName}`
+  : `Trainer Profile - ${brandName}`;
+const pageDesc = trainerName
+  ? `Book sessions with ${trainerName}, a verified ${trainerSpecialty} on ${brandName}.`
+  : `Verified personal trainer profile on ${brandName}`;
+const profileUrl = `${Astro.url.origin}/${slug}`;
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": trainerName,
+  "url": profileUrl,
+  ...(trainerPhoto ? { "image": trainerPhoto } : {}),
+  "jobTitle": trainerSpecialty,
+  "description": pageDesc,
+  ...(certifications.length > 0 ? {
+    "hasCredential": certifications.map(c => ({ "@type": "EducationalOccupationalCredential", "name": c }))
+  } : {}),
+  ...(avgRating !== null && reviewCount > 0 ? {
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": avgRating.toFixed(1),
+      "reviewCount": reviewCount,
+      "bestRating": "5",
+      "worstRating": "1",
+    }
+  } : {}),
+};
+---
+<Base
+  title={pageTitle}
+  description={pageDesc}
+  ogImage={'/og/' + slug + '.png'}
+>
+  <Fragment slot="head">
+    <style>
+      html[data-market] {
+        --bg: #FFFFFF;
+        --surface: #FAFAF9;
+        --surface-2: #F5F4F3;
+        --surface-3: #E8E5E2;
+        --text: #1A1411;
+        --text-muted: #6B6460;
+        --border: rgba(0,0,0,0.07);
+        --brand: #FF5C00;
+        --brand-hover: #e05200;
+        --nav-logo-by: var(--brand);
+        --text-faint: #B8B0AA;
+        --btn-secondary-text: #7A7068;
+        --hero-dark-start: #18191C;
+        --hero-dark-end: #272A30;
+        --border-subtle: rgba(0,0,0,0.055);
+        --border-spinner: rgba(0,0,0,0.08);
+        --border-divider: rgba(0,0,0,0.06);
+        --surface-hover: rgba(0,0,0,0.05);
+        --surface-active: rgba(0,0,0,0.10);
+        --btn-secondary-border: rgba(0,0,0,0.10);
+        --tag-bg: rgba(0,0,0,0.05);
+        --nav-bg: rgba(255,255,255,0.92);
+        --bottom-nav-bg: rgba(255,255,255,0.95);
+        --glass-hero-btn: rgba(255,255,255,0.22);
+        --wa-glow: rgba(37,211,102,0.4);
+        --wa-glow-clear: rgba(37,211,102,0);
+        --shadow-btn: 0 4px 20px rgba(0,0,0,0.20);
+        --shadow-card: 0 2px 12px rgba(0,0,0,0.06);
+      }
+    </style>
+  </Fragment>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <!-- CSS: global so .tb-* classes match React-rendered HTML -->
+  <style is:global>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body:has(#tb-page) {
+  background: var(--bg);
+  color: var(--text);
+}
+
+#tb-page {
+  --font: 'DM Sans', system-ui, sans-serif;
+  --text-primary:   var(--text);
+  --text-secondary: var(--text-muted);
+  --bg-white:       var(--bg);
+  --border:         var(--border-subtle);
+  --btn-primary-bg:       var(--text);
+  --btn-primary-text:     var(--text-on-brand);
+  --tag-text: var(--text-muted);
+  --review-card-bg: var(--surface-2);
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.tb-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.tb-spinner {
+  width: 32px; height: 32px;
+  border: 2px solid var(--border-spinner);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: tb-spin 0.75s linear infinite;
+}
+@keyframes tb-spin { to { transform: rotate(360deg); } }
+
+#tb-compact-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: calc(56px + env(safe-area-inset-top));
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: env(safe-area-inset-top) 20px 0;
+  padding-bottom: 0;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+#tb-compact-header.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+#tb-compact-header .ch-name {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 88px);
+}
+.ch-btn {
+  width: 44px; height: 44px;
+  border: none; background: none; border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  transition: background 150ms ease;
+}
+.ch-btn:hover  { background: var(--surface-hover); }
+.ch-btn:active { background: var(--surface-active); }
+#tb-compact-header .ch-btn { margin-bottom: 6px; }
+#tb-compact-header .ch-name { margin-bottom: 8px; }
+
+#tb-bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: calc(84px + env(safe-area-inset-bottom));
+  background: var(--bottom-nav-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  padding-top: 12px;
+  z-index: 90;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  text-decoration: none; font-size: 10px; font-weight: 500;
+  letter-spacing: 0.03em; color: var(--text-muted);
+  cursor: pointer; border: none; background: none; font-family: var(--font);
+}
+.nav-item.active { color: var(--text); }
+.nav-item svg { width: 24px; height: 24px; }
+
+#profile-mount {
+  padding-bottom: max(84px, calc(84px + env(safe-area-inset-bottom)));
+}
+
+@keyframes wa-pulse {
+  0%,100% { box-shadow: 0 0 0 0 var(--wa-glow); }
+  50%      { box-shadow: 0 0 0 8px var(--wa-glow-clear); }
+}
+
+.tb-hero {
+  position: relative;
+  height: 460px;
+  overflow: hidden;
+  background: linear-gradient(168deg, var(--hero-dark-start), var(--hero-dark-end));
+}
+.tb-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+.tb-hero-fade {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 220px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+.tb-hero-controls {
+  position: absolute;
+  top: max(58px, calc(env(safe-area-inset-top) + 16px));
+  left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 10;
+}
+.tb-hero-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--glass-hero-btn);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text-on-brand);
+  flex-shrink: 0;
+}
+.tb-hero-name-block {
+  position: absolute;
+  bottom: 20px; left: 28px;
+  z-index: 10;
+}
+.tb-hero-name {
+  font-weight: 200; font-size: 36px;
+  letter-spacing: 0.02em; color: var(--text); line-height: 1.15;
+}
+.tb-hero-tagline {
+  font-weight: 300; font-size: 13px;
+  color: var(--text-secondary); margin-top: 4px;
+}
+
+.tb-identity {
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.tb-tag {
+  background: var(--tag-bg); color: var(--tag-text);
+  font-weight: 500; font-size: 10.5px;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 5px 10px; border-radius: 20px;
+}
+.tb-location {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; color: var(--text-secondary); font-weight: 300;
+}
+
+.tb-stats {
+  display: grid;
+  border-bottom: 1px solid var(--border);
+}
+.tb-stat-item {
+  padding: 16px 12px; text-align: center;
+  border-right: 1px solid var(--border-divider);
+}
+.tb-stat-item:last-child { border-right: none; }
+.tb-stat-num { font-weight: 200; font-size: 22px; letter-spacing: -0.02em; color: var(--text-primary); line-height: 1; }
+.tb-stat-label { font-weight: 500; font-size: 9.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); margin-top: 4px; }
+
+.tb-cta { padding: 20px 24px 16px; display: flex; flex-direction: column; gap: 10px; }
+.tb-btn-primary {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; height: 52px; border-radius: 13px; border: none;
+  background: var(--btn-primary-bg); color: var(--btn-primary-text);
+  font-family: var(--font); font-weight: 500; font-size: 14px;
+  letter-spacing: 0.04em; cursor: pointer;
+  box-shadow: var(--shadow-btn); text-decoration: none;
+}
+.tb-btn-secondary {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 46px; border-radius: 13px;
+  border: 1px solid var(--btn-secondary-border);
+  background: transparent; color: var(--btn-secondary-text);
+  font-family: var(--font); font-weight: 300; font-size: 14px;
+  cursor: pointer; text-decoration: none;
+}
+
+.tb-sessions { padding: 20px 0 20px; }
+.tb-sessions-header { display: flex; align-items: center; justify-content: space-between; padding: 0 20px 12px; }
+.tb-section-label { font-weight: 600; font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-faint); }
+.tb-see-all { font-size: 12px; font-weight: 400; color: var(--text-muted); text-decoration: none; }
+.tb-sessions-scroll {
+  display: flex; gap: 12px; overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 4px 20px 12px;
+  -webkit-overflow-scrolling: touch;
+}
+.tb-sessions-scroll::-webkit-scrollbar { display: none; }
+.tb-sessions-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+.tb-pkg-card {
+  flex: 0 0 240px; scroll-snap-align: start;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 14px; box-shadow: var(--shadow-card);
+  padding: 18px 20px; display: flex; flex-direction: column; gap: 6px;
+}
+.tb-pkg-name { font-weight: 400; font-size: 15px; color: var(--text-primary); }
+.tb-pkg-detail { font-weight: 300; font-size: 11px; color: var(--text-muted); }
+.tb-pkg-price { font-weight: 200; font-size: 20px; letter-spacing: -0.02em; color: var(--text-primary); margin-top: auto; }
+.tb-pkg-book {
+  width: 100%; height: 36px; border-radius: 8px; border: none;
+  background: var(--btn-primary-bg); color: var(--text-on-brand);
+  font-family: var(--font); font-weight: 500; font-size: 12px;
+  cursor: pointer; margin-top: 8px;
+}
+
+.tb-about { padding: 20px; border-top: 1px solid var(--border); }
+.tb-about-text {
+  font-weight: 300; font-size: 13.5px; color: var(--text-muted); line-height: 1.68;
+  overflow: hidden; display: -webkit-box;
+  -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+}
+.tb-about-text.expanded { display: block; -webkit-line-clamp: unset; }
+.tb-read-more {
+  display: inline-block; margin-top: 8px;
+  font-size: 13px; font-weight: 400; color: var(--text-muted);
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: var(--font);
+}
+
+.tb-reviews { padding: 20px; border-top: 1px solid var(--border); }
+.tb-reviews-loading { color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px 0; }
+
+/* ─── Desktop layout (≥768px) ─────────────────────────────────────────── */
+@media (min-width: 768px) {
+  /* Hide mobile-only chrome */
+  #tb-bottom-nav    { display: none; }
+  #tb-compact-header { display: none; }
+
+  /* Remove bottom-nav padding from mount */
+  #profile-mount {
+    position: relative;
+    padding-bottom: 0;
+  }
+
+  /* ── Hero ─────────────────────────────────────────────────────────────── */
+  .tb-hero { height: 300px; }
+
+  /* Shorter white fade — keeps name area on dark photo */
+  .tb-hero-fade {
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--bg));
+  }
+
+  /* Name/tagline: white on dark photo background */
+  .tb-hero-name {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.5);
+  }
+  .tb-hero-tagline {
+    color: rgba(255,255,255,0.75);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  }
+  /* Shift name block to match grid's 48px inset */
+  .tb-hero-name-block { left: 48px; bottom: 36px; }
+
+  /* ── CTA: overlaid at hero bottom-right ──────────────────────────────── */
+  /* Positioned relative to #profile-mount (position: relative) */
+  .tb-cta {
+    position: absolute;
+    top: 172px; /* hero 300px – 36px bottom pad – ~92px button stack */
+    right: 48px;
+    width: 210px;
+    padding: 0;
+    gap: 8px;
+    z-index: 20;
+    flex-direction: column;
+  }
+  .tb-cta .tb-btn-primary {
+    background: var(--brand);
+    height: 44px;
+    border-radius: 10px;
+  }
+  .tb-cta .tb-btn-secondary {
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: rgba(255,255,255,0.95);
+    border-color: rgba(255,255,255,0.3);
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  /* ── Content shelf: 3-col CSS grid ───────────────────────────────────── */
+  #tb-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-areas:
+      "identity  identity"
+      "sessions  stats"
+      "about     reviews";
+    column-gap: 20px;
+    padding: 24px 48px 64px;
+    background: var(--bg);
+  }
+
+  /* Identity strip: full-width header row */
+  .tb-identity {
+    grid-area: identity;
+    padding: 0 0 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+  }
+
+  /* Stats: right sidebar card */
+  .tb-stats {
+    grid-area: stats;
+    display: flex !important;   /* override inline style grid */
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    align-self: start;
+    border-bottom: none;
+  }
+  .tb-stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-right: none;
+    border-bottom: 1px solid var(--border-divider);
+    padding: 12px 0;
+    text-align: left;
+  }
+  .tb-stat-item:last-child { border-bottom: none; }
+  .tb-stat-num  { font-size: 20px; }
+  .tb-stat-label { font-size: 10px; }
+
+  /* Sessions / packages: left main card */
+  .tb-sessions {
+    grid-area: sessions;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    align-self: start;
+  }
+  .tb-sessions-header { padding: 0 0 12px; }
+  /* Packages: 2-col inner grid instead of horizontal scroll */
+  .tb-sessions-scroll {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    overflow-x: visible;
+    scroll-snap-type: none;
+    padding: 0;
+    gap: 12px;
+  }
+  .tb-pkg-card {
+    flex: none;
+    scroll-snap-align: none;
+  }
+
+  /* About: left main card (row 3) */
+  .tb-about {
+    grid-area: about;
+    border-top: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    align-self: start;
+  }
+  /* Expand bio fully — no clamp, no "read more" */
+  .tb-about-text { -webkit-line-clamp: unset !important; display: block !important; }
+  .tb-read-more  { display: none; }
+
+  /* Reviews: right sidebar card (row 3) */
+  .tb-reviews {
+    grid-area: reviews;
+    border-top: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    align-self: start;
+  }
+}
+  </style>
+
+  <TrainerProfile
+    client:load
+    slug={slug}
+    paymentEnabled={paymentEnabled}
+    currencySymbol={currencySymbol}
+  />
+</Base>

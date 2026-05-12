@@ -1,0 +1,24 @@
+name: Weekly Trainer Digest
+
+on:
+  schedule:
+    # Every Monday at 08:00 UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger weekly digest
+        run: |
+          STATUS=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -X POST \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            https://mezhtdbfyvkshpuplqqw.supabase.co/functions/v1/trainer-weekly-digest)
+          cat /tmp/response.json
+          if [ "$STATUS" != "200" ]; then
+            echo "Digest failed with status $STATUS"
+            exit 1
+          fi

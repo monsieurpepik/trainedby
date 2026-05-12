@@ -1,13 +1,13 @@
 -- ─────────────────────────────────────────────────────────────────────────────
--- TrainedBy Agent OS — Weekly Cron Schedules
+-- TrainedBy Agent OS  -  Weekly Cron Schedules
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Uses pg_cron (available in Supabase) to trigger edge functions on schedule.
 -- All times are UTC. UAE (GST) = UTC+4.
 --
 -- Schedule:
---   content-agent  → Sunday 06:00 UTC (10:00 GST)  — weekly blog post
---   growth-agent   → Monday 05:00 UTC (09:00 GST)  — weekly funnel digest
---   meta-agent     → Sunday 16:00 UTC (20:00 GST)  — weekly product memo
+--   content-agent  → Sunday 06:00 UTC (10:00 GST)   -  weekly blog post
+--   growth-agent   → Monday 05:00 UTC (09:00 GST)   -  weekly funnel digest
+--   meta-agent     → Sunday 16:00 UTC (20:00 GST)   -  weekly product memo
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Enable pg_cron extension if not already enabled

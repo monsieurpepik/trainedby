@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
     .single();
 
   if (existing) {
-    logger.info("Duplicate webhook event — skipping", { event_id: eventId, type: event.type });
+    logger.info("Duplicate webhook event  -  skipping", { event_id: eventId, type: event.type });
     return new Response(JSON.stringify({ received: true, duplicate: true }), { status: 200 });
   }
 
@@ -51,11 +51,14 @@ Deno.serve(async (req) => {
         const session = event.data.object as Stripe.Checkout.Session;
         const trainer_id = session.metadata?.trainer_id;
         const plan = session.metadata?.plan;
-        if (trainer_id && plan) {
+        if (trainer_id && plan && session.subscription) {
+          const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+
           await sb.from("trainers").update({
             plan,
             subscription_status: "active",
             stripe_subscription_id: session.subscription as string,
+            subscription_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
           }).eq("id", trainer_id);
 
           const { data: trainer } = await sb
@@ -76,7 +79,7 @@ Deno.serve(async (req) => {
               body: JSON.stringify({ type: "pro_upgrade", data: { name: trainer.name, email: trainer.email, market } }),
             }).catch(() => {});
 
-            // Pro welcome lifecycle email — market-aware
+            // Pro welcome lifecycle email  -  market-aware
             fetch(`${SELF_BASE}/lifecycle-email`, {
               method: "POST",
               headers: { "Content-Type": "application/json", "Authorization": `Bearer ${svcKey}` },
@@ -84,7 +87,7 @@ Deno.serve(async (req) => {
             }).catch(() => {});
           }
 
-          logger.info("Checkout completed — trainer upgraded", { trainer_id, plan, market });
+          logger.info("Checkout completed  -  trainer upgraded", { trainer_id, plan, market });
         }
         break;
       }

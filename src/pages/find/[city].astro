@@ -1,0 +1,164 @@
+---
+import Nav from '../../components/Nav.astro';
+import Base from '../../layouts/Base.astro';
+import { getMarket } from '../../lib/market.ts';
+import { createClient } from '@supabase/supabase-js';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../lib/config.ts';
+
+const market = getMarket(Astro.url.hostname);
+
+const CITY_MAP: Record<string, string> = {
+  'dubai': 'Dubai',
+  'abu-dhabi': 'Abu Dhabi',
+  'sharjah': 'Sharjah',
+  'london': 'London',
+  'manchester': 'Manchester',
+  'new-york': 'New York',
+  'los-angeles': 'Los Angeles',
+  'miami': 'Miami',
+  'paris': 'Paris',
+  'rome': 'Rome',
+  'milan': 'Milan',
+  'madrid': 'Madrid',
+  'barcelona': 'Barcelona',
+  'delhi': 'Delhi',
+  'mumbai': 'Mumbai',
+  'bangalore': 'Bangalore',
+};
+
+const citySlug = Astro.params.city ?? '';
+const cityName = CITY_MAP[citySlug];
+
+if (!cityName) {
+  return Astro.redirect('/find', 302);
+}
+
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const { data: trainers, error: trainersError } = await sb
+  .from('trainers')
+  .select('id, name, slug, title, avatar_url, specialties, city, market, plan, reps_verified')
+  .ilike('city', `%${cityName}%`)
+  .eq('market', market.market)
+  .order('plan', { ascending: false })
+  .limit(20);
+if (trainersError) console.error('[city page] Supabase error:', trainersError.message);
+
+const pageTitle = `Personal Trainers in ${cityName} | ${market.brandName}`;
+const pageDesc = `Find verified personal trainers in ${cityName}. Book sessions, compare rates, and connect via WhatsApp — free on ${market.brandName}.`;
+---
+
+<Base title={pageTitle} description={pageDesc}>
+  <Fragment slot="head">
+    <style>
+      html[data-market] {
+        --bg: #FFFFFF;
+        --surface: #FAFAF9;
+        --surface-2: #F5F4F3;
+        --surface-3: #E8E5E2;
+        --text: #1A1411;
+        --text-2: #4A4240;
+        --text-muted: #6B6460;
+        --text-faint: #9B9290;
+        --border: rgba(0,0,0,0.07);
+        --border-hover: rgba(0,0,0,0.15);
+        --brand: #FF5C00;
+        --brand-hover: #e05200;
+        --brand-dim: rgba(255,92,0,0.08);
+        --brand-border: rgba(255,92,0,0.20);
+        --nav-logo-by: var(--brand);
+        --nav-bg: rgba(255,255,255,0.92);
+        --nav-scrolled-bg: rgba(255,255,255,0.97);
+        --avatar-gradient-end: #FF8C42;
+        --reps: #16a34a;
+        --reps-dim: rgba(22,163,74,0.08);
+        --reps-border: rgba(22,163,74,0.20);
+      }
+    </style>
+  </Fragment>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 64px; background: var(--nav-bg); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); transition: background 0.3s, box-shadow 0.3s; }
+    .nav.scrolled { background: var(--nav-scrolled-bg); box-shadow: 0 1px 12px var(--border); }
+    .nav-logo { font-family: 'DM Sans',sans-serif; font-weight: 900; font-size: 20px; text-decoration: none; color: var(--text); display: flex; align-items: center; }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { font-size: 14px; font-weight: 500; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { background: var(--text); color: var(--bg); padding: 9px 18px; border-radius: 20px; font-size: 13px; font-weight: 700; text-decoration: none; transition: opacity 0.2s; }
+    .nav-cta:hover { opacity: 0.85; }
+    :global(#nav .nav-logo span) { color: var(--text); }
+    :global(#nav .nav-logo span span) { color: var(--brand) !important; }
+    @media (max-width: 768px) { .nav-links { display: none; } .nav { padding: 0 20px; } }
+    .hero { max-width: 900px; margin: 0 auto; padding: 84px 24px 40px; }
+    .hero-eyebrow { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+    h1 { font-family: 'DM Sans', sans-serif; font-size: clamp(28px, 5vw, 42px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 16px; }
+    .hero-sub { font-size: 16px; color: var(--text-muted); line-height: 1.6; margin-bottom: 32px; }
+    .trainer-grid { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .trainer-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-decoration: none; color: inherit; display: block; transition: border-color 0.2s; }
+    .trainer-card:hover { border-color: var(--brand-border); }
+    .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .card-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--avatar-gradient-end)); flex-shrink: 0; object-fit: cover; }
+    .card-avatar-initials { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--avatar-gradient-end)); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 18px; color: var(--bg); }
+    .card-name { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 15px; margin-bottom: 2px; }
+    .card-title { font-size: 12px; color: var(--text-muted); }
+    .card-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: var(--reps); background: var(--reps-dim); border: 1px solid var(--reps-border); border-radius: 20px; padding: 2px 8px; font-weight: 700; margin-bottom: 10px; }
+    .card-specs { display: flex; flex-wrap: wrap; gap: 4px; }
+    .spec-pill { font-size: 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px; padding: 2px 8px; color: var(--text-muted); }
+    .empty { text-align: center; padding: 80px 24px; color: var(--text-muted); }
+    .cta-strip { background: var(--brand-dim); border-top: 1px solid var(--brand-border); border-bottom: 1px solid var(--brand-border); padding: 48px 24px; text-align: center; margin-top: 40px; }
+    .cta-strip h2 { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+    .cta-strip p { color: var(--text-muted); margin-bottom: 24px; }
+    .btn-primary { background: var(--brand); color: var(--bg); padding: 14px 28px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; font-family: 'DM Sans', sans-serif; }
+  </style>
+
+  <Nav variant="consumer" />
+
+  <div class="hero">
+    <div class="hero-eyebrow">Verified Trainers · {market.certificationBody} Standard</div>
+    <h1>Personal Trainers<br>in {cityName}</h1>
+    <p class="hero-sub">
+      {trainers && trainers.length > 0
+        ? `${trainers.length} verified trainer${trainers.length > 1 ? 's' : ''} in ${cityName}. Compare profiles, see packages, and book directly via WhatsApp.`
+        : `Be the first verified trainer listed in ${cityName} on ${market.brandName}.`
+      }
+    </p>
+  </div>
+
+  {trainers && trainers.length > 0 ? (
+    <div class="trainer-grid">
+      {trainers.map((trainer) => (
+        <a href={`/${trainer.slug}`} class="trainer-card">
+          <div class="card-header">
+            {trainer.avatar_url
+              ? <img src={trainer.avatar_url} alt={trainer.name} class="card-avatar" loading="lazy" />
+              : <div class="card-avatar-initials">{trainer.name.charAt(0)}</div>
+            }
+            <div>
+              <div class="card-name">{trainer.name}</div>
+              <div class="card-title">{trainer.title || 'Personal Trainer'}</div>
+            </div>
+          </div>
+          {trainer.reps_verified && (
+            <div class="card-badge">✓ {market.certificationBody} Verified</div>
+          )}
+          <div class="card-specs">
+            {(trainer.specialties || []).slice(0, 3).map((s: string) => (
+              <span class="spec-pill">{s}</span>
+            ))}
+          </div>
+        </a>
+      ))}
+    </div>
+  ) : (
+    <div class="empty">
+      <p>No trainers listed in {cityName} yet.</p>
+    </div>
+  )}
+
+  <div class="cta-strip">
+    <h2>Are you a trainer in {cityName}?</h2>
+    <p>Get a verified public profile, manage leads, and book clients — free to start.</p>
+    <a href="/join" class="btn-primary">Create your free profile →</a>
+  </div>
+</Base>

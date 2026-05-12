@@ -56,7 +56,7 @@ CREATE INDEX IF NOT EXISTS idx_cert_reviews_trainer
 -- ─── 4. RLS policies for cert_reviews ────────────────────────────────────────
 ALTER TABLE cert_reviews ENABLE ROW LEVEL SECURITY;
 
--- Admins (service role) can do everything — handled via service role key in edge functions
+-- Admins (service role) can do everything  -  handled via service role key in edge functions
 -- Trainers can read their own reviews only (via anon key + trainer_id match)
 CREATE POLICY "trainers_read_own_cert_reviews"
   ON cert_reviews FOR SELECT

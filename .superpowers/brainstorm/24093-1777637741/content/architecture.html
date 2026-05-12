@@ -1,0 +1,42 @@
+<h2>How is the booking system structured?</h2>
+<p class="subtitle">This shapes how consumers discover and pay, and how trainers get their money</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Embedded on trainer profile</h3>
+      <p>The "Book a Session" button lives on <code>[slug].astro</code>. Clicking it opens a booking panel/modal on the same page. Trainer is onboarded to Stripe Connect Express — money goes directly to their bank, platform never touches it.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>No extra pages to build</li><li>Lowest drop-off (consumer stays on profile)</li><li>Fully automated payouts via Stripe Connect</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Profile page gets more complex</li><li>Modal UX on mobile can be awkward</li></ul></div>
+      </div>
+      <p style="margin-top:12px;font-size:12px;color:#FF5C00;font-weight:700;">→ Fastest to ship</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Dedicated booking page per trainer</h3>
+      <p><code>/book/[slug]</code> is a separate Astro page optimised for conversion. Profile shows a "Book" button that navigates here. Same Stripe Connect Express payout model.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Clean, distraction-free booking flow</li><li>Better mobile UX (full-page, not modal)</li><li>Can add structured data for SEO (BookingAction schema)</li><li>Shareable URL trainers send to clients directly</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>One extra page to build</li><li>One extra navigation hop for consumer</li></ul></div>
+      </div>
+      <p style="margin-top:12px;font-size:12px;color:#FF5C00;font-weight:700;">→ Recommended — best UX + shareable</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>External tool (Calendly / Cal.com)</h3>
+      <p>Trainer connects their own Calendly or Cal.com account. Profile shows an embedded widget or a "Book" link that opens their external tool.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Zero infrastructure to build</li><li>Ship in days</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Platform has no booking data — no analytics, no lifecycle emails</li><li>Not automated — trainer sets up payments separately</li><li>Trainers pay Calendly on top of TrainedBy</li><li>Kills the product vision</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>

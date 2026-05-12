@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getDashboardUrl, getEditUrl, getMarketBrand, getMarketSupportEmail } from '../_shared/market_url.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -64,15 +65,16 @@ serve(async (req) => {
       });
     }
 
-    // Validate redirect URL — only allow known TrainedBy domains
+    // Validate redirect URL  -  only allow known TrainedBy domains
+    const stagingUrl = Deno.env.get('STAGING_URL');
     const allowedRedirects = [
-      "https://trainedby.ae/edit",
-      "https://trainedby-ae.netlify.app/edit",
-      "https://trainedby.ae/dashboard",
+      getEditUrl('ae'),
+      getDashboardUrl('ae'),
+      ...(stagingUrl ? [`${stagingUrl}/edit`] : []),
     ];
     const safeRedirect = allowedRedirects.includes(redirect)
       ? redirect
-      : "https://trainedby.ae/edit";
+      : getEditUrl('ae');
 
     const sb = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -91,7 +93,7 @@ serve(async (req) => {
 
     // ── Find trainer by email ─────────────────────────────────────────────────
     const { data: trainer } = await sb.from("trainers")
-      .select("id,slug,name")
+      .select("id,slug,name,market")
       .eq("email", cleanEmail)
       .single();
 
@@ -109,7 +111,7 @@ serve(async (req) => {
     // ── Send email via Resend ─────────────────────────────────────────────────
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!resendKey) {
-      // Dev environment — log the magic URL instead of failing
+      // Dev environment  -  log the magic URL instead of failing
       console.log("DEV: Magic link URL:", magicUrl);
       return new Response(JSON.stringify({ ok: true, dev_url: magicUrl }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -123,7 +125,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "TrainedBy <hello@trainedby.ae>",
+        from: `${getMarketBrand(trainer?.market ?? 'ae')} <${getMarketSupportEmail(trainer?.market ?? 'ae')}>`,
         to: cleanEmail,
         subject: "Your TrainedBy sign-in link",
         html: `

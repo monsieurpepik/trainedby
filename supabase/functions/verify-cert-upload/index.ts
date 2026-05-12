@@ -171,7 +171,7 @@ serve(async (req) => {
         nameMatch: false,
         certMatch: false,
         decision: "manual_review" as const,
-        reasoning: "Claude Vision unavailable — manual review required",
+        reasoning: "Claude Vision unavailable  -  manual review required",
       };
     }
 

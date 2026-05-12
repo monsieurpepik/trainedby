@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<h2>The arc — space field</h2>
+<p class="subtitle">Orange stars scattered across black space. Dense at the detonation point. Sparse at the edges. One universe.</p>
+
+<div style="display:flex;flex-direction:column;gap:48px;max-width:860px">
+  <div style="display:flex;gap:24px;flex-wrap:wrap">
+
+    <!-- TRAINER CARD -->
+    <div style="flex:1;min-width:300px;max-width:390px">
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:10px;font-family:-apple-system,sans-serif">Trainer listing card</div>
+      <div style="background:#0A0A0A;border-radius:24px;overflow:hidden;position:relative;min-height:560px">
+
+        <div style="position:relative;height:320px;background:#0A0A0A;overflow:hidden">
+          <svg id="svg-card" class="starfield-svg" data-vw="390" data-vh="320" data-ex="380" data-ey="18"
+               style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 390 320" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="arcStroke1" x1="-30" y1="320" x2="420" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
+                <stop offset="22%" stop-color="rgba(212,98,42,0.15)"/>
+                <stop offset="58%" stop-color="rgba(212,98,42,0.52)"/>
+                <stop offset="100%" stop-color="#D4622A"/>
+              </linearGradient>
+              <linearGradient id="arcThin1" x1="-30" y1="320" x2="420" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
+                <stop offset="28%" stop-color="rgba(212,98,42,0.38)"/>
+                <stop offset="100%" stop-color="#D4622A"/>
+              </linearGradient>
+              <linearGradient id="bleedGrad1" x1="-30" y1="320" x2="420" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
+                <stop offset="48%" stop-color="rgba(212,98,42,0.04)"/>
+                <stop offset="100%" stop-color="rgba(212,98,42,0.14)"/>
+              </linearGradient>
+              <filter id="glow1" x="-80%" y="-80%" width="260%" height="260%">
+                <feGaussianBlur stdDeviation="5" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <filter id="softglow1" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            <!-- Stars injected here by script -->
+            <g id="stars-card"></g>
+
+            <!-- Arc -->
+            <path d="M -30 320 Q 100 240 195 155 Q 295 65 420 15" stroke="url(#bleedGrad1)" stroke-width="140" fill="none" stroke-linecap="round"/>
+            <path d="M -30 320 Q 100 240 195 155 Q 295 65 420 15" stroke="url(#arcStroke1)" stroke-width="68" fill="none" stroke-linecap="butt"/>
+            <path d="M -30 320 Q 100 240 195 155 Q 295 65 420 15" stroke="rgba(10,10,10,0.55)" stroke-width="40" fill="none" stroke-linecap="butt"/>
+            <path d="M -30 320 Q 100 240 195 155 Q 295 65 420 15" stroke="url(#arcThin1)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+            <!-- Core explosion -->
+            <g filter="url(#glow1)">
+              <circle cx="378" cy="20" r="14" fill="rgba(212,98,42,0.92)"/>
+              <circle cx="358" cy="30" r="11" fill="rgba(212,98,42,0.85)"/>
+              <circle cx="395" cy="10" r="9" fill="rgba(212,98,42,0.80)"/>
+              <circle cx="368" cy="6" r="8" fill="rgba(232,118,52,0.88)"/>
+              <circle cx="390" cy="36" r="7" fill="rgba(212,98,42,0.78)"/>
+            </g>
+
+            <!-- Streaks -->
+            <line x1="380" y1="18" x2="420" y2="-8" stroke="rgba(212,98,42,0.60)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="380" y1="18" x2="415" y2="42" stroke="rgba(212,98,42,0.45)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="380" y1="18" x2="350" y2="-10" stroke="rgba(212,98,42,0.50)" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="380" y1="18" x2="420" y2="20" stroke="rgba(212,98,42,0.40)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="380" y1="18" x2="360" y2="-18" stroke="rgba(212,98,42,0.35)" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="380" y1="18" x2="408" y2="56" stroke="rgba(212,98,42,0.30)" stroke-width="1.2" stroke-linecap="round"/>
+
+            <!-- Inner burst field -->
+            <g filter="url(#softglow1)">
+              <circle cx="345" cy="14" r="6" fill="rgba(212,98,42,0.72)"/>
+              <circle cx="365" cy="-4" r="5.5" fill="rgba(212,98,42,0.68)"/>
+              <circle cx="402" cy="28" r="5" fill="rgba(212,98,42,0.62)"/>
+              <circle cx="340" cy="44" r="5.5" fill="rgba(212,98,42,0.58)"/>
+              <circle cx="375" cy="48" r="4.5" fill="rgba(212,98,42,0.55)"/>
+              <circle cx="328" cy="28" r="4" fill="rgba(212,98,42,0.52)"/>
+              <circle cx="350" cy="58" r="4" fill="rgba(212,98,42,0.48)"/>
+              <circle cx="408" cy="52" r="3.5" fill="rgba(212,98,42,0.45)"/>
+              <circle cx="385" cy="-14" r="4" fill="rgba(212,98,42,0.55)"/>
+              <circle cx="318" cy="18" r="3.5" fill="rgba(212,98,42,0.42)"/>
+              <circle cx="358" cy="72" r="3.5" fill="rgba(212,98,42,0.38)"/>
+              <circle cx="335" cy="62" r="3" fill="rgba(212,98,42,0.42)"/>
+              <circle cx="312" cy="38" r="3" fill="rgba(212,98,42,0.36)"/>
+              <circle cx="372" cy="64" r="2.5" fill="rgba(212,98,42,0.40)"/>
+              <circle cx="405" cy="68" r="3" fill="rgba(212,98,42,0.34)"/>
+            </g>
+          </svg>
+
+          <!-- Avatar -->
+          <div style="position:absolute;bottom:24px;left:24px;width:72px;height:72px;border-radius:50%;background:rgba(212,98,42,0.10);border:2px solid rgba(212,98,42,0.32);display:flex;align-items:center;justify-content:center">
+            <div style="font-size:24px;font-weight:800;color:#D4622A;font-family:-apple-system,sans-serif">MS</div>
+          </div>
+          <div style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);border-radius:100px;padding:6px 14px;backdrop-filter:blur(12px)">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.55);letter-spacing:0.08em;text-transform:uppercase;font-family:-apple-system,sans-serif">Dubai</div>
+          </div>
+          <div style="position:absolute;top:20px;left:20px">
+            <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.16);font-family:-apple-system,sans-serif;font-weight:700">TrainedBy</div>
+          </div>
+        </div>
+
+        <div style="padding:24px">
+          <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.26);margin-bottom:8px;font-family:-apple-system,sans-serif;font-weight:600">Strength & Conditioning</div>
+          <div style="font-size:36px;font-weight:700;color:#FAFAFA;font-family:Georgia,'Times New Roman',serif;letter-spacing:-0.015em;line-height:1.05;font-style:italic;margin-bottom:4px">Mariana<br>Silva</div>
+          <div style="width:36px;height:1.5px;background:#D4622A;margin:14px 0"></div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.28);font-family:-apple-system,sans-serif;margin-bottom:20px">NASM · ACE · 6 years experience</div>
+          <div style="display:flex;gap:0;margin-bottom:24px;border:1px solid rgba(255,255,255,0.07);border-radius:14px;overflow:hidden">
+            <div style="flex:1;padding:14px 16px;border-right:1px solid rgba(255,255,255,0.07)">
+              <div style="font-size:22px;font-weight:800;color:#FAFAFA;font-family:-apple-system,sans-serif;letter-spacing:-0.02em">48</div>
+              <div style="font-size:9px;color:rgba(255,255,255,0.24);letter-spacing:0.1em;text-transform:uppercase;font-family:-apple-system,sans-serif;margin-top:2px">Clients</div>
+            </div>
+            <div style="flex:1;padding:14px 16px;border-right:1px solid rgba(255,255,255,0.07)">
+              <div style="font-size:22px;font-weight:800;color:#FAFAFA;font-family:-apple-system,sans-serif;letter-spacing:-0.02em">4.9★</div>
+              <div style="font-size:9px;color:rgba(255,255,255,0.24);letter-spacing:0.1em;text-transform:uppercase;font-family:-apple-system,sans-serif;margin-top:2px">Rating</div>
+            </div>
+            <div style="flex:1;padding:14px 16px">
+              <div style="font-size:22px;font-weight:800;color:#D4622A;font-family:-apple-system,sans-serif;letter-spacing:-0.02em">350</div>
+              <div style="font-size:9px;color:rgba(255,255,255,0.24);letter-spacing:0.1em;text-transform:uppercase;font-family:-apple-system,sans-serif;margin-top:2px">AED / session</div>
+            </div>
+          </div>
+          <div style="background:#D4622A;color:#0A0A0A;font-size:12px;font-weight:800;text-align:center;padding:16px;border-radius:100px;font-family:-apple-system,sans-serif;letter-spacing:0.1em;text-transform:uppercase">Book a session</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BROWSE SCREEN -->
+    <div style="flex:1;min-width:300px;max-width:390px">
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:10px;font-family:-apple-system,sans-serif">Browse / discovery screen</div>
+      <div style="background:#0A0A0A;border-radius:24px;overflow:hidden;position:relative;min-height:560px">
+
+        <div style="position:relative;height:240px;background:#0A0A0A;overflow:hidden">
+          <svg id="svg-browse" class="starfield-svg" data-vw="390" data-vh="240" data-ex="390" data-ey="5"
+               style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 390 240" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="arcStroke2" x1="-40" y1="240" x2="445" y2="-12" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
+                <stop offset="20%" stop-color="rgba(212,98,42,0.14)"/>
+                <stop offset="62%" stop-color="rgba(212,98,42,0.50)"/>
+                <stop offset="100%" stop-color="#D4622A"/>
+              </linearGradient>
+              <linearGradient id="arcThin2" x1="-40" y1="240" x2="445" y2="-12" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
+                <stop offset="32%" stop-color="rgba(212,98,42,0.42)"/>
+                <stop offset="100%" stop-color="#D4622A"/>
+              </linearGradient>
+              <linearGradient id="bleedGrad2" x1="-40" y1="240" x2="445" y2="-12" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
+                <stop offset="55%" stop-color="rgba(212,98,42,0.05)"/>
+                <stop offset="100%" stop-color="rgba(212,98,42,0.13)"/>
+              </linearGradient>
+              <filter id="glow2" x="-80%" y="-80%" width="260%" height="260%">
+                <feGaussianBlur stdDeviation="5" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <filter id="softglow2" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            <g id="stars-browse"></g>
+
+            <path d="M -40 240 Q 120 160 225 95 Q 330 28 445 -12" stroke="url(#bleedGrad2)" stroke-width="130" fill="none" stroke-linecap="round"/>
+            <path d="M -40 240 Q 120 160 225 95 Q 330 28 445 -12" stroke="url(#arcStroke2)" stroke-width="62" fill="none" stroke-linecap="butt"/>
+            <path d="M -40 240 Q 120 160 225 95 Q 330 28 445 -12" stroke="rgba(10,10,10,0.52)" stroke-width="38" fill="none" stroke-linecap="butt"/>
+            <path d="M -40 240 Q 120 160 225 95 Q 330 28 445 -12" stroke="url(#arcThin2)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+            <g filter="url(#glow2)">
+              <circle cx="390" cy="14" r="13" fill="rgba(212,98,42,0.90)"/>
+              <circle cx="372" cy="24" r="10" fill="rgba(212,98,42,0.84)"/>
+              <circle cx="375" cy="4" r="8.5" fill="rgba(232,118,52,0.86)"/>
+              <circle cx="358" cy="36" r="8" fill="rgba(212,98,42,0.78)"/>
+              <circle cx="400" cy="30" r="7" fill="rgba(212,98,42,0.74)"/>
+            </g>
+
+            <line x1="390" y1="14" x2="425" y2="-10" stroke="rgba(212,98,42,0.55)" stroke-width="2.2" stroke-linecap="round"/>
+            <line x1="390" y1="14" x2="422" y2="40" stroke="rgba(212,98,42,0.42)" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="390" y1="14" x2="362" y2="-14" stroke="rgba(212,98,42,0.46)" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="390" y1="14" x2="428" y2="16" stroke="rgba(212,98,42,0.38)" stroke-width="1.4" stroke-linecap="round"/>
+            <line x1="390" y1="14" x2="372" y2="-26" stroke="rgba(212,98,42,0.32)" stroke-width="1.2" stroke-linecap="round"/>
+
+            <g filter="url(#softglow2)">
+              <circle cx="355" cy="8" r="6" fill="rgba(212,98,42,0.70)"/>
+              <circle cx="370" cy="-8" r="5" fill="rgba(212,98,42,0.64)"/>
+              <circle cx="340" cy="28" r="5.5" fill="rgba(212,98,42,0.60)"/>
+              <circle cx="352" cy="50" r="5" fill="rgba(212,98,42,0.54)"/>
+              <circle cx="375" cy="50" r="4.5" fill="rgba(212,98,42,0.50)"/>
+              <circle cx="328" cy="18" r="4" fill="rgba(212,98,42,0.48)"/>
+              <circle cx="345" cy="62" r="4" fill="rgba(212,98,42,0.42)"/>
+              <circle cx="315" cy="36" r="3.5" fill="rgba(212,98,42,0.36)"/>
+            </g>
+          </svg>
+
+          <div style="position:absolute;inset:0;padding:28px 24px">
+            <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.16);font-family:-apple-system,sans-serif;font-weight:700;margin-bottom:16px">TrainedBy · Dubai</div>
+            <div style="font-size:30px;font-weight:900;color:#FAFAFA;font-family:-apple-system,sans-serif;letter-spacing:-0.03em;line-height:1.1">Find your<br>trainer.</div>
+            <div style="margin-top:10px;font-size:12px;color:rgba(255,255,255,0.28);font-family:-apple-system,sans-serif">34 certified trainers near you</div>
+          </div>
+        </div>
+
+        <div style="padding:16px 24px 12px;display:flex;gap:8px">
+          <div style="background:#D4622A;color:#0A0A0A;font-size:10px;font-weight:700;padding:8px 16px;border-radius:100px;white-space:nowrap;font-family:-apple-system,sans-serif;letter-spacing:0.06em;text-transform:uppercase">All</div>
+          <div style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.09);font-size:10px;font-weight:600;padding:8px 16px;border-radius:100px;white-space:nowrap;font-family:-apple-system,sans-serif;letter-spacing:0.06em;text-transform:uppercase">Strength</div>
+          <div style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.09);font-size:10px;font-weight:600;padding:8px 16px;border-radius:100px;white-space:nowrap;font-family:-apple-system,sans-serif;letter-spacing:0.06em;text-transform:uppercase">Yoga</div>
+          <div style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.09);font-size:10px;font-weight:600;padding:8px 16px;border-radius:100px;white-space:nowrap;font-family:-apple-system,sans-serif;letter-spacing:0.06em;text-transform:uppercase">Boxing</div>
+        </div>
+
+        <div style="padding:8px 24px;display:flex;flex-direction:column;gap:10px">
+          <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px;display:flex;gap:14px;align-items:center">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(212,98,42,0.12);border:1.5px solid rgba(212,98,42,0.30);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <div style="font-size:14px;font-weight:800;color:#D4622A;font-family:-apple-system,sans-serif">MS</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:700;color:#FAFAFA;font-family:Georgia,serif;font-style:italic;letter-spacing:-0.01em">Mariana Silva</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.26);font-family:-apple-system,sans-serif;margin-top:2px">Strength · 4.9★ · AED 350</div>
+            </div>
+            <div style="width:36px;height:36px;border-radius:50%;background:#D4622A;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px;display:flex;gap:14px;align-items:center">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <div style="font-size:14px;font-weight:800;color:rgba(255,255,255,0.35);font-family:-apple-system,sans-serif">AK</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:700;color:#FAFAFA;font-family:Georgia,serif;font-style:italic;letter-spacing:-0.01em">Ahmed Karim</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.26);font-family:-apple-system,sans-serif;margin-top:2px">Boxing · 4.8★ · AED 280</div>
+            </div>
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.32)" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px;display:flex;gap:14px;align-items:center">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <div style="font-size:14px;font-weight:800;color:rgba(255,255,255,0.35);font-family:-apple-system,sans-serif">SB</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:700;color:#FAFAFA;font-family:Georgia,serif;font-style:italic;letter-spacing:-0.01em">Sofia Benali</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.26);font-family:-apple-system,sans-serif;margin-top:2px">Yoga · 5.0★ · AED 320</div>
+            </div>
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.32)" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:40px">The arc rises through an orange cosmos. Every dot is a star — <strong>denser near the detonation, drifting to dust at the edges.</strong></p>
+
+<script>
+(function() {
+  // Seeded LCG random — same stars every load
+  function makeRand(seed) {
+    let s = seed >>> 0;
+    return function() {
+      s = (Math.imul(1664525, s) + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
+  }
+
+  function buildStarfield(svgId, starGroupId, vw, vh, ex, ey, count, seed) {
+    const svg = document.getElementById(svgId);
+    const g = document.getElementById(starGroupId);
+    if (!svg || !g) return;
+
+    const rand = makeRand(seed);
+    const ns = 'http://www.w3.org/2000/svg';
+    const maxDist = Math.sqrt(vw * vw + vh * vh);
+
+    for (let i = 0; i < count; i++) {
+      const x = rand() * vw;
+      const y = rand() * vh;
+
+      const dist = Math.sqrt((x - ex) * (x - ex) + (y - ey) * (y - ey));
+      // proximity: 0 = far edge, 1 = at detonation point
+      const proximity = Math.max(0, 1 - dist / (maxDist * 0.72));
+
+      // Star size: mostly tiny, occasionally medium, larger near burst
+      const sizeRoll = rand();
+      let r;
+      if (sizeRoll < 0.65) {
+        r = 0.3 + rand() * 0.5 + proximity * 1.2;   // tiny stars
+      } else if (sizeRoll < 0.88) {
+        r = 0.6 + rand() * 0.8 + proximity * 1.6;   // small stars
+      } else {
+        r = 1.0 + rand() * 1.2 + proximity * 2.0;   // occasional brighter ones
+      }
+      r = Math.min(3.0, r);
+
+      // Opacity: very faint at edges, brighter near burst
+      const baseOpacity = 0.04 + rand() * 0.10;
+      const proximityBoost = proximity * 0.28;
+      const opacity = Math.min(0.42, baseOpacity + proximityBoost);
+
+      // Skip the burst zone (handled manually with glow fragments)
+      if (dist < 55) continue;
+
+      const c = document.createElementNS(ns, 'circle');
+      c.setAttribute('cx', x.toFixed(1));
+      c.setAttribute('cy', y.toFixed(1));
+      c.setAttribute('r', r.toFixed(2));
+      c.setAttribute('fill', 'rgba(212,98,42,' + opacity.toFixed(3) + ')');
+      g.appendChild(c);
+    }
+  }
+
+  // Trainer card: 390×320, burst at (380,18)
+  buildStarfield('svg-card', 'stars-card', 390, 320, 380, 18, 280, 7331);
+
+  // Browse screen: 390×240, burst at (390,5)
+  buildStarfield('svg-browse', 'stars-browse', 390, 240, 390, 5, 220, 9173);
+})();
+</script>

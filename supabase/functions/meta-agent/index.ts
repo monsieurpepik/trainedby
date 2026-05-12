@@ -1,11 +1,11 @@
 /**
- * TrainedBy — Meta-Agent v2 (Recursive Self-Improvement Engine)
+ * TrainedBy  -  Meta-Agent v2 (Recursive Self-Improvement Engine)
  * ─────────────────────────────────────────────────────────────────────────────
  * Synthesises all agent outputs into a weekly product memo.
  * Uses the TrainedBy Voice System for direct, opinionated recommendations.
  *
- * POST /functions/v1/meta-agent   — run meta-analysis (weekly cron)
- * GET  /functions/v1/meta-agent   — return latest memo
+ * POST /functions/v1/meta-agent    -  run meta-analysis (weekly cron)
+ * GET  /functions/v1/meta-agent    -  return latest memo
  *
  * Anti-slop measures:
  *   1. Persona: writes as a founder/product lead, not a consultant
@@ -20,6 +20,7 @@ import { jsonResponse, errorResponse, CORS_HEADERS } from '../_shared/errors.ts'
 import { createLogger } from '../_shared/logger.ts';
 import { calculateSlopScore } from '../_shared/voice.ts';
 import { callClaudeJSON } from '../_shared/claude.ts';
+import { getMarketBaseUrl, getMarketSupportEmail } from '../_shared/market_url.ts';
 
 const log = createLogger('meta-agent');
 
@@ -200,7 +201,7 @@ Respond as JSON:
     created_at: now.toISOString(),
   });
 
-  const ownerEmail = Deno.env.get('OWNER_EMAIL') ?? 'admin@trainedby.ae';
+  const ownerEmail = Deno.env.get('OWNER_EMAIL') ?? getMarketSupportEmail('ae');
   await sendMetaMemoEmail(ownerEmail, memo);
 
   log.info('Meta-agent complete', { duration_ms: Date.now() - start });
@@ -281,7 +282,7 @@ async function sendMetaMemoEmail(to: string, memo: Record<string, unknown>): Pro
   <div style="background:#111;border:1px solid #222;padding:12px 16px;border-radius:8px;margin-bottom:24px;">
     <p style="color:#888;font-size:12px;margin:0;">Check Monday: <strong style="color:#fff;">${memo.watch_metric}</strong></p>
   </div>
-  <p style="color:#555;font-size:12px;text-align:center;margin-top:32px;">TrainedBy Meta-Agent · <a href="https://trainedby-ae.netlify.app" style="color:#FF5C00;">trainedby.ae</a></p>
+  <p style="color:#555;font-size:12px;text-align:center;margin-top:32px;">TrainedBy Meta-Agent · <a href="${getMarketBaseUrl('ae')}" style="color:#FF5C00;">${getMarketBaseUrl('ae').replace('https://', '')}</a></p>
 </body>
 </html>`;
 
@@ -290,9 +291,9 @@ async function sendMetaMemoEmail(to: string, memo: Record<string, unknown>): Pro
       method: 'POST',
       headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'TrainedBy Meta-Agent <meta@trainedby.ae>',
+        from: `TrainedBy Meta-Agent <${getMarketSupportEmail('ae')}>`,
         to: [to],
-        subject: `TrainedBy Product Memo — ${improvements[0]?.title ?? 'Weekly review'}`,
+        subject: `TrainedBy Product Memo  -  ${improvements[0]?.title ?? 'Weekly review'}`,
         html,
       }),
     });

@@ -1,14 +1,16 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getMarketBaseUrl } from '../_shared/market_url.ts';
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
 // Note: credentials:true requires a specific origin, not wildcard.
 // The frontend must send requests with credentials:include.
+const stagingUrl = Deno.env.get('STAGING_URL');
 const ALLOWED_ORIGINS = [
-  "https://trainedby.ae",
-  "https://trainedby-ae.netlify.app",
+  getMarketBaseUrl('ae'),
   "http://localhost:3000",
   "http://127.0.0.1:5500",
+  ...(stagingUrl ? [stagingUrl] : []),
 ];
 
 function getCorsHeaders(req: Request): Record<string, string> {
@@ -98,9 +100,9 @@ serve(async (req) => {
     });
 
     // ── Build response with HttpOnly cookie ───────────────────────────────────
-    // HttpOnly: JavaScript cannot read this cookie — eliminates XSS token theft.
+    // HttpOnly: JavaScript cannot read this cookie  -  eliminates XSS token theft.
     // Secure: Only sent over HTTPS.
-    // SameSite=Strict: Not sent on cross-site requests — prevents CSRF.
+    // SameSite=Strict: Not sent on cross-site requests  -  prevents CSRF.
     const cookieValue = [
       `tb_session=${sessionToken}`,
       `Expires=${sessionExpiry.toUTCString()}`,

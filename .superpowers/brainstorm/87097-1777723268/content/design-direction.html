@@ -1,0 +1,70 @@
+<h2>Which design direction for Search, Dashboard & Landing?</h2>
+<p class="subtitle">Your trainer profile is already clean and light. Should the rest of the app match?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="light-clean" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#FFFFFF; padding:16px; font-family:'DM Sans',system-ui,sans-serif; border-bottom:1px solid #eee;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span style="font-weight:700;font-size:15px;color:#1A1411;letter-spacing:-0.02em;">TrainedBy</span>
+        <span style="background:#1A1411;color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;">Find a Trainer</span>
+      </div>
+      <div style="background:#F5F4F3;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <span style="color:#999;font-size:13px;">🔍</span>
+        <span style="color:#999;font-size:13px;">Search trainers, specialties…</span>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <span style="padding:4px 10px;background:#F5F4F3;border-radius:20px;font-size:11px;color:#6B6460;font-weight:600;">Weight Loss</span>
+        <span style="padding:4px 10px;background:#F5F4F3;border-radius:20px;font-size:11px;color:#6B6460;font-weight:600;">Strength</span>
+        <span style="padding:4px 10px;background:#F5F4F3;border-radius:20px;font-size:11px;color:#6B6460;font-weight:600;">Yoga</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Light & Clean</h3>
+      <p>White backgrounds, warm neutrals, matches your trainer profile exactly. Modern, professional, easy to read on desktop.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="dark-refined" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0F0F0F; padding:16px; font-family:'Inter',system-ui,sans-serif; border-bottom:1px solid #1e1e1e;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span style="font-weight:700;font-size:15px;color:#fff;letter-spacing:-0.02em;">TrainedBy</span>
+        <span style="background:#FF5C00;color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;">Find a Trainer</span>
+      </div>
+      <div style="background:#1A1A1A;border:1px solid #2a2a2a;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <span style="color:#555;font-size:13px;">🔍</span>
+        <span style="color:#555;font-size:13px;">Search trainers…</span>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <span style="padding:4px 10px;background:#1A1A1A;border:1px solid #2e2e2e;border-radius:20px;font-size:11px;color:#aaa;font-weight:600;">Weight Loss</span>
+        <span style="padding:4px 10px;background:#FF5C00;border-radius:20px;font-size:11px;color:#fff;font-weight:600;">Strength ✓</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Dark Refined</h3>
+      <p>Keep dark mode but rethink everything else — proper desktop grid, subtle borders, refined typography. Orange accent only where it counts.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="neutral-saas" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#F8F9FA; padding:16px; font-family:'Inter',system-ui,sans-serif; border-bottom:1px solid #e5e7eb;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span style="font-weight:700;font-size:15px;color:#111827;letter-spacing:-0.02em;">TrainedBy</span>
+        <span style="background:#6366F1;color:#fff;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;">Sign up free</span>
+      </div>
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:8px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+        <span style="color:#9ca3af;font-size:13px;">🔍</span>
+        <span style="color:#9ca3af;font-size:13px;">Search trainers…</span>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <span style="padding:4px 10px;background:#EEF2FF;border-radius:6px;font-size:11px;color:#4338CA;font-weight:600;">Weight Loss</span>
+        <span style="padding:4px 10px;background:#EEF2FF;border-radius:6px;font-size:11px;color:#4338CA;font-weight:600;">Strength</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Neutral SaaS</h3>
+      <p>Gray/white, looks like Linear or Notion. Very clean and legible. Would require a new accent color — orange doesn't work here.</p>
+    </div>
+  </div>
+
+</div>

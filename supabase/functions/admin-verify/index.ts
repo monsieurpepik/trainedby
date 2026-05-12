@@ -103,7 +103,7 @@ serve(async (req) => {
         reviewer_note: reviewer_note || null,
       }).eq("id", cert_review_id);
 
-      // Update trainer record — back to unverified, not banned
+      // Update trainer record  -  back to unverified, not banned
       await sb.from("trainers").update({
         verification_status: "rejected",
         reps_verified: false,

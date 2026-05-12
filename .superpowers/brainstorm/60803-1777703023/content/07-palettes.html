@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrainedBy — Palette Directions</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #080808;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    color: #fff;
+    padding: 40px 40px 80px;
+    min-height: 100vh;
+  }
+
+  .page-hdr {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .page-hdr h1 {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: #333; margin-bottom: 8px;
+  }
+  .page-hdr p {
+    font-size: 14px; color: #555; max-width: 520px; margin: 0 auto; line-height: 1.6;
+  }
+
+  /* ── GRID ─── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .option { display: flex; flex-direction: column; gap: 16px; }
+
+  .option-label {
+    text-align: center;
+  }
+  .option-letter {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  .option-name {
+    font-size: 13px; font-weight: 500;
+    margin-bottom: 3px;
+  }
+  .option-ref {
+    font-size: 10px; color: #444; line-height: 1.4;
+  }
+  .option-verdict {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .verdict-current  { background: rgba(255,255,255,0.06); color: #555; }
+  .verdict-warm     { background: rgba(180,120,80,0.12);  color: #B87850; }
+  .verdict-equinox  { background: rgba(200,190,175,0.08); color: #9A9080; }
+  .verdict-gold     { background: rgba(180,155,100,0.12); color: #C9A870; }
+
+  /* ── PHONE CARD ─── */
+  .phone {
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  }
+
+  /* ── OPTION A: Current (orange on black) ─── */
+  .a-phone { background: #0b0805; }
+  .a-hero  {
+    background:
+      radial-gradient(ellipse 90% 55% at 58% 0%, rgba(180,80,20,0.32) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 80% 15%, rgba(212,98,42,0.16) 0%, transparent 55%);
+    padding: 16px 16px 24px;
+  }
+  .a-arc-line { background: #D4622A; }
+  .a-ring-bg  { background: conic-gradient(#D4622A 0deg, #ff9c5a 80deg, rgba(212,98,42,0.12) 200deg, #D4622A 360deg); }
+  .a-initials { color: rgba(212,98,42,0.5); }
+  .a-name     { color: #ffffff; }
+  .a-sub      { color: rgba(255,255,255,0.28); }
+  .a-verified { color: #D4622A; }
+  .a-quote    { color: rgba(255,255,255,0.35); }
+  .a-stat-val { color: #ffffff; }
+  .a-stat-lbl { color: rgba(255,255,255,0.22); }
+  .a-avail    { color: rgba(255,255,255,0.3); }
+  .a-avail strong { color: rgba(255,255,255,0.65); }
+  .a-btn-primary  { background: #D4622A; color: #fff; }
+  .a-btn-secondary{ background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.08); }
+  .a-rule { background: rgba(255,255,255,0.05); }
+  .a-result-metric { color: #D4622A; }
+  .a-result-body   { color: rgba(255,255,255,0.32); }
+  .a-pkg-name { color: rgba(255,255,255,0.65); }
+  .a-pkg-price{ color: rgba(255,255,255,0.45); }
+  .a-pkg-feat .a-pkg-name { color: rgba(255,255,255,0.92); }
+  .a-pkg-feat .a-pkg-price{ color: rgba(255,255,255,0.8); }
+
+  /* ── OPTION B: Terracotta & Warm Stone ─── */
+  /* Muted, desaturated, earthy. Less aggression. */
+  .b-bg { background: #0f0c09; }
+  .b-hero {
+    background:
+      radial-gradient(ellipse 90% 55% at 58% 0%, rgba(160,90,50,0.25) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 80% 15%, rgba(180,110,70,0.12) 0%, transparent 55%);
+    padding: 16px 16px 24px;
+  }
+  .b-accent   { color: #C07850; }
+  .b-ring-bg  { background: conic-gradient(#B87050 0deg, #D4956A 80deg, rgba(184,112,80,0.1) 200deg, #B87050 360deg); }
+  .b-initials { color: rgba(184,112,80,0.45); }
+  .b-name     { color: #F0EAE2; }
+  .b-sub      { color: rgba(240,234,226,0.28); }
+  .b-verified { color: #C07850; }
+  .b-quote    { color: rgba(240,234,226,0.32); }
+  .b-stat-val { color: #F0EAE2; }
+  .b-stat-lbl { color: rgba(240,234,226,0.22); }
+  .b-avail    { color: rgba(240,234,226,0.28); }
+  .b-btn-p    { background: #C07850; color: #F8F2EB; }
+  .b-btn-s    { background: rgba(240,234,226,0.04); color: rgba(240,234,226,0.55); border: 1px solid rgba(240,234,226,0.07); }
+  .b-result-m { color: #C07850; }
+  .b-result-b { color: rgba(240,234,226,0.3); }
+  .b-pkg-name { color: rgba(240,234,226,0.62); }
+  .b-pkg-price{ color: rgba(240,234,226,0.42); }
+
+  /* ── OPTION C: Equinox — Near-monochrome ─── */
+  /* Almost no colour. Cream on deep warm charcoal. A ghost of warm. */
+  .c-bg { background: #111009; }
+  .c-hero {
+    background:
+      radial-gradient(ellipse 90% 55% at 58% 0%, rgba(120,100,70,0.18) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 80% 15%, rgba(140,120,90,0.10) 0%, transparent 55%);
+    padding: 16px 16px 24px;
+  }
+  .c-accent   { color: #A89070; }
+  .c-ring-bg  { background: conic-gradient(rgba(200,180,150,0.7) 0deg, rgba(220,200,170,0.9) 80deg, rgba(200,180,150,0.08) 200deg, rgba(200,180,150,0.7) 360deg); }
+  .c-initials { color: rgba(200,185,160,0.4); }
+  .c-name     { color: #EDE8E0; }
+  .c-sub      { color: rgba(237,232,224,0.28); }
+  .c-verified { color: #A89070; }
+  .c-quote    { color: rgba(237,232,224,0.32); }
+  .c-stat-val { color: #EDE8E0; }
+  .c-stat-lbl { color: rgba(237,232,224,0.22); }
+  .c-btn-p    { background: #EDE8E0; color: #111009; }
+  .c-btn-s    { background: rgba(237,232,224,0.04); color: rgba(237,232,224,0.5); border: 1px solid rgba(237,232,224,0.07); }
+  .c-result-m { color: #C8B898; }
+  .c-result-b { color: rgba(237,232,224,0.3); }
+  .c-pkg-name { color: rgba(237,232,224,0.62); }
+  .c-pkg-price{ color: rgba(237,232,224,0.42); }
+
+  /* ── OPTION D: Obsidian & Champagne gold ─── */
+  /* Deep near-black with warm gold. Private banking meets fitness. */
+  .d-bg { background: #0e0d0b; }
+  .d-hero {
+    background:
+      radial-gradient(ellipse 90% 55% at 58% 0%, rgba(140,115,60,0.22) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 80% 15%, rgba(160,130,70,0.12) 0%, transparent 55%);
+    padding: 16px 16px 24px;
+  }
+  .d-accent   { color: #C9A870; }
+  .d-ring-bg  { background: conic-gradient(#C9A870 0deg, #E0C488 80deg, rgba(201,168,112,0.1) 200deg, #C9A870 360deg); }
+  .d-initials { color: rgba(201,168,112,0.4); }
+  .d-name     { color: #F2EDE4; }
+  .d-sub      { color: rgba(242,237,228,0.28); }
+  .d-verified { color: #C9A870; }
+  .d-quote    { color: rgba(242,237,228,0.32); }
+  .d-stat-val { color: #F2EDE4; }
+  .d-stat-lbl { color: rgba(242,237,228,0.22); }
+  .d-btn-p    { background: #C9A870; color: #0e0d0b; }
+  .d-btn-s    { background: rgba(242,237,228,0.04); color: rgba(242,237,228,0.5); border: 1px solid rgba(242,237,228,0.07); }
+  .d-result-m { color: #C9A870; }
+  .d-result-b { color: rgba(242,237,228,0.3); }
+  .d-pkg-name { color: rgba(242,237,228,0.62); }
+  .d-pkg-price{ color: rgba(242,237,228,0.42); }
+
+  /* ── SHARED PROFILE COMPONENTS ─── */
+  .p-notch {
+    position: absolute;
+    top: 10px; left: 50%; transform: translateX(-50%);
+    width: 90px; height: 26px;
+    background: #000; border-radius: 14px;
+    z-index: 100;
+  }
+  .p-status {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 18px 0; font-size: 11px; font-weight: 600;
+    position: relative; z-index: 10;
+    color: inherit;
+  }
+  .p-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 14px 0; position: relative; z-index: 10;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.18);
+  }
+  .p-nav-btn {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: rgba(255,255,255,0.4);
+  }
+
+  /* Arc — redrawn per palette via CSS var */
+  .p-arc { width: 100%; height: 90px; position: relative; overflow: visible; }
+  .p-arc svg { position: absolute; top:0; left:0; width:100%; height:100%; overflow:visible; }
+
+  .p-photo-wrap {
+    display: flex; justify-content: center;
+    margin-top: -14px; position: relative; z-index: 10;
+  }
+  .p-ring {
+    width: 80px; height: 80px; border-radius: 50%;
+    padding: 2px; position: relative;
+  }
+  .p-ring-inner {
+    width: 100%; height: 100%; border-radius: 50%; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.4);
+  }
+  .p-initials {
+    font-family: Georgia, serif; font-size: 24px;
+    font-weight: 400; letter-spacing: -0.5px;
+  }
+
+  .p-identity {
+    text-align: center; padding: 14px 14px 0;
+    position: relative; z-index: 10;
+  }
+  .p-name {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 22px; font-weight: 400;
+    letter-spacing: -0.6px; line-height: 1.1;
+    margin-bottom: 6px; display: inline-block;
+    position: relative;
+  }
+  .p-name::after {
+    content: '';
+    position: absolute; bottom: -3px; left: 10%; right: 10%;
+    height: 1px;
+  }
+  .p-sub {
+    font-size: 10px; display: flex; align-items: center;
+    justify-content: center; gap: 5px; flex-wrap: wrap;
+    opacity: 0.9;
+  }
+  .p-sep { opacity: 0.3; }
+  .p-loc {
+    font-size: 9px; margin-top: 4px; opacity: 0.4;
+  }
+
+  .p-quote {
+    font-family: Georgia, serif; font-style: italic;
+    font-size: 11px; line-height: 1.6; text-align: center;
+    padding: 12px 20px 0; position: relative; z-index: 10;
+  }
+
+  .p-stats {
+    display: flex; justify-content: center;
+    padding: 16px 14px 0; position: relative; z-index: 10;
+  }
+  .p-stat { flex: 1; text-align: center; position: relative; }
+  .p-stat + .p-stat::before {
+    content: ''; position: absolute; left: 0; top: 50%;
+    transform: translateY(-50%); height: 18px; width: 1px;
+    background: rgba(255,255,255,0.07);
+  }
+  .p-stat-val { font-size: 16px; font-weight: 700; line-height: 1; }
+  .p-stat-lbl { font-size: 8px; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; }
+
+  .p-avail {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; padding: 14px 14px 0;
+    font-size: 10px; position: relative; z-index: 10;
+  }
+  .p-avail-dot {
+    width: 5px; height: 5px; border-radius: 50%; background: #3d9e57;
+    box-shadow: 0 0 5px rgba(61,158,87,0.5); flex-shrink: 0;
+  }
+
+  .p-ctas {
+    padding: 14px 14px 0;
+    display: flex; flex-direction: column; gap: 7px;
+    position: relative; z-index: 10;
+  }
+  .p-btn {
+    padding: 12px 14px; border-radius: 10px;
+    font-size: 12px; font-weight: 500;
+    text-align: center; cursor: pointer; border: none;
+  }
+
+  .p-rule {
+    margin: 16px 14px 0; height: 1px; opacity: 0.4;
+    position: relative; z-index: 10;
+  }
+
+  .p-results {
+    overflow-x: auto; display: flex;
+    gap: 8px; padding: 14px 14px 0;
+    scrollbar-width: none;
+    position: relative; z-index: 10;
+  }
+  .p-results::-webkit-scrollbar { display: none; }
+  .p-result {
+    flex-shrink: 0; width: 110px; padding: 12px;
+    background: rgba(255,255,255,0.025);
+    border-radius: 10px;
+  }
+  .p-result-m {
+    font-size: 20px; font-weight: 700;
+    letter-spacing: -1px; line-height: 1; margin-bottom: 3px;
+  }
+  .p-result-b { font-size: 9px; line-height: 1.4; }
+
+  .p-pkgs {
+    padding: 14px 14px 0;
+    position: relative; z-index: 10;
+  }
+  .p-pkg {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .p-pkg:last-child { border-bottom: none; }
+  .p-pkg-n { font-size: 12px; font-weight: 400; }
+  .p-pkg-p { font-size: 11px; font-weight: 500; }
+
+  .p-spacer { height: 24px; }
+</style>
+</head>
+<body>
+
+<div class="page-hdr">
+  <h1>Palette Directions</h1>
+  <p>Same layout. Four colour worlds. The question: is orange on black the right signal, or should we go somewhere quieter?</p>
+</div>
+
+<div class="grid">
+
+  <!-- ══ A: CURRENT — Orange on Black ══ -->
+  <div class="option">
+    <div class="option-label">
+      <div class="option-letter" style="color:#555;">A — Current</div>
+      <div class="option-name" style="color:#888;">Orange on Black</div>
+      <div class="option-ref">The fitness app palette, 2015–2020. Every MyFitnessPal clone.</div>
+      <span class="option-verdict verdict-current">Reference</span>
+    </div>
+
+    <div class="phone a-phone">
+      <div class="p-notch"></div>
+      <div class="a-hero">
+        <div class="p-status" style="color:rgba(255,255,255,0.8);">
+          <span>9:41</span><span style="font-size:9px;opacity:0.6;">▮▮▮ ◈ ▉</span>
+        </div>
+        <div class="p-nav">
+          <div class="p-nav-btn">←</div>
+          <span>TrainedBy</span>
+          <div class="p-nav-btn">↗</div>
+        </div>
+        <div class="p-arc">
+          <svg viewBox="0 0 280 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="agA" x1="0" y1="90" x2="280" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="rgba(212,98,42,0)"/>
+              <stop offset="60%" stop-color="rgba(212,98,42,0.5)"/>
+              <stop offset="100%" stop-color="#D4622A"/>
+            </linearGradient></defs>
+            <path d="M -5 90 Q 70 65 145 38 Q 215 14 285 -5" stroke="url(#agA)" stroke-width="38" fill="none" stroke-linecap="butt"/>
+            <path d="M -5 90 Q 70 65 145 38 Q 215 14 285 -5" stroke="rgba(11,8,5,0.48)" stroke-width="22" fill="none" stroke-linecap="butt"/>
+            <path d="M -5 90 Q 70 65 145 38 Q 215 14 285 -5" stroke="rgba(212,98,42,0.7)" stroke-width="1" fill="none"/>
+            <circle cx="258" cy="4"  r="8.5" fill="rgba(212,98,42,0.95)"/>
+            <circle cx="244" cy="14" r="7"   fill="rgba(212,98,42,0.87)"/>
+            <circle cx="268" cy="-2" r="6"   fill="rgba(232,120,52,0.9)"/>
+            <circle cx="250" cy="-1" r="4.5" fill="rgba(212,98,42,0.72)"/>
+            <circle cx="234" cy="10" r="3.5" fill="rgba(212,98,42,0.52)"/>
+          </svg>
+        </div>
+        <div class="p-photo-wrap">
+          <div class="p-ring a-ring-bg">
+            <div class="p-ring-inner" style="background:#180e06;">
+              <div class="p-initials a-initials">JC</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-identity">
+        <div class="p-name a-name" style="--ul:rgba(212,98,42,0.55);">James Crawford
+          <span style="position:absolute;bottom:-3px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(212,98,42,0.55) 40%,rgba(255,140,80,0.7) 60%,transparent);display:block;"></span>
+        </div>
+        <div class="p-sub a-sub">
+          <span>NASM</span><span class="p-sep">·</span><span>ISSA</span><span class="p-sep">·</span>
+          <span class="a-verified" style="font-size:9px;font-weight:600;">✦ Verified</span>
+        </div>
+        <div class="p-loc a-sub">Dubai Marina, UAE</div>
+      </div>
+      <div class="p-quote a-quote">Every client came with a goal.<br>Every one who stayed built a standard.</div>
+      <div class="p-stats">
+        <div class="p-stat"><div class="p-stat-val a-stat-val">12yr</div><div class="p-stat-lbl a-stat-lbl">Exp.</div></div>
+        <div class="p-stat"><div class="p-stat-val a-stat-val">340+</div><div class="p-stat-lbl a-stat-lbl">Clients</div></div>
+        <div class="p-stat"><div class="p-stat-val a-stat-val">4.9</div><div class="p-stat-lbl a-stat-lbl">Rating</div></div>
+      </div>
+      <div class="p-avail a-avail">
+        <div class="p-avail-dot"></div><span><strong class="a-avail">2 slots left</strong> · Tue 7am</span>
+      </div>
+      <div class="p-ctas">
+        <div class="p-btn a-btn-primary">Request a Consultation</div>
+        <div class="p-btn a-btn-secondary">View Programmes</div>
+      </div>
+      <div class="p-rule" style="background:rgba(255,255,255,0.05);"></div>
+      <div class="p-results">
+        <div class="p-result"><div class="p-result-m a-result-metric">−14kg</div><div class="p-result-b a-result-body">Recomp, 16 wks</div></div>
+        <div class="p-result"><div class="p-result-m a-result-metric">+32%</div><div class="p-result-b a-result-body">Deadlift 1RM</div></div>
+        <div class="p-result"><div class="p-result-m a-result-metric">−9%</div><div class="p-result-b a-result-body">Body fat</div></div>
+      </div>
+      <div class="p-pkgs">
+        <div class="p-pkg"><div class="p-pkg-n a-pkg-name">Fundamentals</div><div class="p-pkg-p a-pkg-price">AED 2,400</div></div>
+        <div class="p-pkg a-pkg-feat"><div class="p-pkg-n" style="color:rgba(255,255,255,0.9);">Transformation</div><div class="p-pkg-p" style="color:rgba(255,255,255,0.8);">AED 5,800</div></div>
+        <div class="p-pkg"><div class="p-pkg-n a-pkg-name">Elite</div><div class="p-pkg-p" style="color:rgba(212,98,42,0.65);font-size:10px;">On enquiry</div></div>
+      </div>
+      <div class="p-spacer"></div>
+    </div>
+  </div>
+
+  <!-- ══ B: Muted Terracotta & Stone ══ -->
+  <div class="option">
+    <div class="option-label">
+      <div class="option-letter" style="color:#C07850;">B — Terracotta</div>
+      <div class="option-name" style="color:#D4A080;">Muted Earth & Stone</div>
+      <div class="option-ref">Same hue, desaturated. Spa, wellness, Le Labo energy.</div>
+      <span class="option-verdict verdict-warm">Warmer, quieter</span>
+    </div>
+
+    <div class="phone b-bg">
+      <div class="p-notch"></div>
+      <div class="b-hero">
+        <div class="p-status" style="color:rgba(240,234,226,0.7);">
+          <span>9:41</span><span style="font-size:9px;opacity:0.5;">▮▮▮ ◈ ▉</span>
+        </div>
+        <div class="p-nav" style="color:rgba(240,234,226,0.18);">
+          <div class="p-nav-btn">←</div>
+          <span>TrainedBy</span>
+          <div class="p-nav-btn">↗</div>
+        </div>
+        <div class="p-arc">
+          <svg viewBox="0 0 280 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="agB" x1="0" y1="90" x2="280" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="rgba(184,112,80,0)"/>
+              <stop offset="60%" stop-color="rgba(184,112,80,0.45)"/>
+              <stop offset="100%" stop-color="#B87050"/>
+            </linearGradient></defs>
+            <path d="M -5 90 Q 70 65 145 38 Q 215 14 285 -5" stroke="url(#agB)" stroke-width="38" fill="none" stroke-linecap="butt"/>
+            <path d="M -5 90 Q 70 65 145 38 Q 215 14 285 -5" stroke="rgba(15,12,9,0.5)" stroke-width="22" fill="none" stroke-linecap="butt"/>
+            <path d="M -5 90 Q 70 65 145 38 Q 215 14 285 -5" stroke="rgba(192,120,80,0.65)" stroke-width="1" fill="none"/>
+            <circle cx="258" cy="4"  r="8.5" fill="rgba(184,112,80,0.95)"/>
+            <circle cx="244" cy="14" r="7"   fill="rgba(184,112,80,0.85)"/>
+            <circle cx="268" cy="-2" r="6"   fill="rgba(210,138,100,0.88)"/>
+            <circle cx="250" cy="-1" r="4.5" fill="rgba(184,112,80,0.70)"/>
+            <circle cx="234" cy="10" r="3.5" fill="rgba(184,112,80,0.52)"/>
+          </svg>
+        </div>
+        <div class="p-photo-wrap">
+          <div class="p-ring b-ring-bg">
+            <div class="p-ring-inner" style="background:#1a100a;">
+              <div class="p-initials b-initials">JC</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-identity">
+        <div class="p-name b-name" style="position:relative;">James Crawford
+          <span style="position:absolute;bottom:-3px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(192,120,80,0.5) 40%,rgba(210,150,110,0.65) 60%,transparent);display:block;"></span>
+        </div>
+        <div class="p-sub b-sub">
+          <span>NASM</span><span class="p-sep">·</span><span>ISSA</span><span class="p-sep">·</span>
+          <span class="b-accent" style="font-size:9px;font-weight:600;">✦ Verified</span>
+        </div>
+        <div class="p-loc" style="color:rgba(240,234,226,0.22);">Dubai Marina, UAE</div>
+      </div>
+      <div class="p-quote b-quote">Every client came with a goal.<br>Every one who stayed built a standard.</div>
+      <div class="p-stats">
+        <div class="p-stat"><div class="p-stat-val b-stat-val">12yr</div><div class="p-stat-lbl" style="color:rgba(240,234,226,0.22);">Exp.</div></div>
+        <div class="p-stat"><div class="p-stat-val b-stat-val">340+</div><div class="p-stat-lbl" style="color:rgba(240,234,226,0.22);">Clients</div></div>
+        <div class="p-stat"><div class="p-stat-val b-stat-val">4.9</div><div class="p-stat-lbl" style="color:rgba(240,234,226,0.22);">Rating</div></div>
+      </div>
+      <div class="p-avail" style="color:rgba(240,234,226,0.28);">
+        <div class="p-avail-dot"></div><span><strong style="color:rgba(240,234,226,0.65);">2 slots left</strong> · Tue 7am</span>
+      </div>
+      <div class="p-ctas">
+        <div class="p-btn b-btn-p">Request a Consultation</div>
+        <div class="p-btn b-btn-s">View Programmes</div>
+      </div>
+      <div class="p-rule" style="background:rgba(240,234,226,0.04);"></div>
+      <div class="p-results">
+        <div class="p-result"><div class="p-result-m b-result-m">−14kg</div><div class="p-result-b b-result-b">Recomp, 16 wks</div></div>
+        <div class="p-result"><div class="p-result-m b-result-m">+32%</div><div class="p-result-b b-result-b">Deadlift 1RM</div></div>
+        <div class="p-result"><div class="p-result-m b-result-m">−9%</div><div class="p-result-b b-result-b">Body fat</div></div>
+      </div>
+      <div class="p-pkgs">
+        <div class="p-pkg"><div class="p-pkg-n b-pkg-name">Fundamentals</div><div class="p-pkg-p b-pkg-price">AED 2,400</div></div>
+        <div class="p-pkg"><div class="p-pkg-n" style="color:rgba(240,234,226,0.9);">Transformation</div><div class="p-pkg-p" style="color:rgba(240,234,226,0.8);">AED 5,800</div></div>
+        <div class="p-pkg"><div class="p-pkg-n b-pkg-name">Elite</div><div class="p-pkg-p" style="color:rgba(192,120,80,0.65);font-size:10px;">On enquiry</div></div>
+      </div>
+      <div class="p-spacer"></div>
+    </div>
+  </div>
+
+  <!-- ══ C: Equinox Monochrome ══ -->
+  <div class="option">
+    <div class="option-label">
+      <div class="option-letter" style="color:#9A9080;">C — Monochrome</div>
+      <div class="option-name" style="color:#C8C0B0;">Cream on Charcoal</div>
+      <div class="option-ref">Equinox, MasterClass. Restraint IS the luxury. Colour is the enemy of premium.</div>
+      <span class="option-verdict verdict-equinox">Maximum restraint</span>
+    </div>
+
+    <div class="phone c-bg">
+      <div class="p-notch"></div>
+      <div class="c-hero">
+        <div class="p-status" style="color:rgba(237,232,224,0.7);">
+          <span>9:41</span><span style="font-size:9px;opacity:0.5;">▮▮▮ ◈ ▉</span>
+        </div>
+        <div class="p-nav" style="color:rgba(237,232,224,0.18);">
+          <div class="p-nav-btn">←</div>
+          <span>TrainedBy</span>
+          <div class="p-nav-btn">↗</div>
+        </div>
+        <div class="p-arc">
+          <svg viewBox="0 0 280 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="agC" x1="0" y1="90" x2="280" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="rgba(200,180,150,0)"/>
+              <stop offset="60%" stop-color="rgba(200,180,150,0.3)"/>
+              <stop offset="100%" stop-color="rgba(200,180,150,0.7)"/>
+            </linearGradient></defs>
+            <path d="M -5 90 Q 70 65 145 38 Q 215 14 285 -5" stroke="url(#agC)" stroke-width="38" fill="none" stroke-linecap="butt"/>
+            <path d="M -5 90 Q 70 65 145 38 Q 215 14 285 -5" stroke="rgba(17,16,9,0.5)" stroke-width="22" fill="none" stroke-linecap="butt"/>
+            <path d="M -5 90 Q 70 65 145 38 Q 215 14 285 -5" stroke="rgba(200,180,150,0.5)" stroke-width="1" fill="none"/>
+            <circle cx="258" cy="4"  r="8.5" fill="rgba(200,185,160,0.85)"/>
+            <circle cx="244" cy="14" r="7"   fill="rgba(200,185,160,0.75)"/>
+            <circle cx="268" cy="-2" r="6"   fill="rgba(218,200,175,0.80)"/>
+            <circle cx="250" cy="-1" r="4.5" fill="rgba(200,185,160,0.62)"/>
+            <circle cx="234" cy="10" r="3.5" fill="rgba(200,185,160,0.45)"/>
+          </svg>
+        </div>
+        <div class="p-photo-wrap">
+          <div class="p-ring c-ring-bg">
+            <div class="p-ring-inner" style="background:#1c1a14;">
+              <div class="p-initials c-initials">JC</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-identity">
+        <div class="p-name c-name" style="position:relative;">James Crawford
+          <span style="position:absolute;bottom:-3px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(200,180,150,0.45) 40%,rgba(220,200,170,0.6) 60%,transparent);display:block;"></span>
+        </div>
+        <div class="p-sub" style="color:rgba(237,232,224,0.28);">
+          <span>NASM</span><span class="p-sep">·</span><span>ISSA</span><span class="p-sep">·</span>
+          <span style="color:#A89070;font-size:9px;font-weight:600;">✦ Verified</span>
+        </div>
+        <div class="p-loc" style="color:rgba(237,232,224,0.22);">Dubai Marina, UAE</div>
+      </div>
+      <div class="p-quote c-quote">Every client came with a goal.<br>Every one who stayed built a standard.</div>
+      <div class="p-stats">
+        <div class="p-stat"><div class="p-stat-val c-stat-val">12yr</div><div class="p-stat-lbl" style="color:rgba(237,232,224,0.22);">Exp.</div></div>
+        <div class="p-stat"><div class="p-stat-val c-stat-val">340+</div><div class="p-stat-lbl" style="color:rgba(237,232,224,0.22);">Clients</div></div>
+        <div class="p-stat"><div class="p-stat-val c-stat-val">4.9</div><div class="p-stat-lbl" style="color:rgba(237,232,224,0.22);">Rating</div></div>
+      </div>
+      <div class="p-avail" style="color:rgba(237,232,224,0.28);">
+        <div class="p-avail-dot"></div><span><strong style="color:rgba(237,232,224,0.65);">2 slots left</strong> · Tue 7am</span>
+      </div>
+      <div class="p-ctas">
+        <div class="p-btn c-btn-p">Request a Consultation</div>
+        <div class="p-btn c-btn-s">View Programmes</div>
+      </div>
+      <div class="p-rule" style="background:rgba(237,232,224,0.04);"></div>
+      <div class="p-results">
+        <div class="p-result"><div class="p-result-m c-result-m">−14kg</div><div class="p-result-b c-result-b">Recomp, 16 wks</div></div>
+        <div class="p-result"><div class="p-result-m c-result-m">+32%</div><div class="p-result-b c-result-b">Deadlift 1RM</div></div>
+        <div class="p-result"><div class="p-result-m c-result-m">−9%</div><div class="p-result-b c-result-b">Body fat</div></div>
+      </div>
+      <div class="p-pkgs">
+        <div class="p-pkg"><div class="p-pkg-n c-pkg-name">Fundamentals</div><div class="p-pkg-p c-pkg-price">AED 2,400</div></div>
+        <div class="p-pkg"><div class="p-pkg-n" style="color:rgba(237,232,224,0.9);">Transformation</div><div class="p-pkg-p" style="color:rgba(237,232,224,0.8);">AED 5,800</div></div>
+        <div class="p-pkg"><div class="p-pkg-n c-pkg-name">Elite</div><div class="p-pkg-p" style="color:rgba(168,144,112,0.7);font-size:10px;">On enquiry</div></div>
+      </div>
+      <div class="p-spacer"></div>
+    </div>
+  </div>
+
+  <!-- ══ D: Obsidian & Champagne Gold ══ -->
+  <div class="option">
+    <div class="option-label">
+      <div class="option-letter" style="color:#C9A870;">D — Gold</div>
+      <div class="option-name" style="color:#E0C870;">Obsidian & Champagne</div>
+      <div class="option-ref">Julius Baer, Centurion card. The orange shifts to gold — same energy, 10× the money.</div>
+      <span class="option-verdict verdict-gold">Private banking</span>
+    </div>
+
+    <div class="phone d-bg">
+      <div class="p-notch"></div>
+      <div class="d-hero">
+        <div class="p-status" style="color:rgba(242,237,228,0.7);">
+          <span>9:41</span><span style="font-size:9px;opacity:0.5;">▮▮▮ ◈ ▉</span>
+        </div>
+        <div class="p-nav" style="color:rgba(242,237,228,0.18);">
+          <div class="p-nav-btn">←</div>
+          <span>TrainedBy</span>
+          <div class="p-nav-btn">↗</div>
+        </div>
+        <div class="p-arc">
+          <svg viewBox="0 0 280 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="agD" x1="0" y1="90" x2="280" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="rgba(201,168,112,0)"/>
+              <stop offset="60%" stop-color="rgba(201,168,112,0.45)"/>
+              <stop offset="100%" stop-color="#C9A870"/>
+            </linearGradient></defs>
+            <path d="M -5 90 Q 70 65 145 38 Q 215 14 285 -5" stroke="url(#agD)" stroke-width="38" fill="none" stroke-linecap="butt"/>
+            <path d="M -5 90 Q 70 65 145 38 Q 215 14 285 -5" stroke="rgba(14,13,11,0.5)" stroke-width="22" fill="none" stroke-linecap="butt"/>
+            <path d="M -5 90 Q 70 65 145 38 Q 215 14 285 -5" stroke="rgba(201,168,112,0.65)" stroke-width="1" fill="none"/>
+            <circle cx="258" cy="4"  r="8.5" fill="rgba(201,168,112,0.95)"/>
+            <circle cx="244" cy="14" r="7"   fill="rgba(201,168,112,0.85)"/>
+            <circle cx="268" cy="-2" r="6"   fill="rgba(224,196,136,0.90)"/>
+            <circle cx="250" cy="-1" r="4.5" fill="rgba(201,168,112,0.72)"/>
+            <circle cx="234" cy="10" r="3.5" fill="rgba(201,168,112,0.52)"/>
+          </svg>
+        </div>
+        <div class="p-photo-wrap">
+          <div class="p-ring d-ring-bg">
+            <div class="p-ring-inner" style="background:#1a1608;">
+              <div class="p-initials d-initials">JC</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-identity">
+        <div class="p-name d-name" style="position:relative;">James Crawford
+          <span style="position:absolute;bottom:-3px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,112,0.5) 40%,rgba(224,196,136,0.65) 60%,transparent);display:block;"></span>
+        </div>
+        <div class="p-sub" style="color:rgba(242,237,228,0.28);">
+          <span>NASM</span><span class="p-sep">·</span><span>ISSA</span><span class="p-sep">·</span>
+          <span style="color:#C9A870;font-size:9px;font-weight:600;">✦ Verified</span>
+        </div>
+        <div class="p-loc" style="color:rgba(242,237,228,0.22);">Dubai Marina, UAE</div>
+      </div>
+      <div class="p-quote d-quote">Every client came with a goal.<br>Every one who stayed built a standard.</div>
+      <div class="p-stats">
+        <div class="p-stat"><div class="p-stat-val d-stat-val">12yr</div><div class="p-stat-lbl" style="color:rgba(242,237,228,0.22);">Exp.</div></div>
+        <div class="p-stat"><div class="p-stat-val d-stat-val">340+</div><div class="p-stat-lbl" style="color:rgba(242,237,228,0.22);">Clients</div></div>
+        <div class="p-stat"><div class="p-stat-val d-stat-val">4.9</div><div class="p-stat-lbl" style="color:rgba(242,237,228,0.22);">Rating</div></div>
+      </div>
+      <div class="p-avail" style="color:rgba(242,237,228,0.28);">
+        <div class="p-avail-dot"></div><span><strong style="color:rgba(242,237,228,0.65);">2 slots left</strong> · Tue 7am</span>
+      </div>
+      <div class="p-ctas">
+        <div class="p-btn d-btn-p">Request a Consultation</div>
+        <div class="p-btn d-btn-s">View Programmes</div>
+      </div>
+      <div class="p-rule" style="background:rgba(242,237,228,0.04);"></div>
+      <div class="p-results">
+        <div class="p-result"><div class="p-result-m d-result-m">−14kg</div><div class="p-result-b d-result-b">Recomp, 16 wks</div></div>
+        <div class="p-result"><div class="p-result-m d-result-m">+32%</div><div class="p-result-b d-result-b">Deadlift 1RM</div></div>
+        <div class="p-result"><div class="p-result-m d-result-m">−9%</div><div class="p-result-b d-result-b">Body fat</div></div>
+      </div>
+      <div class="p-pkgs">
+        <div class="p-pkg"><div class="p-pkg-n d-pkg-name">Fundamentals</div><div class="p-pkg-p d-pkg-price">AED 2,400</div></div>
+        <div class="p-pkg"><div class="p-pkg-n" style="color:rgba(242,237,228,0.9);">Transformation</div><div class="p-pkg-p" style="color:rgba(242,237,228,0.8);">AED 5,800</div></div>
+        <div class="p-pkg"><div class="p-pkg-n d-pkg-name">Elite</div><div class="p-pkg-p" style="color:rgba(201,168,112,0.65);font-size:10px;">On enquiry</div></div>
+      </div>
+      <div class="p-spacer"></div>
+    </div>
+  </div>
+
+</div><!-- /grid -->
+</body>
+</html>

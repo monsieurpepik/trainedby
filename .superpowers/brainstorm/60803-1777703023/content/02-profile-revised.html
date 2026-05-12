@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrainedBy Profile — Revised Direction</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #080808;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    color: #fff;
+    padding: 28px 20px 60px;
+  }
+
+  /* === COMPETITIVE MAP === */
+  .comp-map {
+    max-width: 900px;
+    margin: 0 auto 40px;
+  }
+  .comp-map h2 {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: #555; margin-bottom: 16px; text-align: center;
+  }
+  .comp-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .comp-card {
+    border-radius: 12px;
+    padding: 14px 16px;
+    border: 1px solid;
+  }
+  .comp-card.linktree { border-color: #333; background: rgba(255,255,255,0.02); }
+  .comp-card.hopp { border-color: #2a3a2a; background: rgba(34,197,94,0.04); }
+  .comp-card.trainedby { border-color: rgba(212,98,42,0.5); background: rgba(212,98,42,0.06); }
+  .comp-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .comp-card.linktree .comp-name { color: #aaa; }
+  .comp-card.hopp .comp-name { color: #22c55e; }
+  .comp-card.trainedby .comp-name { color: #D4622A; }
+  .comp-desc { font-size: 10px; color: #666; line-height: 1.5; }
+  .comp-card.trainedby .comp-desc { color: #999; }
+  .comp-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .comp-tag {
+    font-size: 9px; padding: 2px 7px; border-radius: 20px;
+    background: rgba(255,255,255,0.05); color: #666;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .comp-card.trainedby .comp-tag { color: #D4622A; border-color: rgba(212,98,42,0.25); background: rgba(212,98,42,0.08); }
+  .comp-card.hopp .comp-tag { color: #22c55e; border-color: rgba(34,197,94,0.25); background: rgba(34,197,94,0.06); }
+
+  /* === HEADER === */
+  .hdr { text-align: center; margin-bottom: 36px; }
+  .hdr h1 { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #555; margin-bottom: 8px; }
+  .hdr p { font-size: 14px; color: #aaa; line-height: 1.5; }
+  .hdr strong { color: #D4622A; }
+
+  /* === PROFILE MOCKS === */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1050px;
+    margin: 0 auto;
+  }
+
+  .card {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+    background: #111;
+  }
+  .card.selected { transform: scale(1.02); }
+  .card.option-a { border-color: #334155; }
+  .card.option-b { border-color: #D4622A; }
+  .card.option-c { border-color: #7C3AED; }
+
+  .card-label {
+    position: absolute; top: 10px; left: 10px; z-index: 20;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 20px;
+  }
+  .option-a .card-label { background: #334155; color: #94a3b8; }
+  .option-b .card-label { background: #D4622A; color: #fff; }
+  .option-c .card-label { background: #7C3AED; color: #fff; }
+
+  .rec-badge {
+    position: absolute; top: 10px; right: 10px; z-index: 20;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 20px;
+    background: #22c55e; color: #fff;
+  }
+
+  /* =========================================
+     OPTION A — "Hopp/Linktree Match"
+     Clean minimal, competes at surface level
+  ========================================= */
+  .mock-a {
+    min-height: 580px;
+    background: #f8f5f0;
+    display: flex; flex-direction: column;
+    position: relative;
+    color: #1a1a1a;
+  }
+  .a-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(175deg, #fff8f3 0%, #f8f5f0 100%);
+  }
+  .a-hero {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+  }
+  .a-hero-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #1a1a2e 0%, #2d1b3d 40%, #1a0a0a 100%);
+  }
+  /* trainer photo placeholder */
+  .a-photo-hint {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: rgba(255,255,255,0.25); letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .a-gradient-fade {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
+    background: linear-gradient(to bottom, transparent, #f8f5f0);
+  }
+  .a-avatar-wrap {
+    position: absolute; bottom: -36px; left: 50%; transform: translateX(-50%);
+    z-index: 5;
+  }
+  .a-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, #D4622A, #e8882a);
+    border: 3px solid #f8f5f0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 800; color: #fff;
+  }
+  .a-body {
+    padding: 48px 20px 24px;
+    display: flex; flex-direction: column; align-items: center;
+    flex: 1;
+    color: #1a1a1a;
+  }
+  .a-name { font-size: 19px; font-weight: 800; margin-bottom: 2px; color: #111; }
+  .a-handle { font-size: 11px; color: #888; margin-bottom: 4px; }
+  .a-bio { font-size: 11px; color: #555; text-align: center; margin-bottom: 16px; line-height: 1.45; }
+  .a-link {
+    display: block; width: 100%;
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    border-radius: 50px;
+    padding: 11px 16px;
+    text-align: center;
+    font-size: 12px; font-weight: 600;
+    margin-bottom: 8px;
+    color: #111;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .a-link.cta { background: #D4622A; border-color: #D4622A; color: #fff; }
+  .a-socials { display: flex; gap: 10px; margin-top: 14px; justify-content: center; }
+  .a-social {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #ebebeb;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #555;
+  }
+  .a-footer { margin-top: 16px; font-size: 9px; color: #bbb; text-align: center; }
+
+  /* =========================================
+     OPTION B — "TrainedBy Signature"  ★ REC
+     Brand arc + links + AI teaser + trainer-specific
+  ========================================= */
+  .mock-b {
+    min-height: 580px;
+    background: #0a0a0a;
+    display: flex; flex-direction: column;
+  }
+  .b-hero {
+    position: relative; height: 200px; overflow: hidden; flex-shrink: 0;
+  }
+  .b-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, #2d1200 0%, #1a0800 45%, #0a0a0a 100%);
+  }
+  .b-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="g" cx="72%25" cy="25%25" r="55%25"><stop offset="0%25" stop-color="%23D4622A" stop-opacity="0.45"/><stop offset="100%25" stop-color="transparent"/></radialGradient></defs><rect width="100%25" height="100%25" fill="url(%23g)"/></svg>') center/cover;
+  }
+  .b-photo-hint {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: rgba(255,255,255,0.15); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .b-arc {
+    position: absolute; inset: 0; z-index: 2;
+  }
+  .b-arc svg { width: 100%; height: 100%; }
+  .b-fade {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 80px; z-index: 3;
+    background: linear-gradient(to bottom, transparent, #0a0a0a);
+  }
+  .b-av-wrap {
+    position: absolute; bottom: -38px; left: 50%; transform: translateX(-50%); z-index: 6;
+  }
+  .b-av {
+    width: 76px; height: 76px; border-radius: 50%;
+    background: linear-gradient(135deg, #D4622A, #ff8c42);
+    border: 3px solid #0a0a0a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 800; color: #fff;
+    position: relative;
+  }
+  .b-verified {
+    position: absolute; bottom: 0; right: 0;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #D4622A; border: 2px solid #0a0a0a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+  }
+  .b-body {
+    flex: 1; padding: 50px 18px 20px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .b-name { font-size: 19px; font-weight: 800; margin-bottom: 2px; }
+  .b-cert { font-size: 10px; color: #D4622A; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 3px; }
+  .b-bio { font-size: 11px; color: rgba(255,255,255,0.5); text-align: center; margin-bottom: 16px; line-height: 1.45; }
+  .b-link {
+    display: block; width: 100%;
+    border-radius: 50px; padding: 11px 16px;
+    text-align: center; font-size: 12px; font-weight: 600;
+    margin-bottom: 7px; color: #fff;
+  }
+  .b-link.cta { background: #D4622A; }
+  .b-link.ghost { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); }
+  .b-link.wa { background: rgba(37,211,102,0.12); border: 1px solid rgba(37,211,102,0.25); color: #25d366; }
+  .b-spec-row {
+    display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 10px 0;
+  }
+  .b-spec {
+    font-size: 9px; padding: 3px 9px; border-radius: 20px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #aaa;
+  }
+  .b-divider { width: 100%; height: 1px; background: rgba(255,255,255,0.06); margin: 12px 0; }
+  .b-ai-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(212,98,42,0.7); margin-bottom: 7px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .b-ai-card {
+    width: 100%;
+    background: rgba(212,98,42,0.07);
+    border: 1px solid rgba(212,98,42,0.2);
+    border-radius: 12px; padding: 11px 13px;
+    font-size: 10px; color: rgba(255,255,255,0.6); line-height: 1.5;
+  }
+  .b-ai-card strong { color: rgba(212,98,42,0.9); }
+  .b-socials { display: flex; gap: 10px; margin-top: 12px; justify-content: center; }
+  .b-social {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center; font-size: 11px;
+  }
+
+  /* =========================================
+     OPTION C — "Mini Website" (Hopp-level)
+     Full business card: packages visible, testimonials, booking widget
+  ========================================= */
+  .mock-c {
+    min-height: 580px;
+    background: #0c0c0c;
+    display: flex; flex-direction: column;
+  }
+  .c-hero {
+    position: relative; height: 160px; overflow: hidden;
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a0f2e 100%);
+  }
+  .c-hero-glow {
+    position: absolute; top: -40px; right: -20px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(124,58,237,0.35) 0%, transparent 70%);
+  }
+  .c-av-wrap {
+    position: absolute; bottom: -28px; left: 18px; z-index: 5;
+  }
+  .c-av {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: linear-gradient(135deg, #7C3AED, #a855f7);
+    border: 3px solid #0c0c0c;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800; color: #fff;
+  }
+  .c-body { flex: 1; padding: 36px 16px 20px; }
+  .c-name-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+  .c-name { font-size: 17px; font-weight: 800; }
+  .c-nasm { font-size: 9px; color: #7C3AED; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .c-loc { font-size: 10px; color: #666; margin-bottom: 10px; }
+  /* mini package cards */
+  .c-packages { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+  .c-pkg {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 10px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .c-pkg-name { font-size: 11px; font-weight: 700; }
+  .c-pkg-sub { font-size: 9px; color: #666; margin-top: 1px; }
+  .c-pkg-price { font-size: 13px; font-weight: 800; color: #7C3AED; }
+  .c-book-btn {
+    display: block; width: 100%;
+    background: #7C3AED; border-radius: 10px;
+    padding: 11px; text-align: center;
+    font-size: 12px; font-weight: 700; color: #fff;
+    margin-bottom: 8px;
+  }
+  .c-wa-btn {
+    display: block; width: 100%;
+    background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.25);
+    border-radius: 10px; padding: 10px;
+    text-align: center; font-size: 11px; font-weight: 600; color: #25d366;
+    margin-bottom: 10px;
+  }
+  .c-review {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+  }
+  .c-review-stars { font-size: 10px; margin-bottom: 3px; color: #f59e0b; }
+  .c-review-text { font-size: 10px; color: #666; line-height: 1.4; font-style: italic; }
+  .c-review-name { font-size: 9px; color: #444; margin-top: 4px; }
+
+  /* DESC PANELS */
+  .desc {
+    padding: 14px 16px;
+    background: #111;
+    border-top: 1px solid #1e1e1e;
+  }
+  .desc-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .option-a .desc-title { color: #94a3b8; }
+  .option-b .desc-title { color: #D4622A; }
+  .option-c .desc-title { color: #a78bfa; }
+  .desc ul { font-size: 10px; color: #666; line-height: 1.7; padding-left: 14px; }
+  .desc .note { font-size: 10px; color: #555; font-style: italic; margin-top: 6px; }
+
+  /* VOTE SECTION */
+  .vote-row {
+    max-width: 1050px; margin: 36px auto 0;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  }
+  .vote-btn {
+    padding: 13px; border-radius: 12px;
+    font-size: 13px; font-weight: 700; text-align: center;
+    cursor: pointer; border: 2px solid; background: transparent; color: #fff;
+    transition: all 0.15s;
+  }
+  .vote-btn.a { border-color: #334155; }
+  .vote-btn.a:hover { background: #334155; }
+  .vote-btn.b { border-color: #D4622A; }
+  .vote-btn.b:hover { background: #D4622A; }
+  .vote-btn.c { border-color: #7C3AED; }
+  .vote-btn.c:hover { background: #7C3AED; }
+
+  .note-row {
+    max-width: 1050px; margin: 12px auto 0;
+    text-align: center; font-size: 11px; color: #444; line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<!-- COMPETITIVE MAP -->
+<div class="comp-map">
+  <h2>Competitive Landscape</h2>
+  <div class="comp-row">
+    <div class="comp-card linktree">
+      <div class="comp-name">Linktree</div>
+      <div class="comp-desc">Social links aggregator. Avatar + bio + pill buttons. Zero business tools. Free tier dominant.</div>
+      <div class="comp-tags">
+        <span class="comp-tag">Links only</span>
+        <span class="comp-tag">No booking</span>
+        <span class="comp-tag">No AI</span>
+        <span class="comp-tag">Generic</span>
+      </div>
+    </div>
+    <div class="comp-card hopp">
+      <div class="comp-name">Hopp by Wix</div>
+      <div class="comp-desc">Full business platform. 20+ monetization tools, booking, digital products, email marketing, analytics. 0% fees.</div>
+      <div class="comp-tags">
+        <span class="comp-tag">Booking</span>
+        <span class="comp-tag">Store</span>
+        <span class="comp-tag">Email MKT</span>
+        <span class="comp-tag">Analytics</span>
+        <span class="comp-tag">Generic</span>
+      </div>
+    </div>
+    <div class="comp-card trainedby">
+      <div class="comp-name">TrainedBy ✦</div>
+      <div class="comp-desc">Same business tools as Hopp — but specialized for fitness. Plus: AI program builder, discovery layer, trainer verification, performance tracking.</div>
+      <div class="comp-tags">
+        <span class="comp-tag">AI agents</span>
+        <span class="comp-tag">Booking</span>
+        <span class="comp-tag">Discovery</span>
+        <span class="comp-tag">Fitness-only</span>
+        <span class="comp-tag">Verified</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hdr">
+  <h1>Profile Page Design — 3 Directions</h1>
+  <p>The profile is the <strong>front door</strong>. First scroll = Linktree/Hopp competitor. Deeper = TrainedBy vertical.</p>
+</div>
+
+<div class="grid">
+
+  <!-- OPTION A: CLEAN / HOPP-MATCH -->
+  <div class="card option-a" id="card-a">
+    <div class="card-label">A — Clean Match</div>
+    <div class="mock-a">
+      <div class="a-hero">
+        <div class="a-hero-bg"></div>
+        <div class="a-photo-hint">Full-bleed trainer photo</div>
+        <div class="a-gradient-fade"></div>
+        <div class="a-avatar-wrap">
+          <div class="a-avatar">MJ</div>
+        </div>
+      </div>
+      <div class="a-body">
+        <div class="a-name">Marcus Johnson</div>
+        <div class="a-handle">@marcus-johnson · Dubai</div>
+        <div class="a-bio">NASM · 8 years · Strength & Body Recomp<br>Certified in sports nutrition</div>
+        <a class="a-link cta">📅 Book Free Consultation</a>
+        <a class="a-link">💬 WhatsApp Me</a>
+        <a class="a-link">🏋️ View My Packages</a>
+        <a class="a-link">📸 Instagram</a>
+        <div class="a-socials">
+          <div class="a-social">IG</div>
+          <div class="a-social">YT</div>
+          <div class="a-social">𝕏</div>
+          <div class="a-social">TK</div>
+        </div>
+        <div class="a-footer">trainedby.ae/marcus-johnson</div>
+      </div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Light background, Hopp-style</div>
+      <ul>
+        <li>White/cream bg — stands out from dark competitors</li>
+        <li>Photo hero → avatar anchored at bottom</li>
+        <li>Standard pill links + social icons</li>
+        <li>Looks legit, clean, trusted</li>
+        <li>No TrainedBy brand personality yet</li>
+      </ul>
+      <p class="note">Risk: indistinguishable from any Hopp/Linktree page</p>
+    </div>
+  </div>
+
+  <!-- OPTION B: TRAINEDBY SIGNATURE (RECOMMENDED) -->
+  <div class="card option-b" id="card-b">
+    <div class="card-label">B — TrainedBy Signature</div>
+    <div class="rec-badge">★ Recommended</div>
+    <div class="mock-b">
+      <div class="b-hero">
+        <div class="b-bg"></div>
+        <div class="b-photo-hint">Full-bleed trainer photo</div>
+        <div class="b-arc">
+          <svg viewBox="0 0 300 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M -20 200 Q 80 130 160 68 Q 230 16 310 -5"
+                  stroke="rgba(212,98,42,0.5)" stroke-width="44" fill="none" stroke-linecap="butt"/>
+            <path d="M -20 200 Q 80 130 160 68 Q 230 16 310 -5"
+                  stroke="rgba(8,8,8,0.5)" stroke-width="26" fill="none" stroke-linecap="butt"/>
+            <path d="M -20 200 Q 80 130 160 68 Q 230 16 310 -5"
+                  stroke="rgba(212,98,42,0.75)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <g opacity="0.9">
+              <circle cx="278" cy="12" r="9" fill="rgba(212,98,42,0.92)"/>
+              <circle cx="262" cy="22" r="7.5" fill="rgba(212,98,42,0.84)"/>
+              <circle cx="288" cy="4" r="6.5" fill="rgba(232,120,52,0.88)"/>
+              <circle cx="268" cy="2" r="5" fill="rgba(212,98,42,0.7)"/>
+            </g>
+          </svg>
+        </div>
+        <div class="b-fade"></div>
+        <div class="b-av-wrap">
+          <div class="b-av">
+            MJ
+            <div class="b-verified">✓</div>
+          </div>
+        </div>
+      </div>
+      <div class="b-body">
+        <div class="b-name">Marcus Johnson</div>
+        <div class="b-cert">NASM · Elite Strength · Dubai</div>
+        <div class="b-bio">8 years · 142 clients transformed<br>Strength, body recomp & athletic performance</div>
+        <a class="b-link cta">Book Free Consultation</a>
+        <a class="b-link wa">💬 WhatsApp</a>
+        <a class="b-link ghost">View Packages & Pricing</a>
+        <div class="b-spec-row">
+          <span class="b-spec">Strength</span>
+          <span class="b-spec">Body Recomp</span>
+          <span class="b-spec">Nutrition</span>
+          <span class="b-spec">Athletic</span>
+        </div>
+        <div class="b-socials">
+          <div class="b-social">IG</div>
+          <div class="b-social">YT</div>
+          <div class="b-social">𝕏</div>
+        </div>
+        <div class="b-divider"></div>
+        <div class="b-ai-label">✦ AI Training Plan</div>
+        <div class="b-ai-card">
+          <strong>Based on your profile</strong> — Marcus recommends a 12-week hybrid strength program for body recomp. Tap to get your personalised plan →
+        </div>
+      </div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Brand arc + trainer-specific + AI teaser</div>
+      <ul>
+        <li>Orange arc = instant TrainedBy brand recognition</li>
+        <li>Verified badge (trainer credibility signal)</li>
+        <li>Cert + specialties visible above fold</li>
+        <li>WhatsApp link (huge in Dubai/MENA)</li>
+        <li>AI card visible at bottom of first fold</li>
+        <li>Scroll deeper → packages, testimonials, full AI</li>
+      </ul>
+      <p class="note">TrainedBy can't be confused with a Linktree page</p>
+    </div>
+  </div>
+
+  <!-- OPTION C: MINI WEBSITE / HOPP-PLUS -->
+  <div class="card option-c" id="card-c">
+    <div class="card-label">C — Mini Website</div>
+    <div class="mock-c">
+      <div class="c-hero">
+        <div class="c-hero-glow"></div>
+        <div class="c-av-wrap">
+          <div class="c-av">MJ</div>
+        </div>
+      </div>
+      <div class="c-body">
+        <div class="c-name-row">
+          <div class="c-name">Marcus Johnson</div>
+          <div class="c-nasm">NASM ✓</div>
+        </div>
+        <div class="c-loc">📍 Dubai Marina · 8 yrs · ⭐ 4.9 (38 reviews)</div>
+        <div class="c-packages">
+          <div class="c-pkg">
+            <div>
+              <div class="c-pkg-name">Starter · 1 Month</div>
+              <div class="c-pkg-sub">12 sessions · nutrition guide</div>
+            </div>
+            <div class="c-pkg-price">AED 1,800</div>
+          </div>
+          <div class="c-pkg">
+            <div>
+              <div class="c-pkg-name">Elite · 3 Months</div>
+              <div class="c-pkg-sub">36 sessions · AI program + check-ins</div>
+            </div>
+            <div class="c-pkg-price">AED 4,500</div>
+          </div>
+        </div>
+        <a class="c-book-btn">Book Now</a>
+        <a class="c-wa-btn">💬 WhatsApp Marcus</a>
+        <div class="c-review">
+          <div class="c-review-stars">★★★★★</div>
+          <div class="c-review-text">"Lost 12kg in 3 months. Marcus is the real deal — very structured and motivating."</div>
+          <div class="c-review-name">— Ahmed K., Dubai</div>
+        </div>
+      </div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Packages + pricing + social proof visible</div>
+      <ul>
+        <li>Packages with AED pricing above fold</li>
+        <li>Real reviews inline (not hidden below)</li>
+        <li>Rating + location + experience upfront</li>
+        <li>Closer to Hopp "business page" model</li>
+        <li>More conversion-focused, less brand-feel</li>
+      </ul>
+      <p class="note">Strongest for converting intent but least aesthetic</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="vote-row">
+  <button class="vote-btn a" onclick="pick('a')">A — Clean / Hopp-Match</button>
+  <button class="vote-btn b" onclick="pick('b')">B — TrainedBy Signature ★</button>
+  <button class="vote-btn c" onclick="pick('c')">C — Mini Website / Hopp+</button>
+</div>
+<p class="note-row">Pick a direction — or say "B top, C pricing section" to mix them. These are scroll positions, not exclusives.</p>
+
+<script>
+function pick(x) {
+  fetch('/event', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({type:'choice', value:'option-'+x, question:'profile-design-direction-v2', ts:Date.now()})
+  });
+  ['a','b','c'].forEach(o => {
+    document.getElementById('card-'+o).style.opacity = o === x ? '1' : '0.35';
+    document.getElementById('card-'+o).style.transform = o === x ? 'scale(1.02)' : 'none';
+  });
+  document.querySelectorAll('.vote-btn').forEach(b => b.style.opacity = '0.35');
+  document.querySelector('.vote-btn.'+x).style.opacity = '1';
+}
+</script>
+</body>
+</html>

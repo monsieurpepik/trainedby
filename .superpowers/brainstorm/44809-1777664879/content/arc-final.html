@@ -1,0 +1,234 @@
+<h2>The arc — restrained detonation</h2>
+<p class="subtitle">One idea. Maximum silence. The black earns the orange.</p>
+
+<div style="display:flex;gap:24px;flex-wrap:wrap;max-width:860px">
+
+  <!-- TRAINER CARD -->
+  <div style="flex:1;min-width:300px;max-width:390px">
+    <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:10px;font-family:-apple-system,sans-serif">Trainer listing card</div>
+    <div style="background:#0A0A0A;border-radius:24px;overflow:hidden;min-height:560px">
+
+      <div style="position:relative;height:320px;background:#0A0A0A;overflow:hidden">
+        <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 390 320" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="arc1" x1="-30" y1="320" x2="400" y2="10" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
+              <stop offset="30%" stop-color="rgba(212,98,42,0.18)"/>
+              <stop offset="65%" stop-color="rgba(212,98,42,0.58)"/>
+              <stop offset="100%" stop-color="#D4622A"/>
+            </linearGradient>
+            <linearGradient id="arcHair1" x1="-30" y1="320" x2="400" y2="10" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
+              <stop offset="35%" stop-color="rgba(212,98,42,0.45)"/>
+              <stop offset="100%" stop-color="rgba(212,98,42,0.90)"/>
+            </linearGradient>
+            <filter id="coreglow" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur stdDeviation="7" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="midspark" x="-80%" y="-80%" width="260%" height="260%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Arc: stencil mass -->
+          <path d="M -30 320 Q 100 240 195 155 Q 295 65 400 18" stroke="url(#arc1)" stroke-width="64" fill="none" stroke-linecap="butt"/>
+          <!-- Inner dark bite -->
+          <path d="M -30 320 Q 100 240 195 155 Q 295 65 400 18" stroke="rgba(10,10,10,0.58)" stroke-width="38" fill="none" stroke-linecap="butt"/>
+          <!-- Hairline -->
+          <path d="M -30 320 Q 100 240 195 155 Q 295 65 400 18" stroke="url(#arcHair1)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+
+          <!-- DETONATION — tight, controlled, glowing -->
+          <g filter="url(#coreglow)">
+            <circle cx="372" cy="24" r="12" fill="rgba(212,98,42,0.95)"/>
+            <circle cx="354" cy="34" r="9"  fill="rgba(212,98,42,0.88)"/>
+            <circle cx="388" cy="14" r="8"  fill="rgba(232,120,52,0.90)"/>
+            <circle cx="362" cy="10" r="7"  fill="rgba(212,98,42,0.84)"/>
+            <circle cx="385" cy="40" r="6"  fill="rgba(212,98,42,0.78)"/>
+          </g>
+
+          <!-- Mid sparks — with soft glow, tight cone -->
+          <g filter="url(#midspark)">
+            <circle cx="342" cy="18" r="5"   fill="rgba(212,98,42,0.68)"/>
+            <circle cx="360" cy="2"  r="4.5" fill="rgba(212,98,42,0.62)"/>
+            <circle cx="395" cy="26" r="4"   fill="rgba(212,98,42,0.58)"/>
+            <circle cx="338" cy="44" r="4"   fill="rgba(212,98,42,0.52)"/>
+            <circle cx="370" cy="50" r="3.5" fill="rgba(212,98,42,0.48)"/>
+            <circle cx="325" cy="30" r="3"   fill="rgba(212,98,42,0.44)"/>
+            <circle cx="348" cy="60" r="3"   fill="rgba(212,98,42,0.38)"/>
+            <circle cx="380" cy="-10" r="3"  fill="rgba(212,98,42,0.50)"/>
+            <circle cx="400" cy="48" r="2.5" fill="rgba(212,98,42,0.36)"/>
+          </g>
+
+          <!-- Outer fragments — fading fast into black -->
+          <circle cx="310" cy="42" r="2.5" fill="rgba(212,98,42,0.28)"/>
+          <circle cx="325" cy="58" r="2"   fill="rgba(212,98,42,0.22)"/>
+          <circle cx="338" cy="72" r="2"   fill="rgba(212,98,42,0.18)"/>
+          <circle cx="300" cy="56" r="1.5" fill="rgba(212,98,42,0.16)"/>
+          <circle cx="315" cy="74" r="1.5" fill="rgba(212,98,42,0.12)"/>
+          <circle cx="292" cy="70" r="1.5" fill="rgba(212,98,42,0.10)"/>
+          <circle cx="330" cy="86" r="1"   fill="rgba(212,98,42,0.09)"/>
+          <circle cx="280" cy="80" r="1"   fill="rgba(212,98,42,0.07)"/>
+          <!-- A few sparks above frame — just barely -->
+          <circle cx="368" cy="-16" r="2.5" fill="rgba(212,98,42,0.38)"/>
+          <circle cx="382" cy="-28" r="1.5" fill="rgba(212,98,42,0.24)"/>
+          <circle cx="355" cy="-24" r="1.5" fill="rgba(212,98,42,0.18)"/>
+        </svg>
+
+        <div style="position:absolute;bottom:24px;left:24px;width:72px;height:72px;border-radius:50%;background:rgba(212,98,42,0.08);border:1.5px solid rgba(212,98,42,0.25);display:flex;align-items:center;justify-content:center">
+          <div style="font-size:22px;font-weight:800;color:#D4622A;font-family:-apple-system,sans-serif">MS</div>
+        </div>
+        <div style="position:absolute;top:22px;right:22px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:100px;padding:5px 13px;backdrop-filter:blur(12px)">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:0.08em;text-transform:uppercase;font-family:-apple-system,sans-serif">Dubai</div>
+        </div>
+        <div style="position:absolute;top:22px;left:22px">
+          <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.14);font-family:-apple-system,sans-serif;font-weight:700">TrainedBy</div>
+        </div>
+      </div>
+
+      <div style="padding:24px">
+        <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.22);margin-bottom:8px;font-family:-apple-system,sans-serif;font-weight:600">Strength & Conditioning</div>
+        <div style="font-size:36px;font-weight:700;color:#FAFAFA;font-family:Georgia,'Times New Roman',serif;letter-spacing:-0.015em;line-height:1.05;font-style:italic;margin-bottom:4px">Mariana<br>Silva</div>
+        <div style="width:32px;height:1.5px;background:#D4622A;margin:14px 0"></div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.24);font-family:-apple-system,sans-serif;margin-bottom:20px">NASM · ACE · 6 years</div>
+        <div style="display:flex;gap:0;margin-bottom:24px;border:1px solid rgba(255,255,255,0.06);border-radius:14px;overflow:hidden">
+          <div style="flex:1;padding:14px 16px;border-right:1px solid rgba(255,255,255,0.06)">
+            <div style="font-size:22px;font-weight:800;color:#FAFAFA;font-family:-apple-system,sans-serif;letter-spacing:-0.02em">48</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.22);letter-spacing:0.1em;text-transform:uppercase;font-family:-apple-system,sans-serif;margin-top:2px">Clients</div>
+          </div>
+          <div style="flex:1;padding:14px 16px;border-right:1px solid rgba(255,255,255,0.06)">
+            <div style="font-size:22px;font-weight:800;color:#FAFAFA;font-family:-apple-system,sans-serif;letter-spacing:-0.02em">4.9★</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.22);letter-spacing:0.1em;text-transform:uppercase;font-family:-apple-system,sans-serif;margin-top:2px">Rating</div>
+          </div>
+          <div style="flex:1;padding:14px 16px">
+            <div style="font-size:22px;font-weight:800;color:#D4622A;font-family:-apple-system,sans-serif;letter-spacing:-0.02em">350</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.22);letter-spacing:0.1em;text-transform:uppercase;font-family:-apple-system,sans-serif;margin-top:2px">AED / session</div>
+          </div>
+        </div>
+        <div style="background:#D4622A;color:#0A0A0A;font-size:12px;font-weight:800;text-align:center;padding:16px;border-radius:100px;font-family:-apple-system,sans-serif;letter-spacing:0.1em;text-transform:uppercase">Book a session</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BROWSE SCREEN -->
+  <div style="flex:1;min-width:300px;max-width:390px">
+    <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:10px;font-family:-apple-system,sans-serif">Browse / discovery screen</div>
+    <div style="background:#0A0A0A;border-radius:24px;overflow:hidden;min-height:560px">
+
+      <div style="position:relative;height:240px;background:#0A0A0A;overflow:hidden">
+        <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 390 240" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="arc2" x1="-40" y1="240" x2="420" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
+              <stop offset="28%" stop-color="rgba(212,98,42,0.16)"/>
+              <stop offset="65%" stop-color="rgba(212,98,42,0.55)"/>
+              <stop offset="100%" stop-color="#D4622A"/>
+            </linearGradient>
+            <linearGradient id="arcHair2" x1="-40" y1="240" x2="420" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="rgba(212,98,42,0.0)"/>
+              <stop offset="32%" stop-color="rgba(212,98,42,0.42)"/>
+              <stop offset="100%" stop-color="rgba(212,98,42,0.88)"/>
+            </linearGradient>
+            <filter id="coreglow2" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur stdDeviation="6" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="midspark2" x="-80%" y="-80%" width="260%" height="260%">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <path d="M -40 240 Q 120 160 225 90 Q 330 22 420 -5" stroke="url(#arc2)" stroke-width="60" fill="none" stroke-linecap="butt"/>
+          <path d="M -40 240 Q 120 160 225 90 Q 330 22 420 -5" stroke="rgba(10,10,10,0.55)" stroke-width="36" fill="none" stroke-linecap="butt"/>
+          <path d="M -40 240 Q 120 160 225 90 Q 330 22 420 -5" stroke="url(#arcHair2)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+
+          <g filter="url(#coreglow2)">
+            <circle cx="380" cy="16" r="11" fill="rgba(212,98,42,0.93)"/>
+            <circle cx="363" cy="26" r="8.5" fill="rgba(212,98,42,0.86)"/>
+            <circle cx="394" cy="8"  r="7.5" fill="rgba(232,120,52,0.88)"/>
+            <circle cx="370" cy="6"  r="6.5" fill="rgba(212,98,42,0.82)"/>
+            <circle cx="390" cy="36" r="5.5" fill="rgba(212,98,42,0.76)"/>
+          </g>
+
+          <g filter="url(#midspark2)">
+            <circle cx="348" cy="14" r="4.5" fill="rgba(212,98,42,0.66)"/>
+            <circle cx="365" cy="-4" r="4"   fill="rgba(212,98,42,0.60)"/>
+            <circle cx="345" cy="40" r="4"   fill="rgba(212,98,42,0.52)"/>
+            <circle cx="372" cy="46" r="3.5" fill="rgba(212,98,42,0.46)"/>
+            <circle cx="330" cy="26" r="3"   fill="rgba(212,98,42,0.42)"/>
+            <circle cx="350" cy="56" r="3"   fill="rgba(212,98,42,0.36)"/>
+            <circle cx="380" cy="-14" r="3"  fill="rgba(212,98,42,0.48)"/>
+          </g>
+
+          <circle cx="314" cy="40" r="2.5" fill="rgba(212,98,42,0.26)"/>
+          <circle cx="325" cy="56" r="2"   fill="rgba(212,98,42,0.20)"/>
+          <circle cx="336" cy="68" r="1.5" fill="rgba(212,98,42,0.16)"/>
+          <circle cx="304" cy="54" r="1.5" fill="rgba(212,98,42,0.14)"/>
+          <circle cx="318" cy="72" r="1"   fill="rgba(212,98,42,0.10)"/>
+          <circle cx="295" cy="66" r="1"   fill="rgba(212,98,42,0.08)"/>
+          <circle cx="370" cy="-20" r="2"  fill="rgba(212,98,42,0.34)"/>
+          <circle cx="382" cy="-30" r="1.5" fill="rgba(212,98,42,0.22)"/>
+        </svg>
+
+        <div style="position:absolute;inset:0;padding:28px 24px">
+          <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.14);font-family:-apple-system,sans-serif;font-weight:700;margin-bottom:18px">TrainedBy · Dubai</div>
+          <div style="font-size:32px;font-weight:900;color:#FAFAFA;font-family:-apple-system,sans-serif;letter-spacing:-0.03em;line-height:1.1">Find your<br>trainer.</div>
+          <div style="margin-top:10px;font-size:12px;color:rgba(255,255,255,0.25);font-family:-apple-system,sans-serif">34 certified trainers near you</div>
+        </div>
+      </div>
+
+      <div style="padding:16px 24px 12px;display:flex;gap:8px">
+        <div style="background:#D4622A;color:#0A0A0A;font-size:10px;font-weight:700;padding:8px 16px;border-radius:100px;white-space:nowrap;font-family:-apple-system,sans-serif;letter-spacing:0.06em;text-transform:uppercase">All</div>
+        <div style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.38);border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:600;padding:8px 16px;border-radius:100px;white-space:nowrap;font-family:-apple-system,sans-serif;letter-spacing:0.06em;text-transform:uppercase">Strength</div>
+        <div style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.38);border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:600;padding:8px 16px;border-radius:100px;white-space:nowrap;font-family:-apple-system,sans-serif;letter-spacing:0.06em;text-transform:uppercase">Yoga</div>
+        <div style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.38);border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:600;padding:8px 16px;border-radius:100px;white-space:nowrap;font-family:-apple-system,sans-serif;letter-spacing:0.06em;text-transform:uppercase">Boxing</div>
+      </div>
+
+      <div style="padding:8px 24px;display:flex;flex-direction:column;gap:10px">
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px;display:flex;gap:14px;align-items:center">
+          <div style="width:48px;height:48px;border-radius:50%;background:rgba(212,98,42,0.10);border:1.5px solid rgba(212,98,42,0.28);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <div style="font-size:14px;font-weight:800;color:#D4622A;font-family:-apple-system,sans-serif">MS</div>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:16px;font-weight:700;color:#FAFAFA;font-family:Georgia,serif;font-style:italic;letter-spacing:-0.01em">Mariana Silva</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.24);font-family:-apple-system,sans-serif;margin-top:2px">Strength · 4.9★ · AED 350</div>
+          </div>
+          <div style="width:34px;height:34px;border-radius:50%;background:#D4622A;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px;display:flex;gap:14px;align-items:center">
+          <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <div style="font-size:14px;font-weight:800;color:rgba(255,255,255,0.30);font-family:-apple-system,sans-serif">AK</div>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:16px;font-weight:700;color:#FAFAFA;font-family:Georgia,serif;font-style:italic;letter-spacing:-0.01em">Ahmed Karim</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.24);font-family:-apple-system,sans-serif;margin-top:2px">Boxing · 4.8★ · AED 280</div>
+          </div>
+          <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.28)" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px;display:flex;gap:14px;align-items:center">
+          <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <div style="font-size:14px;font-weight:800;color:rgba(255,255,255,0.30);font-family:-apple-system,sans-serif">SB</div>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:16px;font-weight:700;color:#FAFAFA;font-family:Georgia,serif;font-style:italic;letter-spacing:-0.01em">Sofia Benali</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.24);font-family:-apple-system,sans-serif;margin-top:2px">Yoga · 5.0★ · AED 320</div>
+          </div>
+          <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.28)" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:40px">The black is the design. The arc earns its moment. <strong>One detonation. Everything else: silence.</strong></p>

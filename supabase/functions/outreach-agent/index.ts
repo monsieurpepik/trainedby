@@ -1,23 +1,24 @@
 /**
- * TrainedBy — Outreach Agent
+ * TrainedBy  -  Outreach Agent
  * ─────────────────────────────────────────────────────────────────────────────
  * Identifies expert trainers on the platform and sends personalised outreach
  * emails asking for their expert thoughts on a topic. Trainer-authored content
- * is the only content strategy — the platform never publishes AI-only blog posts
+ * is the only content strategy  -  the platform never publishes AI-only blog posts
  * as "from a trainer".
  *
  * Actions:
- *   POST { action: 'identify' }           — find best trainers to approach
- *   POST { action: 'draft', trainer_id, topic } — draft personalised outreach
- *   POST { action: 'send', request_id }   — send the outreach email
- *   POST { action: 'run' }                — full weekly run (identify + draft + send)
- *   GET                                   — health check
+ *   POST { action: 'identify' }            -  find best trainers to approach
+ *   POST { action: 'draft', trainer_id, topic }  -  draft personalised outreach
+ *   POST { action: 'send', request_id }    -  send the outreach email
+ *   POST { action: 'run' }                 -  full weekly run (identify + draft + send)
+ *   GET                                    -  health check
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { CORS_HEADERS } from '../_shared/errors.ts';
 import { createLogger } from '../_shared/logger.ts';
 import { callClaude } from '../_shared/claude.ts';
+import { getMarketBaseUrl, getMarketBrand, getDashboardUrl, getMarketSupportEmail } from '../_shared/market_url.ts';
 
 const log = createLogger('outreach-agent');
 
@@ -25,9 +26,8 @@ const SUPABASE_URL = () => Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_KEY = () => Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ANTHROPIC_KEY = () => Deno.env.get('ANTHROPIC_API_KEY')!;
 const RESEND_KEY = () => Deno.env.get('RESEND_API_KEY') ?? '';
-const FROM_EMAIL = 'TrainedBy <hello@trainedby.ae>';
 
-// ── Blog topics pool — rotated weekly ─────────────────────────────────────────
+// ── Blog topics pool  -  rotated weekly ─────────────────────────────────────────
 
 const TOPIC_POOL = [
   { topic: 'The biggest mistake clients make in their first 30 days', category: 'client-education' },
@@ -152,9 +152,9 @@ async function draftOutreach(
 
   const t = trainer as { name: string; email: string; city: string; specialties: string[]; bio: string; plan: string };
 
-  const systemPrompt = `You are writing a personalised outreach email on behalf of TrainedBy.ae — a platform for verified personal trainers in the UAE. 
+  const systemPrompt = `You are writing a personalised outreach email on behalf of ${getMarketBrand(trainerMarket)} (${getMarketBaseUrl(trainerMarket)}) - a platform for verified personal trainers.
 
-The email asks the trainer to share their expert thoughts on a topic for a blog post. The tone is collegial, direct, and respectful of their expertise. You are not asking them to write a full article — just to share their perspective in a few paragraphs, which the platform will format and publish under their name with their profile linked.
+The email asks the trainer to share their expert thoughts on a topic for a blog post. The tone is collegial, direct, and respectful of their expertise. You are not asking them to write a full article  -  just to share their perspective in a few paragraphs, which the platform will format and publish under their name with their profile linked.
 
 Rules:
 - Address them by first name only
@@ -214,7 +214,7 @@ Write the outreach email (subject line + body).`;
 async function sendOutreach(sb: ReturnType<typeof createClient>, requestId: string): Promise<Record<string, unknown>> {
   const { data: request } = await sb
     .from('content_requests')
-    .select('*, trainer:trainer_id(name, email)')
+    .select('*, trainer:trainer_id(name, email, market)')
     .eq('id', requestId)
     .single();
 
@@ -226,7 +226,7 @@ async function sendOutreach(sb: ReturnType<typeof createClient>, requestId: stri
     outreach_subject: string;
     outreach_body: string;
     status: string;
-    trainer: { name: string; email: string };
+    trainer: { name: string; email: string; market?: string };
   };
 
   if (r.status !== 'pending') {
@@ -235,6 +235,8 @@ async function sendOutreach(sb: ReturnType<typeof createClient>, requestId: stri
 
   const trainerEmail = r.trainer?.email;
   const trainerName = r.trainer?.name;
+  const trainerMarket = r.trainer?.market ?? 'ae';
+  const fromEmail = `${getMarketBrand(trainerMarket)} <${getMarketSupportEmail(trainerMarket)}>`;
 
   if (!trainerEmail) return { error: 'Trainer email not found' };
 
@@ -247,12 +249,12 @@ async function sendOutreach(sb: ReturnType<typeof createClient>, requestId: stri
   const emailHtml = `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a; padding: 32px 24px;">
   <div style="margin-bottom: 32px;">
-    <img src="https://trainedby-ae.netlify.app/logo.svg" alt="TrainedBy" style="height: 32px;" />
+    <img src="${getMarketBaseUrl(trainerMarket)}/logo.svg" alt="TrainedBy" style="height: 32px;" />
   </div>
   <div style="white-space: pre-wrap; line-height: 1.7; font-size: 15px;">${r.outreach_body}</div>
   <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #e5e5e5; font-size: 13px; color: #666;">
-    <p>TrainedBy.ae — The Verified Trainer Platform for the UAE</p>
-    <p><a href="https://trainedby-ae.netlify.app/dashboard" style="color: #FF5C00;">Your dashboard</a></p>
+    <p>${getMarketBrand(trainerMarket)}</p>
+    <p><a href="${getDashboardUrl(trainerMarket)}" style="color: #FF5C00;">Your dashboard</a></p>
   </div>
 </div>`;
 
@@ -263,7 +265,7 @@ async function sendOutreach(sb: ReturnType<typeof createClient>, requestId: stri
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: FROM_EMAIL,
+      from: fromEmail,
       to: trainerEmail,
       subject: r.outreach_subject,
       html: emailHtml,

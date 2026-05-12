@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Structured Logger
+ * TrainedBy  -  Structured Logger
  * Shared across all edge functions.
  *
  * Outputs JSON-structured logs compatible with Supabase log viewer,

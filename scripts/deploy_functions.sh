@@ -28,6 +28,8 @@ NO_JWT_FUNCTIONS=(
   "stripe-webhook"
   "razorpay-webhook"
   "academy-booking-webhook"
+  "booking-webhook"
+  "trainer-weekly-digest"
 )
 
 # ── Colours ───────────────────────────────────────────────────────────────────

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile Desktop Layout Options</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #fff; }
+
+  .page-header {
+    text-align: center;
+    padding: 48px 24px 32px;
+    border-bottom: 1px solid #222;
+  }
+  .page-header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .page-header p { color: #888; margin-top: 8px; font-size: 15px; }
+
+  .option-section {
+    padding: 48px 0;
+    border-bottom: 1px solid #222;
+  }
+  .option-section:last-child { border-bottom: none; }
+
+  .option-label {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 0 24px;
+  }
+  .option-label .badge {
+    display: inline-block;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 12px;
+  }
+  .option-label h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .option-label p { color: #888; font-size: 14px; max-width: 560px; margin: 0 auto; line-height: 1.6; }
+
+  .pros-cons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .pro, .con {
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pro { background: #0f2a1a; color: #4ade80; border: 1px solid #166534; }
+  .con { background: #2a1010; color: #f87171; border: 1px solid #7f1d1d; }
+
+  /* ===========================
+     OPTION A: Magazine Layout
+     =========================== */
+  .mockup-a {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    min-height: 580px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #333;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    background: #111;
+  }
+
+  .mockup-a .left-panel {
+    width: 42%;
+    flex-shrink: 0;
+    background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 40px;
+  }
+  .mockup-a .left-panel .bg-photo {
+    position: absolute;
+    inset: 0;
+    background: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80') center/cover;
+    opacity: 0.3;
+  }
+  .mockup-a .left-panel .gradient-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.1) 100%);
+  }
+  .mockup-a .left-content { position: relative; z-index: 2; }
+  .mockup-a .avatar-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: url('https://images.unsplash.com/photo-1567013127542-490d757e6349?w=200&q=80') center/cover;
+    border: 3px solid rgba(255,255,255,0.3);
+    margin-bottom: 20px;
+  }
+  .mockup-a .trainer-name { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
+  .mockup-a .trainer-cert {
+    margin-top: 8px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cert-badge {
+    background: rgba(74, 222, 128, 0.15);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    color: #4ade80;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .mockup-a .stats-row {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .stat-item { text-align: left; }
+  .stat-num { font-size: 22px; font-weight: 800; }
+  .stat-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .mockup-a .cta-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 28px;
+  }
+  .btn-primary {
+    background: #FF3C00;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .mockup-a .right-panel {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .section-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .section-card h3 { font-size: 13px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+  .package-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .package-item {
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .package-item .pkg-name { font-size: 14px; font-weight: 700; }
+  .package-item .pkg-price { font-size: 20px; font-weight: 800; color: #FF3C00; margin-top: 4px; }
+  .package-item .pkg-desc { font-size: 12px; color: #666; margin-top: 6px; line-height: 1.4; }
+  .specialty-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: #ccc;
+  }
+  .bio-text { font-size: 14px; line-height: 1.7; color: #ccc; }
+
+  /* ===========================
+     OPTION B: Centered Card
+     =========================== */
+  .mockup-b-wrapper {
+    background: #0a0a0a;
+    padding: 48px 24px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    max-width: 1100px;
+    margin: 0 auto;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  }
+  .mockup-b {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .mockup-b .hero-card {
+    background: #161616;
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 40px;
+    display: flex;
+    gap: 36px;
+    align-items: center;
+  }
+  .mockup-b .avatar-mid {
+    width: 120px;
+    height: 120px;
+    border-radius: 16px;
+    background: url('https://images.unsplash.com/photo-1567013127542-490d757e6349?w=200&q=80') center/cover;
+    flex-shrink: 0;
+  }
+  .mockup-b .hero-info { flex: 1; }
+  .mockup-b .trainer-name { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+  .mockup-b .meta-row { display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+  .meta-tag {
+    font-size: 13px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .mockup-b .stats-row-b { display: flex; gap: 32px; margin-top: 20px; }
+  .mockup-b .cta-row { display: flex; gap: 12px; margin-top: 20px; }
+  .cta-row .btn-primary { flex: 1; }
+  .cta-row .btn-secondary { flex: 1; }
+
+  .mockup-b .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .mockup-b .content-grid .section-card.full { grid-column: 1 / -1; }
+
+  /* ===========================
+     OPTION C: Full-bleed Hero
+     =========================== */
+  .mockup-c {
+    max-width: 1100px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #333;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    background: #111;
+  }
+  .mockup-c .hero-banner {
+    position: relative;
+    height: 320px;
+    background: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&q=80') center/cover;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 48px 40px;
+  }
+  .mockup-c .hero-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+  }
+  .mockup-c .hero-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    gap: 28px;
+    width: 100%;
+  }
+  .mockup-c .avatar-sm {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: url('https://images.unsplash.com/photo-1567013127542-490d757e6349?w=200&q=80') center/cover;
+    border: 3px solid rgba(255,255,255,0.4);
+    flex-shrink: 0;
+  }
+  .mockup-c .hero-text { flex: 1; }
+  .mockup-c .trainer-name { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
+  .mockup-c .hero-meta { font-size: 14px; color: rgba(255,255,255,0.65); margin-top: 6px; display: flex; gap: 16px; }
+  .mockup-c .hero-ctas { display: flex; flex-direction: column; gap: 10px; min-width: 180px; }
+
+  .mockup-c .content-shelf {
+    padding: 32px 48px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+  .mockup-c .content-shelf .section-card.wide { grid-column: span 2; }
+
+  .recommended-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #FF3C00, #ff6b35);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+
+  .divider {
+    max-width: 1100px;
+    margin: 0 auto;
+    height: 1px;
+    background: #222;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Profile Page — Desktop Layout Options</h1>
+  <p>Three approaches to fix the "stretched mobile" feeling on wide screens</p>
+</div>
+
+<!-- ===== OPTION A ===== -->
+<div class="option-section">
+  <div class="option-label">
+    <div class="badge">Option A</div>
+    <h2>Magazine Layout — Wide Left Panel</h2>
+    <p>A dedicated ~42% left panel anchors the trainer identity with full-bleed photo background. Right panel shows packages and sections in a real desktop grid. Feels editorial and premium.</p>
+    <div class="pros-cons">
+      <span class="pro">✓ Uses full width properly</span>
+      <span class="pro">✓ Photo creates atmosphere</span>
+      <span class="pro">✓ Strong visual hierarchy</span>
+      <span class="con">✗ Left col always visible (sticky)</span>
+    </div>
+  </div>
+
+  <div style="padding: 0 24px;">
+    <div class="mockup-a">
+      <div class="left-panel">
+        <div class="bg-photo"></div>
+        <div class="gradient-overlay"></div>
+        <div class="left-content">
+          <div class="avatar-large"></div>
+          <div class="trainer-name">Marcus<br>Williams</div>
+          <div class="trainer-cert">
+            <span class="cert-badge">NASM-CPT</span>
+            <span style="color: rgba(255,255,255,0.5)">· Verified</span>
+          </div>
+          <div style="font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 6px;">Upper East Side, New York City</div>
+          <div class="stats-row">
+            <div class="stat-item">
+              <div class="stat-num">8</div>
+              <div class="stat-label">Years Exp</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">140+</div>
+              <div class="stat-label">Clients</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">4.9★</div>
+              <div class="stat-label">Rating</div>
+            </div>
+          </div>
+          <div class="cta-stack">
+            <div class="btn-primary">Book a Session</div>
+            <div class="btn-secondary">Message Marcus</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="section-card">
+          <h3>Packages</h3>
+          <div class="package-grid">
+            <div class="package-item">
+              <div class="pkg-name">Starter</div>
+              <div class="pkg-price">$299/mo</div>
+              <div class="pkg-desc">4 sessions, nutrition basics, check-in support</div>
+            </div>
+            <div class="package-item">
+              <div class="pkg-name">Elite</div>
+              <div class="pkg-price">$599/mo</div>
+              <div class="pkg-desc">8 sessions, full programming, weekly calls</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h3>About</h3>
+          <div class="bio-text">NYC-based NASM-certified trainer with 8 years helping busy professionals build strength without sacrificing their schedule. I specialize in efficient, science-backed programming that fits real life — not just the gym floor.</div>
+        </div>
+
+        <div class="section-card">
+          <h3>Specialties</h3>
+          <div class="specialty-chips">
+            <span class="chip">Strength Training</span>
+            <span class="chip">Weight Loss</span>
+            <span class="chip">Corporate Wellness</span>
+            <span class="chip">HIIT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OPTION B ===== -->
+<div class="option-section">
+  <div class="option-label">
+    <div class="badge">Option B</div>
+    <h2>Centered Card Layout — Constrained & Breathable</h2>
+    <p>Max-width 860px centered layout. A large hero card at the top (avatar + name + stats + CTAs in one row), then a two-column content grid below. Feels like a polished SaaS product page — nothing stretches.</p>
+    <div class="pros-cons">
+      <span class="pro">✓ Nothing ever stretches</span>
+      <span class="pro">✓ Clean, SaaS-grade feel</span>
+      <span class="pro">✓ Easy to scan</span>
+      <span class="con">✗ Doesn't use the full width</span>
+      <span class="con">✗ Less visually dramatic</span>
+    </div>
+  </div>
+
+  <div style="padding: 0 24px;">
+    <div class="mockup-b-wrapper">
+      <div class="mockup-b">
+        <div class="hero-card">
+          <div class="avatar-mid"></div>
+          <div class="hero-info">
+            <div class="trainer-name">Marcus Williams</div>
+            <div class="meta-row">
+              <span class="cert-badge">NASM-CPT</span>
+              <span class="meta-tag">✓ Verified</span>
+              <span class="meta-tag">📍 Upper East Side, NYC</span>
+            </div>
+            <div class="stats-row-b">
+              <div class="stat-item">
+                <div class="stat-num">8</div>
+                <div class="stat-label">Years</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-num">140+</div>
+                <div class="stat-label">Clients</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-num">4.9★</div>
+                <div class="stat-label">Rating</div>
+              </div>
+            </div>
+            <div class="cta-row">
+              <div class="btn-primary">Book a Session</div>
+              <div class="btn-secondary">Message</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="section-card">
+            <h3>Packages</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div class="package-item">
+                <div class="pkg-name">Starter — $299/mo</div>
+                <div class="pkg-desc">4 sessions, nutrition basics</div>
+              </div>
+              <div class="package-item">
+                <div class="pkg-name">Elite — $599/mo</div>
+                <div class="pkg-desc">8 sessions, full programming</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <h3>Specialties</h3>
+            <div class="specialty-chips">
+              <span class="chip">Strength Training</span>
+              <span class="chip">Weight Loss</span>
+              <span class="chip">Corporate Wellness</span>
+              <span class="chip">HIIT</span>
+            </div>
+          </div>
+
+          <div class="section-card full">
+            <h3>About</h3>
+            <div class="bio-text">NYC-based NASM-certified trainer with 8 years helping busy professionals build strength without sacrificing their schedule. I specialize in efficient, science-backed programming that fits real life — not just the gym floor.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OPTION C ===== -->
+<div class="option-section">
+  <div class="option-label">
+    <div class="badge">Option C — Recommended</div>
+    <h2>Full-Bleed Hero + Content Shelf</h2>
+    <p>A cinematic full-width photo header with identity anchored at the bottom-left (like Airbnb/Dribbble profiles). Below: a three-column content grid. CTAs float in the hero alongside the name. Maximally desktop-native.</p>
+    <div class="pros-cons">
+      <span class="recommended-badge">★ Recommended</span>
+    </div>
+    <div class="pros-cons">
+      <span class="pro">✓ Most desktop-native feel</span>
+      <span class="pro">✓ Photo used dramatically, not as a bg texture</span>
+      <span class="pro">✓ Real content grid below</span>
+      <span class="con">✗ Bigger visual change</span>
+    </div>
+  </div>
+
+  <div style="padding: 0 24px;">
+    <div class="mockup-c">
+      <div class="hero-banner">
+        <div class="hero-content">
+          <div class="avatar-sm"></div>
+          <div class="hero-text">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <span class="cert-badge">NASM-CPT</span>
+              <span style="font-size: 13px; color: rgba(255,255,255,0.5);">✓ Verified</span>
+            </div>
+            <div class="trainer-name">Marcus Williams</div>
+            <div class="hero-meta">
+              <span>📍 Upper East Side, NYC</span>
+              <span>8 years experience</span>
+              <span>4.9★ rating</span>
+            </div>
+          </div>
+          <div class="hero-ctas">
+            <div class="btn-primary">Book a Session</div>
+            <div class="btn-secondary">Message Marcus</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-shelf">
+        <div class="section-card wide">
+          <h3>Packages</h3>
+          <div class="package-grid">
+            <div class="package-item">
+              <div class="pkg-name">Starter</div>
+              <div class="pkg-price">$299/mo</div>
+              <div class="pkg-desc">4 sessions, nutrition basics, check-in support</div>
+            </div>
+            <div class="package-item">
+              <div class="pkg-name">Elite</div>
+              <div class="pkg-price">$599/mo</div>
+              <div class="pkg-desc">8 sessions, full programming, weekly calls</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h3>Specialties</h3>
+          <div class="specialty-chips" style="flex-direction: column;">
+            <span class="chip">Strength Training</span>
+            <span class="chip">Weight Loss</span>
+            <span class="chip">Corporate Wellness</span>
+          </div>
+        </div>
+
+        <div class="section-card wide">
+          <h3>About Marcus</h3>
+          <div class="bio-text">NYC-based NASM-certified trainer with 8 years helping busy professionals build strength without sacrificing their schedule. I specialize in efficient, science-backed programming that fits real life — not just the gym floor.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

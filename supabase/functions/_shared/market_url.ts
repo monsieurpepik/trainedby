@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Market-Aware URL Builder
+ * TrainedBy  -  Market-Aware URL Builder
  * ─────────────────────────────────────────────────────────────────────────────
  * Replaces all hardcoded trainedby.ae URLs in edge functions with
  * dynamic, market-aware equivalents.
@@ -83,4 +83,9 @@ export function getJoinUrl(market: string, refSlug?: string): string {
 /** Detect market from a trainer row (falls back to 'ae') */
 export function getTrainerMarket(trainer: { market?: string }): string {
   return trainer.market ?? 'ae';
+}
+
+/** Build the edit profile URL for a given market */
+export function getEditUrl(market: string): string {
+  return `${getMarketBaseUrl(market)}/edit`;
 }

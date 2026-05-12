@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "trainedby-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev", "--port", "4323"],
+      "port": 4323
+    },
+    {
+      "name": "design-companion",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "63751", "--directory", "/tmp/trainedby-design"],
+      "port": 63751
+    }
+  ]
+}

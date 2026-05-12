@@ -1,5 +1,5 @@
 /**
- * TrainedBy — Health Check Endpoint
+ * TrainedBy  -  Health Check Endpoint
  * GET /functions/v1/health
  *
  * Returns platform status, version, and uptime.
@@ -12,7 +12,7 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'apikey, Authorization, Content-Type',
 };
 
-const VERSION = '1.3.0'; // Week 3 — YC-ready release
+const VERSION = '1.3.0'; // Week 3  -  YC-ready release
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -28,7 +28,7 @@ Deno.serve(async (req: Request) => {
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
 
-  // Lightweight DB ping — check trainers table is accessible
+  // Lightweight DB ping  -  check trainers table is accessible
   let dbStatus = 'unknown';
   let dbLatencyMs = 0;
   try {

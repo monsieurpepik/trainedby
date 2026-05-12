@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #EDEBE8;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  gap: 48px;
+}
+
+/* ── PAGE LABEL ── */
+.title { font-size: 13px; color: #6B6460; text-align: center; letter-spacing: -0.01em; }
+.title strong { color: #111; }
+
+/* ── HERO CONTEXT PANEL ── */
+.panel {
+  background: #F5F4F3;
+  border-radius: 24px;
+  padding: 48px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+/* ── THE CARD ── */
+.card {
+  width: 240px;
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 3/4;
+  cursor: pointer;
+  /* No border. No shadow. The photo does everything. */
+}
+
+/* Full-bleed photo layer */
+.card-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.4s ease;
+}
+.card:hover .card-bg { transform: scale(1.03); }
+
+/* Bottom gradient overlay — lets text read on any photo */
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 30%,
+    rgba(0,0,0,0.15) 55%,
+    rgba(0,0,0,0.70) 100%
+  );
+}
+
+/* Top: verified badge */
+.card-top {
+  position: absolute;
+  top: 14px; left: 14px; right: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 100px;
+  padding: 5px 10px;
+  font-size: 10px; font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+.badge-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #00C853;
+}
+
+/* Bottom: name, meta, price + CTA */
+.card-bottom {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 20px 18px 20px;
+}
+.card-name {
+  font-weight: 700;
+  font-size: 17px;
+  color: #fff;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.card-meta {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin-bottom: 14px;
+}
+.card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.card-price {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: -0.02em;
+}
+.card-price span {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.55);
+}
+.card-cta {
+  background: #fff;
+  color: #111;
+  border: none;
+  border-radius: 100px;
+  padding: 9px 18px;
+  font-family: 'DM Sans', system-ui;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── CARD VARIANTS ── */
+
+/* With real photo simulation: warm athletic gradient */
+.photo-a .card-bg {
+  background: linear-gradient(160deg, #2c1810 0%, #8B4513 30%, #D2691E 55%, #FF6B35 75%, #FFB347 100%);
+}
+
+/* No photo: brand gradient fallback */
+.photo-b .card-bg {
+  background: linear-gradient(160deg, #1a0a04 0%, #7a2d00 40%, #FF5C00 70%, #ff8c42 100%);
+}
+
+/* Cool/studio tone */
+.photo-c .card-bg {
+  background: linear-gradient(160deg, #0f0f14 0%, #1a1a2e 35%, #2d2d44 60%, #4a4060 85%, #6b5b7e 100%);
+}
+
+/* ── DOTS ── */
+.dots {
+  display: flex; gap: 5px; justify-content: center;
+  margin-top: 16px;
+}
+.dot { height: 3px; border-radius: 100px; }
+.dot.on { width: 22px; background: #111; }
+.dot.off { width: 6px; background: rgba(0,0,0,0.15); }
+
+/* ── GRID: multiple cards ── */
+.cards-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+.card-sm {
+  width: 180px;
+  border-radius: 18px;
+}
+
+/* ── NOTE ── */
+.note {
+  max-width: 560px;
+  font-size: 13px;
+  color: #6B6460;
+  line-height: 1.7;
+  text-align: center;
+}
+.note strong { color: #111; }
+</style>
+</head>
+<body>
+
+<div class="title">
+  <strong>Full-bleed editorial card</strong><br>
+  Photo IS the card. UI floats on top. Linktree approach.
+</div>
+
+<!-- Hero panel — single card, with photo -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:400px">
+  <div style="font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:#9B9490">Hero right panel</div>
+  <div class="panel">
+    <div>
+      <div class="card photo-a">
+        <div class="card-bg"></div>
+        <div class="card-overlay"></div>
+        <div class="card-top">
+          <div class="badge">
+            <div class="badge-dot"></div>
+            REPs Verified
+          </div>
+        </div>
+        <div class="card-bottom">
+          <div class="card-name">Sarah Al-Mansoori</div>
+          <div class="card-meta">Strength & HIIT · Dubai Marina</div>
+          <div class="card-row">
+            <div class="card-price">AED 350 <span>/ session</span></div>
+            <button class="card-cta">View profile</button>
+          </div>
+        </div>
+      </div>
+      <div class="dots">
+        <div class="dot on"></div>
+        <div class="dot off"></div>
+        <div class="dot off"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Grid: how multiple cards look together (trainer listing) -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:16px;width:100%">
+  <div style="font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:#9B9490">Trainer grid — same card, smaller</div>
+  <div class="cards-row">
+    <div class="card card-sm photo-a">
+      <div class="card-bg"></div>
+      <div class="card-overlay"></div>
+      <div class="card-top">
+        <div class="badge"><div class="badge-dot"></div>REPs</div>
+      </div>
+      <div class="card-bottom" style="padding:14px">
+        <div class="card-name" style="font-size:13px;margin-bottom:2px">Sarah A.</div>
+        <div class="card-meta" style="font-size:11px;margin-bottom:10px">Strength · Dubai</div>
+        <div class="card-price" style="font-size:12px">AED 350 <span>/ session</span></div>
+      </div>
+    </div>
+    <div class="card card-sm photo-c">
+      <div class="card-bg"></div>
+      <div class="card-overlay"></div>
+      <div class="card-top">
+        <div class="badge"><div class="badge-dot"></div>REPs</div>
+      </div>
+      <div class="card-bottom" style="padding:14px">
+        <div class="card-name" style="font-size:13px;margin-bottom:2px">Marcus T.</div>
+        <div class="card-meta" style="font-size:11px;margin-bottom:10px">Boxing · JBR</div>
+        <div class="card-price" style="font-size:12px">AED 420 <span>/ session</span></div>
+      </div>
+    </div>
+    <div class="card card-sm photo-b">
+      <div class="card-bg"></div>
+      <div class="card-overlay"></div>
+      <div class="card-top">
+        <div class="badge"><div class="badge-dot"></div>REPs</div>
+      </div>
+      <div class="card-bottom" style="padding:14px">
+        <div class="card-name" style="font-size:13px;margin-bottom:2px">Aisha K.</div>
+        <div class="card-meta" style="font-size:11px;margin-bottom:10px">Yoga · DIFC</div>
+        <div class="card-price" style="font-size:12px">AED 280 <span>/ session</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>What changed:</strong> The card has no photo area + body split anymore. The trainer photo fills the entire card edge-to-edge. Name and price overlay at the bottom via a gradient scrim. The badge is frosted glass (backdrop-blur). This is the Linktree pattern — and why those cards feel alive vs Bootstrap components. Real trainer photos will replace the gradients and make this spectacular.
+</div>
+
+</body>
+</html>

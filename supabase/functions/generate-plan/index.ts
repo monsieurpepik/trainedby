@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getLocale, getPersona, getMarket } from '../_shared/locale.ts';
+import { getProfileUrl } from '../_shared/market_url.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -136,7 +137,7 @@ You are creating professional, personalised ${market.language}-language fitness 
 You produce structured, actionable plans that trainers can deliver to their clients with their own branding.
 ${!isEnglish ? `CRITICAL: Your ENTIRE response including all JSON string values must be in ${market.language}. Translate all labels, descriptions, meal names, exercise names, and tips into ${market.language}.` : ''}
 Always include specific foods common in ${market.country} (${localFoodStr}) when relevant.
-Format your response as valid JSON only — no markdown, no explanation outside the JSON.`;
+Format your response as valid JSON only  -  no markdown, no explanation outside the JSON.`;
 
     const userPrompt = `Create a ${type === "both" ? "combined diet and workout" : type} plan for:
 - Name: ${name}
@@ -239,7 +240,10 @@ Return a JSON object with this exact structure:
         research_grounded: !!perplexityContext,
         tdee_calculated: tdee,
         target_calories: targetCalories,
-        trainer_profile_url: trainer_slug ? `https://trainedby.ae/${trainer_slug}` : null,
+        trainer_profile_url: trainer_slug ? getProfileUrl(
+          ({ 'en-ae': 'ae', 'en-uk': 'uk', 'en-us': 'com', 'en-in': 'in', 'fr': 'fr', 'it': 'it', 'es': 'es' } as Record<string, string>)[market.locale] ?? 'ae',
+          trainer_slug,
+        ) : null,
       },
     };
 

@@ -1,16 +1,26 @@
 ---
 interface Props {
-  variant?: 'landing' | 'app' | 'consumer';
+  variant?: 'landing' | 'app' | 'consumer' | 'minimal';
   activePage?: string;
 }
 const { variant = 'landing', activePage = '' } = Astro.props;
 ---
 
-{variant === 'consumer' ? (
+{variant === 'minimal' ? (
+  <header class="minimal-header">
+    <a href="/" class="nav-logo" aria-label="Home">
+      <span style="font-family:'DM Sans',sans-serif;font-weight:900;font-size:20px;text-decoration:none;color:var(--text);">
+        Trained<span style="color:var(--brand)">By</span><span
+          style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:2px;vertical-align:middle;margin-bottom:3px"
+        ></span>
+      </span>
+    </a>
+  </header>
+) : variant === 'consumer' ? (
   <!-- Consumer homepage nav: Find a Trainer focus -->
   <nav class="nav" id="nav">
-    <a href="/landing" class="nav-logo" data-brand-name>
-      <span>Trained<span style="color:#fff">By</span></span><span
+    <a href="/" class="nav-logo" data-brand-name>
+      <span>Trained<span style="color:var(--nav-logo-by,#fff)">By</span></span><span
         style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:2px;vertical-align:middle;margin-bottom:3px"
       ></span>
     </a>
@@ -25,8 +35,8 @@ const { variant = 'landing', activePage = '' } = Astro.props;
 ) : variant === 'landing' ? (
   <!-- For-trainers / SaaS nav -->
   <nav class="nav" id="nav">
-    <a href="/landing" class="nav-logo" data-brand-name>
-      <span>Trained<span style="color:#fff">By</span></span><span
+    <a href="/" class="nav-logo" data-brand-name>
+      <span>Trained<span style="color:var(--nav-logo-by,#fff)">By</span></span><span
         style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:2px;vertical-align:middle;margin-bottom:3px"
       ></span>
     </a>
@@ -40,8 +50,8 @@ const { variant = 'landing', activePage = '' } = Astro.props;
   </nav>
 ) : (
   <header class="app-header">
-    <a href="/landing" class="nav-logo" style="font-family:'Manrope',sans-serif;font-weight:900;font-size:18px;color:var(--brand);text-decoration:none;">
-      <span data-brand-name>Trained<span style="color:#fff">By</span></span>
+    <a href="/" class="nav-logo" style="font-family:'DM Sans',sans-serif;font-weight:900;font-size:18px;color:var(--brand);text-decoration:none;">
+      <span data-brand-name>Trained<span style="color:var(--nav-logo-by,#fff)">By</span></span>
     </a>
     <div class="header-nav">
       <a href="/edit" class={`nav-edit${activePage === 'edit' ? ' active' : ''}`}>Edit</a>
@@ -53,13 +63,21 @@ const { variant = 'landing', activePage = '' } = Astro.props;
 <style>
   .nav-for-trainers { color: var(--brand) !important; font-weight: 700 !important; }
   .nav-for-trainers:hover { opacity: 0.8; }
+  .minimal-header {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
 </style>
 
-<script>
-  const nav = document.getElementById('nav');
-  if (nav) {
-    window.addEventListener('scroll', () => {
-      nav.classList.toggle('scrolled', window.scrollY > 20);
-    }, { passive: true });
-  }
-</script>
+{(variant === 'consumer' || variant === 'landing') && (
+  <script>
+    const nav = document.getElementById('nav');
+    if (nav) {
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 20);
+      }, { passive: true });
+    }
+  </script>
+)}

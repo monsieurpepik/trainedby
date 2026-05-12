@@ -77,7 +77,7 @@ serve(async (req) => {
       } else if (market === "uk") {
         stillActive = await checkRepsUK(trainer.reps_number);
       } else {
-        // India / global certs — skip automated re-check, require manual review annually
+        // India / global certs  -  skip automated re-check, require manual review annually
         results.skipped++;
         continue;
       }
@@ -131,7 +131,7 @@ serve(async (req) => {
       if (results.lapsedTrainers.length > 0) {
         msg += `\n*Lapsed Trainers:*\n`;
         for (const t of results.lapsedTrainers.slice(0, 10)) {
-          msg += `— ${t.name} (${t.market.toUpperCase()}) \`${t.certNumber}\`\n`;
+          msg += ` -  ${t.name} (${t.market.toUpperCase()}) \`${t.certNumber}\`\n`;
         }
         if (results.lapsedTrainers.length > 10) {
           msg += `...and ${results.lapsedTrainers.length - 10} more. See /admin for full list.`;

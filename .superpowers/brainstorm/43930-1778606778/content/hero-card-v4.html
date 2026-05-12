@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #111111;
+  --canvas: #ffffff;
+  --soft-cloud: #F5F4F3;
+  --hairline: #E0DDD9;
+  --mute: #9B9490;
+  --charcoal: #6B6460;
+  --brand: #FF5C00;
+  --success: #00A844;
+}
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #FAFAF9;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56px 24px;
+  gap: 56px;
+  min-height: 100vh;
+}
+
+/* ─── CONTEXT: how it sits in the hero ─── */
+.hero-demo {
+  width: 100%;
+  max-width: 700px;
+  background: var(--soft-cloud);
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  padding: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── THE CARD ─── */
+.card {
+  width: 260px;
+  background: var(--canvas);
+  /* NO border. NO shadow. Nike: product cards are borderless. */
+  /* Definition comes from image area bg vs canvas, and panel bg vs canvas. */
+}
+
+.card-photo {
+  background: var(--soft-cloud);
+  aspect-ratio: 3 / 2;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* When a real photo loads, it replaces everything — fills edge to edge */
+.card-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-avatar {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: var(--canvas);
+  /* Just a hairline on the avatar circle only, not the card */
+  border: 1px solid rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: 18px;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+}
+
+.card-badge {
+  position: absolute;
+  top: 10px; left: 10px;
+  background: var(--canvas);
+  /* hairline on the badge only */
+  border: 1px solid rgba(0,0,0,0.10);
+  padding: 4px 9px;
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600; color: var(--ink);
+}
+.card-badge-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+}
+
+/* Body: separated from image by a hairline — like Nike's row/section separators */
+.card-body {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--hairline);
+  background: var(--canvas);
+}
+
+.card-name {
+  font-weight: 600; font-size: 15px;
+  color: var(--ink);
+  letter-spacing: -0.025em;
+  margin-bottom: 3px;
+  line-height: 1.25;
+}
+.card-meta {
+  font-size: 12px; color: var(--mute);
+  font-weight: 400; letter-spacing: -0.01em;
+  margin-bottom: 14px;
+}
+.card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--hairline);
+  padding-top: 12px;
+}
+.card-price {
+  font-weight: 600; font-size: 14px;
+  color: var(--ink); letter-spacing: -0.02em;
+}
+.card-price span { font-size: 11px; font-weight: 400; color: var(--mute); }
+.card-btn {
+  background: var(--ink); color: var(--canvas);
+  border: none; border-radius: 9999px;
+  padding: 9px 17px;
+  font-family: 'DM Sans', system-ui;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: -0.01em; cursor: pointer;
+}
+
+/* Dots: flat bars, no radius — Nike style */
+.dots {
+  display: flex; gap: 5px; justify-content: center; margin-top: 14px;
+}
+.dot { height: 2px; }
+.dot.on { width: 22px; background: var(--ink); }
+.dot.off { width: 6px; background: var(--hairline); }
+
+/* ─── ANNOTATION ─── */
+.note {
+  max-width: 560px;
+  font-size: 13px; color: var(--charcoal);
+  line-height: 1.7;
+  border-top: 1px solid var(--hairline);
+  padding-top: 20px;
+  width: 100%;
+}
+.note strong { color: var(--ink); }
+
+.label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--mute); text-align: center;
+}
+
+/* ─── WITH PHOTO ─── */
+.with-photo .card-photo {
+  background: #C8C0B5; /* warm mid-tone, simulates a real trainer photo */
+}
+.with-photo .card-photo::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.15) 100%);
+}
+
+.col { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.compare { display: flex; gap: 48px; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+</style>
+</head>
+<body>
+
+<div style="text-align:center">
+  <div style="font-size:17px;font-weight:700;color:var(--ink);letter-spacing:-0.03em;margin-bottom:6px">No border. No shadow.</div>
+  <div style="font-size:13px;color:var(--mute)">Nike product cards: definition from bg contrast only. The soft-cloud image area against white canvas is the card edge.</div>
+</div>
+
+<div class="compare">
+
+  <!-- No photo yet (initials) -->
+  <div class="col">
+    <div class="label">No photo yet</div>
+    <div class="hero-demo">
+      <div>
+        <div class="card">
+          <div class="card-photo">
+            <div class="card-badge"><div class="card-badge-dot"></div>REPs Verified</div>
+            <div class="card-avatar">SA</div>
+          </div>
+          <div class="card-body">
+            <div class="card-name">Sarah Al-Mansoori</div>
+            <div class="card-meta">Strength & HIIT · Dubai Marina</div>
+            <div class="card-footer">
+              <div class="card-price">AED 350 <span>/ session</span></div>
+              <button class="card-btn">View profile</button>
+            </div>
+          </div>
+        </div>
+        <div class="dots">
+          <div class="dot on"></div><div class="dot off"></div><div class="dot off"></div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--mute);text-align:center;max-width:200px;line-height:1.5">
+      Soft-cloud panel bg separates card from hero. Card has no border.
+    </div>
+  </div>
+
+  <!-- With photo -->
+  <div class="col">
+    <div class="label" style="color:var(--brand)">With trainer photo</div>
+    <div class="hero-demo with-photo">
+      <div>
+        <div class="card">
+          <div class="card-photo">
+            <div class="card-badge"><div class="card-badge-dot"></div>REPs Verified</div>
+            <!-- simulated photo fill -->
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:52px;opacity:0.4">🏃‍♀️</div>
+          </div>
+          <div class="card-body">
+            <div class="card-name">Sarah Al-Mansoori</div>
+            <div class="card-meta">Strength & HIIT · Dubai Marina</div>
+            <div class="card-footer">
+              <div class="card-price">AED 350 <span>/ session</span></div>
+              <button class="card-btn">View profile</button>
+            </div>
+          </div>
+        </div>
+        <div class="dots">
+          <div class="dot on"></div><div class="dot off"></div><div class="dot off"></div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--mute);text-align:center;max-width:200px;line-height:1.5">
+      Photo fills edge-to-edge. Card becomes invisible — photo is everything.
+    </div>
+  </div>
+
+</div>
+
+<div class="note">
+  <strong>What changed:</strong> The card has zero border and zero shadow. The only border in the entire card is: (1) a hairline between image and body <code style="font-size:11px;background:var(--soft-cloud);padding:1px 5px">border-top: 1px solid #E0DDD9</code>, (2) the same between body and price row, and (3) a hairline on the badge and avatar circle — never on the card shell itself. This is exactly how Nike product cards work. The hero panel background (soft-cloud) creates the visual separation from the white card canvas.
+</div>
+
+<div style="font-size:13px;color:var(--mute);text-align:center">Does this feel right now?</div>
+
+</body>
+</html>

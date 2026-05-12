@@ -1,0 +1,42 @@
+<h2>How does a trainer set their availability?</h2>
+<p class="subtitle">This determines how consumers see open slots and how complex the trainer setup is</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Weekly recurring slots</h3>
+      <p>Trainer picks which days and hours they're available each week. Repeats automatically. A consumer sees "Tuesday 9am, Tuesday 10am, Thursday 2pm…"</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>5-minute setup</li><li>No third-party auth</li><li>Simple to display</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Trainer must manually block holidays</li><li>No sync with their real calendar</li></ul></div>
+      </div>
+      <p style="margin-top:12px;font-size:12px;color:#FF5C00;font-weight:700;">→ Recommended for v1</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Google Calendar sync</h3>
+      <p>Trainer connects Google Calendar via OAuth. Availability is derived from their free/busy. Bookings appear as events automatically.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Zero double-booking risk</li><li>Real-time accuracy</li><li>Familiar to trainers</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>OAuth integration (2-3 weeks extra)</li><li>Google API quota management</li><li>Trainer must have Google account</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Weekly slots + manual overrides</h3>
+      <p>Recurring weekly schedule as a base, but trainer can block specific dates (vacations, sick days) and add one-off slots without changing the pattern.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Flexible without full calendar sync</li><li>Handles holidays cleanly</li><li>Still no OAuth required</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Slightly more complex UI</li><li>~1 extra week to build vs A</li></ul></div>
+      </div>
+      <p style="margin-top:12px;font-size:12px;color:#FF5C00;font-weight:700;">→ Best long-term without Google dependency</p>
+    </div>
+  </div>
+</div>

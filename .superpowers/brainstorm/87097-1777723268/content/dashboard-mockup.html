@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #E8E5E2; font-family: 'DM Sans', system-ui, sans-serif; color: #1A1411; padding: 24px; }
+  .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #6B6460; margin-bottom: 12px; text-align: center; }
+
+  .browser { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.12); max-width: 960px; margin: 0 auto; }
+  .browser-bar { background: #F5F4F3; padding: 10px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #E8E5E2; }
+  .browser-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .browser-url { flex: 1; background: #fff; border-radius: 6px; padding: 4px 10px; font-size: 11px; color: #6B6460; margin: 0 10px; border: 1px solid #E8E5E2; }
+
+  .page { background: #FAFAF9; min-height: 420px; }
+
+  /* Top nav with tabs */
+  .dash-nav { background: #fff; border-bottom: 1px solid rgba(0,0,0,0.07); padding: 0 32px; display: flex; align-items: center; height: 52px; gap: 0; }
+  .dash-logo { font-weight: 800; font-size: 15px; color: #1A1411; letter-spacing: -0.03em; margin-right: 32px; flex-shrink: 0; }
+  .tabs { display: flex; gap: 0; flex: 1; height: 100%; }
+  .tab { padding: 0 16px; font-size: 13px; font-weight: 500; color: #6B6460; display: flex; align-items: center; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
+  .tab.active { color: #1A1411; font-weight: 700; border-bottom-color: #1A1411; }
+  .tab-badge { background: #1A1411; color: #fff; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 10px; margin-left: 5px; }
+  .dash-right { margin-left: auto; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .dash-avatar { width: 30px; height: 30px; border-radius: 50%; background: #F5F4F3; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #1A1411; border: 1px solid rgba(0,0,0,0.08); }
+  .dash-profile-link { font-size: 12px; color: #FF5C00; font-weight: 700; }
+
+  /* Content */
+  .content { padding: 28px 32px; }
+  .greeting { font-size: 20px; font-weight: 800; color: #1A1411; letter-spacing: -0.03em; margin-bottom: 4px; }
+  .greeting-sub { font-size: 13px; color: #6B6460; margin-bottom: 24px; }
+
+  /* Stats row */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: #fff; border: 1px solid rgba(0,0,0,0.07); border-radius: 14px; padding: 18px; }
+  .stat-card.highlight { background: #1A1411; border-color: #1A1411; }
+  .stat-label { font-size: 11px; font-weight: 600; color: #6B6460; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .stat-card.highlight .stat-label { color: rgba(255,255,255,0.5); }
+  .stat-val { font-size: 26px; font-weight: 800; color: #1A1411; letter-spacing: -0.04em; line-height: 1; margin-bottom: 4px; }
+  .stat-card.highlight .stat-val { color: #fff; }
+  .stat-delta { font-size: 11px; color: #00C853; font-weight: 600; }
+
+  /* Two-col layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .panel { background: #fff; border: 1px solid rgba(0,0,0,0.07); border-radius: 14px; padding: 18px; }
+  .panel-title { font-size: 13px; font-weight: 700; color: #1A1411; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+  .panel-link { font-size: 11px; color: #6B6460; font-weight: 500; }
+
+  /* Session rows */
+  .session-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+  .session-row:last-child { border-bottom: none; }
+  .session-time { font-size: 10px; font-weight: 700; color: #6B6460; min-width: 60px; }
+  .session-name { font-size: 12px; font-weight: 600; color: #1A1411; flex: 1; }
+  .session-spec { font-size: 11px; color: #6B6460; }
+  .session-dot { width: 6px; height: 6px; border-radius: 50%; background: #00C853; flex-shrink: 0; }
+
+  /* Message rows */
+  .msg-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+  .msg-row:last-child { border-bottom: none; }
+  .msg-avatar { width: 28px; height: 28px; border-radius: 50%; background: #F5F4F3; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #1A1411; flex-shrink: 0; }
+  .msg-body { flex: 1; min-width: 0; }
+  .msg-name { font-size: 12px; font-weight: 700; color: #1A1411; }
+  .msg-preview { font-size: 11px; color: #6B6460; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .msg-time { font-size: 10px; color: #6B6460; flex-shrink: 0; }
+  .msg-unread { width: 7px; height: 7px; border-radius: 50%; background: #1A1411; flex-shrink: 0; margin-top: 4px; }
+
+  /* Profile completion */
+  .profile-bar-wrap { margin-top: 6px; }
+  .profile-bar-track { background: #F5F4F3; border-radius: 100px; height: 6px; margin: 8px 0; }
+  .profile-bar-fill { background: #1A1411; border-radius: 100px; height: 6px; width: 72%; }
+  .profile-items { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .profile-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6B6460; }
+  .profile-item.done { color: #1A1411; }
+  .check { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0; }
+  .check.done { background: #1A1411; color: #fff; }
+  .check.todo { border: 1px solid rgba(0,0,0,0.15); color: transparent; }
+
+  .mobile-note { background: #F5F4F3; border-top: 1px solid #E8E5E2; padding: 12px 32px; font-size: 11px; color: #6B6460; display: flex; align-items: center; gap: 8px; }
+</style>
+</head>
+<body>
+
+<p class="label">Trainer Dashboard — desktop mockup (960px)</p>
+
+<div class="browser">
+  <div class="browser-bar">
+    <div class="browser-dot" style="background:#FF5F57;"></div>
+    <div class="browser-dot" style="background:#FFBD2E;"></div>
+    <div class="browser-dot" style="background:#28C840;"></div>
+    <div class="browser-url">trainedby.ae/dashboard</div>
+  </div>
+
+  <div class="page">
+
+    <!-- Top nav + tabs -->
+    <nav class="dash-nav">
+      <span class="dash-logo">TrainedBy</span>
+      <div class="tabs">
+        <div class="tab active">Overview</div>
+        <div class="tab">Bookings</div>
+        <div class="tab">Messages <span class="tab-badge">3</span></div>
+        <div class="tab">Packages</div>
+        <div class="tab">Profile</div>
+        <div class="tab">Settings</div>
+      </div>
+      <div class="dash-right">
+        <a class="dash-profile-link" href="#">View my profile →</a>
+        <div class="dash-avatar">AK</div>
+      </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="greeting">Good morning, Ahmed 👋</div>
+      <div class="greeting-sub">Friday, 2 May 2025 · 2 sessions today</div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card highlight">
+          <div class="stat-label">Revenue this month</div>
+          <div class="stat-val">AED 4,200</div>
+          <div class="stat-delta">↑ 18% vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Bookings</div>
+          <div class="stat-val">12</div>
+          <div class="stat-delta">↑ 3 new this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg rating</div>
+          <div class="stat-val">4.9★</div>
+          <div class="stat-delta" style="color:#6B6460;">From 38 reviews</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Profile views</div>
+          <div class="stat-val">284</div>
+          <div class="stat-delta">↑ 42 this week</div>
+        </div>
+      </div>
+
+      <!-- Two col -->
+      <div class="two-col">
+
+        <!-- Upcoming sessions -->
+        <div class="panel">
+          <div class="panel-title">
+            Today's sessions
+            <span class="panel-link">View all →</span>
+          </div>
+          <div class="session-row">
+            <span class="session-dot"></span>
+            <span class="session-time">9:00 AM</span>
+            <span class="session-name">Sara J.</span>
+            <span class="session-spec">Strength · 60 min</span>
+          </div>
+          <div class="session-row">
+            <span class="session-dot" style="background:#F5F4F3;border:1px solid #ddd;"></span>
+            <span class="session-time">11:00 AM</span>
+            <span class="session-name">Mark R.</span>
+            <span class="session-spec">HIIT · 45 min</span>
+          </div>
+          <div style="margin-top:14px;border-top:1px solid rgba(0,0,0,0.05);padding-top:14px;">
+            <div class="panel-title" style="margin-bottom:10px;">Tomorrow</div>
+            <div class="session-row">
+              <span class="session-dot" style="background:#F5F4F3;border:1px solid #ddd;"></span>
+              <span class="session-time">8:00 AM</span>
+              <span class="session-name">Julia K.</span>
+              <span class="session-spec">Weight Loss · 60 min</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right col: messages + profile -->
+        <div style="display:flex;flex-direction:column;gap:14px;">
+
+          <!-- Messages -->
+          <div class="panel">
+            <div class="panel-title">
+              Messages
+              <span class="panel-link">View all →</span>
+            </div>
+            <div class="msg-row">
+              <div class="msg-unread"></div>
+              <div class="msg-avatar">SJ</div>
+              <div class="msg-body">
+                <div class="msg-name">Sara J.</div>
+                <div class="msg-preview">Can we move Saturday to 10am?</div>
+              </div>
+              <div class="msg-time">2m ago</div>
+            </div>
+            <div class="msg-row">
+              <div class="msg-unread"></div>
+              <div class="msg-avatar">NK</div>
+              <div class="msg-body">
+                <div class="msg-name">Nour K.</div>
+                <div class="msg-preview">Thanks for today's session!</div>
+              </div>
+              <div class="msg-time">1h ago</div>
+            </div>
+            <div class="msg-row">
+              <div style="width:7px;flex-shrink:0;"></div>
+              <div class="msg-avatar">RA</div>
+              <div class="msg-body">
+                <div class="msg-name">Rami A.</div>
+                <div class="msg-preview">Interested in a monthly package</div>
+              </div>
+              <div class="msg-time">3h ago</div>
+            </div>
+          </div>
+
+          <!-- Profile completion -->
+          <div class="panel">
+            <div class="panel-title">Profile completion <span style="font-size:12px;font-weight:600;color:#6B6460;">72%</span></div>
+            <div class="profile-bar-track"><div class="profile-bar-fill"></div></div>
+            <div class="profile-items">
+              <div class="profile-item done"><span class="check done">✓</span> Profile photo uploaded</div>
+              <div class="profile-item done"><span class="check done">✓</span> Bio written</div>
+              <div class="profile-item done"><span class="check done">✓</span> 1 package added</div>
+              <div class="profile-item"><span class="check todo">○</span> Add certifications</div>
+              <div class="profile-item"><span class="check todo">○</span> Connect Stripe for payments</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-note">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B6460" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
+      On mobile: bottom nav bar (existing) — tabs switch to bottom icons. Same data, stacked layout.
+    </div>
+
+  </div>
+</div>
+
+<p style="text-align:center;font-size:11px;color:#6B6460;margin-top:16px;">Does the dashboard layout look right? Reply in terminal.</p>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 /**
- * TrainedBy — In-Memory Rate Limiter
+ * TrainedBy  -  In-Memory Rate Limiter
  * ─────────────────────────────────────────────────────────────────────────────
  * Sliding window rate limiter using Deno's in-memory Map.
  * Suitable for Supabase Edge Functions (single-instance per region).
@@ -19,7 +19,7 @@ interface RateLimitEntry {
   resetAt: number;
 }
 
-// In-memory store — persists for the lifetime of the edge function instance
+// In-memory store  -  persists for the lifetime of the edge function instance
 const store = new Map<string, RateLimitEntry>();
 
 /**
@@ -38,7 +38,7 @@ export function checkRateLimit(
   const entry = store.get(key);
 
   if (!entry || now > entry.resetAt) {
-    // First request or window expired — start fresh
+    // First request or window expired  -  start fresh
     store.set(key, { count: 1, resetAt: now + windowMs });
     return false;
   }

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrainedBy — Native Feel</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: #0b0805;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    color: #fff;
+    display: flex;
+    gap: 64px;
+    padding: 40px;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+
+  /* ── ANNOTATION PANEL ─────────────────────────── */
+  .notes {
+    width: 280px;
+    padding-top: 80px;
+    flex-shrink: 0;
+  }
+  .notes-title {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: #2a2a2a; margin-bottom: 24px;
+  }
+  .note {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #111;
+  }
+  .note:last-child { border-bottom: none; }
+  .note-tag {
+    display: inline-block;
+    font-size: 8px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #D4622A;
+    margin-bottom: 5px;
+  }
+  .note-text {
+    font-size: 12px; color: #555; line-height: 1.55;
+  }
+  .note-text strong { color: #888; }
+
+  /* ── PHONE ────────────────────────────────────── */
+  .phone {
+    width: 375px;
+    min-height: 812px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px #1a1410,
+      0 0 0 8px #0f0c09,
+      0 40px 100px rgba(0,0,0,0.9),
+      0 20px 40px rgba(0,0,0,0.6);
+    flex-shrink: 0;
+    background: #0b0805;
+  }
+
+  /* Notch */
+  .notch {
+    position: absolute;
+    top: 14px; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 34px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+  }
+
+  /* ── STATUS BAR ───────────────────────────────── */
+  .status {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 28px 0;
+    font-size: 12px; font-weight: 600; color: #fff;
+    position: relative; z-index: 10; height: 44px;
+  }
+  .status-time { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+  .status-icons { display: flex; gap: 5px; align-items: center; }
+  .status-icons svg { width: 16px; height: 16px; fill: #fff; }
+
+  /* ── TOP NAV ──────────────────────────────────── */
+  .nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 20px 0;
+    position: relative; z-index: 10;
+  }
+  /* Status + nav live INSIDE the hero now */
+  .status, .nav { position: relative; z-index: 20; }
+  .nav-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; cursor: pointer; color: rgba(255,255,255,0.5);
+  }
+  .nav-wordmark {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: rgba(255,255,255,0.18);
+  }
+
+  /* ── FULL-BLEED HERO ──────────────────────────── */
+  /* Wraps status bar + nav + arc + photo.
+     Atmosphere starts at pixel 0 — true full bleed to top edge. */
+  .hero {
+    position: relative;
+    padding-bottom: 32px;
+    /* No overflow:hidden — arc dots can breathe */
+  }
+
+  /* Atmospheric background — starts at top:0, bleeds to edges */
+  .hero-atmosphere {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 90% 55% at 58% -5%, rgba(180,80,20,0.35) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 45% at 80% 15%, rgba(212,98,42,0.16) 0%, transparent 55%),
+      radial-gradient(ellipse 45% 35% at 15% 8%,  rgba(140,55,10,0.12) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grain */
+  .hero-grain {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 0.04; pointer-events: none; z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ── BANKSY ARC ─────────────────────────── */
+  .arc {
+    position: relative;
+    width: 100%;
+    height: 130px;
+    overflow: visible;
+    z-index: 4;
+  }
+  .arc svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow: visible;
+  }
+
+  /* ── PHOTO ────────────────────────────────────── */
+  .photo-wrap {
+    position: relative;
+    display: flex; justify-content: center;
+    margin-top: -20px;
+    z-index: 10;
+  }
+  .photo-ring {
+    width: 108px; height: 108px;
+    border-radius: 50%;
+    padding: 2.5px;
+    background: conic-gradient(
+      #D4622A 0deg,
+      #ff9c5a 80deg,
+      rgba(212,98,42,0.15) 175deg,
+      rgba(212,98,42,0.05) 260deg,
+      #D4622A 360deg
+    );
+    animation: ring-spin 10s linear infinite;
+    cursor: pointer;
+    position: relative;
+  }
+  @keyframes ring-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .photo-inner {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    /* Important: counter-rotate so face stays upright */
+    animation: ring-spin 10s linear infinite reverse;
+    background: linear-gradient(160deg, #2a1608 0%, #150b04 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .photo-initials {
+    font-family: Georgia, serif;
+    font-size: 34px; font-weight: 400;
+    color: rgba(212,98,42,0.55);
+    letter-spacing: -1px;
+  }
+  /* Play pip */
+  .photo-play {
+    position: absolute;
+    bottom: 4px; right: 4px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #D4622A;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    padding-left: 2px;
+    z-index: 20;
+    box-shadow: 0 2px 8px rgba(212,98,42,0.5);
+  }
+
+  /* ── IDENTITY ─────────────────────────────────── */
+  /* Name is the product — biggest thing on screen */
+  .identity {
+    text-align: center;
+    padding: 20px 24px 0;
+    position: relative; z-index: 10;
+  }
+  .trainer-name {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 32px;
+    font-weight: 400;
+    letter-spacing: -1px;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    position: relative;
+    display: inline-block;
+  }
+  .trainer-name::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 15%; right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212,98,42,0.6) 40%, rgba(255,156,90,0.8) 60%, transparent);
+  }
+
+  .trainer-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.32);
+    letter-spacing: 0.04em;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .trainer-cert { color: rgba(255,255,255,0.28); }
+  .trainer-sep  { color: rgba(255,255,255,0.12); }
+  .trainer-verified {
+    color: #D4622A;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+  .trainer-location {
+    font-size: 11px;
+    color: rgba(255,255,255,0.22);
+    margin-top: 5px;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── QUOTE ────────────────────────────────────── */
+  .quote {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 13px;
+    line-height: 1.65;
+    color: rgba(255,255,255,0.38);
+    text-align: center;
+    padding: 18px 32px 0;
+    position: relative; z-index: 10;
+  }
+
+  /* ── STATS — NO BORDERS ───────────────────────── */
+  /* Just numbers in space. No card, no border. */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 24px 20px 0;
+    position: relative; z-index: 10;
+  }
+  .stat {
+    flex: 1;
+    text-align: center;
+    position: relative;
+  }
+  .stat + .stat::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    height: 24px; width: 1px;
+    background: rgba(255,255,255,0.07);
+  }
+  .stat-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+  .stat-lbl {
+    font-size: 9px;
+    color: rgba(255,255,255,0.22);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  /* ── AVAILABILITY ─────────────────────────────── */
+  /* Not a card — just a subtle inline line */
+  .avail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px 24px 0;
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+    position: relative; z-index: 10;
+  }
+  .avail-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #3d9e57;
+    box-shadow: 0 0 6px rgba(61,158,87,0.5);
+    flex-shrink: 0;
+  }
+  .avail strong { color: rgba(255,255,255,0.65); font-weight: 500; }
+
+  /* ── BUTTONS ──────────────────────────────────── */
+  /* Full-width. No pill radius (pill = 2020 SaaS).
+     Slightly rounded (12px) = modern native. */
+  .ctas {
+    padding: 24px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative; z-index: 10;
+  }
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 15px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    letter-spacing: 0.01em;
+  }
+  .btn-primary {
+    background: #D4622A;
+    color: #fff;
+    box-shadow: 0 4px 24px rgba(212,98,42,0.25);
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.09);
+  }
+  .btn-wa {
+    background: rgba(37,211,102,0.06);
+    color: rgba(37,211,102,0.75);
+    border: 1px solid rgba(37,211,102,0.14);
+    font-size: 13px;
+  }
+
+  /* ── DIVIDER ──────────────────────────────────── */
+  .rule {
+    margin: 28px 24px 0;
+    height: 1px;
+    background: rgba(255,255,255,0.05);
+    position: relative; z-index: 10;
+  }
+
+  /* ── MATCH CARD ───────────────────────────────── */
+  /* No visible card border — ambient warm tint only */
+  .match {
+    margin: 24px 20px 0;
+    padding: 18px 20px;
+    background: rgba(212,98,42,0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(212,98,42,0.1);
+    position: relative; z-index: 10;
+  }
+  .match-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: rgba(212,98,42,0.65);
+    margin-bottom: 8px;
+  }
+  .match-body {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.6;
+  }
+  .match-body strong { color: rgba(255,255,255,0.75); }
+
+  /* ── METHODOLOGY ──────────────────────────────── */
+  /* Just text — no card chrome */
+  .method {
+    padding: 24px 24px 0;
+    position: relative; z-index: 10;
+  }
+  .method-name {
+    font-family: Georgia, serif;
+    font-size: 18px; font-weight: 400;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 6px;
+  }
+  .method-tm {
+    font-family: -apple-system, sans-serif;
+    font-size: 9px; font-weight: 700;
+    color: #D4622A; letter-spacing: 0.06em;
+    vertical-align: super; margin-left: 2px;
+  }
+  .method-desc {
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .method-pills {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .method-pill {
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+  }
+
+  /* ── RESULTS ──────────────────────────────────── */
+  /* Scroll strip — no card chrome, just numbers */
+  .results {
+    padding: 24px 0 0;
+    overflow: hidden;
+    position: relative; z-index: 10;
+  }
+  .results-scroll {
+    display: flex;
+    gap: 1px;
+    overflow-x: auto;
+    padding: 0 20px 4px;
+    scrollbar-width: none;
+  }
+  .results-scroll::-webkit-scrollbar { display: none; }
+  .result {
+    flex-shrink: 0;
+    width: 140px;
+    padding: 16px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 14px;
+    margin-right: 9px;
+  }
+  .result:last-child { margin-right: 0; }
+  .result-metric {
+    font-size: 26px; font-weight: 700;
+    color: #D4622A;
+    letter-spacing: -1.5px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .result-desc {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+  .result-client {
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+  }
+
+  /* ── PACKAGES ─────────────────────────────────── */
+  /* No table. Just rows of text + price — like a menu */
+  .packages {
+    padding: 24px 24px 0;
+    position: relative; z-index: 10;
+  }
+  .pkg {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    cursor: pointer;
+  }
+  .pkg:last-child { border-bottom: none; }
+  .pkg-name {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 400;
+  }
+  .pkg-detail {
+    font-size: 11px;
+    color: rgba(255,255,255,0.22);
+    margin-top: 2px;
+  }
+  .pkg-price {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 500;
+    text-align: right;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+  .pkg-price.enquiry {
+    color: rgba(212,98,42,0.7);
+    font-size: 11px;
+  }
+  .pkg.featured .pkg-name {
+    color: rgba(255,255,255,0.9);
+  }
+  .pkg.featured .pkg-price {
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* Padding at bottom */
+  .spacer { height: 48px; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══ PHONE ═══════════════════════════════════════════ -->
+<div class="phone">
+  <div class="notch"></div>
+
+  <!-- Full-bleed hero — atmosphere starts at pixel 0, wraps status+nav -->
+  <div class="hero">
+    <div class="hero-atmosphere"></div>
+    <div class="hero-grain"></div>
+
+    <!-- Status bar floats ON the atmosphere -->
+    <div class="status">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 17 12"><rect x="0" y="6" width="3" height="6" rx="1"/><rect x="4.5" y="4" width="3" height="8" rx="1"/><rect x="9" y="2" width="3" height="10" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg>
+        <svg viewBox="0 0 16 12"><path d="M8 10.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/><path d="M4.5 7.5a5 5 0 017 0" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M1.5 4.5a9 9 0 0113 0" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 25 12"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#fff" stroke-width="1.3" fill="none"/><rect x="1.5" y="2.5" width="17" height="7" rx="2" fill="#fff"/><path d="M22.5 4.5v3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <!-- Nav floats ON the atmosphere -->
+    <div class="nav">
+      <div class="nav-btn">←</div>
+      <div class="nav-wordmark">TrainedBy</div>
+      <div class="nav-btn">↗</div>
+    </div>
+
+    <!-- Banksy arc — bottom-left to top-right sweep -->
+    <div class="arc">
+      <svg viewBox="0 0 375 130" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="ag" x1="-10" y1="130" x2="395" y2="-10" gradientUnits="userSpaceOnUse">
+            <stop offset="0%"   stop-color="rgba(212,98,42,0)"/>
+            <stop offset="30%"  stop-color="rgba(212,98,42,0.15)"/>
+            <stop offset="68%"  stop-color="rgba(212,98,42,0.52)"/>
+            <stop offset="100%" stop-color="#D4622A"/>
+          </linearGradient>
+        </defs>
+        <!-- Wide gradient body -->
+        <path d="M -10 130 Q 90 95 195 55 Q 295 18 395 -8"
+              stroke="url(#ag)" stroke-width="48" fill="none" stroke-linecap="butt"/>
+        <!-- Shadow depth -->
+        <path d="M -10 130 Q 90 95 195 55 Q 295 18 395 -8"
+              stroke="rgba(11,8,5,0.5)" stroke-width="28" fill="none" stroke-linecap="butt"/>
+        <!-- Bright edge -->
+        <path d="M -10 130 Q 90 95 195 55 Q 295 18 395 -8"
+              stroke="rgba(212,98,42,0.72)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <!-- Paint-splatter dots at tip -->
+        <circle cx="352" cy="6"   r="11"  fill="rgba(212,98,42,0.95)"/>
+        <circle cx="334" cy="18"  r="9"   fill="rgba(212,98,42,0.87)"/>
+        <circle cx="368" cy="0"   r="7.5" fill="rgba(232,120,52,0.92)"/>
+        <circle cx="342" cy="-2"  r="6"   fill="rgba(212,98,42,0.74)"/>
+        <circle cx="320" cy="12"  r="5"   fill="rgba(212,98,42,0.58)"/>
+        <circle cx="330" cy="1"   r="3.5" fill="rgba(212,98,42,0.44)"/>
+        <circle cx="374" cy="10"  r="2.5" fill="rgba(212,98,42,0.36)"/>
+        <circle cx="312" cy="24"  r="2"   fill="rgba(212,98,42,0.28)"/>
+      </svg>
+    </div>
+
+    <!-- Photo -->
+    <div class="photo-wrap">
+      <div class="photo-ring">
+        <div class="photo-inner">
+          <div class="photo-initials">JC</div>
+        </div>
+      </div>
+      <div class="photo-play">▶</div>
+    </div>
+  </div><!-- /hero -->
+
+  <!-- Identity — name leads, everything else recedes -->
+  <div class="identity">
+    <div class="trainer-name">James Crawford</div>
+    <div class="trainer-sub">
+      <span class="trainer-cert">NASM</span>
+      <span class="trainer-sep">·</span>
+      <span class="trainer-cert">ISSA</span>
+      <span class="trainer-sep">·</span>
+      <span class="trainer-verified">✦ Verified</span>
+    </div>
+    <div class="trainer-location">Dubai Marina, UAE</div>
+  </div>
+
+  <!-- Quote -->
+  <div class="quote">
+    Every client who walked through my door came with a goal.<br>Every one who stayed built a standard.
+  </div>
+
+  <!-- Stats — borderless, just numbers in space -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val">12 yrs</div>
+      <div class="stat-lbl">Experience</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">340+</div>
+      <div class="stat-lbl">Clients</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">4.9</div>
+      <div class="stat-lbl">Rating</div>
+    </div>
+  </div>
+
+  <!-- Availability — inline, not a card -->
+  <div class="avail">
+    <div class="avail-dot"></div>
+    <span><strong>2 slots remaining</strong> this week · Tue 7am next</span>
+  </div>
+
+  <!-- CTAs -->
+  <div class="ctas">
+    <button class="btn btn-primary">Request a Consultation</button>
+    <button class="btn btn-secondary">View Programmes &amp; Pricing</button>
+    <button class="btn btn-wa">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Connect on WhatsApp
+    </button>
+  </div>
+
+  <div class="rule"></div>
+
+  <!-- Match card — atmosphere only, no visible border box -->
+  <div class="match">
+    <div class="match-label">Why this trainer fits your goals</div>
+    <div class="match-body">
+      You want to <strong>lose 8kg and build lean muscle</strong>. James specialises in body recomposition for active professionals — 47 documented transformations in 18 months.
+    </div>
+  </div>
+
+  <!-- Methodology — just text, no card -->
+  <div class="method">
+    <div class="method-name">
+      The Foundation Method<span class="method-tm">TM</span>
+    </div>
+    <div class="method-desc">A structured 3-phase approach: movement audit, progressive overload, and habit architecture for long-term performance.</div>
+    <div class="method-pills">
+      <span class="method-pill">Movement Audit</span>
+      <span class="method-pill">Load Progression</span>
+      <span class="method-pill">Habit Architecture</span>
+    </div>
+  </div>
+
+  <!-- Results scroll — minimal, numbers speak -->
+  <div class="results">
+    <div class="results-scroll">
+      <div class="result">
+        <div class="result-metric">−14kg</div>
+        <div class="result-desc">Body recomposition, 16 weeks</div>
+        <div class="result-client">Sarah M. · Lean Athlete</div>
+      </div>
+      <div class="result">
+        <div class="result-metric">+32%</div>
+        <div class="result-desc">Deadlift 1-rep max increase</div>
+        <div class="result-client">David K. · Strength Base</div>
+      </div>
+      <div class="result">
+        <div class="result-metric">8 wks</div>
+        <div class="result-desc">Marathon prep, first-time finish</div>
+        <div class="result-client">Aisha R. · Endurance</div>
+      </div>
+      <div class="result">
+        <div class="result-metric">−9%</div>
+        <div class="result-desc">Body fat, zero muscle loss</div>
+        <div class="result-client">Tom H. · Recomposition</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Packages — menu style, no table -->
+  <div class="packages">
+    <div class="pkg">
+      <div>
+        <div class="pkg-name">Fundamentals</div>
+        <div class="pkg-detail">8 sessions · assessment included</div>
+      </div>
+      <div class="pkg-price">From AED 2,400</div>
+    </div>
+    <div class="pkg featured">
+      <div>
+        <div class="pkg-name">Transformation</div>
+        <div class="pkg-detail">16 weeks · nutrition included</div>
+      </div>
+      <div class="pkg-price">From AED 5,800</div>
+    </div>
+    <div class="pkg">
+      <div>
+        <div class="pkg-name">Elite Performance</div>
+        <div class="pkg-detail">Athletes &amp; executives</div>
+      </div>
+      <div class="pkg-price enquiry">On enquiry</div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+</div>
+
+<!-- ═══ NOTES ══════════════════════════════════════════ -->
+<div class="notes">
+  <div class="notes-title">What changed vs last version</div>
+
+  <div class="note">
+    <div class="note-tag">Palette fixed</div>
+    <div class="note-text"><strong>One background tone: #0b0805.</strong> No more patchwork of #0d0d0d / #0f0f0f / #111 / #1a1a1a. Single warm-black throughout. Shades were the problem.</div>
+  </div>
+
+  <div class="note">
+    <div class="note-tag">Full bleed</div>
+    <div class="note-text"><strong>Hero atmosphere fills edge to edge.</strong> No container borders. The background is the screen — same pattern as Linktree templates.</div>
+  </div>
+
+  <div class="note">
+    <div class="note-tag">Borders gone</div>
+    <div class="note-text"><strong>Stat row, methodology card, result cards — no borders.</strong> Stats are just numbers in space. Hierarchy comes from type scale and opacity, not boxes.</div>
+  </div>
+
+  <div class="note">
+    <div class="note-tag">Packages = menu</div>
+    <div class="note-text"><strong>Packages look like a restaurant menu, not a SaaS pricing table.</strong> Text + price, separated by a hairline. Featured item is brighter, not boxed.</div>
+  </div>
+
+  <div class="note">
+    <div class="note-tag">Name leads</div>
+    <div class="note-text"><strong>No "Verified Professional Trainer" banner.</strong> Name at 32px serif, gradient underline. Verified is a quiet inline mark next to certs.</div>
+  </div>
+
+  <div class="note">
+    <div class="note-tag">Viewer count gone</div>
+    <div class="note-text">Removed. Availability stays (concierge signal) but "6 people viewed" is Groupon energy, not Soho House energy.</div>
+  </div>
+</div>
+
+</body>
+</html>

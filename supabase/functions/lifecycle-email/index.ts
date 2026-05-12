@@ -1,9 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { getProfileUrl, getDashboardUrl, getPricingUrl, getJoinUrl, getMarketBrand, getMarketSupportEmail } from '../_shared/market_url.ts';
-import { captureException } from '../_shared/sentry.ts';
 import { callClaude } from '../_shared/claude.ts';
 import { TRAINEDBY_PERSONA } from '../_shared/voice.ts';
-import { getLocale, getEmailCopy, getPersona, getMarket } from '../_shared/locale.ts';
+import { getMarketBaseUrl, getMarketBrand, getMarketSupportEmail, getDashboardUrl, getPricingUrl, getProfileUrl } from '../_shared/market_url.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,7 +9,6 @@ const corsHeaders = {
 };
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || '';
-// FROM_EMAIL is now locale-aware — set per-send below
 const TELEGRAM_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN') || '';
 const FOUNDER_CHAT_ID = Deno.env.get('FOUNDER_CHAT_ID') || '';
 
@@ -35,6 +32,7 @@ interface Trainer {
   specialties: string[];
   instagram: string;
   created_at: string;
+  market?: string;
 }
 
 function completionScore(t: Trainer): number {
@@ -61,8 +59,8 @@ function getMissingItems(t: Trainer): string[] {
 
 function emailBase(content: string, market = 'ae'): string {
   const brand = getMarketBrand(market);
-  const supportEmail = getMarketSupportEmail(market);
-  const baseUrl = `https://${market === 'ae' ? 'trainedby.ae' : market === 'fr' ? 'coachepar.fr' : market === 'it' ? 'allenaticon.it' : market === 'es' || market === 'mx' ? 'entrenacon.com' : market === 'uk' ? 'trainedby.uk' : market === 'in' ? 'trainedby.in' : 'trainedby.com'}`;
+  const baseUrl = getMarketBaseUrl(market);
+  const domain = baseUrl.replace('https://', '');
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -88,13 +86,13 @@ function emailBase(content: string, market = 'ae'): string {
 </head>
 <body>
 <div class="wrap">
-  <div class="logo">${brand.replace('é', 'é')}</div>
+  <div class="logo">Trained<span>By</span></div>
   <div class="card">
     ${content}
   </div>
   <div class="footer">
-    ${brand}<br>
-    You're receiving this because you signed up at ${baseUrl}<br>
+    ${brand} · Dubai, UAE<br>
+    You're receiving this because you signed up at ${domain}<br>
     <a href="${baseUrl}/unsubscribe" style="color:rgba(255,255,255,0.25)">Unsubscribe</a>
   </div>
 </div>
@@ -102,66 +100,65 @@ function emailBase(content: string, market = 'ae'): string {
 </html>`;
 }
 
-function welcomeEmail(t: Trainer, market = 'ae'): { subject: string; html: string } {
+function welcomeEmail(t: Trainer): { subject: string; html: string } {
+  const market = t.market ?? 'ae';
   const profileUrl = getProfileUrl(market, t.slug);
-  const dashUrl = getDashboardUrl(market);
-  const brand = getMarketBrand(market);
   return {
-    subject: `Welcome to ${brand}, ${t.name.split(' ')[0]}`,
+    subject: `Welcome to TrainedBy, ${t.name.split(' ')[0]}`,
     html: emailBase(`
       <h1>You're in. Now let's get clients finding you.</h1>
       <p>Your TrainedBy profile is live at <a href="${profileUrl}" style="color:#FF5C00">${profileUrl}</a>.</p>
       <p>Trainers with complete profiles get <span class="highlight">5× more leads</span> than those with empty ones. Here's what to do in the next 10 minutes:</p>
       <ul class="checklist">
-        <li>Add a clear profile photo (not a gym selfie — face forward, good lighting)</li>
+        <li>Add a clear profile photo (not a gym selfie  -  face forward, good lighting)</li>
         <li>Write a 2-sentence bio that says who you help and how</li>
         <li>Add your REPs UAE number to get the verified badge</li>
         <li>Set your session packages so clients know your rates</li>
       </ul>
-      <a href="${dashUrl}" class="btn">Complete Your Profile →</a>
+      <a href="${getDashboardUrl(market)}" class="btn">Complete Your Profile →</a>
       <hr class="divider">
       <p style="font-size:12px">Any questions? Just reply to this email. A real person reads every response.</p>
-    `)
+    `, market)
   };
 }
 
-function nudgeEmail(t: Trainer, market = 'ae'): { subject: string; html: string } {
-  const dashUrl = getDashboardUrl(market);
+function nudgeEmail(t: Trainer): { subject: string; html: string } {
+  const market = t.market ?? 'ae';
   const missing = getMissingItems(t);
   const pct = completionScore(t);
   return {
     subject: `${t.name.split(' ')[0]}, your profile is ${pct}% complete`,
     html: emailBase(`
       <h1>You're ${pct}% there.</h1>
-      <p>Your TrainedBy profile is live but not yet working hard for you. Clients who find you right now see an incomplete profile — and they move on.</p>
+      <p>Your TrainedBy profile is live but not yet working hard for you. Clients who find you right now see an incomplete profile  -  and they move on.</p>
       ${missing.length > 0 ? `
       <p>You're still missing:</p>
       <ul class="checklist">
         ${missing.map(m => `<li>${m}</li>`).join('')}
       </ul>` : ''}
       <p>Takes less than 5 minutes. Do it now while it's fresh.</p>
-      <a href="${dashUrl}" class="btn">Finish Your Profile →</a>
-    `)
+      <a href="${getDashboardUrl(market)}" class="btn">Finish Your Profile →</a>
+    `, market)
   };
 }
 
-function firstLeadEmail(t: Trainer, leadName: string, market = 'ae'): { subject: string; html: string } {
-  const dashUrl = getDashboardUrl(market);
+function firstLeadEmail(t: Trainer, leadName: string): { subject: string; html: string } {
+  const market = t.market ?? 'ae';
   return {
     subject: `You just got your first lead on TrainedBy`,
     html: emailBase(`
       <h1>First lead. That's how it starts.</h1>
       <p><span class="highlight">${leadName}</span> just reached out through your TrainedBy profile. They're interested in working with you.</p>
-      <p>Reply within the hour. The trainers who convert leads are the ones who respond fast — not the ones with the best credentials.</p>
-      <a href="${dashUrl}" class="btn">View Your Leads →</a>
+      <p>Reply within the hour. The trainers who convert leads are the ones who respond fast  -  not the ones with the best credentials.</p>
+      <a href="${getDashboardUrl(market)}" class="btn">View Your Leads →</a>
       <hr class="divider">
-      <p style="font-size:12px">Pro tip: Upgrade to Pro to see all your leads, track conversions, and sell digital products directly from your profile.</p>
-    `)
+      <p style="font-size:12px">Pro tip: Upgrade to Pro to see all your leads, track conversions, and get priority placement in search results.</p>
+    `, market)
   };
 }
 
-function proWelcomeEmail(t: Trainer, market = 'ae'): { subject: string; html: string } {
-  const dashUrl = getDashboardUrl(market);
+function proWelcomeEmail(t: Trainer): { subject: string; html: string } {
+  const market = t.market ?? 'ae';
   return {
     subject: `Pro is live. Here's what to do first.`,
     html: emailBase(`
@@ -169,38 +166,44 @@ function proWelcomeEmail(t: Trainer, market = 'ae'): { subject: string; html: st
       <p>Most trainers upgrade and then do nothing different. Don't be that trainer.</p>
       <p>Here's what to set up in the next 30 minutes:</p>
       <ul class="checklist">
-        <li>Create your first digital product (a PDF nutrition guide, a 4-week plan, anything)</li>
-        <li>Set up your Grand Slam Offer — bundle sessions + a digital product</li>
-        <li>Copy your referral link and put it in your Instagram bio</li>
-        <li>Refer 4 trainers and your Pro subscription is free forever</li>
+        <li>Add your session packages with clear outcomes and prices</li>
+        <li>Upload a profile photo and write a 2-sentence bio</li>
+        <li>Share your profile link in your Instagram bio and WhatsApp status</li>
+        <li>Open your AI assistant and ask it to write your first client welcome message</li>
       </ul>
-      <a href="${dashUrl}" class="btn">Go to Dashboard →</a>
-    `)
+      <a href="${getDashboardUrl(market)}" class="btn">Go to Dashboard →</a>
+    `, market)
   };
 }
 
-function sevenDayEmail(t: Trainer, market = 'ae'): { subject: string; html: string } {
-  const dashUrl = getDashboardUrl(market);
-  const pricingUrl = getPricingUrl(market);
+function sevenDayEmail(t: Trainer): { subject: string; html: string } {
+  const market = t.market ?? 'ae';
   const pct = completionScore(t);
   return {
-    subject: `One week in — here's where you stand`,
+    subject: `One week in  -  here's where you stand`,
     html: emailBase(`
       <h1>You've been on TrainedBy for a week.</h1>
-      <p>Your profile is <span class="highlight">${pct}% complete</span>. ${pct >= 80 ? 'That\'s solid.' : 'There\'s still room to improve.'}</p>
+      <p>Your profile is <span class="highlight">${pct}% complete</span>. ${pct >= 80 ? 'That\\'s solid.' : 'There\\'s still room to improve.'}</p>
       ${pct < 80 ? `<p>Trainers with 80%+ complete profiles get significantly more views. A few more minutes on your profile could make a real difference.</p>
-      <a href="${dashUrl}" class="btn">Finish Your Profile →</a>` : ''}
+      <a href="${getDashboardUrl(market)}" class="btn">Finish Your Profile →</a>` : ''}
+
+      <hr class="divider">
+      <h2>Want to get more clients from Google?</h2>
+      <p>We're looking for expert trainers to feature on the TrainedBy blog. Articles rank on Google and send traffic directly to your profile.</p>
+      <p>You don't even need to write it. Just reply to this email with a voice note or a few bullet points about your training philosophy, a common client mistake, or a specific workout tip. We'll format it, publish it, and link it to your profile.</p>
+      <p><strong>Reply to this email to get started.</strong></p>
+
       ${t.plan === 'free' ? `
       <hr class="divider">
-      <p>You're on the free plan. If you're serious about building a client base in the UAE, Pro gives you digital product sales, the Affiliate Vault, and priority listing. <span class="highlight">149 AED/month.</span></p>
-      <a href="${pricingUrl}" class="btn" style="background:#1c1c1c;border:1px solid rgba(255,92,0,0.3)">See What Pro Includes →</a>
+      <p>You're on the free plan. Pro gives you an AI assistant, priority placement in search, unlimited session packages, and advanced analytics. <span class="highlight">99 AED/month.</span></p>
+      <a href="${getPricingUrl(market)}" class="btn" style="background:#1c1c1c;border:1px solid rgba(255,92,0,0.3)">See What Pro Includes →</a>
       ` : ''}
-    `)
+    `, market)
   };
 }
 
-function monthlyReportEmail(t: Trainer, stats: { views: number; leads: number; }, market = 'ae'): { subject: string; html: string } {
-  const dashUrl = getDashboardUrl(market);
+function monthlyReportEmail(t: Trainer, stats: { views: number; leads: number; }): { subject: string; html: string } {
+  const market = t.market ?? 'ae';
   const month = new Date().toLocaleDateString('en-AE', { month: 'long', year: 'numeric' });
   return {
     subject: `Your TrainedBy report for ${month}`,
@@ -212,20 +215,15 @@ function monthlyReportEmail(t: Trainer, stats: { views: number; leads: number; }
         <li>Leads received: <span class="highlight">${stats.leads}</span></li>
       </ul>
       ${stats.leads === 0 ? '<p>No leads this month. The most common reason: incomplete profile or no REPs badge. Both are fixable in under 10 minutes.</p>' : '<p>Keep the momentum going. Reply to every lead within the hour.</p>'}
-      <a href="${dashUrl}" class="btn">View Dashboard →</a>
-    `)
+      <a href="${getDashboardUrl(market)}" class="btn">View Dashboard →</a>
+    `, market)
   };
 }
 
-// ── Send email via Resend ──────────────────────────────────────────────────
-async function sendEmail(
-  to: string,
-  subject: string,
-  html: string,
-  fromEmail = 'TrainedBy <hello@trainedby.ae>'
-): Promise<boolean> {
+// ── Send email via Resend ─────────────────────────────────────────────────────
+async function sendEmail(to: string, subject: string, html: string, from: string): Promise<boolean> {
   if (!RESEND_API_KEY) {
-    console.log(`[lifecycle-email] No Resend key — would send to ${to}: ${subject}`);
+    console.log(`[lifecycle-email] No Resend key  -  would send to ${to}: ${subject}`);
     return true; // Graceful no-op when key not set
   }
 
@@ -235,7 +233,7 @@ async function sendEmail(
       'Authorization': `Bearer ${RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ from: fromEmail, to, subject, html }),
+    body: JSON.stringify({ from, to, subject, html }),
   });
 
   if (!res.ok) {
@@ -292,35 +290,26 @@ Deno.serve(async (req) => {
       });
     }
 
-    // ── Locale detection ──
-    // Detect from trainer's domain field, or fall back to request origin
-    const trainerLocale = getLocale(trainer.domain || req.headers.get('origin'));
-    const emailCopy = getEmailCopy(trainerLocale);
-    const marketConfig = getMarket(trainerLocale);
-    const fromEmail = `${emailCopy.from_name} <${emailCopy.from_email}>`;
-
     let email: { subject: string; html: string } | null = null;
-
-    const market = body.market || trainer.market || 'ae';
 
     switch (type) {
       case 'welcome':
-        email = welcomeEmail(trainer, market);
+        email = welcomeEmail(trainer);
         break;
       case 'nudge':
-        email = nudgeEmail(trainer, market);
+        email = nudgeEmail(trainer);
         break;
       case 'first_lead':
-        email = firstLeadEmail(trainer, lead_name || 'A potential client', market);
+        email = firstLeadEmail(trainer, lead_name || 'A potential client');
         break;
       case 'pro_welcome':
-        email = proWelcomeEmail(trainer, market);
+        email = proWelcomeEmail(trainer);
         break;
       case 'seven_day':
-        email = sevenDayEmail(trainer, market);
+        email = sevenDayEmail(trainer);
         break;
       case 'monthly_report':
-        email = monthlyReportEmail(trainer, stats || { views: 0, leads: 0 }, market);
+        email = monthlyReportEmail(trainer, stats || { views: 0, leads: 0 });
         break;
       default:
         return new Response(JSON.stringify({ error: 'Unknown email type' }), {
@@ -334,6 +323,7 @@ Deno.serve(async (req) => {
       });
     }
 
+    const fromEmail = `${getMarketBrand(trainer.market ?? 'ae')} <${getMarketSupportEmail(trainer.market ?? 'ae')}>`;
     const ok = await sendEmail(trainer.email, email.subject, email.html, fromEmail);
 
     // Log the email send
@@ -350,7 +340,6 @@ Deno.serve(async (req) => {
     });
 
   } catch (err) {
-    await captureException(err, { function: 'lifecycle-email' });
     return new Response(JSON.stringify({ error: String(err) }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
@@ -378,7 +367,8 @@ async function runScheduledLifecycle(type: string): Promise<Response> {
       if (completionScore(t) >= 50) { skipped++; continue; }
       if (!t.email?.includes('@')) { skipped++; continue; }
       const email = nudgeEmail(t);
-      await sendEmail(t.email, email.subject, email.html);
+      const fromEmail = `${getMarketBrand(t.market ?? 'ae')} <${getMarketSupportEmail(t.market ?? 'ae')}>`;
+      await sendEmail(t.email, email.subject, email.html, fromEmail);
       sent++;
       await new Promise(r => setTimeout(r, 200));
     }
@@ -399,7 +389,8 @@ async function runScheduledLifecycle(type: string): Promise<Response> {
     for (const t of (trainers || [])) {
       if (!t.email?.includes('@')) { skipped++; continue; }
       const email = sevenDayEmail(t);
-      await sendEmail(t.email, email.subject, email.html);
+      const fromEmail = `${getMarketBrand(t.market ?? 'ae')} <${getMarketSupportEmail(t.market ?? 'ae')}>`;
+      await sendEmail(t.email, email.subject, email.html, fromEmail);
       sent++;
       await new Promise(r => setTimeout(r, 200));
     }
@@ -420,7 +411,8 @@ async function runScheduledLifecycle(type: string): Promise<Response> {
         .gte('created_at', new Date(now.getFullYear(), now.getMonth(), 1).toISOString());
 
       const email = monthlyReportEmail(t, { views: 0, leads: leads || 0 });
-      await sendEmail(t.email, email.subject, email.html);
+      const fromEmail = `${getMarketBrand(t.market ?? 'ae')} <${getMarketSupportEmail(t.market ?? 'ae')}>`;
+      await sendEmail(t.email, email.subject, email.html, fromEmail);
       sent++;
       await new Promise(r => setTimeout(r, 200));
     }

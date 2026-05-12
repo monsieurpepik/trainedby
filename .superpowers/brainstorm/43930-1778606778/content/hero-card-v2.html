@@ -1,0 +1,95 @@
+<h2>Hero card — v2, less cheap</h2>
+<p class="subtitle">Removed: emoji, loud gradient, swipe hint. Refined: photo treatment, badge positioning, spacing, depth.</p>
+
+<div style="display:flex;gap:40px;align-items:flex-start;justify-content:center;flex-wrap:wrap">
+
+  <!-- V1 (old) -->
+  <div style="text-align:center">
+    <div style="font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Before</div>
+    <div style="position:relative;width:260px">
+      <div style="position:absolute;top:6px;left:6px;right:-6px;bottom:-6px;background:#e8e5e2;border-radius:20px"></div>
+      <div style="position:relative;background:#fff;border-radius:20px;border:1px solid rgba(0,0,0,0.08);box-shadow:0 8px 40px rgba(0,0,0,0.10);overflow:hidden">
+        <div style="height:150px;background:linear-gradient(160deg,#FF5C00,#ffb380);display:flex;align-items:center;justify-content:center;position:relative">
+          <div style="font-size:56px;opacity:0.3">👤</div>
+          <div style="position:absolute;top:10px;right:10px;background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.3);color:#00A844;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">✓ REPs</div>
+          <div style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.55);color:#fff;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px">📍 Dubai Marina</div>
+        </div>
+        <div style="padding:16px;font-family:system-ui,sans-serif">
+          <div style="font-weight:800;font-size:15px;color:#1a1411;margin-bottom:2px">Sarah Al-Mansoori</div>
+          <div style="font-size:11px;color:#6B6460;margin-bottom:12px">Strength & HIIT · 6 years</div>
+          <div style="display:flex;gap:4px;margin-bottom:14px">
+            <span style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.08);border-radius:20px;padding:3px 8px;font-size:10px;color:#6B6460;font-weight:600">Weight Loss</span>
+            <span style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.08);border-radius:20px;padding:3px 8px;font-size:10px;color:#6B6460;font-weight:600">HIIT</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-weight:800;font-size:13px;color:#1a1411">AED 350 <span style="font-size:11px;font-weight:400;color:#9B9490">/ session</span></div>
+            <div style="background:#FF5C00;color:#fff;border-radius:100px;padding:7px 14px;font-size:11px;font-weight:700">View →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V2 (refined) -->
+  <div style="text-align:center">
+    <div style="font-size:11px;font-weight:700;color:#FF5C00;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">After</div>
+    <div style="position:relative;width:260px">
+      <!-- Subtle depth: two understated shadows, no colored bg -->
+      <div style="position:absolute;top:8px;left:8px;right:-8px;bottom:-8px;background:#EDEBE8;border-radius:22px;border:1px solid rgba(0,0,0,0.05)"></div>
+      <div style="position:absolute;top:4px;left:4px;right:-4px;bottom:-4px;background:#F2F0ED;border-radius:21px;border:1px solid rgba(0,0,0,0.05)"></div>
+
+      <div style="position:relative;background:#fff;border-radius:20px;border:1px solid rgba(0,0,0,0.09);box-shadow:0 2px 16px rgba(0,0,0,0.07);overflow:hidden">
+
+        <!-- Photo area: dark neutral, initials, no emoji -->
+        <div style="height:160px;background:#1A1411;display:flex;align-items:center;justify-content:center;position:relative">
+          <!-- Initials avatar -->
+          <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;font-weight:900;font-size:26px;color:rgba(255,255,255,0.7);letter-spacing:-0.02em">SA</div>
+
+          <!-- Verified — clean pill, top left -->
+          <div style="position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:5px;background:rgba(0,200,83,0.18);border:1px solid rgba(0,200,83,0.25);padding:4px 10px;border-radius:20px">
+            <div style="width:5px;height:5px;border-radius:50%;background:#00C853"></div>
+            <span style="font-size:10px;font-weight:700;color:#00A844;font-family:system-ui">REPs Verified</span>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div style="padding:18px 20px 20px;font-family:system-ui,sans-serif">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
+            <div style="font-weight:800;font-size:16px;color:#1A1411;letter-spacing:-0.02em;line-height:1.2">Sarah Al-Mansoori</div>
+          </div>
+          <div style="font-size:12px;color:#6B6460;margin-bottom:14px;font-weight:500">Strength & HIIT · Dubai Marina</div>
+
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px">
+            <span style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.07);border-radius:20px;padding:4px 10px;font-size:11px;color:#555;font-weight:600">Weight Loss</span>
+            <span style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.07);border-radius:20px;padding:4px 10px;font-size:11px;color:#555;font-weight:600">Strength</span>
+            <span style="background:#F5F4F3;border:1px solid rgba(0,0,0,0.07);border-radius:20px;padding:4px 10px;font-size:11px;color:#555;font-weight:600">HIIT</span>
+          </div>
+
+          <div style="border-top:1px solid rgba(0,0,0,0.06);padding-top:14px;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:10px;color:#9B9490;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">From</div>
+              <div style="font-weight:800;font-size:15px;color:#1A1411;letter-spacing:-0.02em">AED 350 <span style="font-size:11px;font-weight:500;color:#9B9490">/ session</span></div>
+            </div>
+            <div style="background:#1A1411;color:#fff;border-radius:100px;padding:10px 18px;font-size:12px;font-weight:700;letter-spacing:-0.01em">View profile</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtle dot indicator — no text -->
+      <div style="display:flex;gap:5px;justify-content:center;margin-top:14px">
+        <div style="width:20px;height:4px;border-radius:2px;background:#1A1411"></div>
+        <div style="width:6px;height:4px;border-radius:2px;background:#D9D7D4"></div>
+        <div style="width:6px;height:4px;border-radius:2px;background:#D9D7D4"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section" style="max-width:600px;margin:24px auto 0">
+  <p style="font-size:13px;color:#666;line-height:1.7">
+    Key changes: dark photo background (not orange gradient) · initials instead of emoji · verified badge moves to photo area, top-left · city moves to body text · "view" CTA uses dark not orange (saves orange for primary actions elsewhere) · dot indicator instead of swipe text · shadow reduced, depth more subtle.
+  </p>
+</div>
+
+<p class="subtitle" style="margin-top:16px">Better? Or does something still feel off? Tell me in terminal.</p>
