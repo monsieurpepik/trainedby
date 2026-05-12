@@ -681,7 +681,7 @@ const brandName = market.brandName || 'TrainedBy';
 
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/trainers?select=slug,name,specialties,city,avatar_url,reps_verified,packages&plan=eq.pro&is_active=eq.true&order=created_at.desc&limit=8`,
+          `${SUPABASE_URL}/rest/v1/trainers?select=slug,name,specialties,city,avatar_url,reps_verified,session_packages(name,price)&plan=eq.pro&accepting_clients=eq.true&order=created_at.desc&limit=8`,
           { headers: { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY } }
         );
         const data = await res.json();
@@ -703,7 +703,7 @@ const brandName = market.brandName || 'TrainedBy';
         data.forEach((t: any) => {
           const specialty = Array.isArray(t.specialties) ? t.specialties[0] : (t.specialties || 'Personal Training');
           const location = t.city || '';
-          const packages = Array.isArray(t.packages) ? t.packages : [];
+          const packages = Array.isArray(t.session_packages) ? t.session_packages : [];
           const lowestPrice = packages.length > 0
             ? Math.min(...packages.map((p: any) => p.price || 0).filter((p: number) => p > 0))
             : null;
@@ -759,7 +759,7 @@ const brandName = market.brandName || 'TrainedBy';
         name.textContent = t.name || '';
         const specialty = Array.isArray(t.specialties) ? t.specialties[0] : (t.specialties || 'Personal Training');
         meta.textContent = specialty + (t.city ? ' · ' + t.city : '');
-        const packages = Array.isArray(t.packages) ? t.packages : [];
+        const packages = Array.isArray(t.session_packages) ? t.session_packages : [];
         const lowest = packages.length > 0 ? Math.min(...packages.map((p: any) => p.price || 0).filter(Boolean)) : null;
         price.innerHTML = lowest ? `${lowest} <span>/ session</span>` : 'Contact for pricing';
         if (link instanceof HTMLAnchorElement) link.href = '/' + t.slug;
