@@ -237,7 +237,7 @@ const brandName = market.brandName || 'TrainedBy';
       border-top: 1px solid rgba(0,0,0,0.06);
       padding: 40px;
     }
-    .trainers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 40px; }
+    .trainers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 40px; }
     /* EDITORIAL TRAINER CARD */
     .ecard {
   border-radius: 22px;
@@ -503,22 +503,11 @@ const brandName = market.brandName || 'TrainedBy';
       </div>
       <p class="section-sub">Hand-picked, {market.certificationBody}-verified trainers with proven track records.</p>
       <div class="trainers-grid" id="featured-trainers">
-        <!-- Skeleton loaders -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-          <div class="skeleton" style="height:195px"></div>
-          <div style="padding:16px"><div class="skeleton" style="height:14px;width:60%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:40%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:80%"></div></div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-          <div class="skeleton" style="height:195px"></div>
-          <div style="padding:16px"><div class="skeleton" style="height:14px;width:55%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:45%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:70%"></div></div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-          <div class="skeleton" style="height:195px"></div>
-          <div style="padding:16px"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:35%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:75%"></div></div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-          <div class="skeleton" style="height:195px"></div>
-          <div style="padding:16px"><div class="skeleton" style="height:14px;width:50%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:42%;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:85%"></div></div>
+        <div id="trainers-empty-state" style="grid-column:1/-1;text-align:center;padding:48px 0;display:none">
+          <p style="font-size:15px;color:var(--text-2);margin-bottom:16px">No trainers listed yet.</p>
+          <a href="/for-trainers" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--text);color:#fff;border-radius:100px;font-size:13px;font-weight:700;text-decoration:none">
+            Be the first verified trainer →
+          </a>
         </div>
       </div>
     </div>
@@ -693,7 +682,11 @@ const brandName = market.brandName || 'TrainedBy';
           { headers: { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY } }
         );
         const data = await res.json();
-        if (!Array.isArray(data) || data.length === 0) return;
+        if (!Array.isArray(data) || data.length === 0) {
+          const empty = document.getElementById('trainers-empty-state');
+          if (empty) empty.style.display = 'block';
+          return;
+        }
 
         const countEl = document.getElementById('stat-trainer-count');
         if (countEl && data && data.length) {
@@ -705,32 +698,37 @@ const brandName = market.brandName || 'TrainedBy';
         grid.innerHTML = '';
 
         data.forEach((t: any) => {
-          const initials = (t.full_name || 'T').split(' ').map((n: string) => n[0]).join('').slice(0,2).toUpperCase();
-          const specialty = Array.isArray(t.specialty) ? t.specialty[0] : (t.specialty || 'Personal Training');
-          const location = t.location || '';
+          const specialty = Array.isArray(t.specialties) ? t.specialties[0] : (t.specialties || 'Personal Training');
+          const location = t.city || '';
           const packages = Array.isArray(t.packages) ? t.packages : [];
           const lowestPrice = packages.length > 0
             ? Math.min(...packages.map((p: any) => p.price || 0).filter((p: number) => p > 0))
             : null;
+          const fallbacks = ['ecard-fallback-a', 'ecard-fallback-b', 'ecard-fallback-c'];
+          const fallback = fallbacks[grid.children.length % 3];
+          const bgStyle = t.avatar_url ? `background-image:url(${t.avatar_url})` : '';
+          const bgClass = t.avatar_url ? 'ecard-bg' : `ecard-bg ${fallback}`;
 
           const card = document.createElement('a');
+          card.className = 'ecard ecard-grid';
           card.href = '/' + t.slug;
-          card.className = 'trainer-card';
           card.innerHTML = `
-            <div class="trainer-card-img">
-              ${t.profile_photo_url
-                ? `<img src="${t.profile_photo_url}" alt="${t.full_name}" style="width:100%;height:100%;object-fit:cover">`
-                : `<span>${initials}</span>`}
-              ${t.reps_verified ? '<span class="verified-badge">✓ Verified</span>' : ''}
-            </div>
-            <div class="trainer-card-body">
-              <div class="trainer-card-name">${t.full_name || 'Trainer'}</div>
-              <div class="trainer-card-meta">${specialty}${location ? ' · ' + location : ''}</div>
-              <div class="trainer-card-price">${lowestPrice ? 'From ' + lowestPrice : 'Contact for pricing'} <span>/ session</span></div>
-            </div>
-          `;
+  <div class="${bgClass}" style="${bgStyle}"></div>
+  <div class="ecard-overlay"></div>
+  <div class="ecard-top">
+    ${t.reps_verified ? '<div class="ecard-badge"><div class="ecard-badge-dot"></div>Verified</div>' : ''}
+  </div>
+  <div class="ecard-bottom">
+    <div class="ecard-name" style="font-size:15px">${t.name || 'Trainer'}</div>
+    <div class="ecard-meta">${specialty}${location ? ' · ' + location : ''}</div>
+    <div class="ecard-price" style="font-size:12px">
+      ${lowestPrice ? lowestPrice + ' <span>/ session</span>' : 'Contact for pricing'}
+    </div>
+  </div>
+`;
           grid.appendChild(card);
         });
+        if (typeof (window as any)._heroRotate === 'function') (window as any)._heroRotate(data);
       } catch(e) {
         // Silently fail — empty state handled in Task 5
       }
