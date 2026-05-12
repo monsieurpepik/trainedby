@@ -231,6 +231,34 @@ const jsonLd = structuredData ?? defaultStructuredData;
         });
       }
     </script>
+  <!-- Sentry browser error tracking -->
+  <script is:inline>
+    (function() {
+      var dsn = 'https://245841971f38b0798c021fe5019aeefa@o4511110584926208.ingest.us.sentry.io/4511378618187776';
+      window.__sentryDsn = dsn;
+      window.onerror = function(msg, src, line, col, err) {
+        if (!dsn) return;
+        var u = new URL(dsn);
+        var key = u.username;
+        var proj = u.pathname.replace('/','');
+        fetch(u.protocol+'//'+u.host+'/api/'+proj+'/store/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Sentry-Auth': 'Sentry sentry_version=7, sentry_key='+key },
+          body: JSON.stringify({
+            event_id: ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,function(c){return(c^(crypto.getRandomValues(new Uint8Array(1))[0]&(15>>c/4))).toString(16)}),
+            timestamp: new Date().toISOString(),
+            platform: 'javascript',
+            level: 'error',
+            environment: 'production',
+            exception: { values: [{ type: err ? err.name : 'Error', value: msg, stacktrace: { frames: [] } }] }
+          })
+        }).catch(function(){});
+      };
+      window.addEventListener('unhandledrejection', function(e) {
+        window.onerror(e.reason && e.reason.message ? e.reason.message : String(e.reason), '', 0, 0, e.reason instanceof Error ? e.reason : new Error(String(e.reason)));
+      });
+    })();
+  </script>
   </head>
   <body>
     <slot />
