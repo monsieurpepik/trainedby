@@ -398,7 +398,10 @@ body {
 
     <div class="field">
       <label>{market.certVerifyLabel} <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
-      <input type="text" id="s1-reps" placeholder="{market.certVerifyPlaceholder}" autocomplete="off" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.05em;">
+      <div style="position:relative;">
+        <input type="text" id="s1-reps" placeholder="{market.certVerifyPlaceholder}" autocomplete="off" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.05em;padding-right:36px;" oninput="validateCertNum(this)">
+        <span id="cert-status" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:14px;display:none;"></span>
+      </div>
       <div class="field-hint">Find yours at <a href="https://repsuae.com/searcht" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;">repsuae.com/searcht</a> — leave blank to add later</div>
     </div>
 
@@ -508,7 +511,7 @@ body {
       <div class="success-icon">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="var(--brand)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
       </div>
-      <h1 class="success-title">You're live! 🔥</h1>
+      <h1 class="success-title">You're live.</h1>
       <p class="success-sub">Your profile is up. Share your link now — clients can already view your page.</p>
 
       <div class="url-card">
@@ -517,7 +520,7 @@ body {
       </div>
 
       <a id="view-profile-btn" href="#" class="btn-primary" style="display:flex;text-align:center;text-decoration:none;margin-bottom:12px;">View My Profile →</a>
-      <a href="/dashboard.html" class="btn-secondary" style="display:flex;text-align:center;text-decoration:none;justify-content:center;">Complete Profile &amp; Unlock Earnings →</a>
+      <a href="/dashboard" class="btn-secondary" style="display:flex;text-align:center;text-decoration:none;justify-content:center;">Complete Profile &amp; Unlock Earnings →</a>
 
       <div class="next-steps">
         <div class="next-steps-title">What happens next</div>
@@ -589,6 +592,17 @@ const state = {
   training_modes: ['in-person'],
   trainer_id: null
 };
+
+// ===== CERT NUMBER INLINE VALIDATION =====
+function validateCertNum(input) {
+  const val = input.value.trim();
+  const status = document.getElementById('cert-status');
+  if (!val) { status.style.display = 'none'; return; }
+  const valid = /^[A-Za-z0-9]{4,}$/.test(val);
+  status.style.display = 'inline';
+  status.textContent = valid ? '✓' : '✗';
+  status.style.color = valid ? 'var(--reps)' : 'var(--text-muted)';
+}
 
 // ===== PROGRESS =====
 function setProgress(pct) {
