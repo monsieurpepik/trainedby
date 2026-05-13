@@ -652,8 +652,9 @@ const brandName = market.brandName || 'TrainedBy';
       const ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
       try {
+        const marketCode = document.documentElement.dataset.market || 'ae';
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/trainers?select=slug,name,specialties,city,avatar_url,reps_verified,session_packages(name,price)&plan=eq.pro&accepting_clients=eq.true&order=created_at.desc&limit=8`,
+          `${SUPABASE_URL}/rest/v1/trainers?select=slug,name,specialties,city,avatar_url,reps_verified,session_packages(name,price)&plan=eq.pro&accepting_clients=eq.true&market=eq.${marketCode}&order=created_at.desc&limit=8`,
           { headers: { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY } }
         );
         const data = await res.json();
