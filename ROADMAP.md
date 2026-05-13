@@ -28,8 +28,8 @@
 
 ## Revenue Execution
 
-- [ ] **REV-1** UAE trainer outreach — draft cold DM / WhatsApp template for 10 REPs UAE trainers (free Pro 90-day offer)
-- [ ] **REV-2** UAE corporate wellness — one-pager pitch template for HR/office managers
+- [x] **REV-1** UAE trainer outreach — Instagram DM + WhatsApp templates, objection handling → `docs/outreach-uae-trainers.md`
+- [x] **REV-2** UAE corporate wellness — LinkedIn + email pitch, pricing model, target segments → `docs/corporate-wellness-pitch.md`
 
 ---
 
