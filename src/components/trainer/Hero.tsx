@@ -60,9 +60,9 @@ export default function Hero({ trainer, onBack, onShare }: HeroProps) {
 
       <div className="tb-hero-name-block">
         <div className="tb-hero-name">{displayName}</div>
-        {(specialties[0] || location) && (
+        {(trainer.title || trainer.city) && (
           <div className="tb-hero-tagline">
-            {specialties[0]}{location ? ` · ${location}` : ''}
+            {trainer.title}{trainer.city ? ` · ${trainer.city}` : ''}
           </div>
         )}
         {specialties.length > 0 && (

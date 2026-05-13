@@ -277,13 +277,12 @@ body:has(#tb-page) {
   object-fit: cover; object-position: top center; display: block;
 }
 .tb-hero-fade {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  height: 60%;
+  position: absolute; inset: 0;
   background: linear-gradient(to bottom,
-    transparent 0%,
-    rgba(0,0,0,0.3) 40%,
-    rgba(0,0,0,0.75) 75%,
-    rgba(0,0,0,0.92) 100%
+    rgba(0,0,0,0.15) 0%,
+    rgba(0,0,0,0.10) 30%,
+    rgba(0,0,0,0.55) 60%,
+    rgba(0,0,0,0.88) 100%
   );
   pointer-events: none;
 }
@@ -320,13 +319,13 @@ body:has(#tb-page) {
 }
 .tb-reps-badge-num {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 14px; color: rgba(255,255,255,0.92);
+  font-size: 17px; color: rgba(255,255,255,0.92);
   letter-spacing: 0.04em; line-height: 1; margin-bottom: 5px;
   font-variant-numeric: tabular-nums;
   text-shadow: 0 0 8px rgba(200,150,255,0.4);
 }
 .tb-reps-dots { display: flex; gap: 3px; }
-.tb-reps-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+.tb-reps-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.22); }
 .tb-reps-dot--on { background: rgba(255,255,255,0.65); }
 
 .tb-hero-name-block {
@@ -401,7 +400,7 @@ body:has(#tb-page) {
   background: rgba(255,255,255,0.1);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255,255,255,0.15);
-  color: #fff; font-family: var(--font); font-weight: 500; font-size: 14px;
+  color: #fff; font-family: var(--font); font-weight: 400; font-size: 14px;
   cursor: pointer; text-decoration: none;
 }
 .tb-btn-secondary { display: none; }
@@ -491,15 +490,14 @@ body:has(#tb-page) {
 
   /* Name/tagline: white on dark fade */
   .tb-hero-name {
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    color: #ffffff;
-    text-shadow: 0 1px 10px rgba(0,0,0,0.5);
+    font-size: 36px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: #fff;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
   }
   .tb-hero-tagline {
-    color: rgba(255,255,255,0.78);
-    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+    color: rgba(255,255,255,0.45);
   }
   /* Shift name block to match grid's 48px inset */
   .tb-hero-name-block { left: 48px; bottom: 36px; }

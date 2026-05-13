@@ -7,7 +7,7 @@ interface AboutProps {
 export default function About({ bio }: AboutProps) {
   const [expanded, setExpanded] = useState(false);
 
-  if (!bio) return null;
+  if (!bio || bio.length <= 20) return null;
 
   return (
     <div className="tb-glass tb-about" style={{ margin: '0 16px 12px' }}>
