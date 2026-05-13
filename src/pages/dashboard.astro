@@ -1137,13 +1137,13 @@ function generateInsight(data) {
   let action = '';
   if (views > 20 && leads === 0) {
     text = `Your profile got <strong>${views} views</strong> this week but 0 leads. Visitors are interested but not converting.`;
-    action = `<a href="/edit.html" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Add a Grand Slam Offer with a guarantee to convert views into bookings</a>`;
+    action = `<a href="/edit" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Add a Grand Slam Offer with a guarantee to convert views into bookings</a>`;
   } else if (leads > 0 && waTaps === 0) {
     text = `You got <strong>${leads} lead${leads>1?'s':''}</strong> but no WhatsApp taps. Clients filled the form but didn't message you directly.`;
-    action = `<a href="/edit.html" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Make sure your WhatsApp number is visible on your profile</a>`;
+    action = `<a href="/edit" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Make sure your WhatsApp number is visible on your profile</a>`;
   } else if (views > 0 && convRate > 0) {
     text = `Your conversion rate is <strong>${convRate}%</strong> this week (${leads} lead${leads>1?'s':''} from ${views} views). ${convRate >= 5 ? 'That\'s above average — great work.' : 'Industry average is 5–8%. A results guarantee could double this.'}`;
-    action = convRate < 5 ? `<a href="/edit.html" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Add a money-back guarantee to your packages</a>` : '';
+    action = convRate < 5 ? `<a href="/edit" style="font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;">→ Add a money-back guarantee to your packages</a>` : '';
   } else if (views === 0) {
     text = 'Your profile has no views yet this week. Share your profile link to start getting traffic.';
     action = `<button onclick="copyUrl()" style="font-size:12px;font-weight:700;color:var(--brand);background:none;border:none;cursor:pointer;padding:0;">→ Copy your profile link and share it now</button>`;
@@ -1208,11 +1208,12 @@ function loadChart(days) {
 function buildChecklist(t) {
   const items = [
     { label: 'Profile photo added', sub: 'A photo increases leads by 5×', done: !!t.avatar_url, action: '/edit', actionLabel: 'Add' },
+    { label: 'Location set', sub: 'Shown on your profile so clients know where you train', done: !!t.city, action: '/edit', actionLabel: 'Set' },
     { label: 'Bio written', sub: 'Tell clients what makes you different', done: !!(t.bio && t.bio.length > 30), action: '/edit', actionLabel: 'Write' },
+    { label: 'Session packages added', sub: 'Show clients your rates', done: (t.packages_count ?? 0) > 0, action: '/edit', actionLabel: 'Add' },
     { label: 'REPs UAE verified', sub: 'Get the verified badge on your profile', done: !!t.reps_verified, action: '/edit', actionLabel: 'Verify' },
-    { label: 'Session packages added', sub: 'Show clients your rates', done: !!(t.packages && t.packages.length > 0), action: '/edit', actionLabel: 'Add' },
     { label: 'Instagram connected', sub: 'Link your social media', done: !!t.instagram, action: '/edit', actionLabel: 'Connect' },
-    { label: 'Profile shared', sub: 'Share your link on Instagram bio', done: false, action: null, actionLabel: null }
+    { label: 'Share your profile', sub: 'Copy your link and post it in your Instagram bio', done: !!(t.avatar_url && (t.packages_count ?? 0) > 0), action: null, actionLabel: null }
   ];
   const list = document.getElementById('checklist-list');
   const allDone = items.every(i => i.done);
