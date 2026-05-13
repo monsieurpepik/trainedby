@@ -52,7 +52,7 @@ function ErrorState() {
   );
 }
 
-export default function TrainerProfile({ slug, paymentEnabled, currencySymbol, initialName = '', initialPhoto = '', initialSpecialty = '' }: TrainerProfileProps) {
+export default function TrainerProfile({ slug, paymentEnabled, currencySymbol, initialName = '', initialPhoto = '', initialSpecialty = '', certificationBody = '' }: TrainerProfileProps) {
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [trainer, setTrainer] = useState<Trainer | null>(null);
   const [packages, setPackages] = useState<Package[]>([]);

@@ -140,7 +140,14 @@ const jsonLd = {
         --wa-glow-clear: rgba(37,211,102,0);
         --shadow-btn: 0 4px 20px rgba(0,0,0,0.20);
         --shadow-card: 0 2px 12px rgba(0,0,0,0.06);
+        --text-on-brand: #ffffff;
+        --reps: #00875A;
       }
+      /* Per-market brand accent (design-strategy.md) */
+      html[data-market="fr"] { --brand: #2563EB; --brand-hover: #1d4ed8; --wa-glow: rgba(37,99,235,0.35); --wa-glow-clear: rgba(37,99,235,0); }
+      html[data-market="it"] { --brand: #DC2626; --brand-hover: #b91c1c; --wa-glow: rgba(220,38,38,0.35); --wa-glow-clear: rgba(220,38,38,0); }
+      html[data-market="es"],
+      html[data-market="mx"] { --brand: #D97706; --brand-hover: #b45309; --wa-glow: rgba(217,119,6,0.35); --wa-glow-clear: rgba(217,119,6,0); }
     </style>
   </Fragment>
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
@@ -281,8 +288,8 @@ body:has(#tb-page) {
 .tb-hero-fade {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  height: 220px;
-  background: linear-gradient(to bottom, transparent, var(--bg));
+  height: 140px;
+  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.72));
   pointer-events: none;
 }
 .tb-hero-controls {
@@ -312,12 +319,15 @@ body:has(#tb-page) {
   z-index: 10;
 }
 .tb-hero-name {
-  font-weight: 200; font-size: 36px;
-  letter-spacing: 0.02em; color: var(--text); line-height: 1.15;
+  font-weight: 300; font-size: 36px;
+  letter-spacing: -0.01em; color: #ffffff;
+  text-shadow: 0 1px 14px rgba(0,0,0,0.55);
+  line-height: 1.15;
 }
 .tb-hero-tagline {
   font-weight: 300; font-size: 13px;
-  color: var(--text-secondary); margin-top: 4px;
+  color: rgba(255,255,255,0.78); margin-top: 4px;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.4);
 }
 
 .tb-identity {
@@ -446,22 +456,22 @@ body:has(#tb-page) {
   /* ── Hero ─────────────────────────────────────────────────────────────── */
   .tb-hero { height: 300px; }
 
-  /* Shorter white fade — keeps name area on dark photo */
+  /* Dark fade — name always readable against photo */
   .tb-hero-fade {
-    height: 80px;
-    background: linear-gradient(to bottom, transparent, var(--bg));
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.68));
   }
 
-  /* Name/tagline: white on dark photo background */
+  /* Name/tagline: white on dark fade */
   .tb-hero-name {
     font-size: 32px;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: -0.5px;
     color: #ffffff;
     text-shadow: 0 1px 10px rgba(0,0,0,0.5);
   }
   .tb-hero-tagline {
-    color: rgba(255,255,255,0.75);
+    color: rgba(255,255,255,0.78);
     text-shadow: 0 1px 6px rgba(0,0,0,0.4);
   }
   /* Shift name block to match grid's 48px inset */

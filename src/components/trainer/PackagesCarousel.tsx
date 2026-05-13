@@ -27,7 +27,6 @@ export default function PackagesCarousel({
     <div className="tb-sessions">
       <div className="tb-sessions-header">
         <span className="tb-section-label">Sessions</span>
-        <a href="javascript:void(0)" className="tb-see-all">See all →</a>
       </div>
       <div className="tb-sessions-scroll">
         {packages.map((pkg, i) => {
