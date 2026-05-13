@@ -41,10 +41,11 @@ export function buildTags(
   specialties: string[],
   isVerified: boolean,
   certifications: string[],
+  certificationBody?: string,
 ): string[] {
   const maxSpecialties = isVerified ? 3 : 4;
   const raw = [...specialties.slice(0, maxSpecialties)];
-  if (isVerified) raw.unshift('Verified');
+  if (isVerified) raw.unshift(certificationBody ? `${certificationBody} Verified` : 'Verified');
   if (certifications.length > 0 && raw.length < 4) raw.push(certifications[0]);
   return [...new Set(raw)].slice(0, 4);
 }

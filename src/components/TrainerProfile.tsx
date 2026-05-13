@@ -113,6 +113,7 @@ export default function TrainerProfile({ slug, paymentEnabled, currencySymbol, i
         specialties,
         isVerifiedTrainer(trainer),
         Array.isArray(trainer.certifications) ? trainer.certifications : [],
+        certificationBody,
       )
     : [];
   const stats = trainer ? buildStats(trainer) : [];
