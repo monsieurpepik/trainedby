@@ -105,7 +105,9 @@ const jsonLd = {
 <Base
   title={pageTitle}
   description={pageDesc}
-  ogImage={'/og/' + slug + '.png'}
+  ogImage={trainerPhoto || undefined}
+  canonical={profileUrl}
+  structuredData={jsonLd}
 >
   <Fragment slot="head">
     <style>
