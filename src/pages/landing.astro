@@ -3,6 +3,28 @@ import Base from '../layouts/Base.astro';
 import { getMarket } from '../lib/market.ts';
 const market = getMarket(Astro.url.hostname);
 const brandName = market.brandName || 'TrainedBy';
+
+// Market-aware hero card static fallback (replaced by JS after trainer data loads)
+const heroFallback: Record<string, { name: string; meta: string; price: string; slug: string }> = {
+  ae: { name: 'Sarah Al-Mansoori', meta: 'Strength & HIIT · Dubai Marina',   price: `${market.currencySymbol} 350`, slug: 'sarah-al-mansoori' },
+  uk: { name: 'Emily Johnson',     meta: 'Weight Loss · London',              price: `${market.currencySymbol} 85`,  slug: 'emily-johnson-uk' },
+  com:{ name: 'Michael Chen',      meta: 'Strength & Conditioning · NYC',     price: `${market.currencySymbol} 90`,  slug: 'michael-chen-nyc' },
+  fr: { name: 'Sophie Martin',     meta: 'Yoga & Bien-être · Paris',          price: `${market.currencySymbol} 70`,  slug: 'sophie-martin-fr' },
+  it: { name: 'Luca Ferrari',      meta: 'Forza e Condizionamento · Milano',  price: `${market.currencySymbol} 65`,  slug: 'luca-ferrari-it' },
+  es: { name: 'Pablo García',      meta: 'Rendimiento Atlético · Barcelona',  price: `${market.currencySymbol} 60`,  slug: 'pablo-garcia' },
+  mx: { name: 'Carlos Mendoza',    meta: 'Fuerza Funcional · CDMX',           price: `${market.currencySymbol} 900`, slug: 'carlos-mendoza-mx' },
+  in: { name: 'Priya Singh',       meta: 'Yoga & Wellness · Mumbai',          price: `${market.currencySymbol} 3500`,slug: 'priya-singh-in' },
+};
+const hero = heroFallback[market.market] ?? heroFallback['ae'];
+
+// Trust strip copy per locale
+const trustCertSuffix: Record<string, string> = { fr: 'certifiés uniquement', it: 'certificati', es: 'certificados' };
+const trustChecked: Record<string, string>    = { fr: 'Antécédents vérifiés', it: 'Precedenti verificati', es: 'Antecedentes verificados' };
+const trustBrowse: Record<string, string>     = { fr: 'Gratuit à parcourir', it: 'Gratuito da sfogliare', es: 'Gratis explorar' };
+const m = market.market;
+const trustSuffix  = trustCertSuffix[m]  ?? 'Certified only';
+const trustCheck   = trustChecked[m]     ?? 'Background checked';
+const trustFree    = trustBrowse[m]      ?? 'Free to browse';
 ---
 
 <Base
@@ -430,15 +452,15 @@ const brandName = market.brandName || 'TrainedBy';
 
       <!-- TRUST STRIP -->
       <div class="trust-strip">
-        <div class="trust-item"><div class="trust-dot"></div><span>{market.certificationBody} Certified only</span></div>
-        <div class="trust-item"><div class="trust-dot"></div><span>Background checked</span></div>
-        <div class="trust-item"><div class="trust-dot"></div><span>Free to browse</span></div>
+        <div class="trust-item"><div class="trust-dot"></div><span>{market.certificationBody} {trustSuffix}</span></div>
+        <div class="trust-item"><div class="trust-dot"></div><span>{trustCheck}</span></div>
+        <div class="trust-item"><div class="trust-dot"></div><span>{trustFree}</span></div>
       </div>
     </div>
 
     <!-- RIGHT COLUMN: Stats grid -->
     <div class="hero-right">
-      <a href="/sarah-al-mansoori" class="ecard ecard-hero" id="hero-trainer-card">
+      <a href={`/${hero.slug}`} class="ecard ecard-hero" id="hero-trainer-card">
         <div class="ecard-bg ecard-fallback-a" id="hero-card-bg"></div>
         <div class="ecard-overlay"></div>
         <div class="ecard-top">
@@ -448,11 +470,11 @@ const brandName = market.brandName || 'TrainedBy';
           </div>
         </div>
         <div class="ecard-bottom">
-          <div class="ecard-name" id="hero-card-name">Sarah Al-Mansoori</div>
-          <div class="ecard-meta" id="hero-card-meta">Strength &amp; HIIT · Dubai Marina</div>
+          <div class="ecard-name" id="hero-card-name">{hero.name}</div>
+          <div class="ecard-meta" id="hero-card-meta">{hero.meta}</div>
           <div class="ecard-row">
             <div class="ecard-price" id="hero-card-price">
-              {market.currencySymbol} 350 <span>/ session</span>
+              {hero.price} <span>/ session</span>
             </div>
             <button class="ecard-cta">View profile</button>
           </div>
@@ -502,7 +524,7 @@ const brandName = market.brandName || 'TrainedBy';
             <div class="transform-trainer">
               <div class="transform-avatar">S</div>
               <div>
-                <div class="transform-trainer-name">Sarah Al Mansoori</div>
+                <div class="transform-trainer-name">Sarah M.</div>
                 <div class="transform-trainer-cert">{market.certificationBody} Level 3 · Strength Coach</div>
               </div>
             </div>
@@ -520,7 +542,7 @@ const brandName = market.brandName || 'TrainedBy';
             <div class="transform-trainer">
               <div class="transform-avatar">K</div>
               <div>
-                <div class="transform-trainer-name">Khalid Rashid</div>
+                <div class="transform-trainer-name">Khalid R.</div>
                 <div class="transform-trainer-cert">{market.certificationBody} Level 4 · HIIT Specialist</div>
               </div>
             </div>
@@ -538,7 +560,7 @@ const brandName = market.brandName || 'TrainedBy';
             <div class="transform-trainer">
               <div class="transform-avatar">N</div>
               <div>
-                <div class="transform-trainer-name">Nour Haddad</div>
+                <div class="transform-trainer-name">Nour H.</div>
                 <div class="transform-trainer-cert">{market.certificationBody} Level 3 · Nutrition & Wellness</div>
               </div>
             </div>

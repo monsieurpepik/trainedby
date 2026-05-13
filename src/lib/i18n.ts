@@ -237,6 +237,18 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'dash.upgrade_title': 'Upgrade to Pro',
     'dash.upgrade_sub':   'Get AI assistant, priority placement, and full analytics.',
     'dash.upgrade_btn':   'Upgrade Now →',
+
+    // Landing page short-form keys (data-i18n attributes)
+    'hero_headline':      'Find your perfect personal trainer',
+    'hero_sub':           'Every trainer is certified and verified. Browse real profiles, read real stories, and book the right person for you.',
+    'nav_find':           'Find a Trainer',
+    'nav_blog':           'Stories',
+    'nav_for_trainers':   'For Trainers →',
+    'nav_cta_find':       'Find Your Trainer →',
+    'search_btn':         'Search',
+    'filter_weight_loss': 'Weight Loss',
+    'filter_strength':    'Strength',
+    'filter_nutrition':   'Nutrition',
   },
 
   fr: {
@@ -425,6 +437,18 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'dash.upgrade_title': 'Passer à Pro',
     'dash.upgrade_sub':   'Obtenez l\'assistant IA, le placement prioritaire et des analyses complètes.',
     'dash.upgrade_btn':   'Mettre à niveau →',
+
+    // Landing page short-form keys
+    'hero_headline':      'Trouvez votre coach sportif idéal',
+    'hero_sub':           'Chaque coach est certifié et vérifié. Parcourez de vrais profils, lisez de vraies histoires, et réservez la bonne personne pour vous.',
+    'nav_find':           'Trouver un coach',
+    'nav_blog':           'Témoignages',
+    'nav_for_trainers':   'Pour les coachs →',
+    'nav_cta_find':       'Trouver votre coach →',
+    'search_btn':         'Rechercher',
+    'filter_weight_loss': 'Perte de poids',
+    'filter_strength':    'Musculation',
+    'filter_nutrition':   'Nutrition',
   },
 
   it: {
@@ -613,6 +637,18 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'dash.upgrade_title': 'Passa a Pro',
     'dash.upgrade_sub':   'Ottieni l\'assistente IA, il posizionamento prioritario e analisi complete.',
     'dash.upgrade_btn':   'Aggiorna ora →',
+
+    // Landing page short-form keys
+    'hero_headline':      'Trova il tuo personal trainer ideale',
+    'hero_sub':           'Ogni trainer è certificato e verificato. Sfoglia profili reali, leggi storie reali e prenota la persona giusta per te.',
+    'nav_find':           'Trova un trainer',
+    'nav_blog':           'Storie',
+    'nav_for_trainers':   'Per i trainer →',
+    'nav_cta_find':       'Trova il tuo trainer →',
+    'search_btn':         'Cerca',
+    'filter_weight_loss': 'Perdita di peso',
+    'filter_strength':    'Forza',
+    'filter_nutrition':   'Nutrizione',
   },
 
   es: {
@@ -801,6 +837,18 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'dash.upgrade_title': 'Actualizar a Pro',
     'dash.upgrade_sub':   'Obtén el asistente de IA, posicionamiento prioritario y análisis completos.',
     'dash.upgrade_btn':   'Actualizar ahora →',
+
+    // Landing page short-form keys
+    'hero_headline':      'Encuentra tu entrenador personal ideal',
+    'hero_sub':           'Cada entrenador está certificado y verificado. Explora perfiles reales, lee historias reales y reserva a la persona adecuada para ti.',
+    'nav_find':           'Encontrar entrenador',
+    'nav_blog':           'Historias',
+    'nav_for_trainers':   'Para entrenadores →',
+    'nav_cta_find':       'Encontrar tu entrenador →',
+    'search_btn':         'Buscar',
+    'filter_weight_loss': 'Pérdida de Peso',
+    'filter_strength':    'Fuerza',
+    'filter_nutrition':   'Nutrición',
   },
 };
 

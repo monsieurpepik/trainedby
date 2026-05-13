@@ -1,15 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getMarket } from '../lib/market.ts';
 const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+const market = getMarket(Astro.url.hostname);
+const brandName = market.brandName || 'TrainedBy';
 ---
 
 <Base
-  title="Find a Verified Personal Trainer in UAE | TrainedBy.ae"
-  description="Browse REPs UAE verified personal trainers in Dubai, Abu Dhabi and across the UAE. Filter by speciality, location and training mode."
+  title={`Find a Verified Personal Trainer — ${brandName}`}
+  description={`Browse ${market.certificationBody}-verified personal trainers. Filter by speciality, location and training mode.`}
 >
   <Fragment slot="head">
     <meta name="color-scheme" content="light">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
   </Fragment>
 
   <style>
@@ -29,7 +31,7 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 body {
   background: #F5F4F3;
   color: #1A1411;
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: 'Manrope', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
