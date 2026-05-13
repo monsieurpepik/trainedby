@@ -40,7 +40,11 @@ serve(async (req) => {
 
     // Build update payload
     const update: Record<string, unknown> = {};
-    const fields = ["name","title","bio","years_experience","clients_trained","specialties","accepting_clients","instagram","tiktok","youtube"];
+    const fields = [
+      "name", "title", "bio", "years_experience", "clients_trained",
+      "specialties", "accepting_clients", "instagram", "tiktok", "youtube",
+      "phone", "whatsapp", "city", "training_modes", "video_intro_url",
+    ];
     fields.forEach(f => { if (body[f] !== undefined) update[f] = body[f]; });
 
     // Handle new gallery images (base64 → upload to Supabase Storage)
