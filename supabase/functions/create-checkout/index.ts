@@ -9,17 +9,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Stripe price IDs  -  set these in your Stripe dashboard and add to env
-const PRICE_IDS: Record<string, Record<string, string>> = {
-  pro: {
-    monthly: Deno.env.get("STRIPE_PRICE_PRO_MONTHLY") || "price_pro_monthly",
-    annual: Deno.env.get("STRIPE_PRICE_PRO_ANNUAL") || "price_pro_annual",
-  },
-  premium: {
-    monthly: Deno.env.get("STRIPE_PRICE_PREMIUM_MONTHLY") || "price_premium_monthly",
-    annual: Deno.env.get("STRIPE_PRICE_PREMIUM_ANNUAL") || "price_premium_annual",
-  },
+// Market → currency code (mirrors src/lib/market.ts)
+const MARKET_CURRENCY: Record<string, string> = {
+  ae: 'AED', uk: 'GBP', us: 'USD', com: 'USD',
+  fr: 'EUR', it: 'EUR', es: 'EUR', mx: 'MXN', in: 'INR',
 };
+
+// Returns the Stripe price ID for a given plan, billing cycle, and market.
+// Env var convention: STRIPE_PRICE_PRO_MONTHLY_AED (market-specific)
+// Falls back to: STRIPE_PRICE_PRO_MONTHLY (global default)
+function getPriceId(plan: string, billing: string, market: string): string | undefined {
+  const currency = MARKET_CURRENCY[market] ?? 'USD';
+  const key = `STRIPE_PRICE_${plan.toUpperCase()}_${billing.toUpperCase()}`;
+  return Deno.env.get(`${key}_${currency}`) || Deno.env.get(key) || undefined;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -65,7 +68,7 @@ serve(async (req) => {
       await sb.from("trainers").update({ stripe_customer_id: customerId }).eq("id", trainer_id);
     }
 
-    const priceId = PRICE_IDS[plan]?.[billing];
+    const priceId = getPriceId(plan, billing, trainer.market ?? 'ae');
     if (!priceId) return new Response(JSON.stringify({ error: "Invalid plan" }), { status: 400, headers: corsHeaders });
 
     const session = await stripe.checkout.sessions.create({
