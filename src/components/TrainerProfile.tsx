@@ -5,13 +5,22 @@ import {
   dedupePackages,
   getDisplayName,
   getContactNumber,
+  buildStats,
+  buildTags,
+  normaliseSpecialties,
+  getLocation,
+  isVerifiedTrainer,
 } from './trainer/utils';
 
 import Hero from './trainer/Hero';
+import IdentityStrip from './trainer/IdentityStrip';
+import StatsRow from './trainer/StatsRow';
 import CTABlock from './trainer/CTABlock';
 import PackagesCarousel from './trainer/PackagesCarousel';
 import About from './trainer/About';
+import Reviews from './trainer/Reviews';
 import CompactHeader from './trainer/CompactHeader';
+import BottomNav from './trainer/BottomNav';
 
 type LoadState = 'loading' | 'loaded' | 'error';
 
@@ -48,7 +57,15 @@ function ErrorState() {
   );
 }
 
-export default function TrainerProfile({ slug, paymentEnabled, currencySymbol, initialName = '', initialPhoto = '', initialSpecialty = '' }: TrainerProfileProps) {
+export default function TrainerProfile({
+  slug,
+  paymentEnabled,
+  currencySymbol,
+  initialName = '',
+  initialPhoto = '',
+  initialSpecialty = '',
+  certificationBody,
+}: TrainerProfileProps) {
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [trainer, setTrainer] = useState<Trainer | null>(null);
   const [packages, setPackages] = useState<Package[]>([]);
@@ -137,6 +154,18 @@ export default function TrainerProfile({ slug, paymentEnabled, currencySymbol, i
           <div id="profile-mount">
             <Hero trainer={trainer} onBack={handleBack} onShare={handleShare} />
             <div id="tb-content">
+              <div className="tb-glass" style={{ margin: '12px 16px', overflow: 'hidden' }}>
+                <IdentityStrip
+                  tags={buildTags(
+                    normaliseSpecialties(trainer.specialties as string[] | string | undefined),
+                    isVerifiedTrainer(trainer),
+                    trainer.certifications ?? [],
+                    certificationBody,
+                  )}
+                  location={getLocation(trainer)}
+                />
+                <StatsRow stats={buildStats(trainer)} />
+              </div>
               <CTABlock
                 paymentEnabled={paymentEnabled}
                 whatsappNumber={whatsappNumber}
@@ -151,7 +180,13 @@ export default function TrainerProfile({ slug, paymentEnabled, currencySymbol, i
                 />
               )}
               <About bio={bio} />
+              <Reviews
+                trainerId={trainer.id}
+                averageRating={trainer.avg_rating != null ? Number(trainer.avg_rating) : null}
+                reviewCount={trainer.review_count ?? 0}
+              />
             </div>
+            <BottomNav />
           </div>
         )}
       </div>
