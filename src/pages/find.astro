@@ -30,7 +30,7 @@ const brandName = market.brandName || 'TrainedBy';
   --green:     #00C853;
 }
 
-body {
+body:has(#find-page) {
   background: #F5F4F3;
   color: #1A1411;
   font-family: 'Manrope', system-ui, sans-serif;
@@ -272,6 +272,7 @@ body {
   </style>
 
 <!-- Sticky top bar — replaces arc-hero -->
+<div id="find-page">
 <div class="top-bar">
   <a href="/" class="top-bar-logo">{brandName}</a>
   <div class="top-bar-search">
@@ -517,4 +518,5 @@ document.getElementById('search-input').addEventListener('input', filterTrainers
 loadTrainers();
 </script>
 
+</div>
 </Base>
