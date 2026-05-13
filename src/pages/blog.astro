@@ -1,11 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getMarket } from '../lib/market.ts';
 const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+const market = getMarket(Astro.url.hostname);
+const brandName = market.brandName || 'TrainedBy';
+
+// Blog content is EN-only for now — redirect non-EN markets to landing
+const isEnMarket = ['ae','uk','com','in'].includes(market.market);
+if (!isEnMarket) {
+  return Astro.redirect('/landing', 302);
+}
 ---
 
 <Base
-  title="TrainedBy Blog — Expert Fitness Advice from UAE's Top Trainers"
-  description="Evidence-based fitness, nutrition, and training articles from UAE's REPs-verified personal trainers."
+  title={`${brandName} Blog — Expert Fitness Advice from Verified Trainers`}
+  description={`Evidence-based fitness, nutrition, and training articles from ${market.certificationBody}-verified personal trainers.`}
 >
   <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

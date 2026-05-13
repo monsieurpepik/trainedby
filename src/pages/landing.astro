@@ -166,13 +166,6 @@ const trustFree    = trustBrowse[m]      ?? 'Free to browse';
       text-decoration: none;
       display: inline-block;
     }
-    .btn-ghost-orange {
-      color: var(--brand);
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-      padding: 12px 4px;
-    }
     .hero-right { display: none; } /* hidden on mobile */
 
     /* Stats grid */
@@ -420,11 +413,10 @@ const trustFree    = trustBrowse[m]      ?? 'Free to browse';
         <span class="hero-eyebrow-dot"></span>
         <span id="trainer-count-label">{market.certificationBody} Verified Trainers · {market.cityName || market.market.toUpperCase()}</span>
       </div>
-      <h1 class="hero-h1" data-i18n="hero_headline">Find your perfect<br/><em>personal trainer</em></h1>
+      <h1 class="hero-h1" data-i18n="hero_headline">Every trainer.<br/><em>{market.certificationBody} verified.</em></h1>
       <p class="hero-sub" data-i18n="hero_sub">Every trainer on {brandName} is {market.certificationBody}-certified and verified. Browse real profiles, read real stories, and book the right person for you.</p>
       <div class="hero-actions">
         <a href="/find" class="btn-dark">Find a trainer</a>
-        <a href="/join" class="btn-ghost-orange">Join as trainer →</a>
       </div>
       <!-- SEARCH -->
       <div class="search-wrap" style="margin-top:28px;">
@@ -476,7 +468,7 @@ const trustFree    = trustBrowse[m]      ?? 'Free to browse';
             <div class="ecard-price" id="hero-card-price">
               {hero.price} <span>/ session</span>
             </div>
-            <button class="ecard-cta">View profile</button>
+            <span class="ecard-cta">View profile</span>
           </div>
         </div>
       </a>
@@ -508,84 +500,26 @@ const trustFree    = trustBrowse[m]      ?? 'Free to browse';
     </div>
   </div>
 
-  <!-- TRANSFORMATIONS -->
+  <!-- PULL QUOTE -->
   <div style="border-top:1px solid var(--border);background:var(--surface);">
-    <div class="section">
-      <p class="section-eyebrow">Real Results</p>
-      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
-        <h2 class="section-title" style="margin-bottom:0">Transformations<br>that speak for themselves.</h2>
-        <a href="/community?category=transformations" style="font-size:14px;font-weight:700;color:var(--text);text-decoration:none">See all →</a>
-      </div>
-      <p class="section-sub">Documented by the trainers who made them happen. No filters, no stock photos.</p>
-      <div class="transforms-grid" id="transformations-grid">
-        <!-- Static seed cards — replaced by live data when available -->
-        <div class="transform-card">
-          <div class="transform-header">
-            <div class="transform-trainer">
-              <div class="transform-avatar">S</div>
-              <div>
-                <div class="transform-trainer-name">Sarah M.</div>
-                <div class="transform-trainer-cert">{market.certificationBody} Level 3 · Strength Coach</div>
-              </div>
-            </div>
-            <div class="transform-title">From sedentary to running her first 10k in 14 weeks</div>
-            <p class="transform-body">My client came to me post-pregnancy, hadn't exercised in 3 years. We started with 20-minute walks and built from there. The key was making every session feel achievable — never overwhelming.</p>
-          </div>
-          <div class="transform-stats">
-            <div class="transform-stat"><div class="transform-stat-val">14</div><div class="transform-stat-label">Weeks</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">8kg</div><div class="transform-stat-label">Lost</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">10k</div><div class="transform-stat-label">First Race</div></div>
-          </div>
-        </div>
-        <div class="transform-card">
-          <div class="transform-header">
-            <div class="transform-trainer">
-              <div class="transform-avatar">K</div>
-              <div>
-                <div class="transform-trainer-name">Khalid R.</div>
-                <div class="transform-trainer-cert">{market.certificationBody} Level 4 · HIIT Specialist</div>
-              </div>
-            </div>
-            <div class="transform-title">Corporate burnout to competing in his first obstacle race</div>
-            <p class="transform-body">He was working 70-hour weeks and using food as stress relief. We didn't talk about diet for the first month — just built the habit of showing up. Everything else followed naturally.</p>
-          </div>
-          <div class="transform-stats">
-            <div class="transform-stat"><div class="transform-stat-val">20</div><div class="transform-stat-label">Weeks</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">14kg</div><div class="transform-stat-label">Lost</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">1st</div><div class="transform-stat-label">Race Done</div></div>
-          </div>
-        </div>
-        <div class="transform-card">
-          <div class="transform-header">
-            <div class="transform-trainer">
-              <div class="transform-avatar">N</div>
-              <div>
-                <div class="transform-trainer-name">Nour H.</div>
-                <div class="transform-trainer-cert">{market.certificationBody} Level 3 · Nutrition & Wellness</div>
-              </div>
-            </div>
-            <div class="transform-title">Rebuilding strength after a back injury — without surgery</div>
-            <p class="transform-body">Her physio cleared her for light exercise but she was terrified to move. We worked with her physiotherapist from day one. Six months later she's deadlifting bodyweight and pain-free.</p>
-          </div>
-          <div class="transform-stats">
-            <div class="transform-stat"><div class="transform-stat-val">24</div><div class="transform-stat-label">Weeks</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">0</div><div class="transform-stat-label">Pain Days</div></div>
-            <div class="transform-stat"><div class="transform-stat-val">BW</div><div class="transform-stat-label">Deadlift</div></div>
-          </div>
-        </div>
-      </div>
+    <div class="section" style="padding:64px 24px;text-align:center;">
+      <blockquote style="max-width:680px;margin:0 auto;">
+        <p style="font-size:clamp(20px,3vw,28px);font-weight:700;letter-spacing:-0.03em;line-height:1.35;color:var(--text);margin-bottom:24px;">"The difference between a random trainer and a verified one isn't just a badge. It's accountability. It's the knowledge that someone checked."</p>
+        <footer style="font-size:13px;color:var(--text-2);font-weight:600;">{market.certificationBody} — {market.market === 'fr' ? 'Organisme officiel de certification des coachs sportifs' : market.market === 'it' ? 'Ente ufficiale di certificazione dei personal trainer' : market.market === 'es' || market.market === 'mx' ? 'Organismo oficial de certificación de entrenadores' : 'The official certification body for personal trainers'}</footer>
+      </blockquote>
     </div>
   </div>
 
-  <!-- BLOG PREVIEW -->
+  <!-- BLOG PREVIEW — EN markets only -->
+  {(market.market === 'ae' || market.market === 'uk' || market.market === 'com' || market.market === 'in') && (
   <div style="border-top:1px solid var(--border);">
     <div class="section">
-      <p class="section-eyebrow">From the Community</p>
+      <p class="section-eyebrow">From the community</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
-        <h2 class="section-title" style="margin-bottom:0">Advice from trainers<br>who actually train.</h2>
-        <a href="/blog" style="font-size:14px;font-weight:700;color:var(--text);text-decoration:none">Read all articles →</a>
+        <h2 class="section-title" style="margin-bottom:0">Written by trainers<br>who actually train.</h2>
+        <a href="/blog" style="font-size:14px;font-weight:700;color:var(--text);text-decoration:none">Read all →</a>
       </div>
-      <p class="section-sub">No sponsored content. No generic listicles. Written by verified trainers from their own practice.</p>
+      <p class="section-sub">No sponsored content. No generic listicles. Written by {market.certificationBody}-verified trainers from their own practice.</p>
       <div class="blog-grid" id="blog-preview">
         <a href="/blog" class="blog-card featured">
           <div>
@@ -619,6 +553,7 @@ const trustFree    = trustBrowse[m]      ?? 'Free to browse';
       </div>
     </div>
   </div>
+  )}
 
   <!-- FOR TRAINERS BANNER -->
   <div style="padding:60px 0;border-top:1px solid var(--border);">
