@@ -80,7 +80,16 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { name, email, phone, title, specialties, reps_number, referred_by_slug, market = 'ae' } = body;
+    const {
+      name, email, phone, title, specialties, reps_number,
+      referred_by_slug, market = 'ae',
+      slug: providedSlug,
+      whatsapp,
+      training_modes,
+      plan,
+      accepting_clients,
+      return_token,
+    } = body;
 
     // ── Validate required fields ──────────────────────────────────────────────
     if (!name || !email) {
@@ -148,24 +157,27 @@ serve(async (req) => {
       });
     }
 
-    // ── Generate unique slug (bounded  -  max 10 attempts) ──────────────────────
-    // Using a bounded loop prevents infinite hang if DB is slow or under load.
-    // On collision after 10 attempts, we append a UUID fragment to guarantee uniqueness.
-    let baseSlug = slugify(cleanName) || "trainer";
-    let slug = baseSlug;
-
-    for (let attempt = 0; attempt <= 10; attempt++) {
-      if (attempt === 10) {
-        // Guaranteed unique fallback  -  append 6 random hex chars
-        slug = `${baseSlug}-${crypto.randomUUID().slice(0, 6)}`;
-        break;
+    // ── Resolve slug ──────────────────────────────────────────────────────────────
+    let slug: string;
+    if (providedSlug && typeof providedSlug === 'string') {
+      // Caller provided a pre-validated slug — just check it's still available
+      slug = sanitize(providedSlug.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 40)) || slugify(cleanName) || 'trainer';
+      const { data: taken } = await sb.from("trainers").select("id").eq("slug", slug).single();
+      if (taken) {
+        return new Response(JSON.stringify({ error: "That profile URL is already taken." }), {
+          status: 409, headers: corsHeaders,
+        });
       }
-      const { data: taken } = await sb.from("trainers")
-        .select("id")
-        .eq("slug", slug)
-        .single();
-      if (!taken) break;
-      slug = attempt === 0 ? `${baseSlug}2` : `${baseSlug}${attempt + 2}`;
+    } else {
+      // Generate from name with bounded uniqueness loop
+      let baseSlug = slugify(cleanName) || "trainer";
+      slug = baseSlug;
+      for (let attempt = 0; attempt <= 10; attempt++) {
+        if (attempt === 10) { slug = `${baseSlug}-${crypto.randomUUID().slice(0, 6)}`; break; }
+        const { data: taken } = await sb.from("trainers").select("id").eq("slug", slug).single();
+        if (!taken) break;
+        slug = attempt === 0 ? `${baseSlug}2` : `${baseSlug}${attempt + 2}`;
+      }
     }
 
     // ── Create trainer ─────────────────────────────────────────────────────────
@@ -174,11 +186,16 @@ serve(async (req) => {
       name: cleanName,
       email: cleanEmail,
       phone: cleanPhone || null,
+      whatsapp: whatsapp ? sanitize(String(whatsapp)) : null,
       title: cleanTitle || null,
       specialties: cleanSpecialties,
+      training_modes: Array.isArray(training_modes) ? training_modes.slice(0, 5).map((m: string) => sanitize(m)) : [],
+      plan: plan === 'pro' ? 'pro' : 'free',
+      accepting_clients: accepting_clients !== false,
       reps_number: cleanReps || null,
       verification_status: cleanReps ? "pending" : "unsubmitted",
       referred_by_slug: cleanReferredBy || null,
+      market: market || 'ae',
     }).select().single();
 
     if (error) throw error;
@@ -228,7 +245,9 @@ serve(async (req) => {
       body: JSON.stringify({ trainer_id: trainer.id, type: 'welcome' })
     }).catch(() => {}); // Non-fatal
 
-    return new Response(JSON.stringify({ ok: true, slug, trainer_id: trainer.id }), {
+    const responseBody: Record<string, unknown> = { ok: true, slug, trainer_id: trainer.id };
+    if (return_token) responseBody.token = token;
+    return new Response(JSON.stringify(responseBody), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
