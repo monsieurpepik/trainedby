@@ -1,14 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { getMarketBaseUrl } from '../_shared/market_url.ts';
+import { MARKET_DOMAINS } from '../_shared/market_url.ts';
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
-// Note: credentials:true requires a specific origin, not wildcard.
-// The frontend must send requests with credentials:include.
+// credentials:true requires a specific origin, not wildcard.
+// All 8 market domains + local dev + optional staging URL are allowed.
 const stagingUrl = Deno.env.get('STAGING_URL');
 const ALLOWED_ORIGINS = [
-  getMarketBaseUrl('ae'),
+  ...Object.values(MARKET_DOMAINS),
   "http://localhost:3000",
+  "http://localhost:4323",
   "http://127.0.0.1:5500",
   ...(stagingUrl ? [stagingUrl] : []),
 ];
@@ -112,17 +113,37 @@ serve(async (req) => {
       "SameSite=Strict",
     ].join("; ");
 
+    // Fetch packages count — needed for dashboard checklist accuracy
+    const { count: pkgCount } = await sb
+      .from('session_packages')
+      .select('id', { count: 'exact', head: true })
+      .eq('trainer_id', trainer.id);
+
     // Return safe trainer data (strip sensitive fields before sending to client)
     const safeTrainer = {
+      // identity
       id: trainer.id,
       slug: trainer.slug,
       name: trainer.name,
       email: trainer.email,
       title: trainer.title,
       plan: trainer.plan,
+      // verification
       reps_verified: trainer.reps_verified,
+      reps_number: trainer.reps_number,
       verification_status: trainer.verification_status,
+      // profile content (needed for checklist + edit form pre-fill)
       avatar_url: trainer.avatar_url,
+      bio: trainer.bio,
+      city: trainer.city,
+      instagram: trainer.instagram,
+      specialties: trainer.specialties,
+      accepting_clients: trainer.accepting_clients,
+      // contact
+      phone: trainer.phone,
+      whatsapp: trainer.whatsapp,
+      // completeness signal
+      packages_count: pkgCount ?? 0,
     };
 
     return new Response(JSON.stringify({ ok: true, trainer: safeTrainer }), {
