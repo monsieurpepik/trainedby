@@ -9,10 +9,7 @@ interface PackagesCarouselProps {
 }
 
 export default function PackagesCarousel({
-  packages,
-  currencySymbol,
-  displayName,
-  whatsappNumber,
+  packages, currencySymbol, displayName, whatsappNumber,
 }: PackagesCarouselProps) {
   if (packages.length === 0) return null;
 
@@ -25,33 +22,35 @@ export default function PackagesCarousel({
 
   return (
     <div className="tb-sessions">
-      <div className="tb-sessions-header">
-        <span className="tb-section-label">Sessions</span>
-      </div>
-      <div className="tb-sessions-scroll">
-        {packages.map((pkg, i) => {
-          const pkgName = pkg.name || pkg.title || 'Package';
-          const price = formatPrice(pkg, currencySymbol);
-          return (
-            <div key={pkg.id ?? i} className="tb-pkg-card">
-              <div className="tb-pkg-name">{pkgName}</div>
-              {pkg.sessions != null && (
-                <div className="tb-pkg-detail">
-                  {pkg.sessions} session{pkg.sessions !== 1 ? 's' : ''}
+      <div className="tb-glass" style={{ margin: '0 16px 12px', overflow: 'hidden' }}>
+        <div className="tb-sessions-header">
+          <span className="tb-section-label">Sessions</span>
+        </div>
+        <div className="tb-sessions-scroll">
+          {packages.map((pkg, i) => {
+            const pkgName = pkg.name || pkg.title || 'Package';
+            const price = formatPrice(pkg, currencySymbol);
+            const meta = pkg.sessions != null
+              ? `${pkg.sessions} session${pkg.sessions !== 1 ? 's' : ''}`
+              : null;
+            return (
+              <div key={pkg.id ?? i} className="tb-pkg-card">
+                <div>
+                  <div className="tb-pkg-name">{pkgName}</div>
+                  {meta && <div className="tb-pkg-detail">{meta}</div>}
                 </div>
-              )}
-              {pkg.description && (
-                <div className="tb-pkg-detail">{pkg.description}</div>
-              )}
-              {price && <div className="tb-pkg-price">{price}</div>}
-              {whatsappNumber && (
-                <button className="tb-pkg-book" onClick={() => handleBook(pkg)}>
-                  Book
-                </button>
-              )}
-            </div>
-          );
-        })}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  {price && <div className="tb-pkg-price">{price}</div>}
+                  {whatsappNumber && (
+                    <button className="tb-pkg-book" onClick={() => handleBook(pkg)}>
+                      Book
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -10,20 +10,15 @@ export default function About({ bio }: AboutProps) {
   if (!bio) return null;
 
   return (
-    <div className="tb-about">
-      <div className="tb-section-label" style={{ marginBottom: '12px' }}>About</div>
+    <div className="tb-glass tb-about" style={{ margin: '0 16px 12px' }}>
+      <div className="tb-section-label" style={{ marginBottom: '10px' }}>About</div>
       <div
         className={`tb-about-text${expanded ? ' expanded' : ''}`}
-        id="tb-about-text"
       >
         {bio}
       </div>
-      {!expanded && (
-        <button
-          className="tb-read-more"
-          style={{ color: '#9A9290', fontWeight: 400 }}
-          onClick={() => setExpanded(true)}
-        >
+      {bio.length > 120 && !expanded && (
+        <button className="tb-read-more" onClick={() => setExpanded(true)}>
           Read more →
         </button>
       )}

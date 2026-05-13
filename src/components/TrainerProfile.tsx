@@ -2,20 +2,16 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Trainer, Package, TrainerProfileProps } from './trainer/types';
 import { SUPABASE_ANON_KEY as SUPABASE_KEY, EDGE_BASE } from '../lib/config';
 import {
-  buildStats, buildTags, dedupePackages,
-  normaliseSpecialties, getDisplayName,
-  getLocation, getContactNumber, isVerifiedTrainer,
+  dedupePackages,
+  getDisplayName,
+  getContactNumber,
 } from './trainer/utils';
 
 import Hero from './trainer/Hero';
-import IdentityStrip from './trainer/IdentityStrip';
-import StatsRow from './trainer/StatsRow';
 import CTABlock from './trainer/CTABlock';
 import PackagesCarousel from './trainer/PackagesCarousel';
 import About from './trainer/About';
-import Reviews from './trainer/Reviews';
 import CompactHeader from './trainer/CompactHeader';
-import BottomNav from './trainer/BottomNav';
 
 type LoadState = 'loading' | 'loaded' | 'error';
 
@@ -52,7 +48,7 @@ function ErrorState() {
   );
 }
 
-export default function TrainerProfile({ slug, paymentEnabled, currencySymbol, initialName = '', initialPhoto = '', initialSpecialty = '', certificationBody = '' }: TrainerProfileProps) {
+export default function TrainerProfile({ slug, paymentEnabled, currencySymbol, initialName = '', initialPhoto = '', initialSpecialty = '' }: TrainerProfileProps) {
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [trainer, setTrainer] = useState<Trainer | null>(null);
   const [packages, setPackages] = useState<Package[]>([]);
@@ -107,21 +103,8 @@ export default function TrainerProfile({ slug, paymentEnabled, currencySymbol, i
     }
   }, [displayName]);
 
-  const specialties = trainer ? normaliseSpecialties(trainer.specialties) : [];
-  const tags = trainer
-    ? buildTags(
-        specialties,
-        isVerifiedTrainer(trainer),
-        Array.isArray(trainer.certifications) ? trainer.certifications : [],
-        certificationBody,
-      )
-    : [];
-  const stats = trainer ? buildStats(trainer) : [];
-  const trainerLocation = trainer ? getLocation(trainer) : '';
   const whatsappNumber = trainer ? getContactNumber(trainer) : '';
   const bio = trainer?.bio ?? '';
-  const averageRating = trainer?.avg_rating != null ? parseFloat(String(trainer.avg_rating)) : null;
-  const reviewCount = trainer?.review_count ?? 0;
 
   return (
     <div id="tb-page">
@@ -154,31 +137,24 @@ export default function TrainerProfile({ slug, paymentEnabled, currencySymbol, i
           <div id="profile-mount">
             <Hero trainer={trainer} onBack={handleBack} onShare={handleShare} />
             <div id="tb-content">
-              <IdentityStrip tags={tags} location={trainerLocation} />
-              <StatsRow stats={stats} />
               <CTABlock
                 paymentEnabled={paymentEnabled}
                 whatsappNumber={whatsappNumber}
                 displayName={displayName}
               />
-              <PackagesCarousel
-                packages={packages}
-                currencySymbol={currencySymbol}
-                displayName={displayName}
-                whatsappNumber={whatsappNumber}
-              />
+              {packages.length > 0 && (
+                <PackagesCarousel
+                  packages={packages}
+                  currencySymbol={currencySymbol}
+                  displayName={displayName}
+                  whatsappNumber={whatsappNumber}
+                />
+              )}
               <About bio={bio} />
-              <Reviews
-                trainerId={trainer.id}
-                averageRating={averageRating}
-                reviewCount={reviewCount}
-              />
             </div>
           </div>
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 }

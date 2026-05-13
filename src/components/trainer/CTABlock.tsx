@@ -27,50 +27,26 @@ export default function CTABlock({ paymentEnabled, whatsappNumber, displayName }
       )}`
     : null;
 
-  const waMessageUrl = whatsappNumber
-    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-        `Hi ${displayName}, I'd like to find out more about your training.`
-      )}`
-    : null;
-
   function open(url: string | null) {
     if (url) window.open(url, '_blank', 'noopener');
   }
 
   if (!whatsappNumber) {
-    return (
-      <div className="tb-cta">
-        <div style={{ padding: '12px 0', fontSize: '13px', color: 'var(--text-muted)', textAlign: 'center' }}>
-          Contact details loading…
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
     <div className="tb-cta">
-      {paymentEnabled ? (
-        <button
-          className="tb-btn-primary"
-          onClick={() => open(waBookUrl)}
-          style={{ animation: 'wa-pulse 2s ease infinite' }}
-        >
-          <CalIcon />
-          Book a Session
-        </button>
-      ) : (
+      <div className="tb-glass" style={{ margin: '12px 16px 0', borderRadius: '18px', overflow: 'hidden' }}>
         <button
           className="tb-btn-primary"
           onClick={() => open(waBookUrl)}
           style={{ animation: 'wa-pulse 2s ease infinite' }}
         >
           <WaIcon />
-          Chat on WhatsApp
+          Message on WhatsApp
         </button>
-      )}
-      <button className="tb-btn-secondary" onClick={() => open(waMessageUrl)}>
-        Send a message
-      </button>
+      </div>
     </div>
   );
 }

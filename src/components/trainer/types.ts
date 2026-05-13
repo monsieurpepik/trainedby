@@ -8,6 +8,7 @@ export interface Trainer {
   avg_rating?: number | string | null;
   review_count?: number;
   reps_verified?: boolean;
+  reps_number?: string;
   is_verified?: boolean;
   verification_status?: string;
   city?: string;
