@@ -6,23 +6,23 @@
 
 ## Quick Fixes (code polish)
 
-- [ ] **QF-1** `blog.astro` — body still using `font-family: 'Inter'` (missed in DM Sans sweep)
-- [ ] **QF-2** `find.astro` + `find/[city].astro` — hardcoded "TrainedBy" brand in nav/top bar
-- [ ] **QF-3** `landing.astro` — dead `.footer-cta` CSS block never renders; remove "Community" link from footer
+- [x] **QF-1** `blog.astro` — body still using `font-family: 'Inter'` (missed in DM Sans sweep)
+- [x] **QF-2** `find.astro` + `find/[city].astro` — hardcoded "TrainedBy" brand in nav/top bar
+- [x] **QF-3** `landing.astro` — dead `.footer-cta` CSS block never renders; remove "Community" link from footer
 
 ---
 
 ## Launch Gates
 
-- [ ] **Gate 5** — WhatsApp OG card: add `og:image` to trainer profile pages so shared links preview with trainer photo + name
-- [ ] **Gate 6** — Stripe currency per market: verify checkout creates sessions in AED/GBP/USD/EUR/MXN based on `market`
+- [x] **Gate 5** — WhatsApp OG card: trainer `avatar_url` used as `og:image` on profile pages
+- [x] **Gate 6** — Stripe per-market price IDs: `STRIPE_PRICE_PRO_MONTHLY_AED` etc.; falls back to global default
 
 ---
 
 ## UX Improvements
 
-- [ ] **UX-1** Join page — multi-step progress indicator (step 1/3), inline cert number validation, success state shows live profile URL
-- [ ] **UX-2** MX market config — verify `market.ts` has full `mx` entry (certBody, currency, paymentEnabled, etc.)
+- [x] **UX-1** Join page — inline cert validation, fix /dashboard link, remove emoji from success screen
+- [x] **UX-2** MX market config — verified complete; fixed corrupted siteTitle ("Españaico" → "México")
 
 ---
 
