@@ -490,8 +490,8 @@ function trainerCardHTML(trainer) {
 
   const photoEl = photo
     ? `<div class="tc-photo" style="background-image:url('${esc(photo)}')"></div>`
-    : `<div class="tc-photo" style="background:#1a1a1a;"></div>
-       <div class="tc-avatar-circle"><div class="tc-avatar-initials" style="background:${nameColor(rawName)};">${initials}</div></div>`;
+    : `<div class="tc-photo" style="background:${nameColor(rawName)};"></div>
+       <div class="tc-avatar-circle"><div class="tc-avatar-initials">${initials}</div></div>`;
 
   const repsEl = trainer.reps_verified
     ? `<div class="tc-reps">
