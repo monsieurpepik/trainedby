@@ -31,7 +31,7 @@ export function buildStats(t: Partial<Trainer>): StatItem[] {
   const goalRate = t.goal_achievement_rate ?? null;
   if (goalRate) items.push({ num: `${goalRate}%`, label: 'Goal Rate' });
 
-  const clients = t.total_clients || t.client_count || null;
+  const clients = t.clients_trained || t.total_clients || t.client_count || null;
   if (clients) items.push({ num: `${clients}+`, label: 'Clients' });
 
   return items;

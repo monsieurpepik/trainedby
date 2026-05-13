@@ -20,6 +20,7 @@ export interface Trainer {
   certifications?: string[];
   experience_years?: number;
   years_experience?: number;
+  clients_trained?: number;
   total_clients?: number;
   client_count?: number;
   goal_achievement_rate?: number | null;
