@@ -12,6 +12,8 @@ const brandName = market.brandName || 'TrainedBy';
 >
   <Fragment slot="head">
     <meta name="color-scheme" content="light">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   </Fragment>
 
   <style>
@@ -199,8 +201,8 @@ body {
   position: absolute; inset: 0;
   background: linear-gradient(
     to bottom,
-    transparent 40%,
-    rgba(0,0,0,0.5) 72%,
+    transparent 45%,
+    rgba(0,0,0,0.55) 75%,
     rgba(0,0,0,0.82) 100%
   );
 }
@@ -226,7 +228,7 @@ body {
   display: flex; flex-direction: column; gap: 2px;
 }
 .tc-reps-label { font-size: 8px; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; }
-.tc-reps-num { font-size: 10px; color: rgba(255,255,255,0.92); letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+.tc-reps-num { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.92); letter-spacing: 0.06em; text-shadow: 0 0 6px rgba(200,150,255,0.4); }
 
 /* Text at bottom — name + specialty only */
 .tc-text {
@@ -476,9 +478,9 @@ function nameColor(name) {
 }
 
 function trainerCardHTML(trainer) {
-  const name = esc(trainer.full_name || trainer.name || 'Trainer');
-  const initials = (trainer.full_name || trainer.name || '?')
-    .split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  const rawName = trainer.full_name || trainer.name || 'Trainer';
+  const name = esc(rawName);
+  const initials = rawName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
   const specialty = esc((trainer.specialties || [])[0] || trainer.title || '');
   const city = esc(trainer.city || trainer.location || '');
   const specCity = [specialty, city].filter(Boolean).join(' · ');
@@ -487,8 +489,8 @@ function trainerCardHTML(trainer) {
 
   const photoEl = photo
     ? `<div class="tc-photo" style="background-image:url('${esc(photo)}')"></div>`
-    : `<div class="tc-photo" style="background:${nameColor(name)};"></div>
-       <div class="tc-avatar-circle"><div class="tc-avatar-initials" style="background:rgba(255,255,255,0.12);">${initials}</div></div>`;
+    : `<div class="tc-photo" style="background:#1a1a1a;"></div>
+       <div class="tc-avatar-circle"><div class="tc-avatar-initials" style="background:${nameColor(rawName)};">${initials}</div></div>`;
 
   const repsEl = trainer.reps_verified
     ? `<div class="tc-reps">
