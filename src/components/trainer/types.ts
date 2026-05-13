@@ -52,4 +52,8 @@ export interface TrainerProfileProps {
   slug: string;
   paymentEnabled: boolean;
   currencySymbol: string;
+  initialName?: string;
+  initialPhoto?: string;
+  initialSpecialty?: string;
+  certificationBody?: string;
 }

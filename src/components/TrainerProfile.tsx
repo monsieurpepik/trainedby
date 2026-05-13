@@ -33,7 +33,7 @@ function ErrorState() {
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       justifyContent: 'center', minHeight: '80vh', gap: '24px',
       padding: '32px', textAlign: 'center',
-      fontFamily: "'DM Sans', system-ui, sans-serif",
+      fontFamily: "'Manrope', system-ui, sans-serif",
     }}>
       <div style={{ fontSize: '64px', fontWeight: 200, letterSpacing: '-0.02em', color: '#111111', lineHeight: 1 }}>404</div>
       <h1 style={{ fontSize: '22px', fontWeight: 300, color: '#111111' }}>Trainer not found</h1>
@@ -52,7 +52,7 @@ function ErrorState() {
   );
 }
 
-export default function TrainerProfile({ slug, paymentEnabled, currencySymbol }: TrainerProfileProps) {
+export default function TrainerProfile({ slug, paymentEnabled, currencySymbol, initialName = '', initialPhoto = '', initialSpecialty = '' }: TrainerProfileProps) {
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [trainer, setTrainer] = useState<Trainer | null>(null);
   const [packages, setPackages] = useState<Package[]>([]);
@@ -131,7 +131,23 @@ export default function TrainerProfile({ slug, paymentEnabled, currencySymbol }:
       />
 
       <div id="tb-root">
-        {loadState === 'loading' && <LoadingSpinner />}
+        {loadState === 'loading' && (
+          initialPhoto ? (
+            <div id="profile-mount">
+              <div className="tb-hero">
+                <img src={initialPhoto} alt={initialName} className="tb-hero-img" />
+                <div className="tb-hero-fade" />
+                <div className="tb-hero-name-block">
+                  <div className="tb-hero-name">{initialName}</div>
+                  <div className="tb-hero-tagline">{initialSpecialty}</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
+                <div className="tb-spinner" />
+              </div>
+            </div>
+          ) : <LoadingSpinner />
+        )}
         {loadState === 'error' && <ErrorState />}
         {loadState === 'loaded' && trainer && (
           <div id="profile-mount">

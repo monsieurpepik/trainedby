@@ -153,7 +153,7 @@ body:has(#tb-page) {
 }
 
 #tb-page {
-  --font: 'DM Sans', system-ui, sans-serif;
+  --font: 'Manrope', system-ui, sans-serif;
   --text-primary:   var(--text);
   --text-secondary: var(--text-muted);
   --bg-white:       var(--bg);
@@ -326,8 +326,7 @@ body:has(#tb-page) {
 }
 .tb-tag {
   background: var(--tag-bg); color: var(--tag-text);
-  font-weight: 500; font-size: 10.5px;
-  letter-spacing: 0.07em; text-transform: uppercase;
+  font-weight: 500; font-size: 11px;
   padding: 5px 10px; border-radius: 20px;
 }
 .tb-location {
@@ -346,7 +345,7 @@ body:has(#tb-page) {
 }
 .tb-stat-item:last-child { border-right: none; }
 .tb-stat-num { font-weight: 200; font-size: 22px; letter-spacing: -0.02em; color: var(--text-primary); line-height: 1; }
-.tb-stat-label { font-weight: 500; font-size: 9.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); margin-top: 4px; }
+.tb-stat-label { font-weight: 500; font-size: 10px; color: var(--text-faint); margin-top: 4px; }
 
 .tb-cta { padding: 20px 24px 16px; display: flex; flex-direction: column; gap: 10px; }
 .tb-btn-primary {
@@ -368,7 +367,7 @@ body:has(#tb-page) {
 
 .tb-sessions { padding: 20px 0 20px; }
 .tb-sessions-header { display: flex; align-items: center; justify-content: space-between; padding: 0 20px 12px; }
-.tb-section-label { font-weight: 600; font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-faint); }
+.tb-section-label { font-weight: 600; font-size: 11px; color: var(--text-faint); }
 .tb-see-all { font-size: 12px; font-weight: 400; color: var(--text-muted); text-decoration: none; }
 .tb-sessions-scroll {
   display: flex; gap: 12px; overflow-x: auto;
@@ -410,6 +409,25 @@ body:has(#tb-page) {
 
 .tb-reviews { padding: 20px; border-top: 1px solid var(--border); }
 .tb-reviews-loading { color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px 0; }
+
+/* Breadcrumb — desktop only */
+#tb-breadcrumb {
+  display: none;
+}
+@media (min-width: 768px) {
+  #tb-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 48px 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--bg);
+  }
+  #tb-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+  #tb-breadcrumb a:hover { color: var(--text); }
+  #tb-breadcrumb span { color: var(--text-faint); }
+}
 
 /* ─── Desktop layout (≥768px) ─────────────────────────────────────────── */
 @media (min-width: 768px) {
@@ -573,10 +591,20 @@ body:has(#tb-page) {
 }
   </style>
 
+  <nav id="tb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/find">Find a trainer</a>
+    <span>›</span>
+    <span>{trainerName || slug}</span>
+  </nav>
+
   <TrainerProfile
     client:load
     slug={slug}
     paymentEnabled={paymentEnabled}
     currencySymbol={currencySymbol}
+    initialName={trainerName}
+    initialPhoto={trainerPhoto}
+    initialSpecialty={trainerSpecialty}
+    certificationBody={market.certificationBody}
   />
 </Base>
