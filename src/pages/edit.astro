@@ -288,6 +288,15 @@ body {
   <!-- ===== EDIT FORM (shown after auth) ===== -->
   <div id="edit-form" class="hidden">
 
+    <!-- Welcome banner — shown for new trainers arriving via ?new=1 -->
+    <div id="welcome-banner" class="hidden" style="background:#422006;border:1px solid #92400e;border-radius:12px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#fbbf24;margin-bottom:2px;">Your profile is live.</div>
+        <div style="font-size:12px;color:rgba(251,191,36,0.75);">Add a photo and your location so clients can find you.</div>
+      </div>
+      <a id="welcome-view-link" href="#" style="font-size:12px;font-weight:600;color:#fbbf24;white-space:nowrap;text-decoration:none;flex-shrink:0;">View profile →</a>
+    </div>
+
     <!-- Section: Profile Photo -->
     <div class="edit-section">
       <div class="section-heading">Profile Photo</div>
@@ -415,6 +424,22 @@ body {
         <label>Video URL</label>
         <input type="url" id="e-video-intro" placeholder="https://youtube.com/shorts/... or https://instagram.com/reel/...">
         <div class="field-hint">YouTube Shorts or Instagram Reels work best (under 60 seconds)</div>
+      </div>
+    </div>
+
+    <!-- Section: Contact & Location -->
+    <div class="edit-section">
+      <div class="section-heading">Contact & Location</div>
+      <div class="section-sub">Clients use WhatsApp to reach you. Your city appears on your profile.</div>
+      <div class="field">
+        <label>WhatsApp Number</label>
+        <input type="tel" id="e-phone" placeholder="+971 50 123 4567">
+        <div class="field-hint">This is the number clients tap to contact you.</div>
+      </div>
+      <div class="field">
+        <label>City</label>
+        <input type="text" id="e-city" placeholder="Dubai">
+        <div class="field-hint">Shown on your profile as your location.</div>
       </div>
     </div>
 
@@ -560,12 +585,17 @@ async function init() {
     if (!res.ok || !data.trainer) throw new Error();
     // Store in localStorage as fallback only when arriving from a URL token
     if (urlToken) localStorage.setItem('tb_edit_token', token);
+    const isNew = params.get('new') === '1';
     if (urlToken) history.replaceState({}, '', '/edit');
     trainer = data.trainer;
     populateForm(trainer);
     document.getElementById('auth-gate').classList.add('hidden');
     document.getElementById('edit-form').classList.remove('hidden');
     document.getElementById('view-profile-link').href = '/' + trainer.slug;
+    if (isNew) {
+      document.getElementById('welcome-banner').classList.remove('hidden');
+      document.getElementById('welcome-view-link').href = '/' + trainer.slug;
+    }
   } catch {
     clearAuthToken();
   }
@@ -582,6 +612,8 @@ function populateForm(t) {
   document.getElementById('e-tiktok').value = t.tiktok || '';
   document.getElementById('e-youtube').value = t.youtube || '';
   document.getElementById('e-reps').value = t.reps_number || '';
+  document.getElementById('e-phone').value = t.whatsapp || t.phone || '';
+  document.getElementById('e-city').value = t.city || '';
 
   // Avatar
   if (t.avatar_url) document.getElementById('avatar-img').src = t.avatar_url;
@@ -809,6 +841,9 @@ async function saveAll() {
       instagram: document.getElementById('e-instagram').value.trim(),
       tiktok: document.getElementById('e-tiktok').value.trim(),
       youtube: document.getElementById('e-youtube').value.trim(),
+      phone: document.getElementById('e-phone').value.trim() || null,
+      whatsapp: document.getElementById('e-phone').value.trim() || null,
+      city: document.getElementById('e-city').value.trim() || null,
       packages: collectEditPackages(),
       gallery_new: galleryImages.filter(i => i.isNew).map(i => i.src)
     };
