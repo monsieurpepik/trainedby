@@ -330,7 +330,7 @@ const MARKETS: Record<string, MarketConfig> = {
     takeRateEnabled: false,
     takeRateNote: 'Cuando EntrenaCon Pagos se lance en México, se aplicará una tarifa de plataforma del 8% a las sesiones reservadas a través de la plataforma. Los entrenadores Pro pagan el 5%.',
     paymentProvider: 'stripe',
-    siteTitle: 'EntrenaCon - Entrenadores Personales Certificados en Españaico',
+    siteTitle: 'EntrenaCon - Entrenadores Personales Certificados en México',
     metaDescription: 'Encuentra un entrenador personal certificado CONADE, NSCA o ISSA cerca de ti. Crea tu perfil verificado gratis.',
     certVerifyLabel: 'Número de certificación (CONADE / NSCA / ISSA)',
     certVerifyPlaceholder: 'ej. CONADE-12345',
