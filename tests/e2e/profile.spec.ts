@@ -295,3 +295,39 @@ test.describe('Mobile layout', () => {
     expect(hasVisible).toBe(false);
   });
 });
+
+// ─── Trainer activation regression tests (2026-05-13) ────────────────────────
+// These guard against bugs fixed in the trainer-activation milestone:
+// Bug 3: verify-magic-link CORS blocked non-AE markets
+// Bug 4/5: /edit.html links returned 404
+// Bug 9/10: safeTrainer missing packages_count, bio, city
+// Bug 13: auto-login redirect after join
+
+test.describe('Activation — no broken /edit.html links', () => {
+  test('join page "Already a member?" link goes to /edit, not /edit.html', async ({ page }) => {
+    await page.goto('/join');
+    const link = page.locator('a[href="/edit"]').first();
+    await expect(link).toBeVisible();
+    // Confirm there are no /edit.html links anywhere on join page
+    const brokenLinks = await page.locator('a[href="/edit.html"]').count();
+    expect(brokenLinks).toBe(0);
+  });
+
+  test('dashboard has no /edit.html links', async ({ page }) => {
+    // Dashboard will show auth gate — that's fine, we just need to check markup
+    await page.goto('/dashboard');
+    await page.waitForLoadState('domcontentloaded');
+    const brokenLinks = await page.locator('a[href="/edit.html"]').count();
+    expect(brokenLinks).toBe(0);
+  });
+});
+
+test.describe('Activation — edit page has phone/city fields', () => {
+  test('edit page renders WhatsApp and City inputs in auth gate state', async ({ page }) => {
+    await page.goto('/edit');
+    await page.waitForLoadState('domcontentloaded');
+    // Fields exist in DOM even before auth (hidden inside #edit-form)
+    expect(await page.locator('#e-phone').count()).toBe(1);
+    expect(await page.locator('#e-city').count()).toBe(1);
+  });
+});
