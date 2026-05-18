@@ -1,0 +1,133 @@
+---
+import Base from '../../../layouts/Base.astro';
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL ?? '';
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+const { slug } = Astro.params;
+---
+<Base title="Join Club — TrainedBy" description="Join this accountability club">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0f0e0d; color: #fff; font-family: 'Manrope', system-ui, sans-serif; min-height: 100vh; }
+.wrap { max-width: 480px; margin: 0 auto; padding: 32px 16px 80px; }
+.trainer-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: #7c3aed; display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff; }
+.club-name { font-size: 24px; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
+.club-goal { font-size: 14px; color: #aaa; line-height: 1.6; margin-bottom: 24px; }
+.meta-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+.meta-chip { background: rgba(255,255,255,0.07); border-radius: 6px; padding: 5px 10px; font-size: 12px; color: #aaa; }
+.price { font-size: 32px; font-weight: 800; margin-bottom: 4px; }
+.price-sub { font-size: 13px; color: #888; margin-bottom: 24px; }
+.join-btn { width: 100%; background: #7c3aed; border: none; border-radius: 12px; padding: 16px; font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; font-family: inherit; }
+.join-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.status { margin-top: 12px; font-size: 13px; color: #a78bfa; text-align: center; min-height: 18px; }
+.error { color: #f87171; }
+</style>
+<div class="wrap">
+  <div id="loading" style="color:#888;font-size:14px;padding:40px 0;">Loading…</div>
+  <div id="content" style="display:none;">
+    <div class="trainer-row">
+      <div class="avatar" id="trainer-avatar"></div>
+      <div>
+        <div style="font-size:13px;font-weight:600;" id="trainer-name"></div>
+        <div style="font-size:11px;color:#888;" id="trainer-title"></div>
+      </div>
+    </div>
+    <div class="club-name" id="club-name"></div>
+    <div class="club-goal" id="club-goal"></div>
+    <div class="meta-row">
+      <div class="meta-chip" id="meta-duration"></div>
+      <div class="meta-chip" id="meta-members"></div>
+      <div class="meta-chip" id="meta-start"></div>
+    </div>
+    <div class="price" id="price"></div>
+    <div class="price-sub" id="price-sub"></div>
+    <button class="join-btn" id="join-btn">Join Club</button>
+    <p class="status" id="status-msg"></p>
+  </div>
+</div>
+
+<script type="module" define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, slug }}>
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/get-club?slug=${slug}`, {
+    headers: { authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+  });
+  const club = await res.json();
+
+  if (!club || club.error) {
+    document.getElementById('loading').textContent = 'Club not found.';
+    return;
+  }
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+
+  document.getElementById('club-name').textContent = club.name;
+  document.getElementById('club-goal').textContent = club.goal;
+  document.getElementById('meta-duration').textContent = `${club.duration_days} days`;
+  document.getElementById('meta-members').textContent = `${club.member_count} members`;
+  if (club.starts_at) {
+    document.getElementById('meta-start').textContent = `Starts ${new Date(club.starts_at).toLocaleDateString()}`;
+  } else {
+    document.getElementById('meta-start').remove();
+  }
+
+  const trainer = club.trainer;
+  if (trainer) {
+    document.getElementById('trainer-name').textContent = trainer.name ?? '';
+    document.getElementById('trainer-title').textContent = trainer.title ?? '';
+    const avatarEl = document.getElementById('trainer-avatar');
+    if (trainer.avatar_url) {
+      avatarEl.innerHTML = `<img src="${trainer.avatar_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">`;
+    } else {
+      avatarEl.textContent = (trainer.name ?? '?').charAt(0).toUpperCase();
+    }
+  }
+
+  document.getElementById('price').textContent = club.is_free ? 'Free' : `$${(club.price_cents / 100).toFixed(0)}`;
+  document.getElementById('price-sub').textContent = club.is_free
+    ? 'No payment required — join instantly'
+    : 'One-time payment · Full 30-day access';
+
+  document.getElementById('join-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('join-btn');
+    const status = document.getElementById('status-msg');
+    btn.disabled = true;
+    status.className = 'status';
+
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) {
+      status.textContent = 'Signing you in with Google…';
+      await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.href)}` }
+      });
+      return;
+    }
+
+    status.textContent = club.is_free ? 'Joining…' : 'Preparing checkout…';
+
+    const joinRes = await fetch(`${SUPABASE_URL}/functions/v1/join-club`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({
+        club_id: club.id,
+        user_id: user.id,
+        return_url: `${window.location.origin}/clubs/${slug}`,
+      }),
+    });
+    const result = await joinRes.json();
+
+    if (result.checkout_url) {
+      window.location.href = result.checkout_url;
+    } else if (result.ok) {
+      window.location.href = `/clubs/${slug}`;
+    } else {
+      status.textContent = result.error || 'Error joining club.';
+      status.className = 'status error';
+      btn.disabled = false;
+    }
+  });
+</script>
+</Base>
