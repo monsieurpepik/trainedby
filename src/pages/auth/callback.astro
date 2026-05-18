@@ -1,0 +1,31 @@
+---
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL ?? '';
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+const next = Astro.url.searchParams.get('next') ?? '/';
+---
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Signing in…</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body style="background:#0f0e0d;color:#fff;font-family:'Manrope',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;">
+  <p id="msg">Signing in…</p>
+<script type="module" define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, next }}>
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const code = new URLSearchParams(window.location.search).get('code');
+  if (code) {
+    const { error } = await sb.auth.exchangeCodeForSession(code);
+    if (error) {
+      document.getElementById('msg').textContent = 'Sign-in failed: ' + error.message;
+    } else {
+      window.location.replace(next);
+    }
+  } else {
+    // No code — just redirect (may already have session)
+    window.location.replace(next);
+  }
+</script>
+</body>
+</html>
