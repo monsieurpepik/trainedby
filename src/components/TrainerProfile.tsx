@@ -21,6 +21,7 @@ import About from './trainer/About';
 import Reviews from './trainer/Reviews';
 import CompactHeader from './trainer/CompactHeader';
 import BottomNav from './trainer/BottomNav';
+import { ClubsSection } from './trainer/ClubsSection';
 
 type LoadState = 'loading' | 'loaded' | 'error';
 
@@ -179,6 +180,7 @@ export default function TrainerProfile({
                   whatsappNumber={whatsappNumber}
                 />
               )}
+              <ClubsSection trainerId={trainer.id} />
               <About bio={bio} />
               <Reviews
                 trainerId={trainer.id}
