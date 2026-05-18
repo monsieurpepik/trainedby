@@ -1,0 +1,19 @@
+---
+import Base from '../../layouts/Base.astro';
+import { ClubMemberView } from '../../components/club/ClubMemberView';
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL ?? '';
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+const { slug } = Astro.params;
+---
+<Base title="Club — TrainedBy" description="Your daily mission">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0e0d; color: #fff; font-family: 'Manrope', system-ui, sans-serif; min-height: 100vh; }
+</style>
+<ClubMemberView
+  client:load
+  slug={slug}
+  supabaseUrl={SUPABASE_URL}
+  supabaseAnonKey={SUPABASE_ANON_KEY}
+/>
+</Base>
