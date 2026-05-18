@@ -15,7 +15,8 @@
 
 export type ClaudeModel =
   | 'claude-haiku-4-5'    // Fast, cheap  -  support & growth agents
-  | 'claude-sonnet-4-5'   // Better prose  -  content & meta agents
+  | 'claude-sonnet-4-6'   // Better prose  -  content & meta agents
+  | 'claude-opus-4-7'     // Highest quality  -  mission generation
 
 export interface ClaudeMessage {
   role: 'user' | 'assistant';
