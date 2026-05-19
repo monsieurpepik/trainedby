@@ -314,28 +314,28 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
       <h2 class="section-title">Common questions.</h2>
       <div class="faq-grid">
         <div class="faq-item">
-          <div class="faq-q">Do I need to be {market.certificationBody} registered?</div>
-          <div class="faq-a">You can create a profile and go live immediately without verification. The {market.certificationBody} badge is added once we verify your registration — usually within 24 hours. Non-verified profiles still get full access to all features.</div>
+          <div class="faq-q">Do I need a big following to run a club?</div>
+          <div class="faq-a">No. Even a small, engaged audience is enough. Clubs with 20–30 dedicated members earn more reliably than trying to scale a large group that doesn't show up. Quality of community matters far more than size.</div>
         </div>
         <div class="faq-item">
-          <div class="faq-q">How does the Digital Product Hub work?</div>
-          <div class="faq-a">Upload any file (PDF, video link, Notion document) and set a price. When a client buys it, the payment goes directly to your account minus a small platform fee. You get paid within 2 business days.</div>
+          <div class="faq-q">How does the AI mission generator work?</div>
+          <div class="faq-a">You describe your club's transformation goal (e.g. "30-day fat loss for beginners"). Claude generates 30 daily missions — specific, actionable, and calibrated to that goal. You review them, edit any day's mission before it goes live, and the system handles delivery to your members.</div>
         </div>
         <div class="faq-item">
-          <div class="faq-q">What is the Affiliate Vault?</div>
-          <div class="faq-a">We negotiate affiliate agreements with fitness brands on behalf of all {brandName} trainers. You activate the brands you already recommend, share your unique link with clients, and earn commission on every purchase they make — automatically, every month.</div>
+          <div class="faq-q">How much time does running a club take each day?</div>
+          <div class="faq-a">About 2 minutes. You'll get an email with tomorrow's AI-drafted mission — review it, edit if needed, and it sends automatically. Shoutouts are optional but take one tap. The infrastructure runs without you.</div>
         </div>
         <div class="faq-item">
-          <div class="faq-q">Can I cancel anytime?</div>
-          <div class="faq-a">Yes. No contracts, no lock-in. Cancel from your dashboard and your profile reverts to the Free tier — it stays live, just without the Pro tools. Your digital products and affiliate earnings are yours to keep.</div>
+          <div class="faq-q">Can I run more than one club at once?</div>
+          <div class="faq-a">Yes. Many coaches run 2–3 concurrent clubs targeting different goals or audiences (fat loss, strength, mindset). Each club is separate — its own members, its own plan, its own payment stream.</div>
         </div>
         <div class="faq-item">
-          <div class="faq-q">What is the trainer referral programme?</div>
-          <div class="faq-a">Every Pro trainer gets a unique referral link. When another trainer signs up to Pro through your link, you earn 20% of their monthly subscription — recurring, for as long as they stay subscribed.</div>
+          <div class="faq-q">How do payments work?</div>
+          <div class="faq-a">Members pay via Stripe Checkout when they join. You receive 80% of every membership directly — TrainedBy takes a 20% platform fee that covers AI generation, hosting, and payments infrastructure. There's no setup required on your end.</div>
         </div>
         <div class="faq-item">
-          <div class="faq-q">How does the AI assistant work?</div>
-          <div class="faq-a">Your AI assistant knows your full profile, your specialties, your market, and your clients. Ask it anything — write a 12-week programme, draft a follow-up email to a lead, explain a nutrition concept, or help you price your packages. It responds in your language.</div>
+          <div class="faq-q">What happens after 30 days?</div>
+          <div class="faq-a">Members complete their cohort. You can invite them to re-enrol in a new club (same goal, advanced level, or a different focus). Clubs are intentionally time-bound — the scarcity and end-date are what create urgency and completion rates.</div>
         </div>
       </div>
     </div>
@@ -366,15 +366,15 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 
   <!-- BOTTOM CTA -->
   <div class="cta-bottom">
-    <h2 class="cta-bottom-title">Your expertise.<br>Your profile.<br><em style="color:var(--brand);font-style:normal">Your practice.</em></h2>
-    <p class="cta-bottom-sub">Free to start. Live in minutes. No credit card required.</p>
+    <h2 class="cta-bottom-title">Your audience is already there.<br><em style="color:var(--brand);font-style:normal">Give them somewhere to show up.</em></h2>
+    <p class="cta-bottom-sub">Launch your first club free. No credit card required.</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
       {isPaid ? (
-        <a href="/join" class="btn-primary" style="font-size:16px;padding:16px 32px">Create your free profile →</a>
+        <a href="/join" class="btn-primary" style="font-size:16px;padding:16px 32px">Launch your first club free →</a>
       ) : (
         <a href="#waitlist" class="btn-primary" style="font-size:16px;padding:16px 32px">Join the waitlist →</a>
       )}
-      <a href="/find" class="btn-ghost" style="font-size:16px;padding:16px 32px">See live profiles ⊙</a>
+      <a href="/find" class="btn-ghost" style="font-size:16px;padding:16px 32px">See live clubs ⊙</a>
     </div>
   </div>
 
@@ -383,10 +383,10 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
     <a href="/landing" class="footer-logo">{brandName}</a>
     <div class="footer-links">
       <a href="/landing">Home</a>
-      <a href="/find">Find a Trainer</a>
+      <a href="/find">Find a Club</a>
       <a href="/blog">Stories</a>
       <a href="/community">Community</a>
-      <a href="/join">Join as Trainer</a>
+      <a href="/join">Launch a Club</a>
     </div>
     <div class="footer-copy">© {new Date().getFullYear()} {brandName}</div>
   </footer>
