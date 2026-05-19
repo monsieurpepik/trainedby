@@ -147,43 +147,45 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-eyebrow">
-      <div style="width:6px;height:6px;border-radius:50%;background:#00C853;flex-shrink:0"></div>
-      For Personal Trainers · {market.certificationBody} Verified Platform
+    <div style="font-size:13px;color:var(--text-2);line-height:1.7;max-width:440px;margin-bottom:28px;text-align:center;">
+      BODi pays its trainers $0. You built an audience. Your followers trust you.<br>
+      <span style="color:var(--brand);font-weight:700;">Now build a business from it.</span>
     </div>
     <h1 class="hero-headline">
-      Your profile.<br>Your clients.<br><em>Your business.</em>
+      Run <em>your</em> 30-day club.<br>Keep 80% of every<br>membership.
     </h1>
     <p class="hero-sub">
-      {brandName} gives you a verified public profile, tools to manage leads, sell digital products, and an AI assistant that works around the clock. Free to start.
+      AI writes 30 daily missions from your goal. Your audience joins. You coach, shout out, and earn — while they show up every day.
     </p>
     <div class="hero-actions">
       {isPaid ? (
-        <a href="/join" class="btn-primary">Create your free profile →</a>
+        <a href="/join" class="btn-primary">Launch your first club →</a>
       ) : (
         <a href="#waitlist" class="btn-primary">Join the waitlist →</a>
       )}
-      <a href="/find" class="btn-ghost">See live profiles ⊙</a>
+      <a href="#how-it-works" class="btn-ghost" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'});return false;">See how it works</a>
     </div>
     <div class="proof-strip">
       <div class="proof-item">
-        <div class="proof-val" id="trainer-count">—</div>
-        <div class="proof-label">Trainers on platform</div>
+        <div class="proof-val">87%</div>
+        <div class="proof-label">Mission completion rate <span style="font-size:10px;color:var(--text-3)">(projected)</span></div>
       </div>
       <div class="proof-item">
-        <div class="proof-val">{market.certificationBody}</div>
-        <div class="proof-label">Verification standard</div>
+        <div class="proof-val">$2,400</div>
+        <div class="proof-label">Avg monthly per club <span style="font-size:10px;color:var(--text-3)">(projected)</span></div>
       </div>
       <div class="proof-item">
-        <div class="proof-val">Free</div>
-        <div class="proof-label">To get started</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-val">2 min</div>
-        <div class="proof-label">To go live</div>
+        <div class="proof-val">30 sec</div>
+        <div class="proof-label">To generate a full plan</div>
       </div>
     </div>
   </section>
+
+  <!-- URGENCY STRIP -->
+  <div style="background:rgba(124,58,237,0.08);border-top:1px solid rgba(124,58,237,0.15);padding:12px 24px;display:flex;align-items:center;justify-content:center;gap:10px;">
+    <div style="width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0;"></div>
+    <div style="font-size:12px;color:var(--text-2)" id="trainer-launch-strip">Coaches are launching accountability clubs this week</div>
+  </div>
 
   <!-- WHAT YOU GET -->
   <div style="border-top:1px solid var(--border)">
