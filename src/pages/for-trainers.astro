@@ -264,70 +264,45 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
     </div>
   </div>
 
-  <!-- PRICING -->
+  <!-- ECONOMICS -->
   <div style="border-top:1px solid var(--border)">
     <div class="section">
-      <p class="section-eyebrow">Pricing</p>
-      <h2 class="section-title">Start free.<br>Upgrade when<br>you're ready.</h2>
-      <p class="section-sub">No lock-in. Cancel anytime. Your profile stays live on the Free tier forever.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-tier">Free</div>
-          <div class="pricing-price">{market.currencySymbol}0 <span>/ month</span></div>
-          <p class="pricing-desc">Your verified profile, live in minutes. The foundation.</p>
-          <ul class="pricing-features">
-            <li>Public {market.certificationBody}-verified profile</li>
-            <li>1 session package</li>
-            <li>Contact / lead form</li>
-            <li>WhatsApp CTA button</li>
-            <li>Community & blog access</li>
-            <li class="muted">AI personal assistant</li>
-            <li class="muted">Digital Product Hub</li>
-            <li class="muted">Affiliate Vault</li>
-            <li class="muted">Lead management dashboard</li>
-            <li class="muted">Analytics & weekly report</li>
-          </ul>
-          <a href="/join" class="pricing-btn pricing-btn-ghost">Get started free →</a>
+      <p class="section-eyebrow">The economics</p>
+      <h2 class="section-title">BODi pays its trainers $0.<br>You keep 80%.</h2>
+      <p class="section-sub">BODi built a $700M business on your kind of content. The difference: they kept the revenue. You won't.</p>
+
+      <!-- Comparison table -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:48px;max-width:600px;">
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:16px;padding:28px;opacity:0.7;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:16px;letter-spacing:0;">BODi</div>
+          <div style="font-size:32px;font-weight:900;color:var(--text-3);letter-spacing:-1px;margin-bottom:8px;">$0</div>
+          <div style="font-size:13px;color:var(--text-3);line-height:1.6;">paid to trainers per month, regardless of how many members use their content</div>
         </div>
-        <div class="pricing-card featured">
-          <div class="pricing-popular">Most popular</div>
-          <div class="pricing-tier">Pro</div>
-          <div class="pricing-price">{market.proPriceLabel}</div>
-          <p class="pricing-desc">The complete toolkit. Everything you need to grow your practice.</p>
-          <ul class="pricing-features">
-            <li>Everything in Free</li>
-            <li>AI personal assistant (unlimited)</li>
-            <li>Digital Product Hub (unlimited products)</li>
-            <li>Affiliate Vault (25% commissions)</li>
-            <li>Lead management dashboard</li>
-            <li>Analytics + weekly email report</li>
-            <li>WhatsApp lead notifications</li>
-            <li>Priority placement in search</li>
-            <li>Trainer referral programme (20% recurring)</li>
-            <li>Unlimited session packages</li>
-          </ul>
-          {isPaid ? (
-            <a href="/join" class="pricing-btn pricing-btn-primary">Get Pro →</a>
-          ) : (
-            <a href="#waitlist" class="pricing-btn pricing-btn-primary">Join the waitlist →</a>
-          )}
+        <div style="background:linear-gradient(135deg,rgba(255,92,0,0.08),var(--surface-2));border:1px solid rgba(255,92,0,0.25);border-radius:16px;padding:28px;">
+          <div style="font-size:12px;font-weight:700;color:var(--brand);margin-bottom:16px;letter-spacing:0;">{brandName}</div>
+          <div style="font-size:32px;font-weight:900;color:var(--text);letter-spacing:-1px;margin-bottom:8px;">80%</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.6;">of every membership goes directly to you — every month, from every member</div>
         </div>
-        <div class="pricing-card">
-          <div class="pricing-tier">Academy</div>
-          <div class="pricing-price" style="font-size:24px;letter-spacing:-1px">Talk to us</div>
-          <p class="pricing-desc">For gyms, academies, and multi-trainer operations.</p>
-          <ul class="pricing-features">
-            <li>Everything in Pro</li>
-            <li>Academy profile page</li>
-            <li>Multiple trainer profiles under one brand</li>
-            <li>Programme & term booking system</li>
-            <li>Parent-facing booking portal</li>
-            <li>Coach payout management</li>
-            <li>Centralised lead inbox</li>
-            <li>Dedicated account manager</li>
-          </ul>
-          <a href="mailto:hello@trainedby.ae" class="pricing-btn pricing-btn-ghost">Contact us →</a>
+      </div>
+
+      <!-- Example calculation -->
+      <div style="margin-top:40px;padding:32px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;max-width:560px;">
+        <div style="font-size:12px;font-weight:600;color:var(--brand);margin-bottom:20px;letter-spacing:0;">Example · One club</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border);">
+            <span style="font-size:14px;color:var(--text-2);">50 members × {market.currencySymbol}49/month</span>
+            <span style="font-size:16px;font-weight:800;color:var(--text);">{market.currencySymbol}2,450</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border);">
+            <span style="font-size:14px;color:var(--text-2);">Your 80% share</span>
+            <span style="font-size:16px;font-weight:800;color:var(--text);">{market.currencySymbol}1,960</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:14px;color:var(--text-2);">Two clubs running</span>
+            <span style="font-size:20px;font-weight:900;color:var(--brand);">{market.currencySymbol}3,920/mo</span>
+          </div>
         </div>
+        <div style="margin-top:20px;font-size:12px;color:var(--text-3);">Recurring. Every month. While they keep showing up.</div>
       </div>
     </div>
   </div>
