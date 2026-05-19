@@ -9,11 +9,23 @@ const corsHeaders = {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-  const { mission_id, trainer_email, title, description, type } = await req.json();
+  // Verify JWT and extract authenticated trainer email
+  const authHeader = req.headers.get("authorization") ?? "";
+  const token = authHeader.replace(/^Bearer\s+/i, "");
+  const sbAnon = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!);
+  const { data: { user }, error: authErr } = await sbAnon.auth.getUser(token);
+  if (authErr || !user?.email) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "content-type": "application/json" }
+    });
+  }
+  const trainer_email = user.email;
 
-  if (!mission_id || !trainer_email || !title) {
-    return new Response(JSON.stringify({ error: "mission_id, trainer_email, title required" }), {
+  const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const { mission_id, title, description, type } = await req.json();
+
+  if (!mission_id || !title) {
+    return new Response(JSON.stringify({ error: "mission_id, title required" }), {
       status: 400, headers: { ...corsHeaders, "content-type": "application/json" }
     });
   }

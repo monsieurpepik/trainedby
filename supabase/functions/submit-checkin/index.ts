@@ -9,6 +9,17 @@ const corsHeaders = {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Verify JWT and extract authenticated user identity
+  const authHeader = req.headers.get("authorization") ?? "";
+  const token = authHeader.replace(/^Bearer\s+/i, "");
+  const sbAnon = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!);
+  const { data: { user }, error: authErr } = await sbAnon.auth.getUser(token);
+  if (authErr || !user) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "content-type": "application/json" }
+    });
+  }
+
   const sb = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -18,6 +29,13 @@ serve(async (req) => {
   if (!club_id || !mission_id || !user_id) {
     return new Response(JSON.stringify({ error: "club_id, mission_id, user_id required" }), {
       status: 400, headers: { ...corsHeaders, "content-type": "application/json" }
+    });
+  }
+
+  // Verify the user_id in the body matches the authenticated caller
+  if (user.id !== user_id) {
+    return new Response(JSON.stringify({ error: "user_id mismatch" }), {
+      status: 403, headers: { ...corsHeaders, "content-type": "application/json" }
     });
   }
 

@@ -18,13 +18,24 @@ function slugify(text: string): string {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Verify JWT and extract authenticated trainer email
+  const authHeader = req.headers.get("authorization") ?? "";
+  const token = authHeader.replace(/^Bearer\s+/i, "");
+  const sbAnon = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!);
+  const { data: { user }, error: authErr } = await sbAnon.auth.getUser(token);
+  if (authErr || !user?.email) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "content-type": "application/json" }
+    });
+  }
+  const trainer_email = user.email;
+
   const sb = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
   const {
-    trainer_email,
     name,
     goal,
     duration_days = 30,
@@ -34,8 +45,8 @@ serve(async (req) => {
     starts_at,
   } = await req.json();
 
-  if (!trainer_email || !name || !goal) {
-    return new Response(JSON.stringify({ error: "trainer_email, name, goal required" }), {
+  if (!name || !goal) {
+    return new Response(JSON.stringify({ error: "name, goal required" }), {
       status: 400, headers: { ...corsHeaders, "content-type": "application/json" }
     });
   }
