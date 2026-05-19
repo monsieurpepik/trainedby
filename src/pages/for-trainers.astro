@@ -435,24 +435,6 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
       nav?.classList.toggle('scrolled', window.scrollY > 40);
     }, { passive: true });
 
-    // Live trainer count
-    (async function() {
-      try {
-        const res = await fetch(
-          'https://mezhtdbfyvkshpuplqqw.supabase.co/rest/v1/trainers?select=id&is_active=eq.true',
-          {
-            headers: {
-              'apikey': SUPABASE_ANON_KEY,
-              'Prefer': 'count=exact'
-            }
-          }
-        );
-        const count = res.headers.get('content-range')?.split('/')[1];
-        const el = document.getElementById('trainer-count');
-        if (el && count) el.textContent = parseInt(count).toLocaleString();
-      } catch(e) {}
-    })();
-
     // Waitlist
     window.submitWaitlist = async function() {
       const email = document.getElementById('wl-email').value;
