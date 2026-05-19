@@ -78,7 +78,6 @@ export function ClubPage({ slug, supabaseUrl, supabaseAnonKey }: Props) {
           .select('club_id,season_number')
           .in('club_id', familyIds)
           .eq('user_id', user.id)
-          .eq('status', 'active')
           .maybeSingle();
 
         if (pastMembership) {
