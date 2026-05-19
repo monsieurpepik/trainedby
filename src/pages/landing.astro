@@ -27,6 +27,19 @@ try {
     }
   }
 } catch (_) {}
+
+// Featured clubs: up to 3 active clubs
+let featuredClubs: Array<{ id: string; name: string; slug: string; goal: string; price_cents: number; is_free: boolean; trainer: { full_name: string; avatar_url: string | null } | null }> = [];
+try {
+  const SUPA_URL2 = import.meta.env.PUBLIC_SUPABASE_URL ?? 'https://mezhtdbfyvkshpuplqqw.supabase.co';
+  const SUPA_KEY2 = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+  const res2 = await fetch(
+    `${SUPA_URL2}/rest/v1/clubs?select=id,name,slug,goal,price_cents,is_free,trainer:trainer_id(full_name,avatar_url)&status=eq.active&order=created_at.desc&limit=3`,
+    { headers: { apikey: SUPA_KEY2, Authorization: `Bearer ${SUPA_KEY2}` } }
+  );
+  const rows2 = await res2.json();
+  if (Array.isArray(rows2)) featuredClubs = rows2;
+} catch (_) {}
 ---
 
 <Base
@@ -466,22 +479,32 @@ try {
     </div>
   </div>
 
-  <!-- FEATURED TRAINERS -->
+  <!-- FEATURED CLUBS -->
   <div class="trainer-strip">
     <div class="section" style="padding-top:0;padding-bottom:0;">
-      <p class="section-eyebrow">Verified Trainers</p>
+      <p class="section-eyebrow">Active clubs</p>
       <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
-        <h2 class="section-title" style="margin-bottom:0">Top trainers<br>near you.</h2>
-        <a href="/find" style="font-size:14px;font-weight:700;color:var(--text);text-decoration:none">See all trainers →</a>
+        <h2 class="section-title" style="margin-bottom:0">Clubs starting<br>this month.</h2>
+        <a href="/find" style="font-size:14px;font-weight:700;color:var(--text);text-decoration:none">See all clubs →</a>
       </div>
-      <p class="section-sub">Hand-picked, {market.certificationBody}-verified trainers with proven track records.</p>
-      <div class="trainers-grid" id="featured-trainers">
-        <div id="trainers-empty-state" style="grid-column:1/-1;text-align:center;padding:48px 0;display:none">
-          <p style="font-size:15px;color:var(--text-2);margin-bottom:16px">No trainers listed yet.</p>
-          <a href="/for-trainers" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--text);color:#fff;border-radius:100px;font-size:13px;font-weight:700;text-decoration:none">
-            Be the first verified trainer →
+      <p class="section-sub">30-day coach-led clubs with daily missions and accountability built in.</p>
+      <div class="trainers-grid" id="featured-clubs">
+        {featuredClubs.length > 0 ? featuredClubs.map(club => (
+          <a href={`/find`} class="t-card" style="text-decoration:none;display:block;">
+            <div class="t-avatar">{club.trainer?.full_name?.[0] ?? '?'}</div>
+            <div class="t-name">{club.name}</div>
+            <div class="t-spec">{club.trainer?.full_name ?? 'Coach'}</div>
+            <div style="font-size:12px;color:var(--text-2);margin-top:4px;line-height:1.5;">{club.goal?.slice(0, 60)}</div>
+            <div class="t-rating" style="margin-top:8px;">{club.is_free ? 'Free' : `${market.currencySymbol}${Math.round((club.price_cents ?? 0) / 100)}/mo`}</div>
           </a>
-        </div>
+        )) : (
+          <div style="grid-column:1/-1;text-align:center;padding:48px 0;">
+            <p style="font-size:15px;color:var(--text-2);margin-bottom:16px">The first clubs are launching soon.</p>
+            <a href="/for-trainers" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--text);color:#fff;border-radius:100px;font-size:13px;font-weight:700;text-decoration:none;">
+              Launch a club as a coach →
+            </a>
+          </div>
+        )}
       </div>
     </div>
   </div>
@@ -545,13 +568,13 @@ try {
   <div style="padding:60px 0;border-top:1px solid var(--border);">
     <div class="trainer-banner" style="max-width:calc(var(--max) - 48px);margin:0 auto">
       <div class="trainer-banner-text">
-        <div class="trainer-banner-eyebrow">For Trainers</div>
-        <div class="trainer-banner-title">Build your practice<br>on a platform that<br>works as hard as you do.</div>
-        <p class="trainer-banner-sub">Verified profile, digital products, lead management, and an AI assistant — all in one place. Free to start.</p>
+        <div class="trainer-banner-eyebrow">For Coaches</div>
+        <div class="trainer-banner-title">Your audience is already there.<br>Give them somewhere<br>to show up.</div>
+        <p class="trainer-banner-sub">AI writes the plan. You coach. Keep 80% of every membership. Launch your first club free.</p>
       </div>
       <div class="trainer-banner-actions">
         <a href="/for-trainers" class="btn-primary">See how it works →</a>
-        <a href="/join" class="btn-ghost">Create your profile</a>
+        <a href="/join" class="btn-ghost">Launch a club free</a>
       </div>
     </div>
   </div>
@@ -560,7 +583,7 @@ try {
   <footer>
     <a href="/landing" class="footer-logo">{brandName}</a>
     <div class="footer-links">
-      <a href="/find">Find a Trainer</a>
+      <a href="/find">Find a Club</a>
       <a href="/blog">Stories</a>
 <a href="/for-trainers">For Trainers</a>
       <a href="/join">Join as Trainer</a>
@@ -588,107 +611,5 @@ try {
       if (e.key === 'Enter') window.doSearch();
     });
 
-    // Load featured trainers from Supabase
-    (async function() {
-      const SUPABASE_URL = 'https://mezhtdbfyvkshpuplqqw.supabase.co';
-      const ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-
-      try {
-        const marketCode = document.documentElement.dataset.market || 'ae';
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/trainers?select=slug,name,specialties,city,avatar_url,reps_verified,session_packages(name,price)&plan=eq.pro&accepting_clients=eq.true&market=eq.${marketCode}&order=created_at.desc&limit=8`,
-          { headers: { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY } }
-        );
-        const data = await res.json();
-        if (!Array.isArray(data) || data.length === 0) {
-          const empty = document.getElementById('trainers-empty-state');
-          if (empty) empty.style.display = 'block';
-          return;
-        }
-
-        const countEl = document.getElementById('stat-trainer-count');
-        if (countEl && data && data.length) {
-          countEl.textContent = data.length >= 10 ? data.length + '+' : String(data.length);
-        }
-
-        const grid = document.getElementById('featured-trainers');
-        if (!grid) return;
-        grid.innerHTML = '';
-
-        data.forEach((t: any) => {
-          const specialty = Array.isArray(t.specialties) ? t.specialties[0] : (t.specialties || 'Personal Training');
-          const location = t.city || '';
-          const packages = Array.isArray(t.session_packages) ? t.session_packages : [];
-          const lowestPrice = packages.length > 0
-            ? Math.min(...packages.map((p: any) => p.price || 0).filter((p: number) => p > 0))
-            : null;
-          const fallbacks = ['ecard-fallback-a', 'ecard-fallback-b', 'ecard-fallback-c'];
-          const fallback = fallbacks[grid.children.length % 3];
-          const bgStyle = t.avatar_url ? `background-image:url(${t.avatar_url})` : '';
-          const bgClass = t.avatar_url ? 'ecard-bg' : `ecard-bg ${fallback}`;
-
-          const card = document.createElement('a');
-          card.className = 'ecard ecard-grid';
-          card.href = '/' + t.slug;
-          card.innerHTML = `
-  <div class="${bgClass}" style="${bgStyle}"></div>
-  <div class="ecard-overlay"></div>
-  <div class="ecard-top">
-    ${t.reps_verified ? '<div class="ecard-badge"><div class="ecard-badge-dot"></div>Verified</div>' : ''}
-  </div>
-  <div class="ecard-bottom">
-    <div class="ecard-name" style="font-size:15px">${t.name || 'Trainer'}</div>
-    <div class="ecard-meta">${specialty}${location ? ' · ' + location : ''}</div>
-    <div class="ecard-price" style="font-size:12px">
-      ${lowestPrice ? lowestPrice + ' <span>/ session</span>' : 'Contact for pricing'}
-    </div>
-  </div>
-`;
-          grid.appendChild(card);
-        });
-        if (typeof (window as any)._heroRotate === 'function') (window as any)._heroRotate(data);
-      } catch(e) {
-        // Silently fail — empty state handled in Task 5
-      }
-    })();
-
-    // Rotate hero card through loaded trainers
-    window._heroRotate = function(trainers: any[]) {
-      if (!trainers || trainers.length === 0) return;
-      let idx = 0;
-      const fallbacks = ['ecard-fallback-a','ecard-fallback-b','ecard-fallback-c'];
-      function show(t: any) {
-        const bg = document.getElementById('hero-card-bg');
-        const name = document.getElementById('hero-card-name');
-        const meta = document.getElementById('hero-card-meta');
-        const price = document.getElementById('hero-card-price');
-        const link = document.getElementById('hero-trainer-card');
-        if (!bg || !name || !meta || !price || !link) return;
-        if (t.avatar_url) {
-          (bg as HTMLElement).style.backgroundImage = `url(${t.avatar_url})`;
-          bg.className = 'ecard-bg';
-        } else {
-          bg.className = 'ecard-bg ' + fallbacks[idx % 3];
-          (bg as HTMLElement).style.backgroundImage = '';
-        }
-        name.textContent = t.name || '';
-        const specialty = Array.isArray(t.specialties) ? t.specialties[0] : (t.specialties || 'Personal Training');
-        meta.textContent = specialty + (t.city ? ' · ' + t.city : '');
-        const packages = Array.isArray(t.session_packages) ? t.session_packages : [];
-        const lowest = packages.length > 0 ? Math.min(...packages.map((p: any) => p.price || 0).filter(Boolean)) : null;
-        price.innerHTML = lowest ? `${lowest} <span>/ session</span>` : 'Contact for pricing';
-        if (link instanceof HTMLAnchorElement) link.href = '/' + t.slug;
-      }
-      show(trainers[0]);
-      if (trainers.length > 1) {
-        setInterval(() => {
-          idx = (idx + 1) % trainers.length;
-          show(trainers[idx]);
-          document.querySelectorAll('.card-dot').forEach((d, i) => {
-            d.className = 'card-dot ' + (i === idx % 3 ? 'card-dot-on' : 'card-dot-off');
-          });
-        }, 4000);
-      }
-    };
   </script>
 </Base>
