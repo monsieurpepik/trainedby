@@ -110,12 +110,36 @@ export function TrainerClubDashboard({ slug, supabaseUrl, supabaseAnonKey }: Pro
             Day {current_day} of {club.duration_days} · {stats.total_members} members
           </div>
         </div>
-        <span style={{
-          background: 'rgba(22,163,74,0.15)', border: '1px solid rgba(22,163,74,0.3)',
-          borderRadius: 6, padding: '4px 10px', fontSize: 11, color: '#4ade80', fontWeight: 600,
-        }}>
-          ● {club.status}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{
+            background: 'rgba(22,163,74,0.15)', border: '1px solid rgba(22,163,74,0.3)',
+            borderRadius: 6, padding: '4px 10px', fontSize: 11, color: '#4ade80', fontWeight: 600,
+          }}>
+            ● {club.status}
+          </span>
+          {club.status === 'draft' && (
+            <button
+              onClick={async () => {
+                if (!window.confirm('Publish this club? Members will be able to join.')) return;
+                const res = await fetch(`${supabaseUrl}/functions/v1/publish-club`, {
+                  method: 'POST',
+                  headers: { 'content-type': 'application/json', authorization: `Bearer ${supabaseAnonKey}` },
+                  body: JSON.stringify({ club_id: club.id }),
+                });
+                const result = await res.json();
+                if (result.ok) loadData();
+                else alert(result.error ?? 'Failed to publish');
+              }}
+              style={{
+                background: '#16a34a', border: 'none', borderRadius: 6,
+                padding: '4px 12px', fontSize: 11, color: '#fff',
+                fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              Publish
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Stats */}

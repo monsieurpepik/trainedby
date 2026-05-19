@@ -443,3 +443,11 @@ verify_jwt = false
 [functions.cancel-booking]
 # Called via cancel link in email  -  no JWT (HMAC token for auth)
 verify_jwt = false
+
+[functions.club-payment-webhook]
+# Receives Stripe webhook POSTs for club payments  -  no JWT, secured by Stripe-Signature header
+verify_jwt = false
+
+[functions.club-daily-nudge]
+# Called by external cron trigger  -  no JWT, secured by x-cron-secret header
+verify_jwt = false
