@@ -7,8 +7,8 @@ const brandName = market.brandName || 'TrainedBy';
 ---
 
 <Base
-  title={`Find a Verified Personal Trainer — ${brandName}`}
-  description={`Browse ${market.certificationBody}-verified personal trainers. Filter by speciality, location and training mode.`}
+  title={`Find an Accountability Club — ${brandName}`}
+  description={`Browse 30-day transformation clubs led by verified coaches. Pick your goal, join a cohort, start showing up.`}
 >
   <Fragment slot="head">
     <meta name="color-scheme" content="light">
@@ -277,25 +277,31 @@ body:has(#find-page) {
   <a href="/" class="top-bar-logo">{brandName}</a>
   <div class="top-bar-search">
     <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="search-input" placeholder="Search trainers…" aria-label="Search trainers" />
+    <input type="text" id="search-input" placeholder="Search clubs or coaches…" aria-label="Search clubs" />
   </div>
   <span class="top-bar-count" id="result-count">Loading…</span>
   <a href="/join" class="top-bar-cta">Sign up</a>
 </div>
 
+<!-- MINI HERO -->
+<div style="background:#fff;border-bottom:1px solid rgba(0,0,0,0.06);padding:20px 20px 0;">
+  <p style="font-size:11px;font-weight:700;color:#FF5C00;letter-spacing:0;margin-bottom:6px;">Accountability Clubs</p>
+  <h1 style="font-family:'Manrope',system-ui,sans-serif;font-size:clamp(22px,4vw,32px);font-weight:900;letter-spacing:-1px;line-height:1.1;color:#1A1411;margin-bottom:8px;">Find your club.<br>Start showing up.</h1>
+  <p style="font-size:13px;color:#6B6460;line-height:1.6;max-width:480px;margin-bottom:20px;">Browse coach-led 30-day clubs. One daily mission, a community that tracks your streak, and a coach who knows your name.</p>
+</div>
+
 <div class="filter-strip" id="filters">
-  <button class="filter-pill active" data-filter="all" onclick="setFilter('all',this)" data-i18n="find.filter_all">All Trainers</button>
-  <button class="filter-pill" data-filter="in-person" onclick="setFilter('in-person',this)">In-Person</button>
-  <button class="filter-pill" data-filter="online" onclick="setFilter('online',this)" data-i18n="find.filter_online">Online</button>
-  <button class="filter-pill" data-filter="hybrid" onclick="setFilter('hybrid',this)">Hybrid</button>
+  <button class="filter-pill active" data-filter="all" onclick="setFilter('all',this)">All Clubs</button>
+  <button class="filter-pill" data-filter="fat-loss" onclick="setFilter('fat-loss',this)">Weight Loss</button>
   <button class="filter-pill" data-filter="strength" onclick="setFilter('strength',this)">Strength</button>
-  <button class="filter-pill" data-filter="fat-loss" onclick="setFilter('fat-loss',this)">Fat Loss</button>
+  <button class="filter-pill" data-filter="running" onclick="setFilter('running',this)">Running</button>
   <button class="filter-pill" data-filter="hiit" onclick="setFilter('hiit',this)">HIIT</button>
-  <button class="filter-pill" data-filter="pilates" onclick="setFilter('pilates',this)">Pilates</button>
-  <button class="filter-pill" data-filter="boxing" onclick="setFilter('boxing',this)">Boxing</button>
-  <button class="filter-pill" data-filter="yoga" onclick="setFilter('yoga',this)">Yoga</button>
+  <button class="filter-pill" data-filter="mindset" onclick="setFilter('mindset',this)">Mindset</button>
   <button class="filter-pill" data-filter="nutrition" onclick="setFilter('nutrition',this)">Nutrition</button>
-  <button class="filter-pill" data-filter="female-only" onclick="setFilter('female-only',this)">Female Trainers</button>
+  <button class="filter-pill" data-filter="yoga" onclick="setFilter('yoga',this)">Yoga &amp; Pilates</button>
+  <button class="filter-pill" data-filter="online" onclick="setFilter('online',this)">Online</button>
+  <button class="filter-pill" data-filter="in-person" onclick="setFilter('in-person',this)">In-Person</button>
+  <button class="filter-pill" data-filter="female-only" onclick="setFilter('female-only',this)">Female Coaches</button>
 </div>
 
 <div class="main">
