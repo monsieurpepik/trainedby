@@ -25,6 +25,30 @@ const m = market.market;
 const trustSuffix  = trustCertSuffix[m]  ?? 'Certified only';
 const trustCheck   = trustChecked[m]     ?? 'Background checked';
 const trustFree    = trustBrowse[m]      ?? 'Free to browse';
+
+// Urgency chip: next active club with open spots
+let nextClub: { starts_at: string; spots_left: number } | null = null;
+try {
+  const SUPA_URL = import.meta.env.PUBLIC_SUPABASE_URL ?? 'https://mezhtdbfyvkshpuplqqw.supabase.co';
+  const SUPA_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+  const res = await fetch(
+    `${SUPA_URL}/rest/v1/clubs?select=starts_at,max_members,club_members(id)&status=eq.active&starts_at=gte.${new Date().toISOString()}&order=starts_at.asc&limit=1`,
+    { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` } }
+  );
+  const rows = await res.json();
+  if (Array.isArray(rows) && rows.length > 0) {
+    const row = rows[0];
+    const joined = Array.isArray(row.club_members) ? row.club_members.length : 0;
+    const maxMembers = row.max_members ?? 50;
+    const spotsLeft = maxMembers - joined;
+    if (spotsLeft > 0) {
+      nextClub = {
+        starts_at: new Date(row.starts_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }),
+        spots_left: spotsLeft,
+      };
+    }
+  }
+} catch (_) {}
 ---
 
 <Base
@@ -387,76 +411,37 @@ const trustFree    = trustBrowse[m]      ?? 'Free to browse';
   </nav>
 
   <!-- HERO -->
-  <section class="hero">
-    <!-- LEFT COLUMN -->
-    <div class="hero-left">
-      <div class="hero-eyebrow">
-        <span class="hero-eyebrow-dot"></span>
-        <span id="trainer-count-label">{market.certificationBody} Verified Trainers · {market.cityName || market.market.toUpperCase()}</span>
+  <section class="hero" style="text-align:center;align-items:center;">
+    <div class="hero-left" style="text-align:center;">
+      <div class="hero-eyebrow" style="justify-content:center;">
+        <span style="font-size:12px;color:var(--text-2);line-height:1.7;">
+          You've started over enough times.<br>
+          <span style="color:var(--brand);font-weight:700;">What you're missing isn't the plan.</span>
+        </span>
       </div>
-      <h1 class="hero-h1" data-i18n="hero_headline">Every trainer.<br/><em>{market.certificationBody} verified.</em></h1>
-      <p class="hero-sub" data-i18n="hero_sub">Every trainer on {brandName} is {market.certificationBody}-certified and verified. Browse real profiles, read real stories, and book the right person for you.</p>
-      <div class="hero-actions">
-        <a href="/find" class="btn-dark">Find a trainer</a>
-      </div>
-      <!-- SEARCH -->
-      <div class="search-wrap" style="margin-top:28px;">
-        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input
-          class="search-bar"
-          id="hero-search"
-          type="text"
-          placeholder={market.market === 'fr' ? 'Rechercher par spécialité, lieu...' :
-                       market.market === 'it' ? 'Cerca per specialità, zona...' :
-                       market.market === 'es' || market.market === 'mx' ? 'Buscar por especialidad, zona...' :
-                       'Search by specialty, area, or name...'}
-          autocomplete="off"
-        />
-        <button class="search-btn" onclick="doSearch()" data-i18n="search_btn">Search</button>
-      </div>
+      <h1 class="hero-h1" style="font-style:normal;">
+        <em style="color:#7c3aed;font-style:normal;font-family:'Manrope',system-ui,sans-serif;font-weight:900;">30 days.</em><br>
+        One coach.<br>
+        A community that<br>sees your streak.
+      </h1>
+      <p class="hero-sub" style="margin-left:auto;margin-right:auto;">
+        Join a coach-led accountability club. One daily mission. Your streak is public. The group notices when you miss — and celebrates when you don't.
+      </p>
 
-      <!-- QUICK FILTERS -->
-      <div class="quick-filters" style="justify-content:flex-start;">
-        <a href="/find?specialty=weight-loss" class="qf-pill" data-i18n="filter_weight_loss">Weight Loss</a>
-        <a href="/find?specialty=strength" class="qf-pill" data-i18n="filter_strength">Strength</a>
-        <a href="/find?specialty=hiit" class="qf-pill">HIIT</a>
-        <a href="/find?specialty=nutrition" class="qf-pill" data-i18n="filter_nutrition">Nutrition</a>
-      </div>
-
-      <!-- TRUST STRIP -->
-      <div class="trust-strip">
-        <div class="trust-item"><div class="trust-dot"></div><span>{market.certificationBody} {trustSuffix}</span></div>
-        <div class="trust-item"><div class="trust-dot"></div><span>{trustCheck}</span></div>
-        <div class="trust-item"><div class="trust-dot"></div><span>{trustFree}</span></div>
-      </div>
-    </div>
-
-    <!-- RIGHT COLUMN: Stats grid -->
-    <div class="hero-right">
-      <a href={`/${hero.slug}`} class="ecard ecard-hero" id="hero-trainer-card">
-        <div class="ecard-bg ecard-fallback-a" id="hero-card-bg"></div>
-        <div class="ecard-overlay"></div>
-        <div class="ecard-top">
-          <div class="ecard-badge">
-            <div class="ecard-badge-dot"></div>
-            {market.certificationBody} Verified
-          </div>
+      {nextClub && (
+        <div style="display:inline-block;background:rgba(255,92,0,0.08);border:1px solid rgba(255,92,0,0.2);border-radius:10px;padding:10px 18px;margin-bottom:20px;">
+          <div style="font-size:12px;color:var(--brand);font-weight:600;">🔥 Next cohort: {nextClub.starts_at} — {nextClub.spots_left} spots remaining</div>
         </div>
-        <div class="ecard-bottom">
-          <div class="ecard-name" id="hero-card-name">{hero.name}</div>
-          <div class="ecard-meta" id="hero-card-meta">{hero.meta}</div>
-          <div class="ecard-row">
-            <div class="ecard-price" id="hero-card-price">
-              {hero.price} <span>/ session</span>
-            </div>
-            <span class="ecard-cta">View profile</span>
-          </div>
-        </div>
-      </a>
-      <div class="card-dots">
-        <div class="card-dot card-dot-on"></div>
-        <div class="card-dot card-dot-off"></div>
-        <div class="card-dot card-dot-off"></div>
+      )}
+
+      <div class="hero-actions" style="justify-content:center;">
+        <a href="/find" class="btn-dark">Find your club →</a>
+        <a href="#how-it-works" style="font-size:13px;color:var(--text-2);font-weight:600;text-decoration:none;" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'});return false;">How it works</a>
+      </div>
+
+      <!-- Social proof strip -->
+      <div style="margin-top:20px;font-size:12px;color:var(--text-muted);" id="social-proof-strip">
+        Members checking in today across active clubs
       </div>
     </div>
   </section>
