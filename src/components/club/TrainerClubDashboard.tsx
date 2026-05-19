@@ -26,6 +26,12 @@ interface DashboardData {
     name: string;
     duration_days: number;
     status: string;
+    starts_at?: string | null;
+    season_number?: number | null;
+    price_cents?: number | null;
+    is_free?: boolean | null;
+    goal?: string | null;
+    slug?: string | null;
   };
   stats: {
     total_members: number;
@@ -52,6 +58,9 @@ export function TrainerClubDashboard({ slug, supabaseUrl, supabaseAnonKey }: Pro
   const [editDesc, setEditDesc] = useState('');
   const [saving, setSaving] = useState(false);
   const [shoutoutSending, setShoutoutSending] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [startingSeasonLoading, setStartingSeasonLoading] = useState(false);
+  const [showSeasonButton, setShowSeasonButton] = useState(false);
 
   useEffect(() => {
     const sb = createClient(supabaseUrl, supabaseAnonKey);
@@ -60,6 +69,24 @@ export function TrainerClubDashboard({ slug, supabaseUrl, supabaseAnonKey }: Pro
     });
     loadData();
   }, [slug]);
+
+  useEffect(() => {
+    if (!data?.club?.id) return;
+    const sb = createClient(supabaseUrl, supabaseAnonKey);
+    // Follower count
+    sb.from('club_followers')
+      .select('id', { count: 'exact', head: true })
+      .eq('club_id', data.club.id)
+      .then(({ count: fCount }) => {
+        setFollowerCount(fCount ?? 0);
+      });
+    // Season button visibility
+    const clubData = data.club;
+    const dayNumber = clubData.starts_at
+      ? Math.floor((Date.now() - new Date(clubData.starts_at).getTime()) / 86400000) + 1
+      : 0;
+    setShowSeasonButton(clubData.status === 'active' && dayNumber >= 27);
+  }, [data?.club?.id]);
 
   function loadData() {
     fetch(`${supabaseUrl}/functions/v1/get-club-dashboard?slug=${slug}`, {
@@ -143,7 +170,7 @@ export function TrainerClubDashboard({ slug, supabaseUrl, supabaseAnonKey }: Pro
       </div>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, marginBottom: 20 }}>
         {[
           { value: `${stats.checked_in_today}/${stats.total_members}`, label: 'checked in today', color: '#16a34a' },
           { value: `${stats.avg_completion}%`, label: 'avg completion', color: '#a78bfa' },
@@ -154,6 +181,10 @@ export function TrainerClubDashboard({ slug, supabaseUrl, supabaseAnonKey }: Pro
             <div style={{ fontSize: 10, color: '#888', marginTop: 2 }}>{label}</div>
           </div>
         ))}
+        <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 8, padding: 10, textAlign: 'center' }}>
+          <div style={{ fontSize: 28, fontWeight: 900, color: '#fff' }}>{followerCount}</div>
+          <div style={{ fontSize: 11, color: '#555', marginTop: 4 }}>followers</div>
+        </div>
       </div>
 
       {/* Roster */}
@@ -259,6 +290,47 @@ export function TrainerClubDashboard({ slug, supabaseUrl, supabaseAnonKey }: Pro
           <p style={{ color: '#555', fontSize: 13 }}>Missions are being generated… refresh in 30 seconds.</p>
         )}
       </div>
+
+      {showSeasonButton && (
+        <div style={{ marginTop: 32, padding: '20px', background: 'rgba(124,58,237,0.08)', borderRadius: 12, border: '1px solid rgba(124,58,237,0.2)' }}>
+          <div style={{ fontSize: 13, color: '#a78bfa', fontWeight: 700, marginBottom: 8 }}>Season ending soon</div>
+          <p style={{ fontSize: 13, color: '#888', marginBottom: 16, lineHeight: 1.6 }}>
+            Start Season {(club.season_number ?? 1) + 1} to keep your crew going. AI will generate a fresh 30-day mission set.
+          </p>
+          <button
+            disabled={startingSeasonLoading}
+            onClick={async () => {
+              setStartingSeasonLoading(true);
+              const sb = createClient(supabaseUrl, supabaseAnonKey);
+              const { data: { session } } = await sb.auth.getSession();
+              if (!session) { setStartingSeasonLoading(false); return; }
+              const res = await fetch(`${supabaseUrl}/functions/v1/start-season`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${session.access_token}`,
+                  'apikey': supabaseAnonKey,
+                },
+                body: JSON.stringify({
+                  parent_club_id: club.id,
+                  name: club.name,
+                  goal: club.goal,
+                  price_cents: club.price_cents,
+                  is_free: club.is_free,
+                }),
+              });
+              const resData = await res.json();
+              if (resData.ok && resData.club) {
+                window.location.href = `/dashboard/clubs/${resData.club.slug}`;
+              }
+              setStartingSeasonLoading(false);
+            }}
+            style={{ background: '#7c3aed', border: 'none', borderRadius: 8, padding: '12px 24px', fontSize: 13, fontWeight: 700, color: '#fff', cursor: startingSeasonLoading ? 'not-allowed' : 'pointer', opacity: startingSeasonLoading ? 0.6 : 1, fontFamily: 'inherit' }}
+          >
+            {startingSeasonLoading ? 'Creating Season…' : `Start Season ${(club.season_number ?? 1) + 1} →`}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
