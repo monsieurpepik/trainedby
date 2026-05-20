@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { VideoLibrary } from './VideoLibrary';
 
@@ -38,7 +38,7 @@ export function VideoLibraryView({ trainerSlug, supabaseUrl, supabaseAnonKey }: 
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [subscribing, setSubscribing] = useState(false);
 
-  const sb = createClient(supabaseUrl, supabaseAnonKey);
+  const sb = useMemo(() => createClient(supabaseUrl, supabaseAnonKey), [supabaseUrl, supabaseAnonKey]);
 
   useEffect(() => {
     async function load() {
@@ -88,7 +88,7 @@ export function VideoLibraryView({ trainerSlug, supabaseUrl, supabaseAnonKey }: 
       setState('ready');
     }
     load();
-  }, [trainerSlug]);
+  }, [trainerSlug, supabaseUrl, supabaseAnonKey, sb]);
 
   async function handleSubscribe() {
     if (!accessToken) {
@@ -107,9 +107,22 @@ export function VideoLibraryView({ trainerSlug, supabaseUrl, supabaseAnonKey }: 
         },
         body: JSON.stringify({ trainer_id: trainer.id }),
       });
+
+      if (!res.ok) {
+        console.error(`Subscription request failed: ${res.status} ${res.statusText}`);
+        return;
+      }
+
       const data = await res.json();
+      if (!data) {
+        console.error('Subscription response is empty or invalid');
+        return;
+      }
+
       if (data.checkout_url) window.location.href = data.checkout_url;
       if (data.already_subscribed) setIsSubscriber(true);
+    } catch (error) {
+      console.error('Subscription error:', error);
     } finally {
       setSubscribing(false);
     }
