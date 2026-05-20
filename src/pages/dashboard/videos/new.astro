@@ -1,0 +1,17 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { VideoUploadDashboard } from '../../../components/video/VideoUploadDashboard';
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL ?? '';
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+---
+<Base title="Upload Video — TrainedBy" description="Upload a workout video">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0e0d; color: #fff; font-family: 'Manrope', system-ui, sans-serif; min-height: 100vh; }
+</style>
+<VideoUploadDashboard
+  client:load
+  supabaseUrl={SUPABASE_URL}
+  supabaseAnonKey={SUPABASE_ANON_KEY}
+/>
+</Base>
