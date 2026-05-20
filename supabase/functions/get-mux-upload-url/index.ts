@@ -20,7 +20,15 @@ serve(async (req) => {
     });
   }
 
-  const { title, description, is_free } = await req.json();
+  let body: { title?: string; description?: string; is_free?: boolean };
+  try {
+    body = await req.json();
+  } catch {
+    return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+      status: 400, headers: { ...corsHeaders, "content-type": "application/json" }
+    });
+  }
+  const { title, description, is_free } = body;
   if (!title) {
     return new Response(JSON.stringify({ error: "title required" }), {
       status: 400, headers: { ...corsHeaders, "content-type": "application/json" }
@@ -42,9 +50,33 @@ serve(async (req) => {
     });
   }
 
+  // Insert video record FIRST (before calling Mux) to avoid orphaned Mux uploads
+  const { data: video, error: insertErr } = await sb
+    .from("videos")
+    .insert({
+      trainer_id: trainer.id,
+      title,
+      description: description ?? null,
+      is_free: is_free ?? false,
+      status: "processing",
+    })
+    .select("id")
+    .single();
+
+  if (insertErr || !video) {
+    return new Response(JSON.stringify({ error: insertErr?.message ?? "Insert failed" }), {
+      status: 500, headers: { ...corsHeaders, "content-type": "application/json" }
+    });
+  }
+
   // Create Mux direct upload URL
-  const muxTokenId = Deno.env.get("MUX_TOKEN_ID")!;
-  const muxTokenSecret = Deno.env.get("MUX_TOKEN_SECRET")!;
+  const muxTokenId = Deno.env.get("MUX_TOKEN_ID");
+  const muxTokenSecret = Deno.env.get("MUX_TOKEN_SECRET");
+  if (!muxTokenId || !muxTokenSecret) {
+    return new Response(JSON.stringify({ error: "Server misconfiguration" }), {
+      status: 500, headers: { ...corsHeaders, "content-type": "application/json" }
+    });
+  }
   const muxAuth = btoa(`${muxTokenId}:${muxTokenSecret}`);
 
   const muxRes = await fetch("https://api.mux.com/video/v1/uploads", {
@@ -61,6 +93,8 @@ serve(async (req) => {
 
   if (!muxRes.ok) {
     const err = await muxRes.text();
+    // Mark the video record as errored since we can't get an upload URL
+    await sb.from("videos").update({ status: "errored" }).eq("id", video.id);
     return new Response(JSON.stringify({ error: `Mux error: ${err}` }), {
       status: 500, headers: { ...corsHeaders, "content-type": "application/json" }
     });
@@ -70,25 +104,8 @@ serve(async (req) => {
   const uploadId = muxData.data.id as string;
   const uploadUrl = muxData.data.url as string;
 
-  // Insert video record in processing state
-  const { data: video, error: insertErr } = await sb
-    .from("videos")
-    .insert({
-      trainer_id: trainer.id,
-      title,
-      description: description ?? null,
-      is_free: is_free ?? false,
-      mux_upload_id: uploadId,
-      status: "processing",
-    })
-    .select("id")
-    .single();
-
-  if (insertErr || !video) {
-    return new Response(JSON.stringify({ error: insertErr?.message ?? "Insert failed" }), {
-      status: 500, headers: { ...corsHeaders, "content-type": "application/json" }
-    });
-  }
+  // Update the video record with the Mux upload ID
+  await sb.from("videos").update({ mux_upload_id: uploadId }).eq("id", video.id);
 
   return new Response(JSON.stringify({ ok: true, upload_url: uploadUrl, video_id: video.id }), {
     headers: { ...corsHeaders, "content-type": "application/json" }
