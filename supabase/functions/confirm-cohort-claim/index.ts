@@ -5,31 +5,28 @@ import { createLogger } from "../_shared/logger.ts";
 const logger = createLogger("confirm-cohort-claim");
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-      },
-    });
+  // Internal-only: verify shared secret
+  const INTERNAL_SECRET = Deno.env.get("INTERNAL_WEBHOOK_SECRET");
+  const authHeader = req.headers.get("authorization") ?? "";
+  if (!INTERNAL_SECRET || authHeader !== `Bearer ${INTERNAL_SECRET}`) {
+    return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
   }
 
   let body: {
     live_session_id: string;
     user_id: string;
-    tier_price_cents: number;
     stripe_checkout_id: string;
   };
 
   try {
     body = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400 });
+    return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: { "Content-Type": "application/json" } });
   }
 
   const { live_session_id, user_id, stripe_checkout_id } = body;
   if (!live_session_id || !user_id || !stripe_checkout_id) {
-    return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400 });
+    return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400, headers: { "Content-Type": "application/json" } });
   }
 
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -40,10 +37,15 @@ Deno.serve(async (req) => {
 
   try {
     // 1. Update drop claim to paid
-    await sb
+    const { error: claimErr } = await sb
       .from("live_drop_claims")
       .update({ status: "paid" })
       .eq("stripe_checkout_id", stripe_checkout_id);
+
+    if (claimErr) {
+      logger.error("Failed to update claim status", { stripe_checkout_id, error: claimErr.message });
+      return new Response(JSON.stringify({ error: "claim_update_failed" }), { status: 500, headers: { "Content-Type": "application/json" } });
+    }
 
     // 2. Fetch session for title + trainer_id + trainer name
     const { data: session, error: sessionErr } = await sb
@@ -54,7 +56,7 @@ Deno.serve(async (req) => {
 
     if (sessionErr || !session) {
       logger.error("Session not found", { live_session_id });
-      return new Response(JSON.stringify({ error: "session_not_found" }), { status: 404 });
+      return new Response(JSON.stringify({ error: "session_not_found" }), { status: 404, headers: { "Content-Type": "application/json" } });
     }
 
     const trainerName = (session.trainers as { name: string } | null)?.name ?? "Your trainer";
@@ -72,20 +74,25 @@ Deno.serve(async (req) => {
           ends_at: endsAt,
           status: "active",
         },
-        { onConflict: "live_session_id" }
+        { onConflict: "live_session_id", ignoreDuplicates: true }
       )
       .select()
       .single();
 
     if (cohortErr || !cohort) {
       logger.error("Failed to upsert cohort", { error: cohortErr?.message });
-      return new Response(JSON.stringify({ error: "cohort_create_failed" }), { status: 500 });
+      return new Response(JSON.stringify({ error: "cohort_create_failed" }), { status: 500, headers: { "Content-Type": "application/json" } });
     }
 
     // 4. Insert cohort_member (ignore if already exists)
-    await sb
+    const { error: memberErr } = await sb
       .from("cohort_members")
       .upsert({ cohort_id: cohort.id, user_id }, { onConflict: "cohort_id,user_id", ignoreDuplicates: true });
+
+    if (memberErr) {
+      logger.error("Failed to upsert cohort member", { cohort_id: cohort.id, user_id, error: memberErr.message });
+      return new Response(JSON.stringify({ error: "member_insert_failed" }), { status: 500, headers: { "Content-Type": "application/json" } });
+    }
 
     // 5. Broadcast cohort_confirmed on cohort-room:{live_session_id}
     try {
@@ -123,6 +130,6 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     logger.error("confirm-cohort-claim error", { error: String(err) });
-    return new Response(JSON.stringify({ error: "internal_error" }), { status: 500 });
+    return new Response(JSON.stringify({ error: "internal_error" }), { status: 500, headers: { "Content-Type": "application/json" } });
   }
 });

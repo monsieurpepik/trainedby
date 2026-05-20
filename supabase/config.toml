@@ -467,3 +467,7 @@ verify_jwt = false
 [functions.mux-live-webhook]
 # Receives Mux live stream events - no JWT, secured by mux-signature header
 verify_jwt = false
+
+[functions.confirm-cohort-claim]
+# Internal function called by live-drop-webhook - no JWT, secured by INTERNAL_WEBHOOK_SECRET
+verify_jwt = false
