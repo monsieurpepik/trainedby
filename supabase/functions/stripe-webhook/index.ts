@@ -88,6 +88,30 @@ Deno.serve(async (req) => {
           }
 
           logger.info("Checkout completed  -  trainer upgraded", { trainer_id, plan, market });
+        } else if (session.metadata?.live_session_id && session.metadata?.user_id) {
+          const live_session_id = session.metadata.live_session_id;
+          const claim_user_id = session.metadata.user_id;
+          const stripe_checkout_id = session.id;
+
+          const SELF_BASE = `${Deno.env.get("SUPABASE_URL")}/functions/v1`;
+          const internalSecret = Deno.env.get("INTERNAL_WEBHOOK_SECRET");
+
+          if (internalSecret) {
+            await fetch(`${SELF_BASE}/confirm-cohort-claim`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${internalSecret}`,
+              },
+              body: JSON.stringify({
+                live_session_id,
+                user_id: claim_user_id,
+                stripe_checkout_id,
+              }),
+            }).catch((e) => logger.error("confirm-cohort-claim call failed", { error: String(e) }));
+          } else {
+            logger.error("INTERNAL_WEBHOOK_SECRET not set — cannot confirm cohort claim", { live_session_id });
+          }
         }
         break;
       }
