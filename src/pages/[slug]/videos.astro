@@ -1,0 +1,20 @@
+---
+import Base from '../../layouts/Base.astro';
+import { VideoLibraryView } from '../../components/video/VideoLibraryView';
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL ?? '';
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/find');
+---
+<Base title="Workout Videos — TrainedBy" description="Watch workout videos from this coach">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0e0d; color: #fff; font-family: 'Manrope', system-ui, sans-serif; min-height: 100vh; }
+</style>
+<VideoLibraryView
+  client:load
+  trainerSlug={slug}
+  supabaseUrl={SUPABASE_URL}
+  supabaseAnonKey={SUPABASE_ANON_KEY}
+/>
+</Base>
