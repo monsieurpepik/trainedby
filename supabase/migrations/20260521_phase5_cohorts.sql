@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS cohorts (
   starts_at       timestamptz NOT NULL DEFAULT now(),
   ends_at         timestamptz NOT NULL,
   status          text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'completed')),
-  created_at      timestamptz NOT NULL DEFAULT now()
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT cohorts_dates_check CHECK (ends_at > starts_at)
 );
 CREATE INDEX IF NOT EXISTS cohorts_trainer_idx ON cohorts(trainer_id);
 CREATE INDEX IF NOT EXISTS cohorts_status_idx ON cohorts(status);
@@ -122,7 +123,6 @@ CREATE TABLE IF NOT EXISTS cohort_messages (
   text         text NOT NULL,
   created_at   timestamptz NOT NULL DEFAULT now()
 );
-CREATE INDEX IF NOT EXISTS cohort_messages_cohort_idx ON cohort_messages(cohort_id);
 CREATE INDEX IF NOT EXISTS cohort_messages_created_idx ON cohort_messages(cohort_id, created_at DESC);
 ALTER TABLE cohort_messages ENABLE ROW LEVEL SECURITY;
 
@@ -174,11 +174,19 @@ END $outer$;
 
 -- pg_cron: mark cohorts as completed daily when ends_at has passed
 DO $outer$ BEGIN
-  PERFORM cron.schedule(
-    'complete-expired-cohorts',
-    '0 3 * * *',
-    'UPDATE cohorts SET status = ''completed'' WHERE ends_at < now() AND status = ''active'''
-  );
-EXCEPTION WHEN undefined_table THEN
-  NULL;
+  IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN
+    PERFORM cron.unschedule('complete-expired-cohorts');
+  END IF;
+EXCEPTION WHEN OTHERS THEN NULL;
+END $outer$;
+
+DO $outer$ BEGIN
+  IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN
+    PERFORM cron.schedule(
+      'complete-expired-cohorts',
+      '0 3 * * *',
+      $$UPDATE cohorts SET status = 'completed' WHERE ends_at < now() AND status = 'active'$$
+    );
+  END IF;
+EXCEPTION WHEN OTHERS THEN NULL;
 END $outer$;
