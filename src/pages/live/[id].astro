@@ -1,0 +1,15 @@
+---
+import Base from '../../layouts/Base.astro';
+import { LiveWatchView } from '../../components/live/LiveWatchView';
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/find');
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL ?? '';
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+---
+<Base title="Live — TrainedBy" description="Watch live workout">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0f0e0d; color: #fff; font-family: 'Manrope', system-ui, sans-serif; min-height: 100vh; }
+  </style>
+  <LiveWatchView client:load liveSessionId={id} supabaseUrl={SUPABASE_URL} supabaseAnonKey={SUPABASE_ANON_KEY} />
+</Base>
