@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { createHmac } from "https://deno.land/std@0.168.0/node/crypto.ts";
+import { createHmac, timingSafeEqual } from "https://deno.land/std@0.168.0/node/crypto.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,7 +24,9 @@ serve(async (req) => {
     const hmac = createHmac("sha256", webhookSecret);
     hmac.update(payload);
     const computedSig = hmac.digest("hex");
-    if (computedSig !== expectedSig) {
+    const computedSigBytes = Buffer.from(computedSig, 'hex');
+    const expectedSigBytes = Buffer.from(expectedSig, 'hex');
+    if (computedSigBytes.length !== expectedSigBytes.length || !timingSafeEqual(computedSigBytes, expectedSigBytes)) {
       return new Response(JSON.stringify({ error: "Invalid signature" }), {
         status: 401, headers: { ...corsHeaders, "content-type": "application/json" }
       });
@@ -56,7 +58,7 @@ serve(async (req) => {
 
     // Find video by upload_id
     if (uploadId) {
-      await sb
+      const { error: dbErr } = await sb
         .from("videos")
         .update({
           mux_asset_id: assetId,
@@ -66,14 +68,24 @@ serve(async (req) => {
           status: "ready",
         })
         .eq("mux_upload_id", uploadId);
+      if (dbErr) {
+        return new Response(JSON.stringify({ error: "db_error" }), {
+          status: 500, headers: { ...corsHeaders, "content-type": "application/json" }
+        });
+      }
     }
   } else if (event.type === "video.asset.errored") {
     const uploadId = event.data.upload_id as string | undefined;
     if (uploadId) {
-      await sb
+      const { error: dbErr } = await sb
         .from("videos")
         .update({ status: "errored" })
         .eq("mux_upload_id", uploadId);
+      if (dbErr) {
+        return new Response(JSON.stringify({ error: "db_error" }), {
+          status: 500, headers: { ...corsHeaders, "content-type": "application/json" }
+        });
+      }
     }
   }
 
