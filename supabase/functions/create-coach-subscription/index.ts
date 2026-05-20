@@ -40,11 +40,17 @@ serve(async (req) => {
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
   // Fetch trainer + subscription price
-  const { data: trainer } = await sb
+  const { data: trainer, error: trainerErr } = await sb
     .from("trainers")
     .select("id, slug, name, subscription_price_cents")
     .eq("id", trainer_id)
     .maybeSingle();
+
+  if (trainerErr) {
+    return new Response(JSON.stringify({ error: "Database error" }), {
+      status: 500, headers: { ...corsHeaders, "content-type": "application/json" }
+    });
+  }
 
   if (!trainer || !trainer.subscription_price_cents) {
     return new Response(JSON.stringify({ error: "Trainer does not have a subscription product" }), {
@@ -53,14 +59,20 @@ serve(async (req) => {
   }
 
   // Check if user already has an active subscription
-  const { data: existing } = await sb
+  const { data: existing, error: existingErr } = await sb
     .from("coach_subscriptions")
     .select("id, status")
     .eq("trainer_id", trainer_id)
     .eq("subscriber_id", user.id)
     .maybeSingle();
 
-  if (existing && existing.status === "active") {
+  if (existingErr) {
+    return new Response(JSON.stringify({ error: "Database error" }), {
+      status: 500, headers: { ...corsHeaders, "content-type": "application/json" }
+    });
+  }
+
+  if (existing && (existing.status === "active" || existing.status === "trialing")) {
     return new Response(JSON.stringify({ ok: true, already_subscribed: true, checkout_url: null }), {
       headers: { ...corsHeaders, "content-type": "application/json" }
     });
@@ -71,25 +83,32 @@ serve(async (req) => {
   const successUrl = return_url ?? `${siteUrl}/${trainer.slug}/videos?subscribed=1`;
   const cancelUrl = return_url ?? `${siteUrl}/${trainer.slug}/videos`;
 
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
-    mode: "subscription",
-    customer_email: user.email ?? undefined,
-    line_items: [{
-      price_data: {
-        currency: "usd",
-        recurring: { interval: "month" },
-        unit_amount: trainer.subscription_price_cents,
-        product_data: {
-          name: `${trainer.name} — Monthly Video Access`,
+  let session: { url: string | null };
+  try {
+    session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "subscription",
+      customer_email: user.email ?? undefined,
+      line_items: [{
+        price_data: {
+          currency: "usd",
+          recurring: { interval: "month" },
+          unit_amount: trainer.subscription_price_cents,
+          product_data: {
+            name: `${trainer.name} — Monthly Video Access`,
+          },
         },
-      },
-      quantity: 1,
-    }],
-    success_url: `${successUrl}&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: cancelUrl,
-    metadata: { trainer_id, subscriber_id: user.id },
-  });
+        quantity: 1,
+      }],
+      success_url: `${successUrl}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl,
+      metadata: { trainer_id, subscriber_id: user.id },
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: `Stripe error: ${err instanceof Error ? err.message : err}` }), {
+      status: 500, headers: { ...corsHeaders, "content-type": "application/json" }
+    });
+  }
 
   return new Response(JSON.stringify({ ok: true, checkout_url: session.url }), {
     headers: { ...corsHeaders, "content-type": "application/json" }
