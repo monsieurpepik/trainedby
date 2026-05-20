@@ -88,30 +88,34 @@ Deno.serve(async (req) => {
       .upsert({ cohort_id: cohort.id, user_id }, { onConflict: "cohort_id,user_id", ignoreDuplicates: true });
 
     // 5. Broadcast cohort_confirmed on cohort-room:{live_session_id}
-    await fetch(`${SUPABASE_URL}/realtime/v1/broadcast`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": ANON_KEY,
-        "Authorization": `Bearer ${SERVICE_KEY}`,
-      },
-      body: JSON.stringify({
-        messages: [
-          {
-            topic: `realtime:cohort-room:${live_session_id}`,
-            event: "cohort_confirmed",
-            payload: {
-              cohort_id: cohort.id,
-              title: cohort.title,
-              trainer_name: trainerName,
-              starts_at: cohort.starts_at,
-              ends_at: cohort.ends_at,
+    try {
+      await fetch(`${SUPABASE_URL}/realtime/v1/broadcast`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": ANON_KEY,
+          "Authorization": `Bearer ${SERVICE_KEY}`,
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              topic: `realtime:cohort-room:${live_session_id}`,
+              event: "cohort_confirmed",
+              payload: {
+                cohort_id: cohort.id,
+                title: cohort.title,
+                trainer_name: trainerName,
+                starts_at: cohort.starts_at,
+                ends_at: cohort.ends_at,
+              },
+              private: false,
             },
-            private: false,
-          },
-        ],
-      }),
-    });
+          ],
+        }),
+      });
+    } catch (broadcastErr) {
+      logger.warn("Broadcast failed (best-effort)", { error: String(broadcastErr) });
+    }
 
     logger.info("Cohort confirmed", { cohort_id: cohort.id, user_id });
     return new Response(JSON.stringify({ ok: true, cohort_id: cohort.id }), {
