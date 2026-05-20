@@ -14,23 +14,26 @@ serve(async (req) => {
 
   // Verify Mux webhook signature
   const webhookSecret = Deno.env.get("MUX_WEBHOOK_SECRET");
-  if (webhookSecret) {
-    const muxSignature = req.headers.get("mux-signature") ?? "";
-    // Mux signature format: "t=<timestamp>,v1=<signature>"
-    const parts = Object.fromEntries(muxSignature.split(",").map(p => p.split("=")));
-    const timestamp = parts["t"] ?? "";
-    const expectedSig = parts["v1"] ?? "";
-    const payload = `${timestamp}.${body}`;
-    const hmac = createHmac("sha256", webhookSecret);
-    hmac.update(payload);
-    const computedSig = hmac.digest("hex");
-    const computedSigBytes = Buffer.from(computedSig, 'hex');
-    const expectedSigBytes = Buffer.from(expectedSig, 'hex');
-    if (computedSigBytes.length !== expectedSigBytes.length || !timingSafeEqual(computedSigBytes, expectedSigBytes)) {
-      return new Response(JSON.stringify({ error: "Invalid signature" }), {
-        status: 401, headers: { ...corsHeaders, "content-type": "application/json" }
-      });
-    }
+  if (!webhookSecret) {
+    return new Response(JSON.stringify({ error: "Server misconfiguration" }), {
+      status: 500, headers: { ...corsHeaders, "content-type": "application/json" }
+    });
+  }
+  const muxSignature = req.headers.get("mux-signature") ?? "";
+  // Mux signature format: "t=<timestamp>,v1=<signature>"
+  const parts = Object.fromEntries(muxSignature.split(",").map(p => p.split("=")));
+  const timestamp = parts["t"] ?? "";
+  const expectedSig = parts["v1"] ?? "";
+  const payload = `${timestamp}.${body}`;
+  const hmac = createHmac("sha256", webhookSecret);
+  hmac.update(payload);
+  const computedSig = hmac.digest("hex");
+  const computedSigBytes = Buffer.from(computedSig, 'hex');
+  const expectedSigBytes = Buffer.from(expectedSig, 'hex');
+  if (computedSigBytes.length !== expectedSigBytes.length || !timingSafeEqual(computedSigBytes, expectedSigBytes)) {
+    return new Response(JSON.stringify({ error: "Invalid signature" }), {
+      status: 401, headers: { ...corsHeaders, "content-type": "application/json" }
+    });
   }
 
   let event: { type: string; data: Record<string, unknown> };

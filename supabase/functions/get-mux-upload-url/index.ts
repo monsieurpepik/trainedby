@@ -86,8 +86,8 @@ serve(async (req) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      new_asset_settings: { playback_policy: ["public"] },
-      cors_origin: "*",
+      new_asset_settings: { playback_policy: ["signed"] },
+      cors_origin: Deno.env.get("PUBLIC_SITE_URL") ?? "*",
     }),
   });
 
