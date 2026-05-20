@@ -7,6 +7,18 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function mapStripeStatus(stripeStatus: string): string {
+  switch (stripeStatus) {
+    case "active":     return "active";
+    case "past_due":   return "past_due";
+    case "trialing":   return "trialing";
+    case "unpaid":     return "unpaid";
+    case "incomplete": return "incomplete";
+    case "incomplete_expired": return "incomplete_expired";
+    default:           return "canceled"; // covers: "canceled", "paused", any future Stripe statuses
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -52,7 +64,7 @@ serve(async (req) => {
         subscriber_id: subscriberId,
         stripe_subscription_id: sub.id,
         stripe_customer_id: typeof sub.customer === "string" ? sub.customer : (sub.customer as Stripe.Customer).id,
-        status: sub.status === "active" ? "active" : sub.status === "past_due" ? "past_due" : sub.status === "trialing" ? "trialing" : "canceled",
+        status: mapStripeStatus(sub.status),
         price_cents: priceAmount,
         current_period_end: currentPeriodEnd,
       }, { onConflict: "trainer_id,subscriber_id" });
