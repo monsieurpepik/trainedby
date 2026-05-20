@@ -459,3 +459,11 @@ verify_jwt = false
 [functions.club-daily-nudge]
 # Called by external cron trigger  -  no JWT, secured by x-cron-secret header
 verify_jwt = false
+
+[functions.live-drop-webhook]
+# Receives Stripe checkout.session.completed for live season drops - no JWT, secured by Stripe-Signature header
+verify_jwt = false
+
+[functions.mux-live-webhook]
+# Receives Mux live stream events - no JWT, secured by mux-signature header
+verify_jwt = false
