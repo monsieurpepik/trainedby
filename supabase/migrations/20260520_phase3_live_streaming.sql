@@ -63,7 +63,7 @@ END $$;
 CREATE TABLE IF NOT EXISTS live_drop_claims (
   id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   live_session_id     uuid REFERENCES live_sessions(id) NOT NULL,
-  user_id             uuid REFERENCES users(id) NOT NULL,
+  user_id             uuid REFERENCES users(id) ON DELETE CASCADE NOT NULL,
   stripe_checkout_id  text NOT NULL UNIQUE,
   tier_price_cents    int NOT NULL,
   status              text NOT NULL DEFAULT 'pending',
@@ -103,6 +103,9 @@ BEGIN
   IF sess.status != 'live' THEN RETURN json_build_object('error', 'session_not_live'); END IF;
   IF NOT sess.is_season_drop THEN RETURN json_build_object('error', 'not_a_season_drop'); END IF;
   tiers := sess.drop_tiers;
+  IF tiers IS NULL OR jsonb_array_length(tiers) = 0 THEN
+    RETURN json_build_object('error', 'no_tiers_configured');
+  END IF;
   FOR i IN 0..jsonb_array_length(tiers)-1 LOOP
     tier := tiers->i;
     IF (tier->>'total_spots')::int = 0 OR (tier->>'claimed')::int < (tier->>'total_spots')::int THEN
