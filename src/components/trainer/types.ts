@@ -25,6 +25,7 @@ export interface Trainer {
   total_clients?: number;
   client_count?: number;
   goal_achievement_rate?: number | null;
+  subscription_price_cents?: number | null;
 }
 
 export interface Package {

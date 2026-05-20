@@ -181,6 +181,17 @@ export default function TrainerProfile({
                 />
               )}
               <ClubsSection trainerId={trainer.id} />
+              {trainer.subscription_price_cents && trainer.subscription_price_cents > 0 && (
+                <div style={{ margin: '0 16px 16px', padding: '20px 24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)', marginBottom: '4px' }}>Video library</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-2)' }}>Workouts, tutorials &amp; coaching content</div>
+                  </div>
+                  <a href={`/${slug}/videos`} style={{ flexShrink: 0, background: 'var(--brand)', color: '#fff', padding: '10px 18px', borderRadius: '10px', textDecoration: 'none', fontWeight: 700, fontSize: '13px' }}>
+                    Browse videos
+                  </a>
+                </div>
+              )}
               <About bio={bio} />
               <Reviews
                 trainerId={trainer.id}

@@ -19,7 +19,7 @@ serve(async (req) => {
     // Fetch trainer
     const { data: trainer, error } = await sb
       .from("trainers")
-      .select("id,slug,name,title,bio,avatar_url,cover_url,specialties,certifications,reps_number,reps_level,reps_verified,years_experience,clients_trained,sessions_delivered,avg_rating,review_count,locations,city,phone,instagram,tiktok,youtube,accepting_clients,gallery_urls,plan,verification_status,created_at,stripe_connect_onboarded")
+      .select("id,slug,name,title,bio,avatar_url,cover_url,specialties,certifications,reps_number,reps_level,reps_verified,years_experience,clients_trained,sessions_delivered,avg_rating,review_count,locations,city,phone,instagram,tiktok,youtube,accepting_clients,gallery_urls,plan,verification_status,created_at,stripe_connect_onboarded,subscription_price_cents")
       .eq("slug", slug.toLowerCase())
       .single();
 
