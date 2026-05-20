@@ -35,11 +35,11 @@ export function LiveWatchView({ liveSessionId, supabaseUrl, supabaseAnonKey }: P
   const [userName, setUserName] = useState<string>("Guest");
   const [claiming, setClaiming] = useState(false);
 
+  // Effect 1: Fetch session + listen for status updates
   useEffect(() => {
     let alive = true;
 
-    async function join() {
-      // Fetch session metadata
+    (async () => {
       const { data: sess, error: sessErr } = await sb.from("live_sessions")
         .select("id, title, status, is_season_drop, drop_tiers, trainer_id")
         .eq("id", liveSessionId)
@@ -47,10 +47,28 @@ export function LiveWatchView({ liveSessionId, supabaseUrl, supabaseAnonKey }: P
       if (!alive) return;
       if (sessErr || !sess) { setError("Session not found"); return; }
       setSession(sess as Session);
+    })();
 
-      if (sess.status !== "live") return; // scheduled or ended — no need to join
+    const channel = sb.channel(`live:${liveSessionId}`)
+      .on("postgres_changes",
+        { event: "UPDATE", schema: "public", table: "live_sessions", filter: `id=eq.${liveSessionId}` },
+        (payload) => {
+          setSession((s) => s ? { ...s, ...(payload.new as Session) } : s);
+        })
+      .subscribe();
 
+    return () => { alive = false; sb.removeChannel(channel); };
+  }, [sb, liveSessionId]);
+
+  // Effect 2: Join when session goes live and we don't have playback yet
+  useEffect(() => {
+    if (!session || session.status !== "live" || playback) return;
+
+    let alive = true;
+
+    (async () => {
       const { data: { session: authSess } } = await sb.auth.getSession();
+      if (!alive) return;
       if (!authSess) {
         setError("Please sign in to watch");
         return;
@@ -71,37 +89,22 @@ export function LiveWatchView({ liveSessionId, supabaseUrl, supabaseAnonKey }: P
       if (resp.status === 403 && json?.error === "paywall") {
         const { data: trainer } = await sb.from("trainers")
           .select("slug")
-          .eq("id", sess.trainer_id)
+          .eq("id", session.trainer_id)
           .maybeSingle();
+        if (!alive) return;
         setPaywall({ trainerSlug: trainer?.slug ?? "" });
         return;
       }
       if (!resp.ok) { setError(json?.error ?? "Could not join session"); return; }
       setPlayback({ playbackId: json.playback_id, token: json.token });
-    }
+    })();
 
-    join();
-
-    // Realtime: detect status changes (scheduled → live → ended)
-    const channel = sb.channel(`live:${liveSessionId}`)
-      .on("postgres_changes",
-        { event: "UPDATE", schema: "public", table: "live_sessions", filter: `id=eq.${liveSessionId}` },
-        (payload) => {
-          if (!alive) return;
-          setSession((s) => s ? { ...s, ...(payload.new as Session) } : s);
-          // If session just went live and we don't have playback yet, re-join
-          if ((payload.new as Session).status === "live" && !playback) {
-            join();
-          }
-        })
-      .subscribe();
-
-    return () => { alive = false; sb.removeChannel(channel); };
-  }, [sb, liveSessionId, supabaseUrl, supabaseAnonKey]);
+    return () => { alive = false; };
+  }, [sb, session?.status, liveSessionId, supabaseUrl, supabaseAnonKey]);
 
   const handleClaim = async () => {
-    const { data: { session: authSess } } = await sb.auth.getSession();
-    if (!authSess) { window.location.href = "/join"; return; }
+    const { data: { session: authSess }, error: sessErr } = await sb.auth.getSession();
+    if (sessErr || !authSess) { window.location.href = "/join"; return; }
     setClaiming(true);
     try {
       const resp = await fetch(`${supabaseUrl}/functions/v1/claim-live-drop-spot`, {
