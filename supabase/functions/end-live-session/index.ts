@@ -48,10 +48,13 @@ serve(async (req) => {
     const muxTokenSecret = Deno.env.get("MUX_TOKEN_SECRET");
     if (muxTokenId && muxTokenSecret) {
       const muxAuth = btoa(`${muxTokenId}:${muxTokenSecret}`);
-      await fetch(`https://api.mux.com/video/v1/live-streams/${session.mux_stream_id}/disable`, {
+      const disableResp = await fetch(`https://api.mux.com/video/v1/live-streams/${session.mux_stream_id}/disable`, {
         method: "PUT",
         headers: { "Authorization": `Basic ${muxAuth}` },
       });
+      if (!disableResp.ok) {
+        console.error(`Mux disable failed for stream ${session.mux_stream_id}: ${disableResp.status}`);
+      }
     }
   }
 

@@ -41,6 +41,9 @@ serve(async (req) => {
     if (tiers.some((t) => t.price_cents <= 0)) {
       return new Response(JSON.stringify({ error: "tier price_cents must be > 0" }), { status: 400, headers: { ...corsHeaders, "content-type": "application/json" } });
     }
+    if (tiers.some((t) => t.total_spots <= 0)) {
+      return new Response(JSON.stringify({ error: "tier total_spots must be > 0" }), { status: 400, headers: { ...corsHeaders, "content-type": "application/json" } });
+    }
   }
 
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -80,6 +83,9 @@ serve(async (req) => {
   const muxJson = await muxResp.json();
   const muxStream = muxJson.data;
   const playbackId = muxStream.playback_ids?.[0]?.id;
+  if (!playbackId) {
+    return new Response(JSON.stringify({ error: "mux_no_playback_id" }), { status: 502, headers: { ...corsHeaders, "content-type": "application/json" } });
+  }
 
   const { data: session, error: insErr } = await sb.from("live_sessions").insert({
     trainer_id: trainer.id,
