@@ -64,7 +64,9 @@ Deno.serve(async (req) => {
     // 3. Upsert cohort (one cohort per live_session_id)
     const endsAt = new Date(Date.now() + 8 * 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    const { data: cohort, error: cohortErr } = await sb
+    // ignoreDuplicates: true means ON CONFLICT DO NOTHING — returns nothing on conflict.
+    // Fall back to a SELECT if the upsert returns no row (cohort already existed).
+    const { data: upsertedCohort } = await sb
       .from("cohorts")
       .upsert(
         {
@@ -77,10 +79,17 @@ Deno.serve(async (req) => {
         { onConflict: "live_session_id", ignoreDuplicates: true }
       )
       .select()
-      .single();
+      .maybeSingle();
 
-    if (cohortErr || !cohort) {
-      logger.error("Failed to upsert cohort", { error: cohortErr?.message });
+    const cohort = upsertedCohort ?? (await sb
+      .from("cohorts")
+      .select()
+      .eq("live_session_id", live_session_id)
+      .single()
+    ).data;
+
+    if (!cohort) {
+      logger.error("Failed to upsert or fetch cohort", { live_session_id });
       return new Response(JSON.stringify({ error: "cohort_create_failed" }), { status: 500, headers: { "Content-Type": "application/json" } });
     }
 
